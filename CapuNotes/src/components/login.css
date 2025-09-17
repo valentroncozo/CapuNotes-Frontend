@@ -1,0 +1,68 @@
+/* Fondo general */
+.login-container {
+  min-height: 100vh;
+  width: 100vw;
+  background-image: url('/fondo.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Bloque azul con onda */
+.login-form-onda {
+  background: #0d0c2b;
+  width: 340px;
+  padding: 2.5rem 2rem 2rem 2rem;
+  border-radius: 40px 40px 60px 60px / 20px 20px 80px 80px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1;
+  margin-top: 120px;
+}
+
+.logo-text {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 2.5rem;
+  color: white;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.logo-icon {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Inputs y botón igual que antes */
+.input-group-text {
+  background-color: #1e1b4b;
+  color: white;
+  border: none;
+}
+
+.form-control {
+  background-color: #1e1b4b;
+  color: white;
+  border: none;
+}
+
+.form-control::placeholder {
+  color: #b0b0b0;
+}
+
+.btn-ingresar {
+  background-color: #f3a21d;
+  border: none;
+  font-weight: bold;
+  border-radius: 20px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.btn-ingresar:hover {
+  background-color: #d98f16;
+}
