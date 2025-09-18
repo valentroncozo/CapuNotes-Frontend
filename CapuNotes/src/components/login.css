@@ -6,29 +6,66 @@
   background-size: cover;
   background-position: center;
   display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   align-items: center;
-  justify-content: center;
   position: relative;
+  overflow: hidden;
 }
 
-/* Bloque azul con onda */
+/* Onda azul arriba del bloque */
+.onda-superior {
+  position: absolute;
+  left: 0;
+  top: auto;
+  bottom: 180px; /* Ajusta según la altura del bloque azul */
+  width: 100vw;
+  height: 80px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.onda-superior svg {
+  width: 100vw;
+  height: 80px;
+  display: block;
+}
+
+/* Bloque azul ocupa todo el ancho inferior */
 .login-form-onda {
   background: #0d0c2b;
-  width: 340px;
-  padding: 2.5rem 2rem 2rem 2rem;
-  border-radius: 40px 40px 60px 60px / 20px 20px 80px 80px;
+  width: 100vw;
+  min-height: 300px; /* Ajusta según lo que necesites */
+  padding: 2.5rem 0 2rem 0;
+  border-radius: 40px 40px 0 0 / 60px 60px 0 0; /* Solo arriba redondeado */
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  position: relative;
+  position: absolute;
+  left: 0;
+  bottom: 0;
   z-index: 1;
-  margin-top: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Centra el contenido del formulario */
+.login-form-onda form {
+  width: 340px;
+  max-width: 90vw;
 }
 
 .logo-text {
   font-family: 'Brush Script MT', cursive;
   font-size: 2.5rem;
   color: white;
-  margin-bottom: 10px;
-  text-align: left;
+  margin-bottom: 0;
+  text-align: center;
+  position: absolute;
+  top: 40px; /* Ajusta según lo alto que quieras el título */
+  left: 0;
+  width: 100vw;
+  z-index: 10;
+  text-shadow: 2px 2px 8px #0008;
 }
 
 .logo-icon {
@@ -65,4 +102,71 @@
 
 .btn-ingresar:hover {
   background-color: #d98f16;
+}
+
+.onda-superior {
+  position: absolute;
+  top: -60px;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.onda-amarilla {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 11;
+  width: 120px;
+  height: 80px;
+  pointer-events: none;
+}
+
+.onda-amarilla svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.logo-coro {
+  display: block;
+  margin: 0 auto 20px auto;
+  max-width: 100px;
+  max-height: 100px;
+  object-fit: contain;
+}
+
+/* Inputs personalizados */
+.custom-input-group {
+  display: flex;
+  align-items: center;
+  background: #18173a;
+  border-radius: 20px;
+  padding: 6px 16px;
+  margin-bottom: 16px;
+  gap: 10px;
+  width: 100%;
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+.custom-input-emoji {
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.custom-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 1rem;
+  flex: 1;
+  font-family: 'Poppins', Arial, sans-serif;
+  padding: 4px 0;
+}
+
+.custom-input::placeholder {
+  color: #b0b0b0;
+  font-family: 'Poppins', Arial, sans-serif;
 }
