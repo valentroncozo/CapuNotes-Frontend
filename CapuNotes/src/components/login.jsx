@@ -1,8 +1,15 @@
-import { Form, Button } from 'react-bootstrap';
-import { PersonFill, LockFill } from 'react-bootstrap-icons';
+import { useState } from 'react';
 import './login.css';
 
-export default function Login() {
+export default function Login({ onLogin }) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onLogin(username, password);
+  };
+
   return (
     <div className="login-container">
       {/* Onda amarilla superior izquierda */}
@@ -16,8 +23,10 @@ export default function Login() {
           <path d="M0,0 Q80,0 120,60 Q60,80 0,80 Z" fill="#f3a21d" />
         </svg>
       </div>
+
       {/* Título sobre la imagen */}
       <h1 className="logo-text">CapuNotes</h1>
+
       {/* Onda azul */}
       <div className="onda-superior">
         <svg
@@ -32,6 +41,7 @@ export default function Login() {
           />
         </svg>
       </div>
+
       <div className="login-form-onda">
         {/* Logo centrado arriba del bloque azul */}
         <img
@@ -39,7 +49,9 @@ export default function Login() {
           alt="Logo Coro"
           className="logo-coro"
         />
-        <Form>
+
+        {/* 👉 Formulario con estados y submit */}
+        <form onSubmit={handleSubmit}>
           <div className="custom-input-group">
             <span
               className="custom-input-emoji"
@@ -48,8 +60,15 @@ export default function Login() {
             >
               👤
             </span>
-            <input type="text" className="custom-input" placeholder="Usuario" />
+            <input
+              type="text"
+              className="custom-input"
+              placeholder="Usuario"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)} // ✅ guarda en estado
+            />
           </div>
+
           <div className="custom-input-group">
             <span
               className="custom-input-emoji"
@@ -62,12 +81,15 @@ export default function Login() {
               type="password"
               className="custom-input"
               placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)} // ✅ guarda en estado
             />
           </div>
-          <Button type="submit" className="btn-ingresar w-100">
+
+          <button type="submit" className="btn-ingresar w-100">
             Ingresar
-          </Button>
-        </Form>
+          </button>
+        </form>
       </div>
     </div>
   );

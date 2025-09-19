@@ -1,0 +1,91 @@
+.home-container {
+  background: #0c1330;
+  color: white;
+  min-height: 100vh;
+  padding: 1rem;
+  font-family: sans-serif;
+}
+
+.welcome h3 {
+  margin: 0;
+}
+
+.welcome p {
+  margin: 0;
+  color: #bbb;
+  font-size: 0.9rem;
+}
+
+.welcome-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.welcome-logo {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #fff2;
+  margin: 0 0 8px 0;
+}
+
+/* Eventos con scroll horizontal */
+.eventos-section {
+  margin-top: 1rem;
+}
+
+.eventos-scroll {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+}
+
+.evento-card {
+  min-width: 180px;
+  background: #cde0f7;
+  color: #000;
+  padding: 0.8rem;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.evento-card h5 {
+  margin: 0 0 0.5rem 0;
+}
+
+/* Tareas principales en grid */
+.tareas-section {
+  margin-top: 1.5rem;
+}
+
+.tareas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.tarea-card {
+  background: #6c89ad;
+  padding: 1.2rem;
+  text-align: center;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.tarea-activa {
+  background: #f0a500;
+  color: #000;
+}
+
+.divisor-amarillo {
+  border: none;
+  border-top: 4px solid #f0a500;
+  width: 100%;
+  margin: 2rem 0 1.2rem 0;
+  border-radius: 2px;
+}
