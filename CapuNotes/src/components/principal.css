@@ -23,13 +23,29 @@
   gap: 10px;
 }
 
+/* Nueva clase para la fila horizontal */
+.welcome-row-horizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 18px;
+  justify-content: center;
+}
+
 .welcome-logo {
   width: 70px;
   height: 70px;
   object-fit: contain;
   border-radius: 50%;
   background: #fff2;
-  margin: 0 0 8px 0;
+  margin: 0;
+}
+
+/* Centrar textos verticalmente */
+.welcome-row-horizontal > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 /* Eventos con scroll horizontal */
@@ -39,18 +55,23 @@
 
 .eventos-scroll {
   display: flex;
-  gap: 1rem;
+  gap: 16px;
   overflow-x: auto;
-  padding: 0.5rem 0;
+  padding-bottom: 8px;
+  margin-bottom: 1.5rem;
+  scroll-snap-type: x mandatory;
 }
 
 .evento-card {
-  min-width: 180px;
-  background: #cde0f7;
-  color: #000;
-  padding: 0.8rem;
-  border-radius: 10px;
+  min-width: 220px;
+  background: #b3cdfa;
+  color: #222;
+  border-radius: 12px;
+  padding: 1rem;
   flex-shrink: 0;
+  scroll-snap-align: start;
+  box-shadow: 0 2px 8px #0002;
+  font-size: 1rem;
 }
 
 .evento-card h5 {

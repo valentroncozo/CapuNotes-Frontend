@@ -3,9 +3,9 @@ import './principal.css';
 export default function Principal({ username }) {
   return (
     <div className="home-container">
-      {/* Bienvenida con logo */}
+      {/* Bienvenida con logo a la izquierda y textos a la derecha */}
       <header className="welcome">
-        <div className="welcome-row">
+        <div className="welcome-row-horizontal">
           <img
             src="/Logo coro sin fondo.jpg"
             alt="Logo Coro"
@@ -40,6 +40,7 @@ export default function Principal({ username }) {
             <p>📅 Domingo 15/09 – 10hs</p>
             <p>📍 Sede Central</p>
           </div>
+          {/* Puedes agregar más eventos aquí */}
         </div>
       </section>
 

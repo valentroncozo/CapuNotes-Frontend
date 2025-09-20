@@ -1,7 +1,7 @@
 /* Fondo general */
 .login-container {
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
   background-image: url('/fondo.jpg');
   background-size: cover;
   background-position: center;
@@ -13,141 +13,55 @@
   overflow: hidden;
 }
 
-/* Onda azul arriba del bloque */
-.onda-superior {
-  position: absolute;
-  left: 0;
-  top: auto;
-  bottom: 180px; /* Ajusta según la altura del bloque azul */
-  width: 100vw;
-  height: 80px;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.onda-superior svg {
-  width: 100vw;
-  height: 80px;
-  display: block;
-}
-
-/* Bloque azul ocupa todo el ancho inferior */
+/* Bloque azul con onda superior */
 .login-form-onda {
+  position: relative;
   background: #0d0c2b;
-  width: 100vw;
-  min-height: 300px; /* Ajusta según lo que necesites */
-  padding: 2.5rem 0 2rem 0;
-  border-radius: 40px 40px 0 0 / 60px 60px 0 0; /* Solo arriba redondeado */
+  width: 100%;
+  min-height: 320px;
+  padding: 2rem 1rem;
+  border-radius: 40px 40px 0 0 / 60px 60px 0 0;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: hidden;
 }
 
-/* Centra el contenido del formulario */
-.login-form-onda form {
-  width: 340px;
-  max-width: 90vw;
-}
-
-.logo-text {
-  font-family: 'Brush Script MT', cursive;
-  font-size: 2.5rem;
-  color: white;
-  margin-bottom: 0;
-  text-align: center;
+.login-form-onda .onda-superior {
   position: absolute;
-  top: 40px; /* Ajusta según lo alto que quieras el título */
-  left: 0;
-  width: 100vw;
-  z-index: 10;
-  text-shadow: 2px 2px 8px #0008;
-}
-
-.logo-icon {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-/* Inputs y botón igual que antes */
-.input-group-text {
-  background-color: #1e1b4b;
-  color: white;
-  border: none;
-}
-
-.form-control {
-  background-color: #1e1b4b;
-  color: white;
-  border: none;
-}
-
-.form-control::placeholder {
-  color: #b0b0b0;
-}
-
-.btn-ingresar {
-  background-color: #f3a21d;
-  border: none;
-  font-weight: bold;
-  border-radius: 20px;
-  padding: 10px;
-  margin-top: 10px;
-}
-
-.btn-ingresar:hover {
-  background-color: #d98f16;
-}
-
-.onda-superior {
-  position: absolute;
-  top: -60px;
+  top: -80px;
   left: 0;
   width: 100%;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.onda-amarilla {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 11;
-  width: 120px;
   height: 80px;
-  pointer-events: none;
-}
-
-.onda-amarilla svg {
-  width: 100%;
-  height: 100%;
-  display: block;
+  z-index: 0;
 }
 
 .logo-coro {
   display: block;
-  margin: 0 auto 20px auto;
-  max-width: 100px;
-  max-height: 100px;
+  margin: 0 auto 1.5rem auto;
+  max-width: 90px;
+  max-height: 90px;
   object-fit: contain;
+  z-index: 1;
 }
 
-/* Inputs personalizados */
+/* Formulario */
+.login-form-onda form {
+  width: 100%;
+  max-width: 350px;
+  z-index: 1;
+}
+
 .custom-input-group {
   display: flex;
   align-items: center;
   background: #18173a;
   border-radius: 20px;
-  padding: 6px 16px;
+  padding: 10px 16px;
   margin-bottom: 16px;
   gap: 10px;
   width: 100%;
-  font-family: 'Poppins', Arial, sans-serif;
 }
 
 .custom-input-emoji {
@@ -162,11 +76,83 @@
   color: #fff;
   font-size: 1rem;
   flex: 1;
-  font-family: 'Poppins', Arial, sans-serif;
-  padding: 4px 0;
 }
 
 .custom-input::placeholder {
   color: #b0b0b0;
-  font-family: 'Poppins', Arial, sans-serif;
+}
+
+.btn-ingresar {
+  background-color: #f3a21d;
+  border: none;
+  font-weight: bold;
+  border-radius: 20px;
+  padding: 12px;
+  margin-top: 10px;
+  width: 100%;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn-ingresar:hover {
+  background-color: #d98f16;
+}
+
+/* Logo texto */
+.logo-text {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 2.5rem;
+  color: white;
+  margin-bottom: 0;
+  text-align: center;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  text-shadow: 2px 2px 8px #0008;
+}
+
+/* Onda amarilla */
+.onda-amarilla {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 11;
+  width: 100px;
+  height: 70px;
+  pointer-events: none;
+}
+
+/* 📱 RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .logo-text {
+    font-size: 2rem;
+    top: 20px;
+  }
+
+  .login-form-onda {
+    min-height: 280px;
+    padding: 1.5rem 1rem;
+  }
+
+  .logo-coro {
+    max-width: 70px;
+    max-height: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
+    font-size: 1.8rem;
+  }
+
+  .custom-input-group {
+    padding: 8px 12px;
+  }
+
+  .btn-ingresar {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
 }

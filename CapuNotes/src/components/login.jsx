@@ -14,12 +14,7 @@ export default function Login({ onLogin }) {
     <div className="login-container">
       {/* Onda amarilla superior izquierda */}
       <div className="onda-amarilla">
-        <svg
-          viewBox="0 0 120 80"
-          width="120"
-          height="80"
-          preserveAspectRatio="none"
-        >
+        <svg viewBox="0 0 120 80" preserveAspectRatio="none">
           <path d="M0,0 Q80,0 120,60 Q60,80 0,80 Z" fill="#f3a21d" />
         </svg>
       </div>
@@ -27,12 +22,11 @@ export default function Login({ onLogin }) {
       {/* Título sobre la imagen */}
       <h1 className="logo-text">CapuNotes</h1>
 
-      {/* Onda azul */}
-      <div className="onda-superior">
+      {/* Bloque azul con onda */}
+      <div className="login-form-onda">
         <svg
+          className="onda-superior"
           viewBox="0 0 340 80"
-          width="340"
-          height="80"
           preserveAspectRatio="none"
         >
           <path
@@ -40,17 +34,15 @@ export default function Login({ onLogin }) {
             fill="#0d0c2b"
           />
         </svg>
-      </div>
 
-      <div className="login-form-onda">
-        {/* Logo centrado arriba del bloque azul */}
+        {/* Logo */}
         <img
           src="/Logo coro sin fondo.jpg"
           alt="Logo Coro"
           className="logo-coro"
         />
 
-        {/* 👉 Formulario con estados y submit */}
+        {/* Formulario */}
         <form onSubmit={handleSubmit}>
           <div className="custom-input-group">
             <span
@@ -65,7 +57,7 @@ export default function Login({ onLogin }) {
               className="custom-input"
               placeholder="Usuario"
               value={username}
-              onChange={(e) => setUsername(e.target.value)} // ✅ guarda en estado
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
 
@@ -82,11 +74,11 @@ export default function Login({ onLogin }) {
               className="custom-input"
               placeholder="Contraseña"
               value={password}
-              onChange={(e) => setPassword(e.target.value)} // ✅ guarda en estado
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 
-          <button type="submit" className="btn-ingresar w-100">
+          <button type="submit" className="btn-ingresar">
             Ingresar
           </button>
         </form>
