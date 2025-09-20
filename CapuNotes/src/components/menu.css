@@ -1,0 +1,115 @@
+/* --- Pantalla completa del menú --- */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #090928;
+  color: white;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+
+/* Logo y título en la misma fila */
+.menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem; /* espacio entre logo y texto */
+  margin-bottom: 2.5rem;
+}
+
+.menu-logo {
+  width: 60px;
+  height: auto;
+}
+
+.menu-title {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* Lista de botones */
+/* Lista de botones */
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.menu-list button {
+  background-color: #2b6cb0;
+  color: white;
+  border: none;
+  border-radius: 15px;
+  padding: 2rem 1rem;     /* 👈 más alto aún */
+  width: 95%;             /* 👈 casi todo el ancho */
+  max-width: 500px;       /* 👈 en pantallas grandes no pasa de esto */
+  min-height: 90px;       /* 👈 asegura que se vean grandes */
+  font-size: 1.4rem;      /* 👈 texto más grande */
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.menu-list button:hover {
+  background-color: #1e4e8c;
+  transform: translateY(-4px);
+  cursor: pointer;
+}
+
+.menu-list button:active {
+  transform: scale(0.97);
+}
+
+/* Botón cerrar */
+.menu-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+/* Scrollbar estilizado */
+.menu-overlay::-webkit-scrollbar {
+  width: 6px;
+}
+
+.menu-overlay::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.menu-overlay::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.menu-overlay::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+  .menu-overlay::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+
