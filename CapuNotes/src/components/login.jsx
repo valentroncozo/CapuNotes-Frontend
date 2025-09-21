@@ -80,7 +80,7 @@ export default function Login({ onLogin }) {
             />
           </div>
 
-          <button type="submit" className="btn btn-ingresar w-100">
+          <button type="submit" className="btn btn-warning w-100 fw-bold">
             Ingresar
           </button>
         </form>

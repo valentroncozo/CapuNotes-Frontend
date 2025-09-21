@@ -83,22 +83,6 @@
   color: #b0b0b0;
 }
 
-.btn-ingresar {
-  background-color: #f3a21d;
-  border: none;
-  font-weight: bold;
-  border-radius: 20px;
-  padding: 12px;
-  margin-top: 10px;
-  width: 100%;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.btn-ingresar:hover {
-  background-color: #d98f16;
-}
-
 /* Logo texto */
 .logo-text {
   font-family: 'Brush Script MT', cursive;
