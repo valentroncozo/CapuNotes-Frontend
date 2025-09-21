@@ -1,59 +1,73 @@
 import "./menu.css";
-import { useState } from "react";
 
-export default function Menu() {
-  const [abierto, setAbierto] = useState(false);
-
+export default function Menu({ onClose }) {
   return (
-    <>
-      {/* Botón hamburguesa visible solo en móviles */}
-      <button
-        className="btn btn-outline-light d-md-none menu-toggle"
-        onClick={() => setAbierto(!abierto)}
-      >
-        <span className="navbar-toggler-icon"></span>
+    <div className="menu-screen">
+      {/* Hambur/Close opcional */}
+      <button className="menu-close" onClick={onClose} aria-label="Cerrar menú">
+        ✕
       </button>
 
-      {/* Sidebar */}
-      <div className={`sidebar ${abierto ? "open" : ""}`}>
-        <div className="menu-header">
-          <img
-            src="/Logo coro sin fondo.jpg"
-            alt="Logo"
-            className="menu-logo"
-          />
-          <h3 className="menu-title">CapuNotes</h3>
-        </div>
+      {/* Encabezado: logo + marca */}
+      <header className="menu-top menu-top--hero">
+        <img src="/Logo coro sin fondo.jpg" alt="Logo CapuNotes" className="menu-top__logo" />
+        <span className="menu-top__brand">CapuNotes</span>
+      </header>
 
-        <ul className="list-unstyled menu-list">
+      {/* Lista de opciones */}
+      <nav className="menu-body">
+        <ul className="menu-list">
           <li>
-            <button className="btn btn-primary w-100">📋 Asistencias</button>
-          </li>
-          <li>
-            <button className="btn btn-primary w-100">🎤 Audiciones</button>
-          </li>
-          <li>
-            <button className="btn btn-primary w-100">🎶 Canciones</button>
-          </li>
-          <li>
-            <button className="btn btn-primary w-100">📅 Eventos</button>
-          </li>
-          <li>
-            <button className="btn btn-primary w-100">🤝 Fraternidades</button>
-          </li>
-          <li>
-            <button className="btn btn-primary w-100">👥 Miembros</button>
-          </li>
-          <li>
-            <button className="btn btn-primary w-100">
-              🏛 Organización del Coro
+            <button className="menu-item">
+              <span className="menu-item__icon">🧾</span>
+              <span className="menu-item__text">Asistencias</span>
             </button>
           </li>
           <li>
-            <button className="btn btn-primary w-100">⚙️ Usuarios y Roles</button>
+            <button className="menu-item">
+              <span className="menu-item__icon">🎤</span>
+              <span className="menu-item__text">Audiciones</span>
+            </button>
+          </li>
+          <li>
+            <button className="menu-item">
+              <span className="menu-item__icon">🎵</span>
+              <span className="menu-item__text">Canciones</span>
+            </button>
+          </li>
+          <li>
+            <button className="menu-item">
+              <span className="menu-item__icon">🗓️</span>
+              <span className="menu-item__text">Eventos</span>
+            </button>
+          </li>
+          <li>
+            <button className="menu-item">
+              <span className="menu-item__icon">🤍</span>
+              <span className="menu-item__text">Fraternidades</span>
+            </button>
+          </li>
+          <li>
+            <button className="menu-item">
+              <span className="menu-item__icon">👥</span>
+              <span className="menu-item__text">Miembros</span>
+            </button>
+          </li>
+          <li>
+            <button className="menu-item">
+              <span className="menu-item__icon">🏛️</span>
+              <span className="menu-item__text">Organización del Coro</span>
+            </button>
+          </li>
+          <li>
+            <button className="menu-item">
+              <span className="menu-item__icon">⚙️</span>
+              <span className="menu-item__text">Usuarios y Roles</span>
+            </button>
           </li>
         </ul>
-      </div>
-    </>
+      </nav>
+    </div>
   );
 }
+

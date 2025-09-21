@@ -1,115 +1,136 @@
-/* --- Pantalla completa del menú --- */
-.menu-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: #090928;
-  color: white;
-  z-index: 2000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem 1rem;
-  overflow-y: auto;
+:root{
+  --bg:#090928;           /* fondo pantalla */
+  --pill:#245888;         /* azul de los botones */
+  --pill-hover:#1f4a73;   /* hover */
+  --text:#ffffff;
+  --radius:16px;
+  --shadow:0 4px 14px rgba(0,0,0,.35);
 }
 
-/* Logo y título en la misma fila */
-.menu-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.8rem; /* espacio entre logo y texto */
-  margin-bottom: 2.5rem;
+/* Pantalla completa (overlay) */
+.menu-screen{
+  position:fixed;
+  inset:0;
+  background:var(--bg);
+  color:var(--text);
+  z-index:3000;
+  display:flex;
+  flex-direction:column;
+  padding: calc(env(safe-area-inset-top, 0px) + 28px) 16px 24px;
+  /* overflow-y:auto; */
 }
 
-.menu-logo {
-  width: 60px;
-  height: auto;
+/* Botón cerrar opcional (arriba a la derecha) */
+.menu-close{
+  position:absolute;
+  top:10px; right:12px;
+  background:transparent;
+  border:none;
+  color:var(--text);
+  font-size:22px;
+  line-height:1;
+  cursor:pointer;
 }
 
-.menu-title {
-  font-size: 2rem;
-  font-weight: bold;
+/* Encabezado: logo a la izquierda, marca a la derecha */
+.menu-top{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;   /* si querés centrado: center */
+  gap:12px;
 }
 
-/* Lista de botones */
-/* Lista de botones */
-.menu-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  align-items: center;
-}
-
-.menu-list button {
-  background-color: #2b6cb0;
-  color: white;
-  border: none;
-  border-radius: 15px;
-  padding: 2rem 1rem;     /* 👈 más alto aún */
-  width: 95%;             /* 👈 casi todo el ancho */
-  max-width: 500px;       /* 👈 en pantallas grandes no pasa de esto */
-  min-height: 90px;       /* 👈 asegura que se vean grandes */
-  font-size: 1.4rem;      /* 👈 texto más grande */
-  font-weight: 600;
+/* Variante “hero” con más aire arriba/abajo */
+/* más alto y con más aire */
+.menu-top.menu-top--hero{
+  margin: 16px 4px 22px;   /* separa del borde y de los botones */
+  padding: 12px 0;         /* ↑ esto aumenta la altura visual */
+  min-height: 56px;        /* asegura un alto mínimo cómodo */
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.8rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
-  transition: transform 0.2s ease, background 0.3s ease;
+  gap: 12px;               /* espacio entre logo y título */
 }
 
-.menu-list button:hover {
-  background-color: #1e4e8c;
-  transform: translateY(-4px);
-  cursor: pointer;
+/* subí un toque los tamaños para que acompañen */
+.menu-top__logo{
+  width: 34px;
+  height: 34px;
 }
 
-.menu-list button:active {
-  transform: scale(0.97);
+.menu-top__brand{
+  font-size: 26px;         /* ajustá a gusto: 24–28px */
+  line-height: 1.1;
 }
 
-/* Botón cerrar */
-.menu-close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 2rem;
-  cursor: pointer;
+
+/* Contenido */
+.menu-body{
+  width:100%;
+  display:flex;
+  justify-content:center;
+}
+.menu-list{
+  height: 75%;
+  list-style:none;
+  padding:0;
+  margin:8px 0 24px;
+  width:100%;
+  max-width:420px;     /* limita ancho como en el mock */
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+  overflow: auto;
 }
 
-/* Scrollbar estilizado */
-.menu-overlay::-webkit-scrollbar {
-  width: 6px;
+.menu-top--hero::after{
+  content:"";
+  display:block;
+  height:2px;
+  width:100%;
+  border-radius:2px;
+  margin-top:10px;
 }
 
-.menu-overlay::-webkit-scrollbar-track {
-  background: transparent;
+/* Botón estilo “pill” (como la captura) */
+.menu-item{
+  width:100%;
+  border:none;
+  border-radius:18px;
+  padding:12px 14px;
+  background:var(--pill);
+  color:var(--text);
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-align:left;
+  cursor:pointer;
+  transition:background .15s ease, transform .15s ease;
+}
+.menu-item:hover{ background:var(--pill-hover); transform:translateY(-1px); }
+.menu-item:active{ transform:scale(.99); }
+
+/* Icono blanco a la izquierda + texto al lado */
+.menu-item__icon{
+  font-size:18px;
+  filter:brightness(100%);  /* asegura blanco si usás SVG blanco */
+  line-height:1;
+}
+.menu-item__text{
+  font-size:15.5px;
+  font-weight:600;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
 }
 
-.menu-overlay::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
+/* Responsive suave para desktop (no cambia estética) */
+@media (min-width:768px){
+  .menu-screen{ padding:20px 22px; }
+  .menu-top__brand{ font-size:24px; }
+  .menu-item{ padding:14px 16px; }
+  .menu-item__text{ font-size:16px; }
 }
 
-.menu-overlay::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
-
-@media (max-width: 768px) {
-  .menu-overlay::-webkit-scrollbar {
-    display: none;
-  }
-}
 
 

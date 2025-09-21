@@ -25,17 +25,28 @@ body {
 .principal-container {
   margin: 0 auto;        /* centra el bloque */
   width: 100%;
-  max-width: 400px;      /* 👈 ancho máximo en celulares */
+  
   box-sizing: border-box;
 }
 
 
 .home-container {
-  flex: 1;
+  /* flex: 1; */
   width: 100%;
-  max-width: 100vw;
+  /* max-width: 100vw; */
+  min-height: auto;
+  padding-bottom: 10%;
   overflow-x: hidden;
+  overflow-y: auto;
   box-sizing: border-box;
+}
+
+.footer {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 10%;       
+  background-color: transparent; /* vacío, sin color */
 }
 
 /* --- Botón hamburguesa --- */
@@ -88,6 +99,7 @@ body {
 
 /* --- Sección de eventos --- */
 .eventos-section {
+  margin: 0px 4px 0px 4px;
   margin-bottom: 1.5rem;
 }
 
@@ -115,7 +127,9 @@ body {
 
 /* --- Sección de tareas --- */
 .tareas-section {
-  margin-bottom: 2rem;
+  margin: 0px 4px 0px 4px;
+  height: 80vh;
+  /* margin-bottom: 120px; */ 
 }
 
 /* Siempre en 2 columnas (tipo tablero) */
@@ -126,6 +140,7 @@ body {
 }
 
 .tarea-card {
+  height: auto;
   background-color: #AFD1F0;
   padding: 2rem 1rem;
   border-radius: 15px;
@@ -146,11 +161,12 @@ body {
 /* --- Responsive layout general --- */
 @media (min-width: 768px) {
   .principal-container {
-    flex-direction: row;
+    /* flex-direction: row; */
   }
 
   .home-container {
-    padding: 2rem;
+    /* padding: 2rem; */
   }
 }
+
 
