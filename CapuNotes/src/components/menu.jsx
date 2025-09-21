@@ -1,6 +1,9 @@
-import "./menu.css";
+import './menu.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function Menu({ onClose }) {
+  const navigate = useNavigate();
+
   return (
     <div className="menu-screen">
       {/* Hambur/Close opcional */}
@@ -10,7 +13,11 @@ export default function Menu({ onClose }) {
 
       {/* Encabezado: logo + marca */}
       <header className="menu-top menu-top--hero">
-        <img src="/Logo coro sin fondo.jpg" alt="Logo CapuNotes" className="menu-top__logo" />
+        <img
+          src="/Logo coro sin fondo.jpg"
+          alt="Logo CapuNotes"
+          className="menu-top__logo"
+        />
         <span className="menu-top__brand">CapuNotes</span>
       </header>
 
@@ -54,7 +61,10 @@ export default function Menu({ onClose }) {
             </button>
           </li>
           <li>
-            <button className="menu-item">
+            <button
+              className="menu-item"
+              onClick={() => navigate('/organizacion-coro')}
+            >
               <span className="menu-item__icon">🏛️</span>
               <span className="menu-item__text">Organización del Coro</span>
             </button>
@@ -70,4 +80,3 @@ export default function Menu({ onClose }) {
     </div>
   );
 }
-

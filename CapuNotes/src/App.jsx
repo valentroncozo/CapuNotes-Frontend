@@ -8,6 +8,7 @@ import {
 import './App.css';
 import Login from './components/login.jsx';
 import Principal from './components/principal.jsx';
+import OrganizacionCoro from './components/organizacionCoro.jsx';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -50,6 +51,9 @@ function App() {
               )
             }
           />
+
+          <Route path="/organizacion-coro" element={<OrganizacionCoro />} />
+          {/* ...otras rutas... */}
         </Routes>
       </div>
     </Router>

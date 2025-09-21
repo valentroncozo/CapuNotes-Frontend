@@ -1,0 +1,157 @@
+.organizacion-container {
+  min-height: 100vh;
+  background: #0d0c2b;
+  border-radius: 24px;
+  max-width: 400px;
+  margin: 0 auto;
+  box-shadow: 0 4px 16px #0003;
+  position: relative;
+}
+
+.organizacion-header {
+  background: transparent;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.organizacion-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+.organizacion-title {
+  color: #fff;
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.divisor-amarillo {
+  border: none;
+  border-top: 2.5px solid #f3a21d;
+  width: 100%;
+  margin: 0.5rem 0 1.2rem 0;
+  border-radius: 2px;
+}
+
+.organizacion-form .organizacion-input {
+  background: #18173a !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 20px !important;
+  padding: 10px 16px !important;
+}
+
+.organizacion-form .organizacion-input::placeholder {
+  color: #b0b0b0 !important;
+}
+
+.organizacion-btn {
+  border-radius: 20px !important;
+  background: #f3a21d !important;
+  border: none !important;
+}
+
+.organizacion-btn:hover {
+  background: #d98f16 !important;
+}
+
+.organizacion-list-title {
+  font-size: 1.1rem;
+}
+
+.organizacion-list {
+  height: 260px;
+  overflow: hidden;
+  position: relative;
+}
+
+.organizacion-list-scroll {
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.organizacion-card {
+  background: #b3cdfa;
+  border-radius: 12px;
+  padding: 1rem;
+  color: #222;
+  box-shadow: 0 2px 8px #0002;
+  font-size: 1rem;
+}
+
+.organizacion-desc {
+  font-size: 0.95rem;
+  color: #222;
+  margin-top: 4px;
+}
+
+.areas-list-scroll {
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.area-card {
+  background: #b3cdfa;
+  border-radius: 12px;
+  padding: 1rem;
+  color: #222;
+  box-shadow: 0 2px 8px #0002;
+  font-size: 1rem;
+}
+
+.area-desc {
+  font-size: 0.95rem;
+  color: #222;
+  margin-top: 4px;
+}
+
+/* Menú hamburguesa estilo Bootstrap */
+.menu-bar {
+  width: 32px;
+  height: 6px;
+  background: #fff;
+  border-radius: 3px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .organizacion-title {
+    font-size: 1.2rem;
+  }
+  .organizacion-logo {
+    width: 38px;
+    height: 38px;
+  }
+  .areas-list-scroll {
+    max-height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .organizacion-container {
+    max-width: 100vw;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .organizacion-header {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  .organizacion-list {
+    height: 180px;
+  }
+}
+
+.organizacion-bg {
+  background: #0d0c2b !important;
+}

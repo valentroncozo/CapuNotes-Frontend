@@ -11,7 +11,7 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="login-container">
+    <div className="login-container d-flex flex-column justify-content-end align-items-center">
       {/* Onda amarilla superior izquierda */}
       <div className="onda-amarilla">
         <svg viewBox="0 0 120 80" preserveAspectRatio="none">
@@ -23,7 +23,7 @@ export default function Login({ onLogin }) {
       <h1 className="logo-text">CapuNotes</h1>
 
       {/* Bloque azul con onda */}
-      <div className="login-form-onda">
+      <div className="login-form-onda w-100 w-sm-75 w-md-50">
         <svg
           className="onda-superior"
           viewBox="0 0 340 80"
@@ -43,8 +43,8 @@ export default function Login({ onLogin }) {
         />
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit}>
-          <div className="custom-input-group">
+        <form onSubmit={handleSubmit} className="w-100">
+          <div className="custom-input-group mb-3">
             <span
               className="custom-input-emoji"
               role="img"
@@ -54,14 +54,15 @@ export default function Login({ onLogin }) {
             </span>
             <input
               type="text"
-              className="custom-input"
+              className="custom-input form-control bg-transparent border-0 text-white"
               placeholder="Usuario"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              required
             />
           </div>
 
-          <div className="custom-input-group">
+          <div className="custom-input-group mb-3">
             <span
               className="custom-input-emoji"
               role="img"
@@ -71,14 +72,15 @@ export default function Login({ onLogin }) {
             </span>
             <input
               type="password"
-              className="custom-input"
+              className="custom-input form-control bg-transparent border-0 text-white"
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
 
-          <button type="submit" className="btn-ingresar">
+          <button type="submit" className="btn btn-ingresar w-100">
             Ingresar
           </button>
         </form>
