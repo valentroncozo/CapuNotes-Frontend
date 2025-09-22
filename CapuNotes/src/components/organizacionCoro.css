@@ -53,14 +53,57 @@
   color: #b0b0b0 !important;
 }
 
-.organizacion-btn {
-  border-radius: 20px !important;
-  background: #f3a21d !important;
-  border: none !important;
+.organizacion-card {
+  background: #b3cdfa;
+  border-radius: 12px;
+  padding: 1rem;
+  color: #222;
+  box-shadow: 0 2px 8px #0002;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.organizacion-btn:hover {
+.organizacion-card .btn-container {
+  display: flex;
+  flex-wrap: wrap;   /* ✅ permite que se acomoden en varias líneas en pantallas chicas */
+  justify-content: center;
+  gap: 12px;         /* ✅ espacio entre botones */
+  margin-top: 12px;  /* aire con el texto */
+}
+
+.organizacion-card .btn-card {
+  border-radius: 20px;
+  background: #f3a21d !important; /* naranja */
+  border: none !important;
+  color: #fff !important;
+  font-weight: 600;
+  padding: 6px 16px;
+  min-width: 100px;   /* ✅ ancho mínimo uniforme */
+  text-align: center;
+  cursor: pointer;
+}
+
+.organizacion-card .btn-card:hover {
   background: #d98f16 !important;
+}
+/* Botones de acción en las cards */
+.organizacion-card .btn-card,
+.area-card .btn-card {
+  border-radius: 20px !important;
+  background: #f3a21d !important; /* naranja */
+  border: none !important;
+  color: #fff !important;
+  margin: 0px 12px;
+  font-weight: 600;
+  padding: 6px 16px;
+  transition: background 0.2s ease;
+}
+
+.organizacion-card .btn-card:hover,
+.area-card .btn-card:hover {
+  background: #d98f16 !important; /* más oscuro en hover */
 }
 
 .organizacion-list-title {
@@ -154,4 +197,56 @@
 
 .organizacion-bg {
   background: #0d0c2b !important;
+}
+/* Fondo oscuro detrás del modal */
+/* Fondo oscuro detrás del modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6); /* oscurece fondo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5000; /* encima de todo */
+  padding: 1rem;         /* margen interno en pantallas pequeñas */
+  overflow-y: auto;      /* ✅ permite hacer scroll si el modal es más alto */
+}
+
+/* Caja del modal */
+.modal-content {
+  background: #0d0c2b !important; /* ✅ fondo sólido */
+  padding: 2rem;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.8); /* sombra fuerte */
+  animation: fadeIn 0.2s ease-in-out;
+  max-height: 95vh;     /* ✅ ahora ocupa casi toda la altura de la pantalla */
+  min-height: 70vh;     /* ✅ asegura que tenga buena altura aunque tenga poco contenido */
+  overflow-y: auto;     /* ✅ si se pasa, permite scroll interno */
+}
+
+/* Botón cerrar arriba a la derecha */
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Animación de aparición */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

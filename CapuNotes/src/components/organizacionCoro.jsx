@@ -1,9 +1,33 @@
 import { useState } from 'react';
 import './organizacionCoro.css';
 import Menu from './menu.jsx';
+import AreaModal from './modificarArea.jsx';
 
 export default function OrganizacionCoro() {
   const [menuAbierto, setMenuAbierto] = useState(false);
+
+  // Estado para el modal
+  const [showModal, setShowModal] = useState(false);
+  const [selectedArea, setSelectedArea] = useState(null);
+
+  // Función para abrir modal con el área seleccionada
+  const handleConsultar = (area) => {
+    setSelectedArea(area);
+    setShowModal(true);
+  };
+
+  // Cerrar modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedArea(null);
+  };
+
+  // Datos simulados (pueden venir del backend más adelante)
+  const areas = [
+    { nombre: "Administración", descripcion: "Gestión general y coordinación interna" },
+    { nombre: "Logística", descripcion: "Movilización de recursos y materiales" },
+    { nombre: "Comunicación", descripcion: "Manejo de redes sociales y prensa" },
+  ];
 
   return (
     <div className="container-fluid min-vh-100 organizacion-bg text-white p-0">
@@ -63,26 +87,28 @@ export default function OrganizacionCoro() {
           {/* Áreas registradas */}
           <div className="fw-semibold mb-2">Áreas registradas:</div>
           <div className="areas-list-scroll">
-            {[1, 2, 3].map((i) => (
+            {areas.map((area, i) => (
               <div className="area-card mb-3" key={i}>
-                <div className="fw-bold">Administración</div>
-                <div className="area-desc">
-                  Aquí va la descripción, aquí va la descripción, aquí va la
-                  descripción
-                </div>
-                <div className="d-flex gap-2 mt-2">
-                  <button className="btn btn-primary btn-sm flex-fill">
+                <div className="fw-bold">{area.nombre}</div>
+                <div className="area-desc">{area.descripcion}</div>
+                <div className="btn-container">
+                  <button
+                    className="btn-card"
+                    onClick={() => handleConsultar(area)}
+                  >
                     Consultar
                   </button>
-                  <button className="btn btn-warning btn-sm flex-fill">
-                    Eliminar
-                  </button>
+                  <button className="btn-card">Eliminar</button>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      <AreaModal show={showModal} onClose={handleCloseModal} area={selectedArea} />
     </div>
   );
 }
+
