@@ -11,7 +11,7 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="login-container d-flex flex-column justify-content-end align-items-center">
+    <div className="login-container">
       {/* Onda amarilla superior izquierda */}
       <div className="onda-amarilla">
         <svg viewBox="0 0 120 80" preserveAspectRatio="none">
@@ -19,18 +19,19 @@ export default function Login({ onLogin }) {
         </svg>
       </div>
 
-      {/* Título sobre la imagen */}
+      {/* Título */}
       <h1 className="logo-text">CapuNotes</h1>
 
-      {/* Bloque azul con onda */}
-      <div className="login-form-onda w-100 w-sm-75 w-md-50">
+      {/* Contenedor azul con onda en el borde superior */}
+      <div className="login-form-onda">
+        {/* 👉 La onda ahora está arriba del bloque */}
         <svg
           className="onda-superior"
-          viewBox="0 0 340 80"
+          viewBox="0 0 500 100"
           preserveAspectRatio="none"
         >
           <path
-            d="M0,80 Q85,0 170,40 Q255,80 340,20 L340,0 L0,0 Z"
+            d="M0,100 Q125,0 250,50 Q375,100 500,30 L500,0 L0,0 Z"
             fill="#0d0c2b"
           />
         </svg>
@@ -43,8 +44,8 @@ export default function Login({ onLogin }) {
         />
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit} className="w-100">
-          <div className="custom-input-group mb-3">
+        <form onSubmit={handleSubmit}>
+          <div className="custom-input-group">
             <span
               className="custom-input-emoji"
               role="img"
@@ -54,7 +55,7 @@ export default function Login({ onLogin }) {
             </span>
             <input
               type="text"
-              className="custom-input form-control bg-transparent border-0 text-white"
+              className="custom-input"
               placeholder="Usuario"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -62,7 +63,7 @@ export default function Login({ onLogin }) {
             />
           </div>
 
-          <div className="custom-input-group mb-3">
+          <div className="custom-input-group">
             <span
               className="custom-input-emoji"
               role="img"
@@ -72,7 +73,7 @@ export default function Login({ onLogin }) {
             </span>
             <input
               type="password"
-              className="custom-input form-control bg-transparent border-0 text-white"
+              className="custom-input"
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -80,7 +81,7 @@ export default function Login({ onLogin }) {
             />
           </div>
 
-          <button type="submit" className="btn btn-warning w-100 fw-bold">
+          <button type="submit" className="btn-ingresar">
             Ingresar
           </button>
         </form>

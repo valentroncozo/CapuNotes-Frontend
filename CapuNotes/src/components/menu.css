@@ -1,3 +1,6 @@
+/* Importar tipografías */
+@import url('https://fonts.googleapis.com/css2?family=Manjari:wght@400;700&family=Mr+Dafoe&display=swap');
+
 :root {
   --bg: #090928; /* fondo pantalla */
   --pill: #245888; /* azul de los botones */
@@ -7,17 +10,13 @@
   --shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
-/* Pantalla completa (overlay) */
-.menu-screen {
-  position: fixed;
-  inset: 0;
-  background: var(--bg);
-  color: var(--text);
-  z-index: 3000;
-  display: flex;
-  flex-direction: column;
-  padding: calc(env(safe-area-inset-top, 0px) + 28px) 16px 24px;
-  /* overflow-y:auto; */
+/* 👇 Forzamos que todo el menú use Manjari */
+.menu-screen,
+.menu-body,
+.menu-list,
+.menu-item,
+.menu-item__text {
+  font-family: 'Manjari', sans-serif !important;
 }
 
 /* Botón cerrar opcional (arriba a la derecha) */
@@ -37,30 +36,31 @@
 .menu-top {
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* si querés centrado: center */
+  justify-content: flex-start;
   gap: 12px;
 }
 
-/* Variante “hero” con más aire arriba/abajo */
-/* más alto y con más aire */
+/* Variante “hero” con más aire */
 .menu-top.menu-top--hero {
-  margin: 16px 4px 22px; /* separa del borde y de los botones */
-  padding: 12px 0; /* ↑ esto aumenta la altura visual */
-  min-height: 56px; /* asegura un alto mínimo cómodo */
+  margin: 16px 4px 22px;
+  padding: 12px 0;
+  min-height: 56px;
   display: flex;
   align-items: center;
-  gap: 12px; /* espacio entre logo y título */
+  gap: 12px;
 }
 
-/* subí un toque los tamaños para que acompañen */
 .menu-top__logo {
   width: 34px;
   height: 34px;
 }
 
+/* 👉 Aquí aplicamos Mr Dafoe SOLO al título CapuNotes */
 .menu-top__brand {
-  font-size: 26px; /* ajustá a gusto: 24–28px */
+  font-size: 26px;
   line-height: 1.1;
+  font-family: 'Mr Dafoe', cursive !important;
+  font-weight: normal;
 }
 
 /* Contenido */
@@ -69,13 +69,14 @@
   display: flex;
   justify-content: center;
 }
+
 .menu-list {
   height: 75%;
   list-style: none;
   padding: 0;
   margin: 8px 0 24px;
   width: 100%;
-  max-width: 420px; /* limita ancho como en el mock */
+  max-width: 420px;
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -91,7 +92,7 @@
   margin-top: 10px;
 }
 
-/* Botón estilo “pill” (como la captura) */
+/* Botón estilo “pill” */
 .menu-item {
   width: 100%;
   border: none;
@@ -115,12 +116,12 @@
   transform: scale(0.99);
 }
 
-/* Icono blanco a la izquierda + texto al lado */
 .menu-item__icon {
   font-size: 18px;
-  filter: brightness(100%); /* asegura blanco si usás SVG blanco */
+  filter: brightness(100%);
   line-height: 1;
 }
+
 .menu-item__text {
   font-size: 15.5px;
   font-weight: 600;
@@ -129,7 +130,7 @@
   text-overflow: ellipsis;
 }
 
-/* Responsive suave para desktop (no cambia estética) */
+/* Responsive */
 @media (min-width: 768px) {
   .menu-screen {
     padding: 20px 22px;
@@ -145,7 +146,6 @@
   }
 }
 
-/* Nueva clase para overlay y botón de cierre */
 .menu-overlay {
   position: fixed;
   top: 0;
