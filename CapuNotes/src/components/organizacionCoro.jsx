@@ -2,9 +2,16 @@ import { useState } from 'react';
 import './organizacionCoro.css';
 import Menu from './menu.jsx';
 import AreaModal from './modificarArea.jsx';
+import { useNavigate } from 'react-router-dom';
 
-export default function OrganizacionCoro() {
+export default function OrganizacionCoro({ onClose }) {
+  const navigate = useNavigate();
   const [menuAbierto, setMenuAbierto] = useState(false);
+
+  const handleClose = () => {
+    if (onClose) onClose(); // cierra el overlay
+    navigate('/menu'); // redirige siempre al menu
+  };
 
   // Estado para el modal
   const [showModal, setShowModal] = useState(false);
@@ -24,13 +31,31 @@ export default function OrganizacionCoro() {
 
   // Datos simulados (pueden venir del backend más adelante)
   const areas = [
-    { nombre: "Administración", descripcion: "Gestión general y coordinación interna" },
-    { nombre: "Logística", descripcion: "Movilización de recursos y materiales" },
-    { nombre: "Comunicación", descripcion: "Manejo de redes sociales y prensa" },
+    {
+      nombre: 'Administración',
+      descripcion: 'Gestión general y coordinación interna',
+    },
+    {
+      nombre: 'Logística',
+      descripcion: 'Movilización de recursos y materiales',
+    },
+    {
+      nombre: 'Comunicación',
+      descripcion: 'Manejo de redes sociales y prensa',
+    },
   ];
 
   return (
     <div className="container-fluid min-vh-100 organizacion-bg text-white p-0">
+      {/* Hambur/Close opcional */}
+      <button
+        className="menu-close"
+        onClick={handleClose}
+        aria-label="Cerrar menú"
+      >
+        ✕
+      </button>
+
       {/* Botón menú hamburguesa siempre visible */}
       <button
         className="btn btn-link position-absolute top-0 start-0 m-3 p-0 z-3"
@@ -107,8 +132,11 @@ export default function OrganizacionCoro() {
       </div>
 
       {/* Modal */}
-      <AreaModal show={showModal} onClose={handleCloseModal} area={selectedArea} />
+      <AreaModal
+        show={showModal}
+        onClose={handleCloseModal}
+        area={selectedArea}
+      />
     </div>
   );
 }
-

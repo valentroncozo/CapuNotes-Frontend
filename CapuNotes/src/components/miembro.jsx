@@ -3,12 +3,18 @@ import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
 import { PencilFill, XCircleFill } from 'react-bootstrap-icons';
 import AgregarModificarMiembro from './agregarModificarMiembro';
 import './miembro.css';
+import { useNavigate } from 'react-router-dom';
 
-const Miembros = () => {
+const Miembros = ({ onClose }) => {
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState('registro'); // 'registro' o 'modificacion'
   const [miembroSeleccionado, setMiembroSeleccionado] = useState(null);
 
+  const handleClose = () => {
+    if (onClose) onClose(); // cierra el overlay
+    navigate('/menu'); // redirige siempre al menu
+  };
   const miembros = [
     {
       id: 1,
@@ -60,6 +66,14 @@ const Miembros = () => {
 
   return (
     <Container fluid className="miembros-container">
+      {/* Hambur/Close opcional */}
+      <button
+        className="menu-close"
+        onClick={handleClose}
+        aria-label="Cerrar menú"
+      >
+        ✕
+      </button>
       {!showForm ? (
         <>
           <Row className="mb-4 align-items-center">

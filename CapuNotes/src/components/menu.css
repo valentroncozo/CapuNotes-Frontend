@@ -61,6 +61,7 @@
   line-height: 1.1;
   font-family: 'Mr Dafoe', cursive !important;
   font-weight: normal;
+  color: #fff; /* Cambia el color a blanco */
 }
 
 /* Contenido */

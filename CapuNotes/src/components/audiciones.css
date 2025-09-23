@@ -1,4 +1,4 @@
-.miembros-container {
+.audiciones-container {
   background-color: #0b0b3a;
   min-height: 100vh;
   color: #fff;
@@ -15,61 +15,44 @@
   margin-right: 10px;
 }
 
-/* Botón cerrar opcional (arriba a la derecha) */
-.menu-close {
-  position: absolute;
-  top: 38px; /* antes: 10px */
-  right: 32px; /* antes: 12px */
-  background: transparent;
-  border: none;
-  color: var(--text);
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.miembros-title {
-  font-size: 2rem;
+.audiciones-title {
+  font-size: 1.3rem;
   font-weight: 500;
-  margin-bottom: 0;
   font-family: 'Manjari', sans-serif;
 }
 
-.miembros-label {
-  margin-bottom: 1rem;
+.audiciones-subtitle {
   font-size: 1rem;
   color: #fff;
   font-family: 'Manjari', sans-serif;
 }
 
-.search-input {
+.divisor-amarillo {
+  border: none;
+  border-top: 2px solid #fbbf24;
+  margin: 0.5rem 0 1.2rem 0;
+}
+
+.audiciones-select {
+  background-color: #a7bedf;
+  border: none;
+  border-radius: 20px;
+  color: #23233a;
+  font-family: 'Manjari', sans-serif;
+  font-size: 1rem;
+  padding: 0.4rem 1rem;
+  min-width: 120px;
+}
+
+.audiciones-search {
   background-color: #23233a;
   border: none;
   color: #fff;
   border-radius: 20px;
-  padding: 0.6rem 1rem;
+  padding: 0.4rem 1rem;
   font-size: 1rem;
   font-family: 'Manjari', sans-serif;
-}
-
-.search-input::placeholder {
-  color: #bbb;
-  font-family: 'Manjari', sans-serif;
-}
-
-.btn-agregar {
-  background-color: #fbbf24;
-  border: none;
-  border-radius: 20px;
-  padding: 0.5rem 1.2rem;
-  color: #fff;
-  font-weight: 500;
-  transition: background 0.2s;
-  font-family: 'Manjari', sans-serif;
-}
-
-.btn-agregar:hover {
-  background-color: #de9205;
+  min-width: 120px;
 }
 
 .tabla-wrapper {
@@ -79,14 +62,14 @@
   font-family: 'Manjari', sans-serif;
 }
 
-.tabla-miembros {
+.tabla-audiciones {
   background: transparent;
   border-radius: 12px;
   overflow: hidden;
   font-family: 'Manjari', sans-serif;
 }
 
-.tabla-miembros th {
+.tabla-audiciones th {
   background-color: #243c5a;
   color: #fff;
   text-align: center;
@@ -95,7 +78,7 @@
   font-family: 'Manjari', sans-serif;
 }
 
-.tabla-miembros td {
+.tabla-audiciones td {
   background-color: #a7bedf;
   color: #23233a;
   vertical-align: middle;
@@ -103,54 +86,60 @@
   font-family: 'Manjari', sans-serif;
 }
 
-.miembro-nombre {
-  font-weight: 500;
-  font-family: 'Manjari', sans-serif;
+.audiciones-rta {
+  text-align: center;
+  font-size: 1.3rem;
 }
 
-.acciones {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: 'Manjari', sans-serif;
+.rta-ok {
+  color: #4ade80;
+  font-weight: bold;
 }
 
-.btn-accion {
-  background-color: #fbbf24 !important;
-  border: none !important;
-  border-radius: 50% !important;
+.rta-no {
+  color: #f87171;
+  font-weight: bold;
+}
+
+.btn-agregar-audicion {
+  background-color: #243c5a;
+  border: none;
+  border-radius: 50%;
   width: 36px;
   height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff !important;
+  color: #fff;
   font-size: 1.2rem;
   transition: background 0.2s;
   font-family: 'Manjari', sans-serif;
 }
 
-.btn-accion.eliminar {
-  background-color: #f87171 !important;
-}
-
-.btn-accion:hover {
-  filter: brightness(0.9);
+.btn-agregar-audicion:hover {
+  background-color: #fbbf24;
+  color: #23233a;
 }
 
 @media (max-width: 768px) {
-  .miembros-container {
+  .audiciones-container {
     padding: 1rem 0.2rem;
   }
   .tabla-wrapper {
     padding: 0.5rem;
   }
-  .miembros-title {
-    font-size: 1.3rem;
+  .audiciones-title {
+    font-size: 1rem;
   }
-  .btn-agregar {
+  .audiciones-select,
+  .audiciones-search {
     font-size: 0.9rem;
-    padding: 0.4rem 1rem;
+    min-width: 80px;
+    padding: 0.3rem 0.7rem;
+  }
+  .btn-agregar-audicion {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
   }
 }

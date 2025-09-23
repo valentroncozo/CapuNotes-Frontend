@@ -11,6 +11,7 @@ import Principal from './components/principal.jsx';
 import Menu from './components/menu.jsx';
 import Miembros from './components/miembro.jsx';
 import OrganizacionCoro from './components/organizacionCoro.jsx';
+import Audiciones from './components/audiciones.jsx';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -70,6 +71,16 @@ function App() {
             path="/organizacion-coro"
             element={
               isAuthenticated ? <OrganizacionCoro /> : <Navigate to="/" />
+            }
+          />
+          <Route
+            path="/audiciones"
+            element={
+              isAuthenticated ? (
+                <Audiciones username={username} />
+              ) : (
+                <Navigate to="/" />
+              )
             }
           />
           {/* ...otras rutas... */}

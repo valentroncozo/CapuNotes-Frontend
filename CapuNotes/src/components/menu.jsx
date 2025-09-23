@@ -38,7 +38,10 @@ export default function Menu({ onClose }) {
             </button>
           </li>
           <li>
-            <button className="menu-item">
+            <button
+              className="menu-item"
+              onClick={() => navigate('/audiciones')}
+            >
               <span className="menu-item__icon">🎤</span>
               <span className="menu-item__text">Audiciones</span>
             </button>

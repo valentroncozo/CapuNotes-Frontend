@@ -49,6 +49,14 @@ const AgregarModificarMiembro = ({
 
   return (
     <Container fluid className="form-container">
+      {/* Botón cerrar (cruz) SOLO el del borde */}
+      <button
+        className="menu-close"
+        onClick={onCancel}
+        aria-label="Cerrar formulario"
+      >
+        ✕
+      </button>
       <Row className="mb-4 align-items-center">
         <Col xs="auto">
           <div className="header-icon"></div>

@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './principal.css';
 import Menu from './menu.jsx';
 
 export default function Principal({ username }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const navigate = useNavigate();
 
   // Si el menú está abierto, solo mostrar el menú
   if (menuAbierto) {
@@ -70,7 +72,14 @@ export default function Principal({ username }) {
             <div className="tarea-card tarea-activa">
               🎶 Actividades complementarias
             </div>
-            <div className="tarea-card">🎤 Audiciones</div>
+            <div
+              className="tarea-card"
+              style={{ cursor: 'pointer' }}
+              username={username}
+              onClick={() => navigate('/audiciones')}
+            >
+              🎤 Audiciones
+            </div>
           </div>
         </section>
       </div>
