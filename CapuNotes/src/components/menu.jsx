@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Menu({ onClose }) {
   const navigate = useNavigate();
-    const handleClose = () => {
-    if (onClose) onClose();       // cierra el overlay
-        navigate('/principal');       // redirige siempre al principal
-    };
+  const handleClose = () => {
+    if (onClose) onClose(); // cierra el overlay
+    navigate('/principal'); // redirige siempre al principal
+  };
   return (
     <div className="menu-screen">
       {/* Hambur/Close opcional */}
@@ -62,7 +62,7 @@ export default function Menu({ onClose }) {
             </button>
           </li>
           <li>
-            <button className="menu-item">
+            <button className="menu-item" onClick={() => navigate('/miembros')}>
               <span className="menu-item__icon">👥</span>
               <span className="menu-item__text">Miembros</span>
             </button>

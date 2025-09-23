@@ -8,6 +8,8 @@ import {
 import './App.css';
 import Login from './components/login.jsx';
 import Principal from './components/principal.jsx';
+import Menu from './components/menu.jsx';
+import Miembros from './components/miembro.jsx';
 import OrganizacionCoro from './components/organizacionCoro.jsx';
 
 function App() {
@@ -52,7 +54,24 @@ function App() {
             }
           />
 
-          <Route path="/organizacion-coro" element={<OrganizacionCoro />} />
+          {/* Ruta para el menú */}
+          <Route
+            path="/menu"
+            element={isAuthenticated ? <Menu /> : <Navigate to="/" />}
+          />
+
+          {/* Ruta para miembros */}
+          <Route
+            path="/miembros"
+            element={isAuthenticated ? <Miembros /> : <Navigate to="/" />}
+          />
+
+          <Route
+            path="/organizacion-coro"
+            element={
+              isAuthenticated ? <OrganizacionCoro /> : <Navigate to="/" />
+            }
+          />
           {/* ...otras rutas... */}
         </Routes>
       </div>

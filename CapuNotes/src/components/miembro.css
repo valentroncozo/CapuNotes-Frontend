@@ -1,0 +1,143 @@
+.miembros-container {
+  background-color: #0b0b3a;
+  min-height: 100vh;
+  color: #fff;
+  padding: 2rem 1rem;
+  font-family: 'Manjari', sans-serif;
+}
+
+.header-icon {
+  width: 48px;
+  height: 48px;
+  background-image: url('/public/Logo coro sin fondo.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin-right: 10px;
+}
+
+.miembros-title {
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: 0;
+  font-family: 'Manjari', sans-serif;
+}
+
+.miembros-label {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #fff;
+  font-family: 'Manjari', sans-serif;
+}
+
+.search-input {
+  background-color: #23233a;
+  border: none;
+  color: #fff;
+  border-radius: 20px;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  font-family: 'Manjari', sans-serif;
+}
+
+.search-input::placeholder {
+  color: #bbb;
+  font-family: 'Manjari', sans-serif;
+}
+
+.btn-agregar {
+  background-color: #fbbf24;
+  border: none;
+  border-radius: 20px;
+  padding: 0.5rem 1.2rem;
+  color: #fff;
+  font-weight: 500;
+  transition: background 0.2s;
+  font-family: 'Manjari', sans-serif;
+}
+
+.btn-agregar:hover {
+  background-color: #de9205;
+}
+
+.tabla-wrapper {
+  background-color: #a7bedf;
+  border-radius: 20px;
+  padding: 1rem;
+  font-family: 'Manjari', sans-serif;
+}
+
+.tabla-miembros {
+  background: transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'Manjari', sans-serif;
+}
+
+.tabla-miembros th {
+  background-color: #243c5a;
+  color: #fff;
+  text-align: center;
+  font-weight: 500;
+  border: none;
+  font-family: 'Manjari', sans-serif;
+}
+
+.tabla-miembros td {
+  background-color: #a7bedf;
+  color: #23233a;
+  vertical-align: middle;
+  border: none;
+  font-family: 'Manjari', sans-serif;
+}
+
+.miembro-nombre {
+  font-weight: 500;
+  font-family: 'Manjari', sans-serif;
+}
+
+.acciones {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Manjari', sans-serif;
+}
+
+.btn-accion {
+  background-color: #fbbf24 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff !important;
+  font-size: 1.2rem;
+  transition: background 0.2s;
+  font-family: 'Manjari', sans-serif;
+}
+
+.btn-accion.eliminar {
+  background-color: #f87171 !important;
+}
+
+.btn-accion:hover {
+  filter: brightness(0.9);
+}
+
+@media (max-width: 768px) {
+  .miembros-container {
+    padding: 1rem 0.2rem;
+  }
+  .tabla-wrapper {
+    padding: 0.5rem;
+  }
+  .miembros-title {
+    font-size: 1.3rem;
+  }
+  .btn-agregar {
+    font-size: 0.9rem;
+    padding: 0.4rem 1rem;
+  }
+}
