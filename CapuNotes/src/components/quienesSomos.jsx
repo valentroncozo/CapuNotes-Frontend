@@ -7,10 +7,12 @@ const QuienesSomos = () => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
+    window.scrollTo(0, 0);
     navigate('/login');
   };
 
   const handleInscripciones = () => {
+    window.scrollTo(0, 0);
     navigate('/inscripciones');
   };
 
@@ -19,6 +21,7 @@ const QuienesSomos = () => {
   };
 
   const handleHome = () => {
+    window.scrollTo(0, 0);
     navigate('/');
   };
 

@@ -17,12 +17,13 @@ const MenuAudiciones = ({ onClose }) => {
   };
 
   const handleVerAudiciones = () => {
-    navigate('/audiciones');
+    // Lógica para ver audiciones
+    console.log('Ver audiciones');
   };
 
   const handleCandidatos = () => {
-    // Lógica para candidatos
-    console.log('Candidatos');
+    window.scrollTo(0, 0);
+    navigate('/audiciones');
   };
 
   const handleHistorial = () => {

@@ -29,14 +29,17 @@ const Landing = () => {
   }, [images.length]);
 
   const handleLogin = () => {
+    window.scrollTo(0, 0);
     navigate('/login');
   };
 
   const handleInscripciones = () => {
+    window.scrollTo(0, 0);
     navigate('/inscripciones');
   };
 
   const handleQuienesSomos = () => {
+    window.scrollTo(0, 0);
     navigate('/quienes-somos');
   };
 
