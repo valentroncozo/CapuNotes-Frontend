@@ -75,8 +75,7 @@ export default function Principal({ username }) {
             <div
               className="tarea-card"
               style={{ cursor: 'pointer' }}
-              username={username}
-              onClick={() => navigate('/audiciones')}
+              onClick={() => navigate('/menu-audiciones')}
             >
               🎤 Audiciones
             </div>

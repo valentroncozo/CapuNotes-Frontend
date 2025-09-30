@@ -12,6 +12,8 @@ import Menu from './components/menu.jsx';
 import Miembros from './components/miembro.jsx';
 import OrganizacionCoro from './components/organizacionCoro.jsx';
 import Audiciones from './components/audiciones.jsx';
+import MenuAudiciones from './components/menuAudiciones.jsx';
+import Candidato from './components/candidato.jsx';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -82,6 +84,14 @@ function App() {
                 <Navigate to="/" />
               )
             }
+          />
+          <Route
+            path="/menu-audiciones"
+            element={isAuthenticated ? <MenuAudiciones /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/candidato"
+            element={isAuthenticated ? <Candidato /> : <Navigate to="/" />}
           />
           {/* ...otras rutas... */}
         </Routes>

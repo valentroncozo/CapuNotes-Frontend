@@ -40,7 +40,7 @@ export default function Menu({ onClose }) {
           <li>
             <button
               className="menu-item"
-              onClick={() => navigate('/audiciones')}
+              onClick={() => navigate('/menu-audiciones')}
             >
               <span className="menu-item__icon">🎤</span>
               <span className="menu-item__text">Audiciones</span>
