@@ -11,7 +11,7 @@ const QuienesSomos = () => {
   };
 
   const handleInscripciones = () => {
-    console.log('Ir a inscripciones');
+    navigate('/inscripciones');
   };
 
   const handleContacto = () => {
@@ -43,6 +43,9 @@ const QuienesSomos = () => {
                 <span className="nav-link" onClick={handleContacto}>
                   Contacto
                 </span>
+                <button className="close-btn" onClick={handleHome}>
+                  ✕
+                </button>
               </div>
             </Col>
           </Row>

@@ -9,6 +9,7 @@ import {
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Landing from './components/landing';
 import QuienesSomos from './components/quienesSomos';
+import Formulario from './components/formulario';
 import Login from './components/login';
 import Principal from './components/principal';
 import Menu from './components/menu';
@@ -37,6 +38,9 @@ function App() {
 
           {/* Quienes somos */}
           <Route path="/quienes-somos" element={<QuienesSomos />} />
+
+          {/* Formulario de Inscripciones */}
+          <Route path="/inscripciones" element={<Formulario />} />
 
           {/* Login - Permite acceso al formulario de login */}
           <Route

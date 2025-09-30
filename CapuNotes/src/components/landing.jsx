@@ -33,8 +33,7 @@ const Landing = () => {
   };
 
   const handleInscripciones = () => {
-    // Redirigir a inscripciones
-    console.log('Ir a inscripciones');
+    navigate('/inscripciones');
   };
 
   const handleQuienesSomos = () => {
