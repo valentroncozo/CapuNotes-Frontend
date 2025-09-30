@@ -1,13 +1,25 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './login.css';
 
-export default function Login({ onLogin }) {
-  const [username, setUsername] = useState('');
+export default function Login({ setIsAuthenticated, setUsername }) {
+  const navigate = useNavigate();
+  const [usernameInput, setUsernameInput] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onLogin(username, password);
+
+    // Validación básica
+    if (usernameInput.trim() && password.trim()) {
+      // Establecer el estado de autenticación
+      setUsername(usernameInput);
+      setIsAuthenticated(true);
+      // Navegar al principal
+      navigate('/principal');
+    } else {
+      alert('Por favor, completa todos los campos');
+    }
   };
 
   return (
@@ -24,7 +36,7 @@ export default function Login({ onLogin }) {
 
       {/* Contenedor azul con onda en el borde superior */}
       <div className="login-form-onda">
-        {/* 👉 La onda ahora está arriba del bloque */}
+        {/* La onda ahora está arriba del bloque */}
         <svg
           className="onda-superior"
           viewBox="0 0 500 100"
@@ -57,8 +69,8 @@ export default function Login({ onLogin }) {
               type="text"
               className="custom-input"
               placeholder="Usuario"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={usernameInput}
+              onChange={(e) => setUsernameInput(e.target.value)}
               required
             />
           </div>
