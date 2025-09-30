@@ -25,7 +25,8 @@ const Formulario = () => {
     encontrarMotivo: '',
     cancion: '',
     audicion: '',
-    horario: 'Mañana',
+    dia: '',
+    horarioDisponible: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -64,6 +65,9 @@ const Formulario = () => {
     if (!formData.provincia) newErrors.provincia = 'Selecciona la provincia';
     if (!formData.pais) newErrors.pais = 'Selecciona el país';
     if (!formData.profesion) newErrors.profesion = 'Selecciona la profesión';
+    if (!formData.dia) newErrors.dia = 'Selecciona el día para la audición';
+    if (!formData.horarioDisponible)
+      newErrors.horarioDisponible = 'Selecciona el horario disponible';
 
     // Validación de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -125,7 +129,8 @@ const Formulario = () => {
         encontrarMotivo: '',
         cancion: '',
         audicion: '',
-        horario: 'Mañana',
+        dia: '',
+        horarioDisponible: '',
       });
     } catch (error) {
       console.error('Error al enviar el formulario:', error);
@@ -464,47 +469,75 @@ const Formulario = () => {
                     />
                   </div>
 
-                  {/* Selección de horario para audición */}
+                  {/* Selección de día y horario para audición */}
                   <div className="form-group mb-4">
                     <label className="form-label">
                       Elegí el horario para tu audición:
                     </label>
-                    <div className="horario-selection mt-3">
-                      <div className="row">
-                        <div className="col-md-6">
-                          <div className="form-check">
-                            <input
-                              className="form-check-input"
-                              type="radio"
-                              name="horario"
-                              id="manana"
-                              value="Mañana"
-                              checked={formData.horario === 'Mañana'}
-                              onChange={handleChange}
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="manana"
-                            >
-                              Mañana
-                            </label>
-                          </div>
+                    <div className="row mt-3">
+                      <div className="col-md-6">
+                        <div className="form-group">
+                          <label className="form-label">Día:</label>
+                          <select
+                            className={`form-select ${
+                              errors.dia ? 'is-invalid' : ''
+                            }`}
+                            name="dia"
+                            value={formData.dia}
+                            onChange={handleChange}
+                            required
+                          >
+                            <option value="">Seleccionar</option>
+                            <option value="Lunes">Lunes</option>
+                            <option value="Martes">Martes</option>
+                            <option value="Miércoles">Miércoles</option>
+                            <option value="Jueves">Jueves</option>
+                            <option value="Viernes">Viernes</option>
+                            <option value="Sábado">Sábado</option>
+                            <option value="Domingo">Domingo</option>
+                          </select>
+                          {errors.dia && (
+                            <div className="invalid-feedback">{errors.dia}</div>
+                          )}
                         </div>
-                        <div className="col-md-6">
-                          <div className="form-check">
-                            <input
-                              className="form-check-input"
-                              type="radio"
-                              name="horario"
-                              id="tarde"
-                              value="Tarde"
-                              checked={formData.horario === 'Tarde'}
-                              onChange={handleChange}
-                            />
-                            <label className="form-check-label" htmlFor="tarde">
-                              Tarde
-                            </label>
-                          </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="form-group">
+                          <label className="form-label">
+                            Horarios disponibles:
+                          </label>
+                          <select
+                            className={`form-select ${
+                              errors.horarioDisponible ? 'is-invalid' : ''
+                            }`}
+                            name="horarioDisponible"
+                            value={formData.horarioDisponible}
+                            onChange={handleChange}
+                            required
+                          >
+                            <option value="">Seleccionar</option>
+                            <option value="09:00 - 09:30">09:00 - 09:30</option>
+                            <option value="09:30 - 10:00">09:30 - 10:00</option>
+                            <option value="10:00 - 10:30">10:00 - 10:30</option>
+                            <option value="10:30 - 11:00">10:30 - 11:00</option>
+                            <option value="11:00 - 11:30">11:00 - 11:30</option>
+                            <option value="11:30 - 12:00">11:30 - 12:00</option>
+                            <option value="14:00 - 14:30">14:00 - 14:30</option>
+                            <option value="14:30 - 15:00">14:30 - 15:00</option>
+                            <option value="15:00 - 15:30">15:00 - 15:30</option>
+                            <option value="15:30 - 16:00">15:30 - 16:00</option>
+                            <option value="16:00 - 16:30">16:00 - 16:30</option>
+                            <option value="16:30 - 17:00">16:30 - 17:00</option>
+                            <option value="17:00 - 17:30">17:00 - 17:30</option>
+                            <option value="17:30 - 18:00">17:30 - 18:00</option>
+                            <option value="18:00 - 18:30">18:00 - 18:30</option>
+                            <option value="18:30 - 19:00">18:30 - 19:00</option>
+                          </select>
+                          {errors.horarioDisponible && (
+                            <div className="invalid-feedback">
+                              {errors.horarioDisponible}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
