@@ -1,186 +1,375 @@
-import { useEffect, useState } from "react";
-import "./organizacionCoro.css";
-import Menu from "./menu.jsx";
-import AreaModal from "./modificarArea.jsx";
-import { useNavigate } from "react-router-dom";
-import { areasApi } from "../services/areas"; // 👈 importamos API
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useForm, useCrud, useModal, useNotification } from '../hooks';
+import * as areasApi from '../services/areas';
+import './organizacionCoro.css';
 
-export default function OrganizacionCoro({ onClose }) {
-  const navigate = useNavigate();
-  const [menuAbierto, setMenuAbierto] = useState(false);
-
-  const handleClose = () => {
-    if (onClose) onClose();
-    navigate("/menu");
-  };
-  
-  const handleGuardarCambios = async (updatedArea) => {
-  try {
-    await areasApi.actualizar(selectedArea.name, {
-      name: updatedArea.name,
-      description: updatedArea.description,
-    });
-    await cargarAreas();
-    setShowModal(false);
-    setSelectedArea(null);
-  } catch (err) {
-    console.error("Error al actualizar área:", err);
-    alert("No se pudo actualizar el área");
-  }
+// Reglas de validación para áreas
+const areaValidationRules = {
+  nombre: {
+    required: true,
+    label: 'Nombre del área',
+    minLength: 2,
+    minLengthMessage: 'El nombre debe tener al menos 2 caracteres',
+    maxLength: 50,
+    maxLengthMessage: 'El nombre no puede exceder 50 caracteres',
+  },
+  descripcion: {
+    required: true,
+    label: 'Descripción',
+    minLength: 10,
+    minLengthMessage: 'La descripción debe tener al menos 10 caracteres',
+    maxLength: 500,
+    maxLengthMessage: 'La descripción no puede exceder 500 caracteres',
+  },
 };
 
+// Valores iniciales del formulario de área
+const initialAreaValues = {
+  nombre: '',
+  descripcion: '',
+};
 
-  // Estado del modal
-  const [showModal, setShowModal] = useState(false);
-  const [selectedArea, setSelectedArea] = useState(null);
+const OrganizacionCoro = () => {
+  const navigate = useNavigate();
+  const { showSuccess, showError, showWarning } = useNotification();
 
-  // Estado de áreas
-  const [areas, setAreas] = useState([]);
-  const [nombre, setNombre] = useState("");
-  const [descripcion, setDescripcion] = useState("");
+  // Hook para manejar CRUD de áreas
+  const {
+    items: areas,
+    loading: areasLoading,
+    error: areasError,
+    fetchItems: fetchAreas,
+    createItem: createArea,
+    updateItem: updateArea,
+    deleteItem: deleteArea,
+  } = useCrud(areasApi);
 
-  // Cargar áreas al inicio
-  useEffect(() => {
-    cargarAreas();
+  // Hook para manejar el modal de agregar/editar área
+  const {
+    isOpen: isModalOpen,
+    data: editingArea,
+    openModal,
+    closeModal,
+  } = useModal();
+
+  // Hook para el formulario de área
+  const {
+    values: areaValues,
+    errors: areaErrors,
+    isSubmitting,
+    setIsSubmitting,
+    handleChange: handleAreaChange,
+    validate: validateArea,
+    reset: resetAreaForm,
+    setValue: setAreaValue,
+  } = useForm(initialAreaValues, areaValidationRules);
+
+  // Cargar áreas al montar el componente
+  React.useEffect(() => {
+    loadAreas();
   }, []);
 
-  const cargarAreas = async () => {
+  // Función para cargar áreas
+  const loadAreas = async () => {
     try {
-      const data = await areasApi.listar();
-      setAreas(data);
-    } catch (err) {
-      console.error("Error al cargar áreas:", err);
+      await fetchAreas();
+    } catch (error) {
+      showError('Error al cargar las áreas del coro');
     }
   };
 
-  const handleSubmit = async (e) => {
+  // Abrir modal para agregar nueva área
+  const handleAgregarArea = () => {
+    resetAreaForm();
+    openModal(null); // null significa "nueva área"
+  };
+
+  // Abrir modal para editar área existente
+  const handleEditarArea = (area) => {
+    setAreaValue('nombre', area.nombre);
+    setAreaValue('descripcion', area.descripcion);
+    openModal(area); // pasar el área a editar
+  };
+
+  // Manejar envío del formulario de área
+  const handleSubmitArea = async (e) => {
     e.preventDefault();
+
+    if (!validateArea()) {
+      showWarning('Por favor corrige los errores del formulario');
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
-      await areasApi.crear({ name: nombre, description: descripcion });
-      setNombre("");
-      setDescripcion("");
-      cargarAreas(); // refrescar lista
-    } catch (err) {
-      console.error("Error al crear área:", err);
-      alert("No se pudo crear el área");
+      if (editingArea) {
+        // Editando área existente
+        await updateArea(editingArea.id, areaValues);
+        showSuccess('Área actualizada exitosamente');
+      } else {
+        // Creando nueva área
+        await createArea(areaValues);
+        showSuccess('Área creada exitosamente');
+      }
+
+      closeModal();
+      resetAreaForm();
+    } catch (error) {
+      showError(
+        editingArea ? 'Error al actualizar el área' : 'Error al crear el área'
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleEliminar = async (id) => {
-    if (!window.confirm("¿Seguro que deseas eliminar esta área?")) return;
-    try {
-      await areasApi.eliminarPorId(id);
-      cargarAreas();
-    } catch (err) {
-      console.error("Error al eliminar área:", err);
+  // Manejar eliminación de área
+  const handleEliminarArea = async (area) => {
+    if (
+      !window.confirm(
+        `¿Estás seguro de que deseas eliminar el área "${area.nombre}"?`
+      )
+    ) {
+      return;
     }
+
+    try {
+      await deleteArea(area.id);
+      showSuccess('Área eliminada exitosamente');
+    } catch (error) {
+      showError('Error al eliminar el área');
+    }
+  };
+
+  // Navegar de vuelta al menú principal
+  const handleVolver = () => {
+    navigate('/principal');
+  };
+
+  // Navegar al home
+  const handleHome = () => {
+    window.scrollTo(0, 0);
+    navigate('/');
   };
 
   return (
-    <div className="container-fluid min-vh-100 organizacion-bg text-white p-0">
-      {/* Botón cerrar */}
-      <button className="menu-close" onClick={handleClose}>
-        ✕
-      </button>
+    <div className="organizacion-container">
+      {/* Header */}
+      <div className="organizacion-header">
+        {/* Botón de menú */}
+        <button className="menu-button" onClick={handleVolver}>
+          <div className="menu-icon">
+            <div className="menu-bar"></div>
+            <div className="menu-bar"></div>
+            <div className="menu-bar"></div>
+          </div>
+        </button>
 
-      {/* Menú hamburguesa */}
-      <button
-        className="btn btn-link position-absolute top-0 start-0 m-3 p-0 z-3"
-        onClick={() => setMenuAbierto(true)}
-      >
-        <span className="menu-bar d-block mb-1"></span>
-        <span className="menu-bar d-block mb-1"></span>
-        <span className="menu-bar d-block"></span>
-      </button>
+        {/* Centro - Logo + Título */}
+        <div className="organizacion-center">
+          <img src="/Logo coro sin fondo.jpg" alt="Logo" className="logo" />
+          <h1 className="title-secondary">Áreas</h1>
+        </div>
 
-      {menuAbierto && <Menu onClose={() => setMenuAbierto(false)} />}
+        {/* Botón cerrar */}
+        <button className="close-btn" onClick={handleHome}>
+          ✕
+        </button>
+      </div>
 
-      <div className="row justify-content-center">
-        <div className="col-12 col-md-8 col-lg-6 py-4">
-          {/* Header */}
-          <div className="d-flex align-items-center gap-2 mb-2">
-            <img
-              src="/Logo coro sin fondo.jpg"
-              alt="Logo"
-              className="organizacion-logo"
+      {/* Línea divisora */}
+      <hr className="divisor-amarillo" />
+
+      {/* Contenido principal */}
+      <div className="organizacion-content">
+        {/* Formulario para agregar área */}
+        <form onSubmit={handleSubmitArea} className="organizacion-form">
+          <div className="form-group">
+            <input
+              type="text"
+              name="nombre"
+              className={`form-input ${areaErrors.nombre ? 'is-invalid' : ''}`}
+              placeholder="Nombre del área"
+              value={areaValues.nombre}
+              onChange={handleAreaChange}
             />
-            <h2 className="organizacion-title mb-0">Áreas</h2>
+            {areaErrors.nombre && (
+              <div className="invalid-feedback">{areaErrors.nombre}</div>
+            )}
           </div>
-          <hr className="divisor-amarillo" />
 
-          {/* Formulario */}
-          <form className="mb-4" onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <label className="form-label text-white">Nombre:</label>
-              <input
-                type="text"
-                className="form-control organizacion-input"
-                placeholder="Nombre del área"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label text-white">Descripción:</label>
-              <input
-                type="text"
-                className="form-control organizacion-input"
-                placeholder="Descripción"
-                value={descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              className="btn btn-warning w-100 fw-bold organizacion-btn"
-            >
-              Agregar
-            </button>
-          </form>
+          <div className="form-group">
+            <textarea
+              name="descripcion"
+              className={`form-input ${
+                areaErrors.descripcion ? 'is-invalid' : ''
+              }`}
+              placeholder="Descripción"
+              rows="3"
+              value={areaValues.descripcion}
+              onChange={handleAreaChange}
+            />
+            {areaErrors.descripcion && (
+              <div className="invalid-feedback">{areaErrors.descripcion}</div>
+            )}
+          </div>
 
-          {/* Áreas registradas */}
-          <div className="fw-semibold mb-2">Áreas registradas:</div>
-          <div className="areas-list-scroll">
-            {areas.map((area) => (
-              <div className="area-card mb-3" key={area.id}>
-                <div className="fw-bold">{area.name}</div>
-                <div className="area-desc">{area.description}</div>
-                <div className="btn-container">
-                  <button
-                    className="btn-card"
-                    onClick={() => {
-                      setSelectedArea(area);
-                      setShowModal(true);
-                    }}
-                  >
-                    Consultar
-                  </button>
-                  <button
-                    className="btn-card"
-                    onClick={() => handleEliminar(area.id)}
-                  >
-                    Eliminar
-                  </button>
-                </div>
+          <button
+            type="submit"
+            className="btn btn-primary btn-full"
+            disabled={isSubmitting}
+          >
+            {isSubmitting
+              ? editingArea
+                ? 'Actualizando...'
+                : 'Agregando...'
+              : editingArea
+              ? 'Actualizar'
+              : 'Agregar'}
+          </button>
+        </form>
+
+        {/* Lista de áreas registradas */}
+        <div className="areas-section">
+          <h3 className="title-secondary">Áreas registradas:</h3>
+
+          {areasLoading && (
+            <div className="loading-message">Cargando áreas...</div>
+          )}
+
+          {areasError && (
+            <div className="error-message">
+              {areasError}
+              <button className="btn btn-secondary" onClick={loadAreas}>
+                Reintentar
+              </button>
+            </div>
+          )}
+
+          {!areasLoading && !areasError && (
+            <div className="areas-list">
+              <div className="areas-list-scroll">
+                {areas.length === 0 ? (
+                  <div className="empty-state">
+                    <p>No hay áreas registradas aún.</p>
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleAgregarArea}
+                    >
+                      Agregar primera área
+                    </button>
+                  </div>
+                ) : (
+                  areas.map((area) => (
+                    <div key={area.id} className="area-card">
+                      <div className="area-content">
+                        <h4 className="area-title">{area.nombre}</h4>
+                        <p className="area-desc">{area.descripcion}</p>
+                      </div>
+
+                      <div className="area-actions">
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => handleEditarArea(area)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleEliminarArea(area)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Modal */}
-      <AreaModal
-        show={showModal}
-        onClose={() => {
-          setShowModal(false);
-          setSelectedArea(null);
-        }}
-        area={selectedArea}
-        onSave={handleGuardarCambios}   // 👈 nuevo
-      />
+      {/* Modal para agregar/editar área */}
+      {isModalOpen && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-btn" onClick={closeModal}>
+              ✕
+            </button>
 
+            <h2 className="title-primary mb-4">
+              {editingArea ? 'Editar Área' : 'Nueva Área'}
+            </h2>
+
+            <form onSubmit={handleSubmitArea}>
+              <div className="form-group">
+                <label className="form-label">Nombre del área</label>
+                <input
+                  type="text"
+                  name="nombre"
+                  className={`form-input ${
+                    areaErrors.nombre ? 'is-invalid' : ''
+                  }`}
+                  placeholder="Ej: Sopranos, Tenores, etc."
+                  value={areaValues.nombre}
+                  onChange={handleAreaChange}
+                />
+                {areaErrors.nombre && (
+                  <div className="invalid-feedback">{areaErrors.nombre}</div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Descripción</label>
+                <textarea
+                  name="descripcion"
+                  className={`form-input ${
+                    areaErrors.descripcion ? 'is-invalid' : ''
+                  }`}
+                  placeholder="Describe las características de esta área..."
+                  rows="4"
+                  value={areaValues.descripcion}
+                  onChange={handleAreaChange}
+                />
+                {areaErrors.descripcion && (
+                  <div className="invalid-feedback">
+                    {areaErrors.descripcion}
+                  </div>
+                )}
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={closeModal}
+                  disabled={isSubmitting}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting
+                    ? editingArea
+                      ? 'Actualizando...'
+                      : 'Creando...'
+                    : editingArea
+                    ? 'Actualizar'
+                    : 'Crear'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default OrganizacionCoro;

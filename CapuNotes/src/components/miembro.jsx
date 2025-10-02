@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Form, Button, Table } from "react-bootstrap";
-import { PencilFill, XCircleFill } from "react-bootstrap-icons";
-import { useNavigate } from "react-router-dom";
-import AgregarModificarMiembro from "./agregarModificarMiembro";
-import { miembrosApi } from "../services/miembros"; // 👈 servicio API
-import "./miembro.css";
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Form, Button, Table } from 'react-bootstrap';
+import { PencilFill, XCircleFill } from 'react-bootstrap-icons';
+import { useNavigate } from 'react-router-dom';
+import AgregarModificarMiembro from './agregarModificarMiembro';
+import * as miembrosApi from '../services/miembros'; // ❌ MAL
+import './miembro.css';
 
 const Miembros = ({ onClose }) => {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
-  const [formMode, setFormMode] = useState("registro"); // 'registro' o 'modificacion'
+  const [formMode, setFormMode] = useState('registro'); // 'registro' o 'modificacion'
   const [miembroSeleccionado, setMiembroSeleccionado] = useState(null);
   const [miembros, setMiembros] = useState([]);
-  const [filtro, setFiltro] = useState("");
+  const [filtro, setFiltro] = useState('');
 
   // --- Navegación / cierre ---
   const handleClose = () => {
     if (onClose) onClose();
-    navigate("/menu");
+    navigate('/menu');
   };
 
   // --- Cargar miembros al inicio ---
@@ -30,34 +30,34 @@ const Miembros = ({ onClose }) => {
       const data = await miembrosApi.listar();
       setMiembros(data);
     } catch (err) {
-      console.error("Error al cargar miembros:", err);
+      console.error('Error al cargar miembros:', err);
     }
   };
 
   // --- Buscar miembros ---
   const handleBuscar = async () => {
     try {
-      if (filtro.trim() === "") {
+      if (filtro.trim() === '') {
         cargarMiembros();
       } else {
         const data = await miembrosApi.buscar(filtro);
         setMiembros(data);
       }
     } catch (err) {
-      console.error("Error en la búsqueda:", err);
+      console.error('Error en la búsqueda:', err);
     }
   };
 
   // --- Abrir formulario vacío ---
   const handleAgregar = () => {
-    setFormMode("registro");
+    setFormMode('registro');
     setMiembroSeleccionado(null);
     setShowForm(true);
   };
 
   // --- Abrir formulario con datos ---
   const handleModificar = (miembro) => {
-    setFormMode("modificacion");
+    setFormMode('modificacion');
     setMiembroSeleccionado(miembro);
     setShowForm(true);
   };
@@ -71,7 +71,7 @@ const Miembros = ({ onClose }) => {
   // --- Guardar (alta o modificación) ---
   const handleSubmit = async (data) => {
     try {
-      if (formMode === "registro") {
+      if (formMode === 'registro') {
         await miembrosApi.crear(data);
       } else {
         await miembrosApi.actualizar(data);
@@ -79,27 +79,31 @@ const Miembros = ({ onClose }) => {
       cargarMiembros();
       setShowForm(false);
     } catch (err) {
-      console.error("Error al guardar miembro:", err);
-      alert("No se pudo guardar el miembro");
+      console.error('Error al guardar miembro:', err);
+      alert('No se pudo guardar el miembro');
     }
   };
 
   // --- Eliminar ---
   const handleEliminar = async (miembro) => {
-    if (!window.confirm("¿Seguro que deseas eliminar este miembro?")) return;
+    if (!window.confirm('¿Seguro que deseas eliminar este miembro?')) return;
     try {
       await miembrosApi.eliminar(miembro.numeroDni, miembro.tipoDni);
       cargarMiembros();
     } catch (err) {
-      console.error("Error al eliminar miembro:", err);
-      alert("No se pudo eliminar el miembro");
+      console.error('Error al eliminar miembro:', err);
+      alert('No se pudo eliminar el miembro');
     }
   };
 
   return (
     <Container fluid className="miembros-container">
       {/* Botón cerrar */}
-      <button className="menu-close" onClick={handleClose} aria-label="Cerrar menú">
+      <button
+        className="menu-close"
+        onClick={handleClose}
+        aria-label="Cerrar menú"
+      >
         ✕
       </button>
 
@@ -124,7 +128,7 @@ const Miembros = ({ onClose }) => {
                 className="search-input"
                 value={filtro}
                 onChange={(e) => setFiltro(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleBuscar()}
+                onKeyDown={(e) => e.key === 'Enter' && handleBuscar()}
               />
             </Col>
             <Col xs={12} md={4} className="text-md-end mt-2 mt-md-0">
@@ -161,8 +165,8 @@ const Miembros = ({ onClose }) => {
                               {m.nombre} {m.apellido}
                             </span>
                           </td>
-                          <td>{m.cuerda?.name || "-"}</td>
-                          <td>{m.area?.name || "-"}</td>
+                          <td>{m.cuerda?.name || '-'}</td>
+                          <td>{m.area?.name || '-'}</td>
                           <td>{m.estado}</td>
                           <td className="acciones">
                             <Button
@@ -198,12 +202,12 @@ const Miembros = ({ onClose }) => {
       ) : (
         <AgregarModificarMiembro
           titulo={
-            formMode === "registro"
-              ? "Registro de miembro"
-              : "Modificación de miembro"
+            formMode === 'registro'
+              ? 'Registro de miembro'
+              : 'Modificación de miembro'
           }
           datosIniciales={
-            formMode === "modificacion" ? miembroSeleccionado : null
+            formMode === 'modificacion' ? miembroSeleccionado : null
           }
           onSubmit={handleSubmit}
           onCancel={handleCancel}
@@ -214,4 +218,3 @@ const Miembros = ({ onClose }) => {
 };
 
 export default Miembros;
-
