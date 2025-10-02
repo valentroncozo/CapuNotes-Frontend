@@ -3,7 +3,7 @@
 /* Container principal */
 .organizacion-container {
   min-height: var(--min-height-screen);
-  background: var(--color-primary);
+  background: #0d0c2b; /* Forzar el azul correcto */
   border-radius: var(--border-radius-xl);
   max-width: var(--card-max-width);
   margin: 0 auto;
@@ -13,77 +13,13 @@
   padding: 0;
 }
 
-/* Header */
-.organizacion-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-lg) var(--spacing-xl);
-  background: transparent;
-  position: relative;
-  height: 80px;
-}
-
-/* Botón de menú - lado izquierdo */
-.menu-button {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  height: 40px;
-  width: 40px;
-  padding: 0;
-}
-
-.menu-icon {
-  width: 32px;
-  height: 32px;
-}
-
-.menu-bar {
-  width: 28px;
-  height: 4px;
-  background: var(--text-white);
-  border-radius: var(--border-radius-sm);
-  margin: 3px 0;
-}
-
-.menu-bar:last-child {
-  margin-bottom: 0;
-}
-
-/* Centro - Logo + Título */
-.organizacion-center {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-/* Línea divisora */
-.divisor-amarillo {
-  border: none;
-  border-top: 2.5px solid var(--color-secondary);
-  width: 100vw;
-  margin: 0;
-  border-radius: var(--border-radius-sm);
-  position: relative;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
 /* Contenido principal */
 .organizacion-content {
   padding: var(--spacing-lg) var(--spacing-xl);
+  background: #0d0c2b; /* Forzar el azul correcto */
 }
 
-/* Formulario */
+/* === FORMULARIO === */
 .organizacion-form {
   margin-bottom: var(--spacing-xl);
 }
@@ -92,7 +28,7 @@
   margin-bottom: var(--spacing-md);
 }
 
-/* Sección de áreas */
+/* === SECCIÓN DE ÁREAS === */
 .areas-section {
   margin-top: var(--spacing-xl);
 }
@@ -110,12 +46,13 @@
   padding-right: 4px;
 }
 
-/* Cards de área */
+/* === CARDS DE ÁREA === */
 .area-card {
-  background: var(--color-accent);
+  background: rgba(243, 162, 29, 0.1);
+  border: 1px solid var(--color-secondary);
   border-radius: var(--border-radius-md);
   padding: var(--spacing-md);
-  color: var(--text-dark);
+  color: var(--text-white);
   box-shadow: var(--box-shadow-sm);
   margin-bottom: var(--spacing-md);
   display: flex;
@@ -127,6 +64,8 @@
 .area-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--box-shadow-md);
+  border-color: #f3a21d;
+  background: rgba(243, 162, 29, 0.15);
 }
 
 .area-content {
@@ -137,16 +76,17 @@
   font-size: var(--font-size-lg);
   font-weight: 600;
   margin: 0 0 var(--spacing-xs) 0;
-  color: var(--text-dark);
+  color: var(--text-white);
   font-family: var(--font-family-primary);
 }
 
 .area-desc {
   font-size: var(--font-size-base);
-  color: var(--text-dark);
+  color: var(--text-white);
   margin: 0;
   line-height: 1.4;
   font-family: var(--font-family-primary);
+  opacity: 0.9;
 }
 
 .area-actions {
@@ -156,22 +96,7 @@
   margin-left: var(--spacing-md);
 }
 
-/* Botones pequeños */
-.btn-sm {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  font-size: var(--font-size-sm);
-}
-
-.btn-danger {
-  background-color: var(--color-danger);
-  color: var(--text-white);
-}
-
-.btn-danger:hover {
-  background-color: #c82333;
-}
-
-/* Estados especiales */
+/* === ESTADOS === */
 .loading-message {
   text-align: center;
   padding: var(--spacing-xl);
@@ -200,7 +125,7 @@
   font-size: var(--font-size-lg);
 }
 
-/* Modal */
+/* === MODAL === */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -214,7 +139,7 @@
 }
 
 .modal-content {
-  background: var(--color-primary);
+  background: #0d0c2b;
   padding: var(--spacing-xl);
   border-radius: var(--border-radius-lg);
   width: 90%;
@@ -225,6 +150,7 @@
   max-height: 90vh;
   overflow-y: auto;
   font-family: var(--font-family-primary);
+  border: 2px solid var(--color-secondary);
 }
 
 .modal-actions {
@@ -245,17 +171,8 @@
   }
 }
 
-/* Responsive */
+/* === RESPONSIVE === */
 @media (max-width: 768px) {
-  .organizacion-header {
-    padding: var(--spacing-md) var(--spacing-lg);
-    height: 60px;
-  }
-
-  .organizacion-content {
-    padding: var(--spacing-md);
-  }
-
   .areas-list {
     height: 250px;
   }
@@ -277,15 +194,6 @@
 }
 
 @media (max-width: 480px) {
-  .organizacion-header {
-    padding: var(--spacing-sm) var(--spacing-md);
-    height: 50px;
-  }
-
-  .organizacion-content {
-    padding: var(--spacing-sm);
-  }
-
   .areas-list {
     height: 200px;
   }

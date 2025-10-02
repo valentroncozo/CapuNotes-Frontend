@@ -1,0 +1,205 @@
+/* src/components/Header.css */
+
+/* === HEADER ESTÁNDAR === */
+.standard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: #0d0c2b;
+  position: relative;
+  height: 80px;
+  font-family: var(--font-family-primary);
+  width: 100%; /* ASEGURAR: Ancho completo */
+  margin: 0; /* ASEGURAR: Sin márgenes */
+}
+
+/* === SECCIONES DEL HEADER === */
+.header-left,
+.header-right {
+  flex: 0 0 60px; /* Ancho fijo para mantener el centrado perfecto */
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.header-left {
+  justify-content: flex-start;
+}
+
+.header-right {
+  justify-content: flex-end;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  height: 100%;
+}
+
+/* === BOTÓN MENÚ (IZQUIERDA) === */
+.menu-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  height: 40px;
+  width: 40px;
+  padding: 0;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.menu-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.menu-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-bar {
+  width: 28px;
+  height: 4px;
+  background: var(--text-white);
+  border-radius: 2px;
+  margin: 3px 0;
+  transition: all 0.2s ease;
+}
+
+.menu-bar:last-child {
+  margin-bottom: 0;
+}
+
+/* === LOGO Y TÍTULO EN LA MISMA LÍNEA === */
+.header-logo {
+  object-fit: contain;
+  border-radius: 50%;
+  flex-shrink: 0; /* No se encoge */
+}
+
+.header-logo.small {
+  width: 40px;
+  height: 40px;
+}
+
+.header-logo.normal {
+  width: 48px;
+  height: 48px;
+}
+
+.header-logo.large {
+  width: 64px;
+  height: 64px;
+}
+
+/* === TÍTULO ALINEADO CON LOGO === */
+.header-title {
+  color: var(--text-white);
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  font-family: var(--font-family-primary);
+  margin: 0;
+  text-align: left; /* Alineado a la izquierda del logo */
+  white-space: nowrap; /* No se rompe en líneas */
+}
+
+/* === BOTÓN CERRAR (DERECHA) === */
+.close-button {
+  background: transparent;
+  border: none;
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  color: var(--text-white);
+  transition: all 0.2s ease;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+/* === LÍNEA DIVISORA AMARILLA === */
+.header-divider {
+  border: none;
+  border-top: 2.5px solid var(--color-secondary);
+  width: 100vw; /* CAMBIO: Ancho completo del viewport */
+  margin: 0;
+  border-radius: 2px;
+  position: relative;
+  left: 0; /* CAMBIO: Sin offset */
+  transform: none; /* CAMBIO: Sin transform */
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .standard-header {
+    padding: var(--spacing-md) var(--spacing-lg);
+    height: 60px;
+  }
+
+  .header-left,
+  .header-right {
+    flex: 0 0 50px;
+  }
+
+  .header-logo.normal {
+    width: 40px;
+    height: 40px;
+  }
+
+  .header-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .menu-button,
+  .close-button {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .standard-header {
+    padding: var(--spacing-sm) var(--spacing-md);
+    height: 50px;
+  }
+
+  .header-left,
+  .header-right {
+    flex: 0 0 40px;
+  }
+
+  .header-logo.normal {
+    width: 36px;
+    height: 36px;
+  }
+
+  .header-title {
+    font-size: var(--font-size-base);
+  }
+
+  .menu-button,
+  .close-button {
+    width: 32px;
+    height: 32px;
+  }
+}

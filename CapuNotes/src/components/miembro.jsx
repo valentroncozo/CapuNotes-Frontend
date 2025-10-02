@@ -4,6 +4,7 @@ import { PencilFill, XCircleFill } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
 import AgregarModificarMiembro from './agregarModificarMiembro';
 import * as miembrosApi from '../services/miembros'; // ❌ MAL
+import Header from './Header';
 import './miembro.css';
 
 const Miembros = ({ onClose }) => {
@@ -18,6 +19,11 @@ const Miembros = ({ onClose }) => {
   const handleClose = () => {
     if (onClose) onClose();
     navigate('/menu');
+  };
+
+  const handleCustomBack = () => {
+    // Lógica personalizada para volver
+    navigate(-1);
   };
 
   // --- Cargar miembros al inicio ---
@@ -98,17 +104,25 @@ const Miembros = ({ onClose }) => {
 
   return (
     <Container fluid className="miembros-container">
-      {/* Botón cerrar */}
-      <button
-        className="menu-close"
-        onClick={handleClose}
-        aria-label="Cerrar menú"
-      >
-        ✕
-      </button>
+      {/* Header con comportamiento personalizado */}
+      <Header
+        title="Perfil de Miembro"
+        showMenuButton={true}
+        showCloseButton={true}
+        onMenuClick={handleCustomBack} // Comportamiento personalizado
+      />
 
       {!showForm ? (
         <>
+          {/* Botón cerrar */}
+          <button
+            className="menu-close"
+            onClick={handleClose}
+            aria-label="Cerrar menú"
+          >
+            ✕
+          </button>
+
           {/* Header */}
           <Row className="mb-4 align-items-center">
             <Col xs="auto">

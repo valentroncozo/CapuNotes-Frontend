@@ -1,6 +1,7 @@
 /* src/index.css */
 @import './styles/variables.css';
 @import './styles/utilities.css';
+@import './styles/page-layout.css';
 
 :root {
   font-family: var(--font-family-primary);
@@ -8,28 +9,36 @@
   font-weight: 400;
   color-scheme: light dark;
   color: var(--text-white);
-  background-color: var(--color-primary);
+  background-color: #0d0c2b;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-html,
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  background: #0d0c2b;
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  width: 100%;
-  background: var(--color-primary);
-  font-size: var(--font-size-base); /* Base más grande para desktop */
-}
-
-body {
-  display: flex;
-  place-items: center;
-  min-width: 1200px; /* Ancho mínimo para desktop */
-  min-height: var(--min-height-screen);
+  width: 100vw; /* CAMBIO: Ancho completo del viewport */
+  min-height: 100vh;
+  background: #0d0c2b;
+  font-size: var(--font-size-base);
+  font-family: var(--font-family-primary);
 }
 
 a {
@@ -77,21 +86,20 @@ button:focus-visible {
 }
 
 #root {
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  background: var(--color-primary);
-  min-height: var(--min-height-screen);
-  padding: 0; /* Sin padding para aprovechar todo el espacio */
+  width: 100vw; /* CAMBIO: Ancho completo del viewport */
+  min-height: 100vh;
+  background: #0d0c2b;
+  margin: 0;
+  padding: 0;
 }
 
-/* === SCROLLBAR PERSONALIZADO PARA DESKTOP === */
+/* === SCROLLBAR === */
 ::-webkit-scrollbar {
-  width: 12px;
+  width: clamp(8px, 1.5vw, 12px);
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-primary);
+  background: #0d0c2b;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -103,24 +111,26 @@ button:focus-visible {
   background: #d98f16;
 }
 
-/* === EFECTOS PARA DESKTOP === */
-* {
-  box-sizing: border-box;
-}
-
-.smooth-scroll {
-  scroll-behavior: smooth;
-}
-
-/* === CONTAINERS PRINCIPALES === */
+/* === PÁGINA CONTAINER RESPONSIVE === */
 .page-container {
   min-height: var(--min-height-screen);
   background: var(--color-primary);
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .main-content {
+  flex: 1;
+  width: 100%;
   max-width: var(--container-max-width);
   margin: 0 auto;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
+}
+
+/* === RESPONSIVE UTILS === */
+@media (max-width: 480px) {
+  .main-content {
+    padding: var(--spacing-sm);
+  }
 }

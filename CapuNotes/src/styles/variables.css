@@ -1,76 +1,72 @@
 /* src/styles/variables.css */
 :root {
   /* === COLORES === */
-  /* Colores principales del proyecto */
-  --color-primary: #0d0c2b; /* Azul oscuro principal */
-  --color-secondary: #f3a21d; /* Amarillo/naranja de botones */
-  --color-accent: #b3cdfa; /* Azul claro de cards */
-  --color-dark-input: #18173a; /* Fondo de inputs oscuros */
+  --color-primary: #0d0c2b;
+  --color-secondary: #f3a21d;
+  --color-accent: #b3cdfa;
+  --color-dark-input: #18173a;
 
-  /* Colores de texto */
   --text-white: #ffffff;
   --text-dark: #212529;
   --text-placeholder: #b0b0b0;
   --text-muted: #6c757d;
 
-  /* Colores de estado */
   --color-success: #28a745;
   --color-danger: #dc3545;
   --color-warning: #ffc107;
   --color-info: #17a2b8;
 
-  /* === ESPACIADO DESKTOP FIRST === */
-  --spacing-xs: 0.75rem; /* 12px */
-  --spacing-sm: 1.25rem; /* 20px */
-  --spacing-md: 2rem; /* 32px */
-  --spacing-lg: 3rem; /* 48px */
-  --spacing-xl: 4rem; /* 64px */
-  --spacing-2xl: 6rem; /* 96px */
+  /* === ESPACIADO RESPONSIVE === */
+  --spacing-xs: clamp(0.5rem, 2vw, 0.75rem); /* 8px - 12px */
+  --spacing-sm: clamp(0.75rem, 3vw, 1.25rem); /* 12px - 20px */
+  --spacing-md: clamp(1rem, 4vw, 2rem); /* 16px - 32px */
+  --spacing-lg: clamp(1.5rem, 5vw, 3rem); /* 24px - 48px */
+  --spacing-xl: clamp(2rem, 6vw, 4rem); /* 32px - 64px */
+  --spacing-2xl: clamp(3rem, 8vw, 6rem); /* 48px - 96px */
 
-  /* === TIPOGRAFÍA DESKTOP === */
+  /* === TIPOGRAFÍA RESPONSIVE === */
   --font-family-primary: 'Manjari', sans-serif;
-  --font-size-xs: 0.875rem; /* 14px */
-  --font-size-sm: 1rem; /* 16px */
-  --font-size-base: 1.125rem; /* 18px - Más grande para desktop */
-  --font-size-lg: 1.25rem; /* 20px */
-  --font-size-xl: 1.5rem; /* 24px */
-  --font-size-2xl: 2rem; /* 32px */
-  --font-size-3xl: 2.5rem; /* 40px */
-  --font-size-4xl: 3rem; /* 48px */
+  --font-size-xs: clamp(0.75rem, 2.5vw, 0.875rem); /* 12px - 14px */
+  --font-size-sm: clamp(0.875rem, 3vw, 1rem); /* 14px - 16px */
+  --font-size-base: clamp(1rem, 3.5vw, 1.125rem); /* 16px - 18px */
+  --font-size-lg: clamp(1.125rem, 4vw, 1.25rem); /* 18px - 20px */
+  --font-size-xl: clamp(1.25rem, 4.5vw, 1.5rem); /* 20px - 24px */
+  --font-size-2xl: clamp(1.5rem, 5vw, 2rem); /* 24px - 32px */
+  --font-size-3xl: clamp(2rem, 6vw, 2.5rem); /* 32px - 40px */
+  --font-size-4xl: clamp(2.5rem, 7vw, 3rem); /* 40px - 48px */
 
-  /* === DIMENSIONES DESKTOP === */
-  --container-max-width: 1400px; /* Más ancho para desktop */
-  --form-max-width: 1200px; /* Formularios más anchos */
-  --card-max-width: 600px; /* Cards más grandes */
-  --sidebar-width: 280px; /* Para menús laterales */
-  --header-height: 100px; /* Header más alto */
+  /* === DIMENSIONES FLUID === */
+  --container-max-width: min(100% - 2rem, 1200px);
+  --form-max-width: min(100% - 1rem, 800px);
+  --card-max-width: min(100% - 1rem, 500px);
+  --header-height: clamp(60px, 8vh, 100px);
 
-  /* === GRID SYSTEM DESKTOP === */
+  /* === GRID SYSTEM RESPONSIVE === */
   --grid-columns: 12;
-  --grid-gap: 2rem; /* Más espacio entre columnas */
-  --grid-container-padding: 3rem; /* Padding del contenedor */
+  --grid-gap: clamp(1rem, 3vw, 2rem);
+  --grid-container-padding: clamp(1rem, 4vw, 3rem);
 
-  /* === BREAKPOINTS === */
-  --desktop-lg: 1440px; /* Desktop grande */
-  --desktop: 1200px; /* Desktop estándar */
-  --laptop: 992px; /* Laptop */
-  --tablet: 768px; /* Tablet */
-  --mobile: 576px; /* Mobile */
+  /* === BREAKPOINTS (solo para referencia) === */
+  --mobile: 480px;
+  --tablet: 768px;
+  --laptop: 1024px;
+  --desktop: 1200px;
+  --desktop-lg: 1440px;
 
-  /* === BORDES Y SOMBRAS DESKTOP === */
+  /* === BORDES Y SOMBRAS === */
   --border-radius-sm: 8px;
-  --border-radius-md: 16px;
-  --border-radius-lg: 24px;
-  --border-radius-xl: 32px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 20px;
+  --border-radius-xl: 24px;
   --border-radius-full: 50%;
 
-  --box-shadow-sm: 0 4px 8px rgba(0, 0, 0, 0.1);
-  --box-shadow-md: 0 8px 16px rgba(0, 0, 0, 0.15);
-  --box-shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.2);
-  --box-shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.25);
+  --box-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --box-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --box-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+  --box-shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.25);
 
   /* === TRANSICIONES === */
-  --transition-fast: 0.2s ease-in-out;
+  --transition-fast: 0.15s ease-in-out;
   --transition-normal: 0.3s ease-in-out;
   --transition-slow: 0.6s ease-in-out;
 
