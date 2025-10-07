@@ -1,6 +1,6 @@
 import './titulo-cards.css';
 
-export default function WelcomeCard({ title, subtitle }) {
+export default function WelcomeCard({ title}) {
   return (
     <div className="welcome-card">
       <img
@@ -10,7 +10,6 @@ export default function WelcomeCard({ title, subtitle }) {
       />
       <div className="welcome-card__text">
         <h3 className="welcome-card__title">{title}</h3>
-        <p className="welcome-card__subtitle">{subtitle}</p>
       </div>
     </div>
   );

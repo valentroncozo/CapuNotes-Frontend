@@ -1,25 +1,12 @@
 import { useState } from 'react';
 import './organizacionCoro.css';
-import Menu from './menu.jsx';
 
 export default function OrganizacionCoro() {
-  const [menuAbierto, setMenuAbierto] = useState(false);
 
   return (
     <div className="container-fluid min-vh-100 organizacion-bg text-white p-0">
       {/* Botón menú hamburguesa siempre visible */}
-      <button
-        className="btn btn-link position-absolute top-0 start-0 m-3 p-0 z-3"
-        onClick={() => setMenuAbierto(true)}
-        aria-label="Abrir menú"
-      >
-        <span className="menu-bar d-block mb-1"></span>
-        <span className="menu-bar d-block mb-1"></span>
-        <span className="menu-bar d-block"></span>
-      </button>
-
-      {/* Mostrar el menú si está abierto */}
-      {menuAbierto && <Menu onClose={() => setMenuAbierto(false)} />}
+    
 
       <div className="row justify-content-center">
         <div className="col-12 col-md-8 col-lg-6 py-4">
