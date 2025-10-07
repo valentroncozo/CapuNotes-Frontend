@@ -1,0 +1,78 @@
+/* === CARD DE BIENVENIDA (NORMALIZADA Y FULL WIDTH) === */
+
+.welcome-card {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.5rem;
+  background: transparent; /* fondo sólido pero con leve transparencia */
+  border-radius: 20px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  width: 95%; /* ✅ ocupa casi todo el ancho */
+  max-width: 1200px;
+  margin: 1.5rem auto;
+  color: #fff;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+/* === LOGO === */
+.welcome-card__logo {
+  width: clamp(80px, 9vw, 110px); /* adaptable */
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* === CONTENEDOR DE TEXTO === */
+.welcome-card__text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* === TÍTULO (achicado) === */
+.welcome-card__title {
+  font-size: clamp(1.4rem, 2.2vw, 2rem); /* 🔽 más chico */
+  font-weight: 700;
+  color: #E8EAED; 
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* === SUBTÍTULO === */
+.welcome-card__subtitle {
+  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  color: #E8EAED;
+  margin-top: 0.3rem;
+}
+
+/* === HOVER SUTIL EN DESKTOP === */
+.welcome-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .welcome-card {
+    width: 100%;
+    padding: 1.2rem 1rem;
+    gap: 1rem;
+  }
+
+  .welcome-card__logo {
+    width: clamp(70px, 20vw, 90px);
+  }
+
+  .welcome-card__title {
+    font-size: 1.6rem;
+    font-weight: 700;
+
+  }
+
+  .welcome-card__subtitle {
+    font-size: 0.9rem;
+  }
+}

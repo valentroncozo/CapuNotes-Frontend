@@ -1,0 +1,144 @@
+/* Fondo general */
+.login-container {
+  min-height: 100vh;
+  width: 100%;
+  background-image: url('/fondo.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Bloque azul con onda superior */
+.login-form-onda {
+  position: relative;
+  background: #0d0c2b;
+  width: 100%;
+  max-width: 400px;
+  min-height: 320px;
+  padding: 2rem 1rem;
+  border-radius: 40px 40px 0 0 / 60px 60px 0 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
+
+.login-form-onda .onda-superior {
+  position: absolute;
+  top: -80px;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  z-index: 0;
+}
+
+.logo-coro {
+  display: block;
+  margin: 0 auto 1.5rem auto;
+  max-width: 90px;
+  max-height: 90px;
+  object-fit: contain;
+  z-index: 1;
+}
+
+/* Formulario */
+.login-form-onda form {
+  width: 100%;
+  max-width: 350px;
+  z-index: 1;
+}
+
+.custom-input-group {
+  display: flex;
+  align-items: center;
+  background: #18173a;
+  border-radius: 20px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  gap: 10px;
+  width: 100%;
+}
+
+.custom-input-emoji {
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.custom-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.custom-input::placeholder {
+  color: #b0b0b0;
+}
+
+/* Logo texto */
+.logo-text {
+  font-family: 'Brush Script MT', cursive;
+  font-size: 2.5rem;
+  color: white;
+  margin-bottom: 0;
+  text-align: center;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  text-shadow: 2px 2px 8px #0008;
+}
+
+/* Onda amarilla */
+.onda-amarilla {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 11;
+  width: 100px;
+  height: 70px;
+  pointer-events: none;
+}
+
+/* 📱 RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .logo-text {
+    font-size: 2rem;
+    top: 20px;
+  }
+
+  .login-form-onda {
+    min-height: 280px;
+    padding: 1.5rem 1rem;
+    max-width: 95vw;
+  }
+
+  .logo-coro {
+    max-width: 70px;
+    max-height: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
+    font-size: 1.8rem;
+  }
+
+  .custom-input-group {
+    padding: 8px 12px;
+  }
+
+  .btn-ingresar {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+}
