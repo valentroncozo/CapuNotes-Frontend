@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './login.css';
+import Form from 'react-bootstrap/Form';
 import WavyClipPath from './WavyClipPath';
 
 export default function Login({ onLogin }) {
@@ -19,41 +20,28 @@ export default function Login({ onLogin }) {
       {/* Bloque azul con onda */}
       <div className="login-form-container"> 
         
-        <h1 className="logo-text">Iniciar Sesion en su cuenta de <strong>CapuNotes</strong></h1>
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit} className="formulario-login">
-    
-
-          <div className="custom-input-group mb-3">
-            <span
-              className="custom-input-emoji"
-              role="img"
-              aria-label="usuario"
-            >
-              👤
-            </span>
-            <input
+        <Form onSubmit={handleSubmit} className=" mb-3 formulario-login">
+  
+          <h1 className="logo-text">Iniciar Sesion en su cuenta de <strong>CapuNotes</strong></h1>
+          <Form.Group className='mb-3 custom-input-group'>
+            <Form.Control
               type="text"
-              className="custom-input form-control bg-transparent border-0 text-white"
+              className="custom-input"
               placeholder="Usuario"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
             />
-          </div>
+          </Form.Group>
 
-          <div className="custom-input-group mb-3">
-            <span
-              className="custom-input-emoji"
-              role="img"
-              aria-label="contraseña"
-            >
-              👁️
-            </span>
+              
+        
+          <div className="mb-3 custom-input-group">
             <input
               type="password"
-              className="custom-input form-control bg-transparent border-0 text-white"
+              className="custom-input"
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -64,7 +52,7 @@ export default function Login({ onLogin }) {
           <button type="submit" className="btn btn-warning w-100 fw-bold">
             Ingresar
           </button>
-        </form>
+        </Form>
 
       </div>
 
