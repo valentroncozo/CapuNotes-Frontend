@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './login.css';
+import WavyClipPath from './WavyClipPath';
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState('');
@@ -11,39 +12,19 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="login-container d-flex flex-column justify-content-end align-items-center">
-      {/* Onda amarilla superior izquierda */}
-      <div className="onda-amarilla">
-        <svg viewBox="0 0 120 80" preserveAspectRatio="none">
-          <path d="M0,0 Q80,0 120,60 Q60,80 0,80 Z" fill="#f3a21d" />
-        </svg>
-      </div>
+    <main className="login-container">
 
-      {/* Título sobre la imagen */}
-      <h1 className="logo-text">CapuNotes</h1>
+      <WavyClipPath/>
 
       {/* Bloque azul con onda */}
-      <div className="login-form-onda w-100 w-sm-75 w-md-50">
-        <svg
-          className="onda-superior"
-          viewBox="0 0 340 80"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M0,80 Q85,0 170,40 Q255,80 340,20 L340,0 L0,0 Z"
-            fill="#0d0c2b"
-          />
-        </svg>
-
-        {/* Logo */}
-        <img
-          src="/Logo coro sin fondo.jpg"
-          alt="Logo Coro"
-          className="logo-coro"
-        />
+      <div className="login-form-container"> 
+        
+        <h1 className="logo-text">Iniciar Sesion en su cuenta de <strong>CapuNotes</strong></h1>
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit} className="w-100">
+        <form onSubmit={handleSubmit} className="formulario-login">
+    
+
           <div className="custom-input-group mb-3">
             <span
               className="custom-input-emoji"
@@ -84,7 +65,15 @@ export default function Login({ onLogin }) {
             Ingresar
           </button>
         </form>
+
       </div>
-    </div>
+
+      <img
+        src="../public/fondo.jpg"
+        alt="fondo"
+        className="img-fondo"
+      />
+
+    </main>
   );
 }

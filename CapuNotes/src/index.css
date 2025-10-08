@@ -6,7 +6,7 @@
   font-family: 'Manjari', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  background: #11103a;
+  background-color: #0d0c2b;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
@@ -34,7 +34,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   font-family: 'Manjari', sans-serif; /* ✅ aseguramos la fuente global */
-  background-color: #090928; /* color del fondo base */
+  background-color: #0d0c2b; /* color del fondo base */
   color: #E8EAED;
 }
 

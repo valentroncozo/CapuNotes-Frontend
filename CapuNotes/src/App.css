@@ -1,9 +1,11 @@
 #root {
-  background: #11103a;
+  background: #0d0c2b;
   width: 100%;
-  margin: 0 auto;
-  padding: 2rem;
   text-align: center;
+}
+
+.App {
+  background-color: #0d0c2b;
 }
 
 .logo {
