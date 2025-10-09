@@ -103,9 +103,15 @@
 }
 
 /* Logos del coro */
+.container-logo-coro {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .logo-coro {
-  max-width: 60px;
-  max-height: 60px;
+  max-width: clamp(40px, 6vw, 60%);
   object-fit: contain;
 }
 
@@ -332,7 +338,7 @@ input[type="password"]::-webkit-password-toggle-button {
     display: flex;
     flex-direction: column;
     gap: .5rem;
-    justify-content: flex-end;
+    justify-content: center;
     text-align: start;
     align-items: flex-start;
     padding: 0;

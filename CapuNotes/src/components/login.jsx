@@ -76,9 +76,13 @@ export default function Login({ onLogin }) {
         <Form onSubmit={handleSubmit} 
         noValidate 
         className="formulario-login">
-
           <h1 className="logo-text">Iniciar Sesion en su cuenta de 
-            <strong> CapuNotes</strong></h1>
+            <strong> CapuNotes </strong>
+              <img src="../public/Logo coro sin fondo.png" 
+              alt="Logo" 
+              className="logo-coro" />
+          </h1>
+
           <Form.Group className='custom-input-group'>
            
             <AccountUser className="account-icon"/>
