@@ -1,0 +1,19 @@
+
+.container-toggle {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  right: 5px;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.container-toggle:hover {
+    border: inherit;
+    opacity: 0.8;
+}
+
+

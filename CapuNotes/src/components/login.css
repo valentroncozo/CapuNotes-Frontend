@@ -1,4 +1,19 @@
-/* Fondo general */
+/* VARIABLES DE ESTILOS */
+:root {
+  --primary-color: #11103a;
+  --secondary-color: #ffc107; 
+  --terciary-color: #b3cdfa;
+  --primary-text-color: #E8EAED;
+  --secondary-text-color: #202124;
+
+  --border-radius:  100%;
+  --box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  --font-family: 'Manjari', sans-serif;
+}
+
+
+
+/* Contenedor principal */
 .login-container {
   height: 100vh;
   width: 100%;
@@ -9,6 +24,7 @@
   justify-content: center;
 }
 
+/* Fondo de la imagen */
 .img-fondo {
   position: absolute;
   right: 0;
@@ -20,7 +36,7 @@
   object-position: center;
 } 
 
-/* Bloque azul con onda superior */
+/* Bloque azul condulado */
 .login-form-container {
   width: 100%;
   max-width: 90vw;
@@ -28,7 +44,7 @@
   left: 0;
   position: absolute;
   clip-path: url(#wavy-shape-clip);
-  background: #11103a;
+  background: var(--primary-color);
   display: flex;
   flex-direction: column;
   align-items:flex-start;
@@ -38,6 +54,7 @@
   padding: 2rem;
 }
 
+/* Logos del coro */
 .logo-coro {
   max-width: 60px;
   max-height: 60px;
@@ -47,7 +64,7 @@
 /* Formulario */
 .formulario-login {
   width: 60%;
-  min-width: 400px;
+  min-width: 325px;
   min-height: 60vh;
   display: flex;
   flex-direction: column;
@@ -55,48 +72,170 @@
   text-align: start;
   align-items: flex-start;
   padding: 1rem;
-  color: #ffff;
-  background: #0008;
+  color: var(--primary-text-color);
 
 }
 
-.custom-input-group {
-  width: 100%;
-}
+/* contenedor de inputs*/
 
-.custom-input-emoji {
-  font-size: 1.2rem;
-  color: #fff;
-}
-
-.custom-input{
-  width: 100%;
-  border: none;
-  outline: none;
-  color: #fff;
+/* Estilos para inputs personalizados */
+.formulario-login .custom-input-group .form-control {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: var(--primary-text-color);
+  border: inherit;
+  border-radius: 16px;
+  padding: clamp(0px, 1rem, 1rem);
   font-size: 1rem;
+  transition: all 0.3s ease;
+}
 
+.formulario-login .custom-input-group .form-control:focus {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--terciary-color);
+ /* terciary-color con transparencia */
+  box-shadow: inherit;
+  color: var(--primary-text-color);
+  outline: none;
+}
+
+.formulario-login .custom-input-group .form-control:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--terciary-color);
+ /* terciary-color con transparencia */
+  box-shadow: inherit;
+  color: var(--primary-text-color);
+  outline: none;
+}
+
+.formulario-login .custom-input-group .form-control::placeholder {
+  color: var(--primary-text-color);
+}
+
+/* Mantener el contenedor como está pero sin opacity */
+.formulario-login .custom-input-group {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: transparent; /* cambiar de #000 */
+  opacity: 1; /* cambiar de 0.8 */
+  border-radius: 16px;
+  border: none;
+}
+
+/* Estilos para el autocompletado */
+.formulario-login .custom-input-group .form-control:-webkit-autofill,
+.formulario-login .custom-input-group .form-control:-webkit-autofill:hover,
+.formulario-login .custom-input-group .form-control:-webkit-autofill:focus,
+.formulario-login .custom-input-group .form-control:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--primary-text-color) !important;
+  -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.3) inset !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  color: var(--primary-text-color) !important;
+}
+
+.account-icon {
+  right: 5px;
+  position: absolute;
+  font-size: 1.2rem;
+  color: var(--primary-text-color);
 }
 
 
 /* Logo texto */
 .logo-text {
-  font-family: 'Brush Script MT', cursive;
-  font-size: 1.5rem;
-  color: white;
-  margin-bottom: 0;
+  font-family: 'Manjari', system-ui, sans-serif;
+  font-size: clamp(1rem, 1.5rem, 3rem);
+  color: var(--primary-text-color);
+  margin: 0;
   position: relative;
-
   width: 100%;
   z-index: 10;
   text-shadow: 2px 2px 8px #0008;
+  text-align: center;
 }
 
 .logo-text strong {
-    font-size: 2rem;
+    font-size: clamp(2.5rem, 4.5vw, 6rem);
+    font-family: "Mr Dafoe", cursive !important;
+    font-weight: 400;
+    font-style: normal;
   }
 
-@media (width > 800px) {
+.custom-input-group .button-login{
+  width: 30%;
+  padding: clamp(0px, .5rem, .5rem);
+  margin: 0;
+  min-width: 120px;
+  border-radius: 16px;
+  background-color: var(--secondary-color);
+  color: var(--secondary-text-color);
+  border: inherit;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+}
 
-  
+.custom-input-group .button-login:hover{
+  background-color: var(--secondary-color);
+  color: var(--secondary-text-color);
+  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  justify-content: center;
+  align-items: center;
+  border: 1px solid var(--primary-text-color);
+}
+
+.menssaje-error-login{
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+  padding-left: clamp(0px, 1.5vw, 1rem);
+  font-weight: 500;
+  margin: 0;
+  align-self: start;
+
+}
+
+@media (width < 510px) {
+  /* Contenedor principal */
+  .login-container {
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* CORREGIDO: space-around no es válido para align-items */
+    justify-content: center;
+  }
+
+
+  /* Fondo de la imagen */
+  .img-fondo {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    object-fit: cover;
+    object-position: top;
+    z-index: 0;
+  } 
+
+  /* Bloque azul condulado */
+  .login-form-container {
+    width: 100%;
+    max-width: 100vw;
+    height: 50%;
+    bottom: 0;
+    position:absolute;
+    clip-path: url(#mobile-wavy-shape-clip);
+    background: var(--primary-color);
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content: center;
+    z-index: 1;
+    gap: 1.5rem;
+    padding: 2rem;
+  }
 }

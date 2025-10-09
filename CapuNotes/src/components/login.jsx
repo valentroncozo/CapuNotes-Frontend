@@ -1,57 +1,129 @@
 import { useState } from 'react';
 import './login.css';
+import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import WavyClipPath from './WavyClipPath';
+import WavyClipPath from '../assets/WavyClipPath';
+import MobileWavyClipPath from '../assets/MobileWavyClipPath';
+import AccountUser from '../assets/AccountUserIcon' 
+import PasswordToggleIcon from '../assets/PasswordToggleIcon';
+
+
+const validateField = (name,value, currentErrors) => {
+    let errors = '';
+    
+    if(value.trim() === ''){
+      errors = `* ${name} es obligatorio no puede estar vacio.`;
+    }
+    return {...currentErrors, [name.toLowerCase()]: errors };
+  }
+
+
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  const [showPassword, setShowPassword] = useState(false);
+  
+  const [errors, setErrors] = useState({});
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    onLogin(username, password);
+    let finalErrors = {};
+    
+    finalErrors.username = validateField('Usuario', username, errors);
+    finalErrors.password = validateField('Contraseña', password, errors);
+
+    const isValid = !finalErrors.username && !finalErrors.password;
+    setErrors(finalErrors);
+
+    if (isValid) {
+      onLogin(username, password);
+    }
+
   };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  }
+
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if(name === 'Usuario'){
+      setUsername(value);
+    } else if (name === 'Contraseña'){
+      setPassword(value);
+    }
+    const updatedErrors = validateField(name, value, errors);
+    setErrors(updatedErrors);
+  }
 
   return (
     <main className="login-container">
 
       <WavyClipPath/>
-
+      <MobileWavyClipPath/>
       {/* Bloque azul con onda */}
       <div className="login-form-container"> 
-        
+
 
         {/* Formulario */}
-        <Form onSubmit={handleSubmit} className=" mb-3 formulario-login">
-  
-          <h1 className="logo-text">Iniciar Sesion en su cuenta de <strong>CapuNotes</strong></h1>
-          <Form.Group className='mb-3 custom-input-group'>
+        <Form onSubmit={handleSubmit} 
+        noValidate 
+        className="formulario-login">
+
+          <h1 className="logo-text">Iniciar Sesion en su cuenta de 
+            <strong> CapuNotes</strong></h1>
+          <Form.Group className='custom-input-group'>
+           
+            <AccountUser className="account-icon"/>
+           
             <Form.Control
               type="text"
               className="custom-input"
               placeholder="Usuario"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={handleInputChange}
+              name="Usuario"
               required
             />
+
+
           </Form.Group>
+          <p className='menssaje-error-login'>{errors.usuario}</p>
 
               
         
-          <div className="mb-3 custom-input-group">
-            <input
-              type="password"
-              className="custom-input"
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+          <Form.Group className="custom-input-group">
+            
+              <PasswordToggleIcon 
+                isVisible={showPassword} 
+                onToggle={togglePasswordVisibility} 
+              />
 
-          <button type="submit" className="btn btn-warning w-100 fw-bold">
-            Ingresar
-          </button>
+              <Form.Control
+                type={showPassword ? "text" : "password"}
+                className="custom-input"
+                placeholder="Contraseña"
+                value={password}
+                onChange={handleInputChange}
+                name="Contraseña"
+                required
+              />
+
+          </Form.Group>
+          
+          <p className='menssaje-error-login'>{errors.contraseña}</p>
+
+          <Form.Group className='custom-input-group'>
+            <Button type="submit" 
+            className="button-login">
+              Ingresar
+            </Button>
+          </Form.Group>
+
         </Form>
 
       </div>
