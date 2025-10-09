@@ -13,6 +13,8 @@ const validateField = (name,value, currentErrors) => {
     
     if(value.trim() === ''){
       errors = `* ${name} es obligatorio no puede estar vacio.`;
+    } else {
+      errors = null;
     }
     return {...currentErrors, [name.toLowerCase()]: errors };
   }
@@ -30,12 +32,13 @@ export default function Login({ onLogin }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Construir el objeto final de errores usando la función validateField
     let finalErrors = {};
-    
-    finalErrors.username = validateField('Usuario', username, errors);
-    finalErrors.password = validateField('Contraseña', password, errors);
+    finalErrors = validateField('Usuario', username, finalErrors);
+    finalErrors = validateField('Contraseña', password, finalErrors);
 
-    const isValid = !finalErrors.username && !finalErrors.password;
+    // La función validateField devuelve un objeto con claves en minúsculas
+    const isValid = !finalErrors.usuario && !finalErrors.contraseña;
     setErrors(finalErrors);
 
     if (isValid) {

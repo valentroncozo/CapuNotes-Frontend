@@ -258,6 +258,9 @@ input[type="password"]::-webkit-password-toggle-button {
   box-shadow: 0 4px 14px rgba(0,0,0,.35);
 }
 
+/* Igualar el estilo al recibir foco por teclado (TAB), y hover */
+.custom-input-group .button-login:focus,
+.custom-input-group .button-login:focus-visible,
 .custom-input-group .button-login:hover{
   background-color: var(--secondary-color);
   color: var(--secondary-text-color);
@@ -266,6 +269,7 @@ input[type="password"]::-webkit-password-toggle-button {
   align-items: center;
   border: 1px solid var(--primary-text-color);
 }
+
 
 .menssaje-error-login{
   color: var(--secondary-color);
