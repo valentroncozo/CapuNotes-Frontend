@@ -64,10 +64,10 @@ export default function Login({ onLogin }) {
     <main className="login-container">
 
       <WavyClipPath/>
-      <MobileWavyClipPath/>
+
       {/* Bloque azul con onda */}
       <div className="login-form-container"> 
-
+        <MobileWavyClipPath />
 
         {/* Formulario */}
         <Form onSubmit={handleSubmit} 
