@@ -55,6 +55,53 @@
   overflow: hidden; /* asegurar que la clip-path recorte el contenido */
 }
 
+/* Asegurar que el SVG de clip no capture eventos y quede detrás del contenido */
+.login-form-container > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* importante */
+  z-index: 0;
+}
+
+/* Forzar que el contenido del formulario esté por encima y reciba eventos */
+.login-form-container > *:not(svg) {
+  position: relative;
+  z-index: 2;
+}
+
+/* Asegurar que inputs y botones sean interactivos */
+.login-form-container input,
+.login-form-container textarea,
+.login-form-container button,
+.login-form-container .form-control {
+  pointer-events: auto;
+  cursor: text;
+}
+
+/* Evitar que aparezca el cursor de texto y la selección en elementos no editables */
+.login-form-container,
+.login-form-container * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+/* Permitir selección e interacción sólo en controles de formulario */
+.login-form-container input,
+.login-form-container textarea,
+.login-form-container button,
+.login-form-container .form-control {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+
 /* Logos del coro */
 .logo-coro {
   max-width: 60px;
@@ -88,6 +135,37 @@
   padding: clamp(0px, 1rem, 1rem);
   font-size: 1rem;
   transition: all 0.3s ease;
+}
+
+/* Ajuste: espacio a la derecha para el icono personalizado y evitar solapamiento */
+.formulario-login .custom-input-group .form-control[type="password"] {
+  padding-right: 3.2rem; /* espacio para el ojo */
+}
+
+/* Ocultar el control nativo de mostrar contraseña en Edge/IE */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+/* Intentar ocultar el botón de decoración en WebKit/Blink (Chrome/Safari)
+   no todos los navegadores exponen los mismos pseudo-elementos, por eso
+   usamos varias variantes y !important donde aplica. */
+input[type="password"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* WebKit/Blink pseudo-elements (varios intentos para cubrir navegadores) */
+input[type="password"]::-webkit-textfield-decoration-button,
+input[type="password"]::-webkit-textfield-decoration-container,
+input[type="password"]::-webkit-password-toggle-button {
+  display: none !important;
+}
+
+/* Fallback: si el navegador sigue mostrando un icono, lo cubriremos con nuestro botón */
+.formulario-login .custom-input-group .container-toggle {
+  right: 0.6rem;
 }
 
 .formulario-login .custom-input-group .form-control:focus {
