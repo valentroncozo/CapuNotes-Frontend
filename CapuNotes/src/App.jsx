@@ -9,6 +9,7 @@ import './App.css';
 import Login from './components/login.jsx';
 import Principal from './components/principal.jsx';
 import OrganizacionCoro from './components/organizacionCoro.jsx';
+import Miembros from './components/miembro.jsx';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -53,6 +54,10 @@ function App() {
           />
 
           <Route path="/organizacion-coro" element={<OrganizacionCoro />} />
+          <Route
+            path="/miembros"
+            element={isAuthenticated ? <Miembros /> : <Navigate to="/" />}
+          />
           {/* ...otras rutas... */}
         </Routes>
       </div>
