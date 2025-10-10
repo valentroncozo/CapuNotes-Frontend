@@ -1,0 +1,84 @@
+/* === FUENTE GLOBAL === */
+@import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
+
+/* Variables según la guía */
+:root{
+  --bg: #11103a;           /* primario / fondo */
+  --accent: #ffc107;       /* secundario / botón primario */
+  --card: #b3cdfa;         /* terciario / cards */
+  --text-light: #E8EAED;   /* textos sobre fondo oscuro */
+  --text-dark: #202124;    /* textos en fondos claros */
+  --radius: 16px;
+  --shadow: 0 4px 14px rgba(0,0,0,.35);
+}
+
+/* Backdrop del modal */
+.pop-backdrop{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  display: grid; place-items: center;
+  z-index: 1000; padding: 24px;
+}
+
+/* Diálogo */
+.pop-dialog{
+  width: min(560px, 96vw);
+  background: var(--bg);
+  color: var(--text-light);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  font-family: "Manjari", "Segoe UI", sans-serif;
+}
+
+/* Header */
+.pop-header{
+  display:flex; align-items:center; justify-content: space-between;
+  padding:16px 18px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.pop-title{ margin:0; font-size:1.15rem; font-weight:700; }
+.icon-btn{
+  border:none; background:transparent; color: var(--text-light);
+  opacity:.85; font-size:18px; line-height:1; padding:6px 8px;
+  border-radius: 10px; cursor:pointer;
+}
+.icon-btn:hover{ opacity:1; background: rgba(255,255,255,.06); }
+
+/* Cuerpo y footer */
+.pop-body{ padding:18px; }
+.pop-footer{
+  display:flex; gap:10px; justify-content:flex-end;
+  padding:14px 18px 18px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+
+/* Botones */
+.btn{
+  border:none; padding:10px 16px; border-radius: var(--radius);
+  cursor:pointer; font-weight:700; font-family: inherit;
+}
+.btn-primary{ background: var(--accent); color: var(--text-dark); }
+.btn-primary:hover{ filter: brightness(0.95); }
+.btn-secondary{
+  background: var(--card); color: var(--text-dark);
+}
+.btn-secondary:hover{ filter: brightness(0.95); }
+
+/* Formulario interno */
+.form-grid{ display:grid; gap:14px; }
+.field label{
+  display:block; font-size:.9rem; color: var(--text-light);
+  opacity:.85; margin-bottom:6px;
+}
+.input, .select{
+  width:100%; background:#0f1036; color: var(--text-light);
+  border:1px solid rgba(255,255,255,.12); border-radius: var(--radius);
+  padding:10px 12px; outline:none;
+}
+.input:focus, .select:focus{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255,193,7,.2);
+}
+.select-wrap{ position:relative; }
