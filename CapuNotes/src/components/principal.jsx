@@ -1,4 +1,3 @@
-import { useState } from "react";
 import "./principal.css";
 import WelcomeCard from "./titulo-cards.jsx";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -8,9 +7,10 @@ import AssignmentIcon from '@mui/icons-material/Assignment'; // 📋 Asistencia
 import EventIcon from '@mui/icons-material/Event'; // 🗓️ Eventos
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic'; // 🎶 Actividades complementarias
 import MicIcon from '@mui/icons-material/Mic'; // 🎤 Audiciones
+import { Link } from 'react-router-dom';
 
 
-export default function Principal({ username }) {
+export default function Principal({ username, onLogout }) {
 
   return (
   <div className="principal-container">
@@ -51,35 +51,47 @@ export default function Principal({ username }) {
         data-bs-dismiss="offcanvas"
         aria-label="Close"
       ></button>
+      {/* Botón cerrar sesión CORREGIDO */}
+      <button
+          type="button"
+          className="nav-link btn" // Mantenemos nav-link para el estilo de color y btn
+          // ✅ CORRECCIÓN: Quitamos los estilos en línea que fuerzan el padding y el textAlign
+          // Dejamos solo los estilos esenciales que no pueden ir en CSS
+          style={{ color: '#E8EAED', background: 'transparent', border: 'none' }} 
+          data-bs-dismiss="offcanvas"
+          onClick={() => { if (onLogout) onLogout(); }}
+      >
+          Cerrar sesión
+      </button>
     </div>
     <div className="offcanvas-body">
-      <a className="nav-link" href="#">
+      <Link className="nav-link" to="/inicio">
         Inicio
-      </a>
-      <a className="nav-link" href="#">
+      </Link>
+      <Link className="nav-link" to="/asistencias">
         Asistencias
-      </a>
-      <a className="nav-link" href="#">
+      </Link>
+      <Link className="nav-link" to="/audiciones">
         Audiciones
-      </a>
-      <a className="nav-link" href="#">
+      </Link>
+      <Link className="nav-link" to="/canciones">
         Canciones
-      </a>
-      <a className="nav-link" href="#">
+      </Link>
+      <Link className="nav-link" to="/eventos">
         Eventos
-      </a>
-      <a className="nav-link" href="#">
+      </Link>
+      <Link className="nav-link" to="/fraternidades">
         Fraternidades
-      </a>
-      <a className="nav-link" href="#">
+      </Link>
+      <Link className="nav-link" to="/miembros">
         Miembros
-      </a>
-      <a className="nav-link" href="#">
-        Organización del Coro
-      </a>
-      <a className="nav-link" href="#">
+      </Link>
+      <Link className="nav-link" to="/organizacion-coro">
+        Organización del Coro 
+      </Link>
+      <Link className="nav-link" to="/usuarios-roles">
         Usuarios y roles
-      </a>
+      </Link>
     </div>
   </div>
 
