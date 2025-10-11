@@ -4,7 +4,7 @@
 /* === VARIABLES DE COLOR === */
 :root {
   --color-primario: #11103a;   /* Fondo */
-  --color-secundario: #ffc107; /* Amarillo (botón principal) */
+  --color-secundario: #ffc107; /* Amarillo (botón principal y detalles) */
   --color-terciario: #b3cdfa;  /* Cards / botones secundarios */
   --text-light: #E8EAED;
   --text-dark: #202124;
@@ -41,13 +41,17 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  /* Línea divisoria en color secundario */
+  border-bottom: 2px solid var(--color-secundario);
 }
+
 .pop-title {
   margin: 0;
   font-weight: 700;
   font-size: 1.1rem;
 }
+
 .icon-btn {
   border: none;
   background: transparent;
