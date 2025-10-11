@@ -6,21 +6,23 @@ import {
   Navigate,
 } from 'react-router-dom';
 import './App.css';
+
+// 👉 Componentes
 import Login from './components/login.jsx';
 import Principal from './components/principal.jsx';
 import OrganizacionCoro from './components/organizacionCoro.jsx';
 import Miembros from './components/miembros.jsx';
-import Cuerda from './components/Cuerda.jsx';
-// ...otros imports de componentes...
+import MiembrosAgregar from './components/miembrosAgregar.jsx';
+import Cuerda from './components/cuerdas.jsx';
 
 function App() {
-  // Persist authentication in localStorage so user only needs to login once
+  // ✅ Persistencia de sesión
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     try {
-      const s = localStorage.getItem('capunotes_auth');
-      if (!s) return false;
-      const obj = JSON.parse(s);
-      return !!obj.isAuthenticated;
+      const saved = localStorage.getItem('capunotes_auth');
+      if (!saved) return false;
+      const { isAuthenticated } = JSON.parse(saved);
+      return !!isAuthenticated;
     } catch {
       return false;
     }
@@ -28,47 +30,40 @@ function App() {
 
   const [username, setUsername] = useState(() => {
     try {
-      const s = localStorage.getItem('capunotes_auth');
-      if (!s) return '';
-      const obj = JSON.parse(s);
-      return obj.username || '';
+      const saved = localStorage.getItem('capunotes_auth');
+      if (!saved) return '';
+      const { username } = JSON.parse(saved);
+      return username || '';
     } catch {
       return '';
     }
   });
 
-  // 👉 función que valida login
+  // ✅ Login
   const handleLogin = (usernameInput, password) => {
     if (usernameInput === 'admin' && password === '1234') {
+      const session = { isAuthenticated: true, username: usernameInput };
       setIsAuthenticated(true);
-      setUsername(usernameInput); // Guarda el nombre del usuario
-      // Guardar sesión en localStorage para persistencia
-      try {
-        localStorage.setItem(
-          'capunotes_auth',
-          JSON.stringify({ isAuthenticated: true, username: usernameInput })
-        );
-      } catch {
-        // noop
-      }
+      setUsername(usernameInput);
+      localStorage.setItem('capunotes_auth', JSON.stringify(session));
     } else {
       alert('Usuario o contraseña incorrectos');
     }
   };
 
+  // ✅ Logout
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUsername('');
-    try {
-      localStorage.removeItem('capunotes_auth');
-  } catch { /* noop */ }
+    localStorage.removeItem('capunotes_auth');
   };
 
   return (
     <Router>
       <div className="App">
+        {console.log("isAuthenticated:", isAuthenticated)}
         <Routes>
-          {/* Ruta login */}
+          {/* Login */}
           <Route
             path="/"
             element={
@@ -80,7 +75,7 @@ function App() {
             }
           />
 
-          {/* Ruta principal */}
+          {/* Principal */}
           <Route
             path="/principal"
             element={
@@ -92,11 +87,25 @@ function App() {
             }
           />
 
+          {/* Alias para inicio */}
           <Route path="/inicio" element={<Navigate to="/principal" />} />
+
+          {/* Organización */}
           <Route path="/organizacion-coro" element={<OrganizacionCoro />} />
-          <Route path="/miembros" element={<Miembros />} />
-          <Route path="/miembros" element={<Cuerda />} />
-          {/* ...otras rutas... */}
+
+          {/* Miembros */}
+          <Route
+            path="/miembros" element={<Miembros/>}
+          />
+          <Route
+            path="/miembros/agregar" element={<MiembrosAgregar/>}
+          />
+          <Route
+            path="/cuerdas"
+            element={<Cuerda cuerda={{ nombre: '' }}/>}
+          />
+          {/* Cualquier ruta inválida redirige a principal */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
     </Router>

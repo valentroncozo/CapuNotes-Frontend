@@ -10,6 +10,7 @@ import MicIcon from '@mui/icons-material/Mic'; // 🎤 Audiciones
 import { Link } from 'react-router-dom';
 
 
+
 export default function Principal({ username, onLogout }) {
 
   return (
