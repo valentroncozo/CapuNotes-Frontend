@@ -1,40 +1,37 @@
+// src/pages/PopupLab.jsx
 import { useState } from "react";
-import AreaEditPopup from "../components/AreaEditPopup"; // ajustá la ruta si lo guardaste en otro lado
+import AreaEditPopup from "../components/AreaEditPopup"; // <-- nuevo popup para Áreas
 import "./popup-lab.css";
 
 export default function PopupLab() {
-  // Áreas de prueba
-  const AREAS = [
-    { id: "adm", nombre: "Administración" },
-    { id: "com", nombre: "Comunicación" },
-    { id: "log", nombre: "Logística" },
-  ];
+  // Áreas de prueba (simulan lo que tendría tu sistema)
+  const [areas, setAreas] = useState([
+    { id: "adm", nombre: "Administración", descripcion: "Gestión y trámites del coro." },
+    { id: "com", nombre: "Comunicación", descripcion: "Redes, prensa y difusión." },
+    { id: "log", nombre: "Logística", descripcion: "Eventos, traslados y materiales." },
+  ]);
 
-  // Miembro demo para probar el pop-up
-  const [member, setMember] = useState({
-    id: 1,
-    nombre: "Miembro",
-    apellido: "Demo",
-    areaId: "adm",
-  });
-
+  // Estado del pop-up de edición de área
   const [open, setOpen] = useState(false);
-  const [lastSaved, setLastSaved] = useState(null);
+  const [areaSel, setAreaSel] = useState(null);
 
-  const handleSave = ({ memberId, areaId }) => {
-    // Solo para demo: actualizamos el estado local
-    setMember((m) => ({ ...m, areaId }));
-    setLastSaved({ memberId, areaId });
+  const openPopup = (area) => {
+    setAreaSel(area);
+    setOpen(true);
+  };
+
+  const handleSave = ({ id, nombre, descripcion }) => {
+    // Actualiza el arreglo local (en tu app real acá iría el PUT/PATCH a backend)
+    setAreas((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, nombre, descripcion } : a))
+    );
   };
 
   return (
     <div className="lab-page">
       {/* === NavBar estándar requerido (según guía) === */}
       <div>
-        <nav
-          className="navbar fixed-top w-100 navbar-dark"
-          style={{ padding: "10px" }}
-        >
+        <nav className="navbar fixed-top w-100 navbar-dark" style={{ padding: "10px" }}>
           <button
             className="navbar-toggler"
             type="button"
@@ -54,15 +51,8 @@ export default function PopupLab() {
           aria-labelledby="offcanvasMenuLabel"
         >
           <div className="offcanvas-header">
-            <h5 className="offcanvas-title" id="offcanvasMenuLabel">
-              Menú
-            </h5>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
-            ></button>
+            <h5 className="offcanvas-title" id="offcanvasMenuLabel">Menú</h5>
+            <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
           <div className="offcanvas-body">
             <a className="nav-link" href="#">Inicio</a>
@@ -77,56 +67,59 @@ export default function PopupLab() {
           </div>
         </div>
 
-        {/* Esto evita que el contenido quede por debajo del navbar */}
+        {/* separador para que el contenido no quede debajo del navbar */}
         <div style={{ marginTop: "60px" }}></div>
       </div>
 
-      {/* === Contenido del laboratorio === */}
+      {/* === Contenido del laboratorio: listado de Áreas con botón Editar === */}
       <div className="lab-card">
-        <h1 className="lab-title">Laboratorio de Pop-up de Área</h1>
+        <h1 className="lab-title">Laboratorio: Edición de Áreas</h1>
+        <p className="lab-text" style={{ marginBottom: 12 }}>
+          Probá el pop-up para modificar <strong>nombre</strong> y <strong>descripción</strong> de un área.
+        </p>
 
-        <div className="lab-row">
-          <div>
-            <p className="lab-text">
-              <strong>Miembro:</strong> {member.nombre} {member.apellido}
-            </p>
-            <p className="lab-text">
-              <strong>Área actual:</strong>{" "}
-              {AREAS.find((a) => a.id === member.areaId)?.nombre ?? "—"}
-            </p>
-          </div>
-
-          <div className="lab-actions">
-            <button
-              className="btn btn-primary capu-btn"
-              onClick={() => setOpen(true)}
-            >
-              Abrir pop-up
-            </button>
-            <button
-              className="btn btn-secondary capu-btn-secondary"
-              onClick={() =>
-                setMember((m) => ({ ...m, areaId: "com" }))
-              }
-            >
-              Setear área = Comunicación (demo)
-            </button>
-          </div>
+        <div className="table-responsive">
+          <table className="table table-dark table-striped align-middle" style={{ borderRadius: "var(--radius)", overflow: "hidden" }}>
+            <thead>
+              <tr>
+                <th style={{ width: "20%" }}>ID</th>
+                <th style={{ width: "25%" }}>Nombre</th>
+                <th>Descripción</th>
+                <th style={{ width: "140px" }}>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {areas.map((a) => (
+                <tr key={a.id}>
+                  <td><code>{a.id}</code></td>
+                  <td>{a.nombre}</td>
+                  <td>{a.descripcion || "—"}</td>
+                  <td>
+                    <button
+                      className="btn btn-primary capu-btn"
+                      onClick={() => openPopup(a)}
+                      title="Editar área"
+                    >
+                      Editar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {areas.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="text-center">No hay áreas cargadas</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-
-        {lastSaved && (
-          <div className="lab-note">
-            Último guardado → memberId={lastSaved.memberId}, areaId={lastSaved.areaId}
-          </div>
-        )}
       </div>
 
-      {/* Pop-up (sin NavBar dentro, como indica la guía) */}
+      {/* Pop-up de edición de Área (sin NavBar dentro) */}
       <AreaEditPopup
         isOpen={open}
-        onClose={() => setOpen(false)}
-        member={member}
-        areas={AREAS}
+        onClose={() => { setOpen(false); setAreaSel(null); }}
+        area={areaSel}
         onSave={handleSave}
       />
     </div>
