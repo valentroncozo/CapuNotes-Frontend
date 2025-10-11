@@ -12,16 +12,33 @@
   }
 
   a {
-    text-decoration: none;
+    text-decoration: text;
   }
 
-  
+.pantalla-cuerdas  * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+.pantalla-cuerdas input,
+.pantalla-cuerdas textarea,
+.pantalla-cuerdas select {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+
 
   /* === FORMULARIOS Y MODALES === */
 
   /* Botones */
   button {
-    border: none;
+    border: text;
     border-radius: 12px;
     cursor: pointer;
     font-weight: 600;
@@ -127,7 +144,7 @@
 .input-cuerda:focus {
   border-color: #ffc107;
   box-shadow: 0 0 8px rgba(255, 193, 7, 0.6);
-  outline: none;
+  outline: text;
 }
 
   .navbar {
@@ -135,11 +152,11 @@
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
   z-index: 1000;
   background-color: #11103a !important;
-  border: none;
+  border: text;
   }
 
   .lista-cuerdas {
-  list-style: none;
+  list-style: text;
   padding-left: 0;
   margin-top: 20px;
   max-width: 600px;
@@ -179,7 +196,7 @@
 .formulario-cuerda input:focus {
   border-color: #ffc107;
   box-shadow: 0 0 8px rgba(255, 193, 7, 0.6);
-  outline: none;
+  outline: text;
   }
 
   .lista-cuerdas li {

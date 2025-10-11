@@ -11,6 +11,22 @@ body {
     border: none;
 }
 
+.navbar * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+.offcanvas * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
 /* === MENU LATERAL (OFFCANVAS) NORMALIZADO === */
 .offcanvas,
 .offcanvas-start,

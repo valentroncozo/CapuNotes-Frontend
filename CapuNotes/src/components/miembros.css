@@ -10,6 +10,24 @@ body {
   padding: 0;
 }
 
+.pantalla-miembros * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+.pantalla-miembros input,
+.pantalla-miembros textarea,
+.pantalla-miembros select {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+  cursor: text;
+}
+
 /* === FORMULARIO DE MIEMBROS === */
 .pantalla-miembros {
   min-height: 100vh;
