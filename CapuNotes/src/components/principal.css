@@ -1,5 +1,6 @@
 /* === FUENTE GLOBAL === */
 @import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
+@import url('./nav-bar.css');
 
 /* --- Variables globales --- */
 :root {
@@ -37,83 +38,6 @@ body {
   -ms-user-select: none;
   user-select: none;
   cursor: default;
-}
-
-
-/* --- Botón menú hamburguesa --- */
-.navbar {
-    /* Este es el color azul oscuro que quieres: #213547 */
-    background: transparent !important; 
-    border: none;
-}
-
-/* === MENU LATERAL (OFFCANVAS) NORMALIZADO === */
-.offcanvas,
-.offcanvas-start,
-.offcanvas-body,
-.offcanvas-header {
-  background-color: #11103a !important; /* azul primario */
-  color: #E8EAED !important; /* texto blanco */
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Título del menú */
-.offcanvas-title {
-  color: #E8EAED !important;
-  font-weight: 700;
-}
-
-/* Links dentro del menú */
-.offcanvas-body .nav-link {
-  color: #E8EAED !important;
-  font-weight: 500;
-  font-size: 1rem;
-  text-decoration: none;
-  margin: 0.4rem 0;
-  display: block;
-}
-
-.offcanvas-body .nav-link:hover {
-  color: #f3a21d !important; /* amarillo de acento */
-}
-
-/* Botón cerrar “X” */
-
-.btn-close {
-  background: none !important;
-  border: none !important;
-  width: 1.2rem;
-  height: 1.2rem;
-  position: relative;
-  opacity: 1 !important;
-}
-
-/* Crear la X blanca manualmente */
-.btn-close::before,
-.btn-close::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 1.2rem;
-  height: 2px;
-  background-color: #E8EAED; /* blanco */
-  transform-origin: center;
-}
-
-.btn-close::before {
-  transform: translate(-50%, -50%) rotate(45deg);
-}
-
-.btn-close::after {
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-
-/* Quita el SVG original de Bootstrap */
-.btn-close svg,
-.btn-close::after svg {
-  display: none !important;
 }
 
 

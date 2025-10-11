@@ -149,39 +149,7 @@
   font-family: 'Manjari', sans-serif;
 }
 
-/* --- MENÚ LATERAL (OFFCANVAS) --- */
-.navbar {
-  background: transparent !important;
-  border: none;
-}
 
-.offcanvas,
-.offcanvas-start,
-.offcanvas-body,
-.offcanvas-header {
-  background-color: #11103a !important;
-  color: #e8eaed !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.offcanvas-title {
-  color: #e8eaed !important;
-  font-weight: 700;
-}
-
-.offcanvas-body .nav-link {
-  color: #e8eaed !important;
-  font-weight: 500;
-  font-size: 1rem;
-  text-decoration: none;
-  margin: 0.4rem 0;
-  display: block;
-}
-
-.offcanvas-body .nav-link:hover {
-  color: #f3a21d !important;
-}
 
 * {
   -webkit-user-select: none;

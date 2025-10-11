@@ -1,3 +1,6 @@
+
+@import url('./nav-bar.css');
+
 /* === CONFIGURACIÓN GENERAL === */
 body {
   background-color: #11103a;
@@ -5,96 +8,6 @@ body {
   font-family: 'Manjari', sans-serif;
   margin: 0;
   padding: 0;
-}
-
-/* --- NAVBAR --- */
-.navbar {
-  background-color: #11103a !important;
-  border: none;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  padding: 10px 16px;
-}
-
-/* Botón menú hamburguesa */
-.navbar-toggler {
-  border: none !important;
-  box-shadow: none !important;
-}
-.navbar-toggler-icon {
-  filter: brightness(120%);
-}
-
-/* --- OFFCANVAS MENU --- */
-.offcanvas,
-.offcanvas-start,
-.offcanvas-body,
-.offcanvas-header {
-  background-color: #11103a !important;
-  color: #E8EAED !important;
-  border: none !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-}
-
-.offcanvas-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: 0.8rem;
-}
-
-.offcanvas-title {
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: #E8EAED;
-  letter-spacing: 0.5px;
-}
-
-/* Links del menú */
-.offcanvas-body .nav-link {
-  color: #E8EAED !important;
-  font-weight: 500;
-  font-size: 1rem;
-  text-decoration: none;
-  margin: 0.4rem 0;
-  display: block;
-  padding: 0.6rem 0.5rem;
-  border-radius: 8px;
-  transition: all 0.25s ease;
-}
-.offcanvas-body .nav-link:hover {
-  color: #11103a !important;
-  background-color: #ffc107;
-  transform: translateX(6px);
-}
-
-/* Botón cerrar “X” */
-.btn-close {
-  background: none !important;
-  border: none !important;
-  width: 1.3rem;
-  height: 1.3rem;
-  position: relative;
-  opacity: 1 !important;
-  cursor: pointer;
-}
-.btn-close::before,
-.btn-close::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 1.2rem;
-  height: 2px;
-  background-color: #E8EAED;
-  transform-origin: center;
-}
-.btn-close::before {
-  transform: translate(-50%, -50%) rotate(45deg);
-}
-.btn-close::after {
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-.btn-close:hover::before,
-.btn-close:hover::after {
-  background-color: #ffc107;
 }
 
 /* === FORMULARIO DE MIEMBROS === */

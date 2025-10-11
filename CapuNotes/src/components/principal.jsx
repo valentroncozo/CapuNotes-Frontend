@@ -1,4 +1,3 @@
-import "./principal.css";
 import WelcomeCard from "./titulo-cards.jsx";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ScheduleIcon from '@mui/icons-material/Schedule';
@@ -8,6 +7,7 @@ import EventIcon from '@mui/icons-material/Event'; // 🗓️ Eventos
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic'; // 🎶 Actividades complementarias
 import MicIcon from '@mui/icons-material/Mic'; // 🎤 Audiciones
 import { Link } from 'react-router-dom';
+import "./principal.css";
 
 
 
@@ -66,7 +66,7 @@ export default function Principal({ username, onLogout }) {
       </button>
     </div>
     <div className="offcanvas-body">
-      <Link className="nav-link" to="/inicio">
+      <Link className="nav-link" to="/inicio" >
         Inicio
       </Link>
       <Link className="nav-link" to="/asistencias">
