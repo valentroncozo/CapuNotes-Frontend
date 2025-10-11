@@ -72,9 +72,9 @@ export default function Principal({ username }) {
             <Link className="nav-link" to="/miembros">
               Miembros
             </Link>
-            <a className="nav-link" href="#">
+            <Link className="nav-link" to="/organizacion-coro">
               Organización del Coro
-            </a>
+            </Link>
             <a className="nav-link" href="#">
               Usuarios y roles
             </a>

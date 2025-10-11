@@ -290,7 +290,7 @@ const Miembros = ({ onClose }) => {
           {/* Tabla de miembros */}
           <Row>
             <Col xs={12}>
-              <div className="miembros-label">Miembros registrados</div>
+              <div className="miembros-label">Miembros registrados:</div>
               <div className="tabla-wrapper">
                 <Table bordered responsive className="tabla-miembros mb-0">
                   <thead>
