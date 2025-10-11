@@ -14,6 +14,7 @@ import OrganizacionCoro from './components/organizacionCoro.jsx';
 import Miembros from './components/miembros.jsx';
 import MiembrosAgregar from './components/miembrosAgregar.jsx';
 import Cuerda from './components/cuerdas.jsx';
+import PopupLab from './pages/popupLab.jsx';
 
 function App() {
   // ✅ Persistencia de sesión
@@ -103,6 +104,10 @@ function App() {
           <Route
             path="/cuerdas"
             element={<Cuerda cuerda={{ nombre: '' }}/>}
+          />
+          <Route
+            path="/popup-lab"
+            element={<PopupLab/>}
           />
           {/* Cualquier ruta inválida redirige a principal */}
           <Route path="*" element={<Navigate to="/" />} />

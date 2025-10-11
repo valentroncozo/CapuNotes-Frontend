@@ -6,6 +6,7 @@
   font-family: 'Manjari', sans-serif;
 }
 
+
 /* --- HEADER --- */
 .miembros-title {
   font-size: 2rem;
@@ -181,6 +182,15 @@
 .offcanvas-body .nav-link:hover {
   color: #f3a21d !important;
 }
+
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
 
 /* --- RESPONSIVE --- */
 @media (max-width: 768px) {

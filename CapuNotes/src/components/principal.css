@@ -31,6 +31,15 @@ body {
   position: relative;
 }
 
+.principal-container * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+
 /* --- Botón menú hamburguesa --- */
 .navbar {
     /* Este es el color azul oscuro que quieres: #213547 */

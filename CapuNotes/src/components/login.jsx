@@ -12,7 +12,7 @@ const validateField = (name,value, currentErrors) => {
     let errors = '';
     
     if(value.trim() === ''){
-      errors = `* ${name} es obligatorio no puede estar vacio.`;
+      errors = `* El campo ${name.toLowerCase()} no puede estar vacío.`;
     } else {
       errors = null;
     }
@@ -76,7 +76,7 @@ export default function Login({ onLogin }) {
         <Form onSubmit={handleSubmit} 
         noValidate 
         className="formulario-login">
-          <h1 className="logo-text">Iniciar Sesion en su cuenta de 
+          <h1 className="logo-text">Iniciar sesión en su cuenta de 
             <strong> CapuNotes </strong>
               <img src="../public/Logo coro sin fondo.png" 
               alt="Logo" 
