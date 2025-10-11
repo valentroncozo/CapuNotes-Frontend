@@ -9,6 +9,8 @@ import './App.css';
 import Login from './components/login.jsx';
 import Principal from './components/principal.jsx';
 import OrganizacionCoro from './components/organizacionCoro.jsx';
+import Miembros from './components/miembro.jsx';
+import PopupLab from "./pages/PopupLab";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -52,8 +54,17 @@ function App() {
             }
           />
 
+          {/* Organización del coro */}
           <Route path="/organizacion-coro" element={<OrganizacionCoro />} />
-          {/* ...otras rutas... */}
+
+          {/* Miembros (protegida) */}
+          <Route
+            path="/miembros"
+            element={isAuthenticated ? <Miembros /> : <Navigate to="/" />}
+          />
+
+          {/* === Ruta de laboratorio del Pop-up (temporal) === */}
+          <Route path="/popup-lab" element={<PopupLab />} />
         </Routes>
       </div>
     </Router>

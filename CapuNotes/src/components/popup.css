@@ -1,0 +1,149 @@
+/* === TIPOGRAFÍA GLOBAL === */
+@import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
+
+/* === VARIABLES DE COLOR === */
+:root {
+  --color-primario: #11103a;   /* Fondo */
+  --color-secundario: #ffc107; /* Amarillo (botón principal y detalles) */
+  --color-terciario: #b3cdfa;  /* Cards / botones secundarios */
+  --text-light: #E8EAED;
+  --text-dark: #202124;
+  --radius: 16px;
+  --shadow: 0 4px 14px rgba(0,0,0,.35);
+}
+
+/* === BACKDROP === */
+.pop-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+/* === CONTENEDOR DEL POPUP === */
+.pop-dialog {
+  width: min(560px, 96vw);
+  background: var(--color-primario);
+  color: var(--text-light);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  font-family: "Manjari", sans-serif;
+}
+
+/* === HEADER === */
+.pop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 18px;
+
+  /* Línea divisoria en color secundario */
+  border-bottom: 2px solid var(--color-secundario);
+}
+
+.pop-title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-light);
+  opacity: 0.85;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.15s;
+}
+.icon-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* === BODY Y FOOTER === */
+.pop-body {
+  padding: 18px;
+}
+.pop-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 18px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* === BOTONES === */
+.btn {
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+/* BOTÓN PRINCIPAL → amarillo #ffc107 con texto oscuro */
+.btn-primary {
+  background: var(--color-secundario) !important;
+  color: var(--text-dark) !important;
+  box-shadow: var(--shadow);
+  border: none !important;
+}
+.btn-primary:hover {
+  filter: brightness(0.95);
+}
+.btn-primary:active {
+  filter: brightness(0.9);
+}
+
+/* BOTÓN SECUNDARIO → borde y texto color terciario */
+.btn-secondary {
+  background: transparent !important;
+  color: var(--color-terciario) !important;
+  border: 2px solid var(--color-terciario) !important;
+}
+.btn-secondary:hover {
+  background: rgba(179, 205, 250, 0.1);
+}
+
+/* === FORMULARIO === */
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
+.field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  opacity: 0.9;
+}
+.input,
+textarea.input {
+  width: 100%;
+  background: #0f1036;
+  color: var(--text-light);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-family: inherit;
+  outline: none;
+  resize: vertical;
+}
+.input:focus,
+textarea.input:focus {
+  border-color: var(--color-terciario);
+  box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25);
+}
+.input::placeholder,
+textarea.input::placeholder {
+  color: rgba(232, 234, 237, 0.6);
+}
