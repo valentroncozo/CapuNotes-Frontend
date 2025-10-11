@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import './organizacionCoro.css';
 
 export default function OrganizacionCoro() {
@@ -24,7 +23,7 @@ export default function OrganizacionCoro() {
           {/* Formulario */}
           <form className="mb-4">
             <div className="mb-3">
-              <label className="form-label text-white">Nombre:</label>
+              <label className="form-label text-white">Nombre</label>
               <input
                 type="text"
                 className="form-control organizacion-input"
@@ -32,7 +31,7 @@ export default function OrganizacionCoro() {
               />
             </div>
             <div className="mb-3">
-              <label className="form-label text-white">Descripción:</label>
+              <label className="form-label text-white">Descripción</label>
               <input
                 type="text"
                 className="form-control organizacion-input"
@@ -48,7 +47,7 @@ export default function OrganizacionCoro() {
           </form>
 
           {/* Áreas registradas */}
-          <div className="fw-semibold mb-2">Áreas registradas:</div>
+          <div className="fw-semibold mb-2">Áreas registradas</div>
           <div className="areas-list-scroll">
             {[1, 2, 3].map((i) => (
               <div className="area-card mb-3" key={i}>

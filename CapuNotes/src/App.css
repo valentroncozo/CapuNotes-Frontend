@@ -8,6 +8,16 @@
   background-color: #11103a;
 }
 
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: red;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

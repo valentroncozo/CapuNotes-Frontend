@@ -1,0 +1,338 @@
+/* === CONFIGURACIÓN GENERAL === */
+body {
+  background-color: #11103a;
+  color: #E8EAED;
+  font-family: 'Manjari', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- NAVBAR --- */
+.navbar {
+  background-color: #11103a !important;
+  border: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  padding: 10px 16px;
+}
+
+/* Botón menú hamburguesa */
+.navbar-toggler {
+  border: none !important;
+  box-shadow: none !important;
+}
+.navbar-toggler-icon {
+  filter: brightness(120%);
+}
+
+/* --- OFFCANVAS MENU --- */
+.offcanvas,
+.offcanvas-start,
+.offcanvas-body,
+.offcanvas-header {
+  background-color: #11103a !important;
+  color: #E8EAED !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.offcanvas-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.8rem;
+}
+
+.offcanvas-title {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #E8EAED;
+  letter-spacing: 0.5px;
+}
+
+/* Links del menú */
+.offcanvas-body .nav-link {
+  color: #E8EAED !important;
+  font-weight: 500;
+  font-size: 1rem;
+  text-decoration: none;
+  margin: 0.4rem 0;
+  display: block;
+  padding: 0.6rem 0.5rem;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+}
+.offcanvas-body .nav-link:hover {
+  color: #11103a !important;
+  background-color: #ffc107;
+  transform: translateX(6px);
+}
+
+/* Botón cerrar “X” */
+.btn-close {
+  background: none !important;
+  border: none !important;
+  width: 1.3rem;
+  height: 1.3rem;
+  position: relative;
+  opacity: 1 !important;
+  cursor: pointer;
+}
+.btn-close::before,
+.btn-close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.2rem;
+  height: 2px;
+  background-color: #E8EAED;
+  transform-origin: center;
+}
+.btn-close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.btn-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+.btn-close:hover::before,
+.btn-close:hover::after {
+  background-color: #ffc107;
+}
+
+/* === FORMULARIO DE MIEMBROS === */
+.pantalla-miembros {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 100px; /* para que no tape la navbar */
+  background-color: #11103a;
+  min-height: 100vh;
+}
+
+.formulario-miembros {
+  background-color: #1c1b3f; /* azul profundo */
+  color: #E8EAED;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  max-width: 800px;
+  width: 100%;
+  margin: auto;
+}
+
+.formulario-miembros h2 {
+  color: #E8EAED;
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.formulario-miembros input {
+  font-size: 16px !important;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* Campos del formulario */
+.formulario-miembros input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  font-size: 16px;
+  font-family: 'Manjari', sans-serif;
+  transition: 0.3s;
+}
+.formulario-miembros input:focus {
+  border-color: #ffc107;
+  box-shadow: 0 0 6px rgba(255, 193, 7, 0.6);
+  outline: none;
+}
+
+/* Botones */
+.formulario-miembros button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: 0.3s ease;
+}
+
+button.btn-primario {
+  background-color: #3b82f6; /* azul vibrante */
+  color: #ffffff;
+}
+button.btn-primario:hover {
+  background-color: #2563eb;
+}
+
+button.btn-secundario {
+  background-color: #b3cdfa;
+  color: #11103a;
+  border: 2px solid #11103a;
+}
+button.btn-secundario:hover {
+  background-color: #a1bced;
+}
+
+/* Sombras suaves y redondez general */
+.card, .formulario-miembros {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  border-radius: 16px;
+}
+
+/* === TABLA DE MIEMBROS === */
+.tabla-miembros {
+  width: 100%;
+  max-width: 900px;
+  margin: 2rem auto;
+  border-collapse: collapse;
+  background-color: #11103a; /* fondo azul oscuro, coherente con el menú */
+  color: #E8EAED; /* texto blanco */
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.tabla-miembros thead {
+  background-color: #11103a; /* azul intermedio para cabecera */
+}
+
+.tabla-miembros th,
+.tabla-miembros td {
+  padding: 12px 16px;
+  vertical-align: middle;
+  text-align: left;
+}
+
+.tabla-miembros td span,
+.tabla-miembros td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tabla-miembros tr:hover {
+  background-color: rgba(243, 162, 29, 0.1); /* hover con acento amarillo */
+  transition: background-color 0.3s ease;
+}
+
+/* Botones dentro de la tabla */
+.tabla-miembros button {
+  background-color: #f3a21d;
+  color: #0c0b53;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tabla-miembros button:hover {
+  background-color: #ffbe45;
+}
+
+/* Evita que la tabla se pegue al borde superior del form */
+.container .tabla-miembros {
+  margin-top: 0rem;
+}
+
+/* Asegura que todos los elementos de la tabla tengan el mismo fondo y color */
+
+.tabla-miembros {
+  background-color: #11103a !important;
+  color: #E8EAED !important;
+}
+
+.tabla-miembros thead,
+.tabla-miembros tbody,
+.tabla-miembros tr,
+.tabla-miembros th,
+.tabla-miembros td {
+  background-color: #11103a !important;
+  color: #E8EAED !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.tabla-wrapper {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.btn-agregar-cuerda {
+  background-color: #ffc107;
+  color: #11103a;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.btn-agregar-cuerda:hover {
+  background-color: #ffcd38;
+  transform: scale(1.05);
+}
+.miembros-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #E8EAED;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  padding-left: 10px;
+  border-left: 4px solid #ffc107;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeInTitle 0.6s forwards;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #E8EAED;
+  margin-top: 0;
+  margin-bottom: 30px;
+  text-align: center;
+  padding-left: 0;
+  border-left: none;
+}
+
+/*bonus animation*/
+@keyframes fadeInTitle {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.miembros-title::before {
+  content: "🎶 ";
+  font-size: 1.8rem;
+  margin-right: 8px;
+}
+
+.botonera-miembros {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.botonera-miembros button {
+  white-space: nowrap;
+  padding: 10px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+.botonera-miembros button {
+  height: 42px;
+}
+/* FIN DE miembros.css */
