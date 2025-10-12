@@ -106,7 +106,7 @@ export default function Miembros() {
 
       {/* === CONTENIDO PRINCIPAL === */}
       <div className="pantalla-miembros" style={{ marginTop: '70px' }}>
-        <Container>
+         <div className="miembros-container">
           {/* Título */}
           <Row className="mb-4">
             <Col xs={12}>
@@ -186,7 +186,7 @@ export default function Miembros() {
               </tbody>
             </Table>
           </div>
-        </Container>
+          </div>
       </div>
     </>
   );

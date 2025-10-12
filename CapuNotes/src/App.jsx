@@ -8,7 +8,6 @@ import {
 import './App.css';
 
 // 👉 Componentes
-import Login from './components/login.jsx';
 import Principal from './components/principal.jsx';
 import OrganizacionCoro from './components/organizacionCoro.jsx';
 import Miembros from './components/miembros.jsx';

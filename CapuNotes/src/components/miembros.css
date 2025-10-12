@@ -46,8 +46,8 @@ body {
   height: auto;           /* Deja crecer si hay más contenido */
   padding-bottom: 60px;   /* Espacio al final para no cortar contenido */
   overflow: visible;
+  background-color: var(--bg) !important;
 }
-
 
 .miembros-container {
   background-color: var(--bg) !important;
@@ -58,6 +58,7 @@ body {
   height: auto;           /* Deja crecer si hay más contenido */
   padding-bottom: 60px;   /* Espacio al final para no cortar contenido */
   overflow: visible;
+  border-radius: 16px;
 }
 
 /* --- HEADER --- */
