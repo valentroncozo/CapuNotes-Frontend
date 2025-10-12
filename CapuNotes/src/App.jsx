@@ -13,6 +13,7 @@ import Principal from './components/principal.jsx';
 import OrganizacionCoro from './components/organizacionCoro.jsx';
 import Miembros from './components/miembros.jsx';
 import MiembrosAgregar from './components/miembrosAgregar.jsx';
+import MiembrosModificar from './components/miembrosModificar.jsx';
 import Cuerda from './components/cuerdas.jsx';
 import PopupLab from './pages/popupLab.jsx';
 
@@ -96,10 +97,16 @@ function App() {
 
           {/* Miembros */}
           <Route
-            path="/miembros" element={<Miembros/>}
+            path="/miembros" 
+            element={<Miembros/>}
           />
           <Route
-            path="/miembros/agregar" element={<MiembrosAgregar/>}
+            path="/miembros/agregar" 
+            element={<MiembrosAgregar/>}
+          />
+          <Route
+            path="/miembros/modificar"
+            element={<MiembrosModificar />}
           />
           <Route
             path="/cuerdas"

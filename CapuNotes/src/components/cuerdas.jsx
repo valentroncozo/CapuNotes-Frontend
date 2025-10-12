@@ -1,124 +1,129 @@
-import React, { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import './cuerdas.css';
-import { Link } from 'react-router-dom';
-import Swal from 'sweetalert2';
+import React, { useState } from "react";
+import "./cuerdas.css";
+import { PlusCircleFill } from "react-bootstrap-icons";
+import { useNavigate } from "react-router-dom";
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Button } from "react-bootstrap";
 
-export default function Cuerdas() {
-  const [ nombre, setNombre ] = useState('');
 
-  const handleGuardar = (e) => {
+export default function Cuerda({ cuerdas = [] }) {
+  const [nombre, setNombre] = useState("");
+  const [listaCuerdas, setListaCuerdas] = useState(cuerdas);
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!nombre.trim()) {
-      alert('Por favor ingresá un nombre válido.');
-      return;
-    }
+    if (!nombre.trim()) return;
 
-  const cuerdasGuardadas = JSON.parse(localStorage.getItem('capunotes_cuerdas')) || [];
-  const nuevaLista = cuerdasGuardadas.some(c => c.nombre.toLowerCase() === nombre.toLowerCase())
-    ? cuerdasGuardadas
-    : [...cuerdasGuardadas, { nombre }];
-  localStorage.setItem('capunotes_cuerdas', JSON.stringify(nuevaLista));
-
-    localStorage.setItem('capunotes_cuerdas', JSON.stringify(nuevaLista));
-      Swal.fire({
-        icon: 'success',
-        title: 'Cuerda guardada',
-        text: `"${nombre}" fue agregada correctamente.`,
-        confirmButtonColor: '#ffc107',
-      });
-      setNombre('');
-
-      if (!nombre.trim()) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Campo vacío',
-        text: 'Por favor ingresá un nombre válido.',
-        confirmButtonColor: '#ffc107',
-      });
+    const existe = listaCuerdas.some(
+      (c) => c.nombre.toLowerCase() === nombre.toLowerCase()
+    );
+    if (!existe) {
+      const nuevaLista = [...listaCuerdas, { nombre }];
+      setListaCuerdas(nuevaLista);
+      setNombre("");
     }
   };
 
   return (
-    <div>
-      {/* Navbar */}
-      <nav className="navbar fixed-top w-100 navbar-dark" style={{ padding: '10px' }}>
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasMenu"
-          aria-controls="offcanvasMenu"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-      </nav>
+    <div className="lab-page">
+      {/* === NavBar estándar requerido (según guía) === */}
+      <div>
+        <nav className="navbar fixed-top w-100 navbar-dark" style={{ padding: "10px" }}>
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasMenu"
+            aria-controls="offcanvasMenu"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+        </nav>
 
-      <div className="offcanvas offcanvas-start" tabIndex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
-        <div className="offcanvas-header">
-          <h5 className="offcanvas-title" id="offcanvasMenuLabel">Menú</h5>
-          <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div className="offcanvas-body">
-          <Link className="nav-link" to="/inicio">
-            Inicio
-          </Link>
-          <Link className="nav-link" to="/asistencias">
-            Asistencias
-          </Link>
-          <Link className="nav-link" to="/audiciones">
-            Audiciones
-          </Link>
-          <Link className="nav-link" to="/canciones">
-            Canciones
-          </Link>
-          <Link className="nav-link" to="/eventos">
-            Eventos
-          </Link>
-          <Link className="nav-link" to="/fraternidades">
-            Fraternidades
-          </Link>
-          <Link className="nav-link" to="/miembros">
-            Miembros
-          </Link>
-          <Link className="nav-link" to="/organizacion-coro">
-            Organización del Coro 
-          </Link>
-          <Link className="nav-link" to="/usuarios-roles">
-            Usuarios y roles
-          </Link>
-        </div>
-      </div>
-      
-      {/* Esto evita que el contenido quede debajo del navbar */}
-      <div style={{ marginTop: '100px', padding: '20px' }}>
-        <h2 className="text-center mb-4">Cuerdas del Coro</h2>
-      </div>
-          <div className="pantalla-cuerdas">
-            <form className="formulario-cuerda" onSubmit={handleGuardar}>
-            <div className="mb-3">
-              <label className="form-label">Ingrese nombre de Cuerda</label>
-              <input
-                type="text"
-                className="input-cuerda"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                placeholder="Ej: Soprano, Tenor, Barítono..."
-              />
+          <div
+            className="offcanvas offcanvas-start"
+            tabIndex="-1"
+            id="offcanvasMenu"
+            aria-labelledby="offcanvasMenuLabel"
+          >
+            <div className="offcanvas-header">
+              <h5 className="offcanvas-title" id="offcanvasMenuLabel">Menú</h5>
+              <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
-
-            <div className="d-flex justify-content-between gap-2">
-              <button type="button" className="btn btn-secundario w-50" onClick={() => setNombre('')}>
-                Cancelar
-              </button>
-              <button type="submit" className="btn btn-warning w-50">
-                Guardar
-              </button>
+            <div className="offcanvas-body">
+              <a className="nav-link" href="#">Inicio</a>
+              <a className="nav-link" href="#">Asistencias</a>
+              <a className="nav-link" href="#">Audiciones</a>
+              <a className="nav-link" href="#">Canciones</a>
+              <a className="nav-link" href="#">Eventos</a>
+              <a className="nav-link" href="#">Fraternidades</a>
+              <a className="nav-link" href="#">Miembros</a>
+              <a className="nav-link" href="#">Organización del Coro</a>
+              <a className="nav-link" href="#">Usuarios y roles</a>
             </div>
-            </form>
           </div>
+      </div>
+      {/* === Fin NavBar estándar requerido (según guía) === */}
+
+        {/* ✅ USAR UN SOLO CONTENEDOR PRINCIPAL QUE APLIQUE EL ESPACIO */} 
+        <div className="lab-page-content"> 
+            <div className="lab-card">
+            {/* 🎯 EL ENCABEZADO CON LA FLECHA QUEDA AQUÍ ABAJO */}
+            <div className="cuerda-header-flex">
+                <Button variant="link" className="p-0 back-btn-inline" onClick={() => navigate(-1)} title="Volver">
+                    <ArrowBackIcon 
+                        style={{ color: '#fff', fontSize: '28px' }} 
+                    /> 
+                </Button>
+            </div>
+            
+            <h2 className="lab-title">Laboratorio: Edición de Cuerdas</h2>
+
+            <p className="lab-note">
+              Probá el pop-up para modificar el nombre de una cuerda.
+            </p>
+
+            <form className="lab-row add-cuerda-form" onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    className="cuerda-input"
+                    placeholder="Ej: Soprano, Tenor..."
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                    required // Agregamos required para mejorar la usabilidad
+                />
+                <button type="submit" className="capu-btn">
+                    <PlusCircleFill size={16} style={{ marginRight: '5px' }} />
+                    Agregar
+                </button>
+            </form>
+
+            <div className="cuerda-table-wrapper">
+              <table className="cuerda-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {listaCuerdas.map((c, i) => (
+                    <tr key={i}>
+                      <td>{i + 1}</td>
+                      <td>{c.nombre}</td>
+                      <td>
+                        <button className="cuerda-edit">Editar</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+      </div>
     </div>
   );
 }

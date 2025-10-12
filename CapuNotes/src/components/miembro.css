@@ -9,15 +9,15 @@
 
 /* --- HEADER --- */
 .miembros-title {
-  font-size: 2rem;
-  font-weight: 500;
-  margin-bottom: 0;
-  font-family: 'Manjari', sans-serif;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+font-size: 2rem;
+font-weight: 500;
+margin-bottom: 0;
+/* ... (otras propiedades) ... */
+ 
+/* ✅ FORZAR EL COLOR DE TEXTO BLANCO */
+  color: #e8eaed !important; 
+  background: #11103a;
+  padding: 1rem 0;
 }
 
 /* --- ICONO DE FLECHA ATRÁS --- */
@@ -199,9 +199,6 @@
   }
   .tabla-wrapper {
     padding: 0.5rem;
-  }
-  .miembros-title {
-    font-size: 1.3rem;
   }
   .btn-agregar {
     font-size: 0.9rem;

@@ -3,6 +3,7 @@ import { Table, Button, Form, Row, Col, Container, InputGroup } from 'react-boot
 import { useNavigate } from 'react-router-dom';
 import './miembros.css';
 import { Link } from 'react-router-dom';
+import { Search, PlusCircleFill, PencilFill, XCircleFill } from 'react-bootstrap-icons';  
 
 export default function Miembros() {
   const navigate = useNavigate();
@@ -19,13 +20,31 @@ export default function Miembros() {
     const q = filtro.toLowerCase();
     return m.nombre && m.nombre.toLowerCase().includes(q);
   });
+  
+  const handleBuscar = () => {
+    // filtro ya se aplica automáticamente
+  };
 
+  // 0. AGREGAR: Función limpia que usa la lógica de navegación
   const handleAgregar = () => {
     navigate('/miembros/agregar');
   };
 
-  const handleBuscar = () => {
-    // filtro ya se aplica automáticamente
+  // 1. EDITAR: Función limpia que usa la lógica de navegación
+  const handleEditar = (miembro) => {
+    navigate('/miembros/modificar', { state: { miembro } });
+  };
+
+  // 2. ELIMINAR: Función limpia que usa la lógica de tu estado (listaMiembros)
+  const handleEliminar = (index) => {
+      if (!window.confirm(`¿Eliminar miembro: ${listaMiembros[index].nombre}?`)) {
+          return;
+      }
+      
+      // Lógica de eliminación (debería estar en el componente padre si esta es solo la tabla)
+      const nuevaLista = listaMiembros.filter((_, i) => i !== index);
+      setListaMiembros(nuevaLista);
+      localStorage.setItem('capunotes_miembros', JSON.stringify(nuevaLista));
   };
 
   return (
@@ -128,6 +147,7 @@ export default function Miembros() {
                   <th>Cuerda</th>
                   <th>Área</th>
                   <th>Estado</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -138,11 +158,29 @@ export default function Miembros() {
                       <td>{m.cuerda || '-'}</td>
                       <td>{m.area || '-'}</td>
                       <td>{m.estado || '-'}</td>
+                      {/* ✅ BOTÓN DE EDITAR (Usando tu estilo .btn-accion) */}
+                      <td className="acciones">
+                          <Button 
+                              className="btn-accion me-2" 
+                              variant="warning"
+                              onClick={() => handleEditar(m)} // Llama a la función de navegación
+                          >
+                              <PencilFill size={18} />
+                          </Button>
+                      {/* ✅ BOTÓN DE ELIMINAR (Usando tu estilo .btn-accion eliminar) */}
+                          <Button 
+                              className="btn-accion eliminar" 
+                              variant="danger"
+                              onClick={() => handleEliminar(index)} // Llama a la función de eliminación
+                          >
+                              <XCircleFill size={18} />
+                          </Button>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4" className="text-center">No hay miembros registrados</td>
+                    <td colSpan="5" className="text-center">No hay miembros registrados</td>
                   </tr>
                 )}
               </tbody>
