@@ -114,7 +114,7 @@ export default function MiembrosAgregar() {
           </Link>
         </div>
       </div>
-
+    
       {/* === CONTENIDO PRINCIPAL === */}
       <div className="pantalla-miembros" style={{ marginTop: '70px' }}>
         <Container className="pt-5">

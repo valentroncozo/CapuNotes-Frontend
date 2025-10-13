@@ -119,11 +119,11 @@ export default function MiembrosEditar() {
         </div>
       </div>
 
-    <div className="pantalla-miembros">
-    <Container>
-    <Row className="justify-content-center">
-      <Col xs={12} md={8} lg={6}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+    {/* === CONTENIDO PRINCIPAL === */}
+    <div className="pantalla-miembros" style={{ marginTop: '70px' }}>
+    <Container  className="pt-5">
+      <div className="formulario-miembros">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
               {/* VOLVER */}
             <Button variant="link" className="p-0" onClick={() => navigate(-1)} title="Volver">
               <ArrowBackIcon 
@@ -286,8 +286,7 @@ export default function MiembrosEditar() {
           </button>
         </div>
       </Form>
-      </Col>
-      </Row>
+      </div>
     </Container>
     </div>
     </>

@@ -25,6 +25,7 @@ export default function Cuerda({ cuerdas = [] }) {
         }
     }, [show]);
 
+  // 2. Manejar el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!nombre.trim()) return;
@@ -33,7 +34,10 @@ export default function Cuerda({ cuerdas = [] }) {
       (c) => c.nombre.toLowerCase() === nombre.toLowerCase()
     );
     if (!existe) {
-       const nuevaCuerda = { nombre: nombre.trim() };
+      const nuevaCuerda = {
+      id: Date.now(), // o usar crypto.randomUUID() si querés algo más robusto
+      nombre: nombre.trim()
+      };
             const nuevaLista = [...listaCuerdas, nuevaCuerda];
             
             // 2. Guardar en localStorage y actualizar estado
@@ -46,9 +50,19 @@ export default function Cuerda({ cuerdas = [] }) {
     }
   };
 
+  // boton de eliminar
+  const handleEliminar = (id) => {
+  const confirmacion = window.confirm("¿Eliminar esta cuerda?");
+  if (!confirmacion) return;
+
+    const actualizadas = listaCuerdas.filter((c) => c.id !== id);
+    setListaCuerdas(actualizadas);
+    localStorage.setItem("capunotes_cuerdas", JSON.stringify(actualizadas));
+  };
+
   return (
     <div className="lab-page">
-      {/* === NavBar estándar requerido (según guía) === */}
+      {/* === NavBar=== */}
       <div>
         <nav className="navbar fixed-top w-100 navbar-dark" style={{ padding: "10px" }}>
           <button
@@ -88,10 +102,8 @@ export default function Cuerda({ cuerdas = [] }) {
       </div>
       {/* === Fin NavBar estándar requerido (según guía) === */}
 
-        {/* ✅ USAR UN SOLO CONTENEDOR PRINCIPAL QUE APLIQUE EL ESPACIO */} 
         <div className="lab-page-content"> 
             <div className="lab-card">
-            {/* 🎯 EL ENCABEZADO CON LA FLECHA QUEDA AQUÍ ABAJO */}
             <div className="cuerda-header-flex">
                 <Button variant="link" className="p-0 back-btn-inline" onClick={() => navigate(-1)} title="Volver">
                     <ArrowBackIcon 
@@ -135,6 +147,9 @@ export default function Cuerda({ cuerdas = [] }) {
                     <tr key={i}>
                       <td>{i + 1}</td>
                       <td>{c.nombre}</td>
+                      <td>
+                        <Button onClick={() => handleEliminar(c.id)}>Eliminar</Button>
+                    </td>
                     </tr>
                   ))}
                 </tbody>
