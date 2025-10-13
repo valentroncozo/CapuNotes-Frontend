@@ -22,6 +22,7 @@ html, body {
   overflow-x: auto;
 }
 
+
 .formulario-miembros {
   background-color: transparent;
   color: var(--color-text-light);
@@ -47,21 +48,26 @@ html, body {
 }
 .form-dni-group .col:first-child { padding-left: 0; }
 .form-dni-group .col:last-child { padding-right: 0; }
-
-.form-header {
-  text-align: center;
-  margin-bottom: 30px;
-  padding-bottom: 12px;
-  position: relative;
+.form-header-wrapper { /* 👈 Clase que envuelve el título y la flecha */
+    /* ✅ 1. Usar Flexbox para la alineación */
+    display: flex;
+    align-items: center;
+    
+    /* 2. Empujar la flecha a la izquierda y el título al centro */
+    justify-content: space-between; 
+    
+    margin-bottom: 30px;
+    padding-bottom: 12px;
+    position: relative; /* Para el posicionamiento absoluto si lo necesitas */
 }
 
-.form-header h2 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--color-text-light);
-  margin: 0;
-  text-align: center;
-  width: 100%;
+/* ❌ Elimina la regla text-align: center; de .form-header h2 */
+.form-header h1 {
+    /* Mantenemos el estilo, pero quitamos el width: 100%; y el text-align: center; */
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-text-light);
+    margin: 0 auto; /* ✅ CLAVE: Margen automático para centrar el título como un bloque */
 }
 
 .btn-add-cuerda-form {
@@ -111,7 +117,7 @@ html, body {
   min-height: 100vh; /* ocupa al menos la altura completa */
   overflow-y: visible; /* permite el scroll vertical */
   padding-bottom: 50px; /* espacio al final */
-  background: #0d0c2b !important;
+  background: var(--bg) !important;
 }
 
 body {

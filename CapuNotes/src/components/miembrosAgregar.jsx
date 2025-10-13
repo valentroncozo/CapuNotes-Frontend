@@ -130,7 +130,7 @@ export default function MiembrosAgregar() {
                     style={{ color: '#fff', fontSize: '28px' }} // Ajusta el tamaño y color
                 /> 
             </Button>
-              <h2 style={{ margin: 0 }}>{editIndex !== null ? 'Registrar miembro' : 'Registro de miembro'}</h2>
+              <h1 className="titulo-formulario-miembros" style={{ margin: 0 }}>Registro de miembro</h1>
             </div>
             <Form onSubmit={handleSubmit} className="d-flex flex-column">
               <Form.Control

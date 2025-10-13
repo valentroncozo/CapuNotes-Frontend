@@ -14,11 +14,12 @@
 }
 
 
+
 html, body {
   height: auto;
   margin: 0;
   padding: 0;
-  background: #0d0c2b;
+  background: var(--bg) !important;
   font-family: var(--font);
   overflow-x: auto;
 }

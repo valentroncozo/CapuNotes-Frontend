@@ -50,7 +50,7 @@ export default function Miembros() {
   return (
     <>
       {/* === NAVBAR CON OFFCANVAS === */}
-      <nav className="navbar fixed-top navbar-dark" style={{ padding: '10px' }}>
+      <nav className="navbar fixed-top navbar-dark">
         <button
           className="navbar-toggler"
           type="button"
@@ -105,7 +105,7 @@ export default function Miembros() {
         </div>
 
       {/* === CONTENIDO PRINCIPAL === */}
-      <div className="pantalla-miembros" style={{ marginTop: '70px' }}>
+      <div className="pantalla-miembros">
          <div className="miembros-container">
           {/* Título */}
           <Row className="mb-4">
