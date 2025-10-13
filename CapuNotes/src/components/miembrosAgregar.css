@@ -62,7 +62,7 @@ html, body {
 }
 
 /* ❌ Elimina la regla text-align: center; de .form-header h2 */
-.form-header h1 {
+.form-header h2 {
     /* Mantenemos el estilo, pero quitamos el width: 100%; y el text-align: center; */
     font-size: 1.8rem;
     font-weight: 700;

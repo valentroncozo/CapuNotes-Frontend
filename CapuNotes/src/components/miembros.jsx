@@ -10,10 +10,6 @@ export default function Miembros() {
   const [listaMiembros, setListaMiembros] = useState([]);
   const [filtro, setFiltro] = useState('');
 
-  useEffect(() => {
-    const dataGuardada = localStorage.getItem('capunotes_miembros');
-    if (dataGuardada) setListaMiembros(JSON.parse(dataGuardada));
-  }, []);
 
   const miembrosFiltrados = listaMiembros.filter((m) => {
     if (!filtro) return true;
@@ -21,6 +17,12 @@ export default function Miembros() {
     return m.nombre && m.nombre.toLowerCase().includes(q);
   });
   
+  //funcion para guardar los miembros con useEffect
+  useEffect(() => {
+    const dataGuardada = localStorage.getItem('capunotes_miembros');
+    if (dataGuardada) setListaMiembros(JSON.parse(dataGuardada));
+  }, []);
+
   const handleBuscar = () => {
     // filtro ya se aplica automáticamente
   };
@@ -32,7 +34,7 @@ export default function Miembros() {
 
   // 1. EDITAR: Función limpia que usa la lógica de navegación
   const handleEditar = (miembro) => {
-    navigate('/miembros/modificar', { state: { miembro } });
+    navigate("/miembros/editar", { state: { miembro } });
   };
 
   // 2. ELIMINAR: Función limpia que usa la lógica de tu estado (listaMiembros)
@@ -44,7 +46,6 @@ export default function Miembros() {
       // Lógica de eliminación (debería estar en el componente padre si esta es solo la tabla)
       const nuevaLista = listaMiembros.filter((_, i) => i !== index);
       setListaMiembros(nuevaLista);
-      localStorage.setItem('capunotes_miembros', JSON.stringify(nuevaLista));
   };
 
   return (
@@ -111,6 +112,7 @@ export default function Miembros() {
           <Row className="mb-4">
             <Col xs={12}>
               <h2 className="miembros-title text-center">Miembros del Coro</h2>
+            <hr className="divisor-amarillo" />
             </Col>
           </Row>
 

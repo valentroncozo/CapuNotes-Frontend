@@ -10,10 +10,6 @@ export default function MiembrosAgregar() {
   const [miembro, setMiembro] = useState(emptyMiembro);
   const [listaMiembros, setListaMiembros] = useState([]);
   const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
-  // const estado = [
-  //   { nombre: 'Activo' },
-  //   { nombre: 'Inactivo' },
-  // ];
   const [editIndex, setEditIndex] = useState(null);
   const areasDisponibles = [
     { nombre: 'Técnica Vocal' },
@@ -132,21 +128,25 @@ export default function MiembrosAgregar() {
             </Button>
               <h1 className="titulo-formulario-miembros" style={{ margin: 0 }}>Registro de miembro</h1>
             </div>
+            <hr className="divisor-amarillo" />
+
             <Form onSubmit={handleSubmit} className="d-flex flex-column">
+              <label className="form-label text-white">Nombre</label>
               <Form.Control
                 type="text"
                 name="nombre"
-                placeholder="Nombre"
+                placeholder="Ej: Juan"
                 value={miembro.nombre}
                 onChange={handleChange}
                 className="form-control"
               />
 
               <Form.Group className="form-group-miembro">
+                <label className="form-label text-white">Apellido</label>
                 <Form.Control
                   type="text"
                   name="apellido"
-                  placeholder="Apellido"
+                  placeholder="Ej: Pérez"
                   value={miembro.apellido || ''}
                   onChange={handleChange}
                   className="form-control"
@@ -154,6 +154,7 @@ export default function MiembrosAgregar() {
               </Form.Group>
 
               <Form.Group className="form-group-miembro">
+                <label className="form-label text-white">Tipo de Documento</label>
                 <Form.Select
                   name="tipoDocumento"
                   value={miembro.tipoDocumento || ''}
@@ -168,10 +169,11 @@ export default function MiembrosAgregar() {
               </Form.Group>
 
               <Form.Group className="form-group-miembro">
+                <label className="form-label text-white">Número de Documento</label>
                 <Form.Control
                   type="text"
                   name="numeroDocumento"
-                  placeholder="Número de documento"
+                  placeholder="Ej: 40123456"
                   value={miembro.numeroDocumento || ''}
                   onChange={handleChange}
                   className="form-control"
@@ -179,10 +181,11 @@ export default function MiembrosAgregar() {
               </Form.Group>
 
               <Form.Group className="form-group-miembro">
+                <label className="form-label text-white">Fecha de Nacimiento</label>
                 <Form.Control
                   type="date"
                   name="fechaNacimiento"
-                  placeholder="Fecha de nacimiento"
+                  placeholder="Ej: 01/01/1990"
                   value={miembro.fechaNacimiento || ''}
                   onChange={handleChange}
                   className="form-control"
@@ -190,10 +193,11 @@ export default function MiembrosAgregar() {
               </Form.Group>
 
               <Form.Group className="form-group-miembro">
+                <label className="form-label text-white">Correo Electrónico</label>
                 <Form.Control
                   type="email"
                   name="correo"
-                  placeholder="Correo electrónico"
+                  placeholder="Ej: juanperez@mail.com"
                   value={miembro.correo || ''}
                   onChange={handleChange}
                   className="form-control"
@@ -201,10 +205,11 @@ export default function MiembrosAgregar() {
               </Form.Group>
 
               <Form.Group className="form-group-miembro">
+                <label className="form-label text-white">Teléfono</label>
                 <Form.Control
                   type="tel"
                   name="telefono"
-                  placeholder="Teléfono"
+                  placeholder="Ej: +54 11 1234-5678"
                   value={miembro.telefono || ''}
                   onChange={handleChange}
                   className="form-control"
@@ -212,10 +217,11 @@ export default function MiembrosAgregar() {
               </Form.Group>
 
               <Form.Group className="form-group-miembro">
+                <label className="form-label text-white">Provincia</label>
                 <Form.Control
                   type="text"
                   name="provincia"
-                  placeholder="Provincia"
+                  placeholder="Ej: Buenos Aires"
                   value={miembro.provincia || ''}
                   onChange={handleChange}
                   className="form-control"
@@ -271,31 +277,16 @@ export default function MiembrosAgregar() {
               </Col>
               </Row>
 
-              {/* 
-              <Row className="mb-3 align-items-center">
-                <Col xs={10}>
-              <Form.Group className="form-group-miembro">
-                <Form.Select
-                  name="estado"
-                  value={miembro.estado || ''}
-                  onChange={handleChange}
-                >
-                  <option value="">Seleccionar estado</option>
-                  {estado.map((c, index) => (
-                    <option key={index} value={c.nombre}>
-                      {c.nombre}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
-              </Col>
-              </Row> */}
-
-              <button type="submit" className="btn-submit-form">
-                {editIndex !== null ? 'GUARDAR CAMBIOS' : 'Agregar miembro'}
-              </button>
+              <div className="d-flex justify-content-between mt-4">
+                <button type="button" className="btn btn-secondary w-50 me-2" onClick={() => navigate("/miembros")}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn btn-warning w-50">
+                  Guardar Cambios
+                </button>
+              </div>
             </Form>
-          </div>
+        </div>
         </Container>
       </div>
     </>

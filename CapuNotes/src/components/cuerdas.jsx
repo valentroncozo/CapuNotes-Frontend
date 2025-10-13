@@ -44,19 +44,6 @@ export default function Cuerda({ cuerdas = [] }) {
             onGuardar && onGuardar(nuevaLista);
             setNombre("");
     }
-
-    // 4. Lógica de Eliminación
-    const handleEliminar = (nombreEliminar) => {
-        if (!window.confirm(`¿Estás seguro de eliminar la cuerda "${nombreEliminar}"?`)) {
-            return;
-        }
-        const nuevaLista = listaCuerdas.filter(c => c.nombre !== nombreEliminar);
-        
-        // Guardar y notificar
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevaLista));
-        setListaCuerdas(nuevaLista);
-        onGuardar && onGuardar(nuevaLista);
-    };
   };
 
   return (
@@ -148,15 +135,6 @@ export default function Cuerda({ cuerdas = [] }) {
                     <tr key={i}>
                       <td>{i + 1}</td>
                       <td>{c.nombre}</td>
-                      <td>
-                        <Button 
-                                        variant="danger"
-                                        className="btn-eliminar-cuerda"
-                                        onClick={() => handleEliminar(c.nombre)}
-                                    >
-                                        <TrashFill size={14} />
-                          </Button>
-                      </td>
                     </tr>
                   ))}
                 </tbody>
