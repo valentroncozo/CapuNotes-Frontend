@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import './miembrosAgregar.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-export default function MiembrosAgregar() {
+export default function MiembrosEditar() {
   const emptyMiembro = { nombre: '', cuerda: '', area: '', estado: '' };
   const [miembro, setMiembro] = useState(emptyMiembro);
   const [listaMiembros, setListaMiembros] = useState([]);
@@ -130,7 +130,7 @@ export default function MiembrosAgregar() {
                     style={{ color: '#fff', fontSize: '28px' }} // Ajusta el tamaño y color
                 /> 
             </Button>
-              <h1 className="titulo-formulario-miembros" style={{ margin: 0 }}>Registro de miembro</h1>
+              <h1 className="titulo-formulario-miembros" style={{ margin: 0 }}>Editar de miembro</h1>
             </div>
             <Form onSubmit={handleSubmit} className="d-flex flex-column">
               <Form.Control
@@ -223,7 +223,6 @@ export default function MiembrosAgregar() {
               </Form.Group>
 
               <Row className="mb-3 align-items-center">
-                <Col xs={10}>
                 <Form.Group className='form-group-miembro'>
                 <Form.Select
                   name="cuerda"
@@ -238,18 +237,6 @@ export default function MiembrosAgregar() {
                   ))}
                 </Form.Select>
                 </Form.Group>
-                </Col>
-
-                <Col xs={1} className="text-end">
-                  <Button
-                    variant="warning"
-                    className="btn-agregar-cuerda"
-                    onClick={() => navigate('/cuerdas')}
-                    title="Gestionar cuerdas"
-                  >
-                    +
-                  </Button>
-                </Col>
               </Row>
 
               <Row className="mb-3 align-items-center">
