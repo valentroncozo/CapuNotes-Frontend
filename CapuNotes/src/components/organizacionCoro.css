@@ -1,10 +1,89 @@
+/* --- Variables de colores y estilos --- */
+:root {
+  --color-primario: #11103a;
+  --color-secundario: #ffc107;
+  --color-terciario: #b3cdfa;
+  --color-texto-principal: #e8eaed;
+  --color-texto-cards: #202124;
+  --font-primary: 'Manjari', sans-serif;
+  --font-title: 'Mr Dafoe', cursive;
+  --border-radius: 16px;
+  --box-shadow-standard: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+/* --- Fondo principal --- */
+.organizacion-bg {
+  background: var(--color-primario) !important;
+}
+
+/* --- Títulos --- */
+.organizacion-title {
+  color: var(--color-texto-principal);
+  font-family: var(--font-primary);
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+/* --- Botones --- */
+.organizacion-btn {
+  background: var(--color-secundario) !important;
+  color: var(--color-texto-principal) !important;
+  border-radius: var(--border-radius) !important;
+  border: none !important;
+  font-family: var(--font-primary);
+  box-shadow: var(--box-shadow-standard);
+}
+
+.organizacion-btn:hover {
+  background: #d98f16 !important;
+}
+
+/* --- Cards --- */
+.area-card {
+  background: var(--color-terciario);
+  color: var(--color-texto-cards);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-standard);
+  padding: 1rem;
+  font-weight: 600; /* Igualar grosor al formulario */
+}
+
+.area-desc {
+  font-size: 0.95rem;
+  color: var(--color-texto-cards);
+  font-weight: 600; /* Igualar grosor al formulario */
+  margin-top: 4px;
+}
+
+/* --- Input --- */
+.organizacion-input {
+  background: #18173a !important;
+  color: var(--color-texto-principal) !important;
+  border: none !important;
+  border-radius: var(--border-radius) !important;
+  padding: 10px 16px !important;
+}
+
+.organizacion-input::placeholder {
+  color: #b0b0b0 !important;
+}
+
+/* --- Divisor --- */
+.divisor-amarillo {
+  border: none;
+  border-top: 2.5px solid var(--color-secundario);
+  width: 100%;
+  margin: 0.5rem 0 1.2rem 0;
+  border-radius: 2px;
+}
+
 .organizacion-container {
   min-height: 100vh;
-  background: #0d0c2b;
-  border-radius: 24px;
+  background: var(--color-primario);
+  border-radius: var(--border-radius);
   max-width: 400px;
   margin: 0 auto;
-  box-shadow: 0 4px 16px #0003;
+  box-shadow: var(--box-shadow-standard);
   position: relative;
 }
 
@@ -27,7 +106,8 @@
 }
 
 .organizacion-title {
-  color: #fff;
+  color: var(--color-texto-principal);
+  font-family: var(--font-primary);
   font-size: 1.6rem;
   font-weight: 600;
   margin-left: 8px;
@@ -35,7 +115,7 @@
 
 .divisor-amarillo {
   border: none;
-  border-top: 2.5px solid #f3a21d;
+  border-top: 2.5px solid var(--color-secundario);
   width: 100%;
   margin: 0.5rem 0 1.2rem 0;
   border-radius: 2px;
@@ -43,9 +123,9 @@
 
 .organizacion-form .organizacion-input {
   background: #18173a !important;
-  color: #fff !important;
+  color: var(--color-texto-principal) !important;
   border: none !important;
-  border-radius: 20px !important;
+  border-radius: var(--border-radius) !important;
   padding: 10px 16px !important;
 }
 
@@ -54,8 +134,8 @@
 }
 
 .organizacion-btn {
-  border-radius: 20px !important;
-  background: #f3a21d !important;
+  border-radius: var(--border-radius) !important;
+  background: var(--color-secundario) !important;
   border: none !important;
 }
 
@@ -80,17 +160,18 @@
 }
 
 .organizacion-card {
-  background: #b3cdfa;
-  border-radius: 12px;
+  background: var(--color-terciario);
+  border-radius: var(--border-radius);
   padding: 1rem;
-  color: #222;
-  box-shadow: 0 2px 8px #0002;
+  color: var(--color-texto-cards);
+  box-shadow: var(--box-shadow-standard);
   font-size: 1rem;
 }
 
 .organizacion-desc {
   font-size: 0.95rem;
-  color: #222;
+  color: var(--color-texto-cards);
+  font-weight: 600; /* Igualar grosor al formulario */
   margin-top: 4px;
 }
 
@@ -101,17 +182,19 @@
 }
 
 .area-card {
-  background: #b3cdfa;
-  border-radius: 12px;
+  background: var(--color-terciario);
+  border-radius: var(--border-radius);
   padding: 1rem;
-  color: #222;
-  box-shadow: 0 2px 8px #0002;
+  color: var(--color-texto-cards);
+  box-shadow: var(--box-shadow-standard);
   font-size: 1rem;
+  font-weight: 600; /* Igualar grosor al formulario */
 }
 
 .area-desc {
   font-size: 0.95rem;
-  color: #222;
+  color: var(--color-texto-cards);
+  font-weight: 600; /* Igualar grosor al formulario */
   margin-top: 4px;
 }
 
@@ -121,6 +204,20 @@
   height: 6px;
   background: #fff;
   border-radius: 3px;
+}
+
+/* Botones personalizados con Bootstrap */
+.btn {
+  background-color: #ffc107 !important; /* Color de fondo amarillo */
+  color: #000 !important; /* Fuente en color negro */
+  border: none !important;
+  border-radius: var(--border-radius) !important;
+  font-family: var(--font-primary) !important;
+  box-shadow: var(--box-shadow-standard) !important;
+}
+
+.btn:hover {
+  background-color: #e0a800 !important; /* Tono más oscuro al pasar el mouse */
 }
 
 /* Responsive */
@@ -153,5 +250,10 @@
 }
 
 .organizacion-bg {
-  background: #0d0c2b !important;
+  background: var(--color-primario) !important;
+}
+
+/* --- Ajuste definitivo para la flecha atrás --- */
+.arrow-back-icon {
+  color: #fff !important; /* Forzar color blanco */
 }
