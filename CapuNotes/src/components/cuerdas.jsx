@@ -1,15 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./cuerdas.css";
 import { PlusCircleFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Button } from "react-bootstrap";
 
+// Clave de persistencia
+const STORAGE_KEY = 'capunotes_cuerdas';
 
 export default function Cuerda({ cuerdas = [] }) {
   const [nombre, setNombre] = useState("");
   const [listaCuerdas, setListaCuerdas] = useState(cuerdas);
+  const [show] = useState(true); // Control del modal
+  // Para notificar al padre (si es necesario)
+  const onGuardar = null; // Aquí podrías pasar una función si es necesario
+  // Navegación
   const navigate = useNavigate();
+
+  // 1. Cargar datos al iniciar el modal
+    useEffect(() => {
+        if (show) {
+            const cuerdasGuardadas = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            setListaCuerdas(cuerdasGuardadas);
+        }
+    }, [show]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,10 +33,30 @@ export default function Cuerda({ cuerdas = [] }) {
       (c) => c.nombre.toLowerCase() === nombre.toLowerCase()
     );
     if (!existe) {
-      const nuevaLista = [...listaCuerdas, { nombre }];
-      setListaCuerdas(nuevaLista);
-      setNombre("");
+       const nuevaCuerda = { nombre: nombre.trim() };
+            const nuevaLista = [...listaCuerdas, nuevaCuerda];
+            
+            // 2. Guardar en localStorage y actualizar estado
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevaLista));
+            setListaCuerdas(nuevaLista); 
+            
+            // 3. Notificar al padre (opcional, si necesita recargar el select)
+            onGuardar && onGuardar(nuevaLista);
+            setNombre("");
     }
+
+    // 4. Lógica de Eliminación
+    const handleEliminar = (nombreEliminar) => {
+        if (!window.confirm(`¿Estás seguro de eliminar la cuerda "${nombreEliminar}"?`)) {
+            return;
+        }
+        const nuevaLista = listaCuerdas.filter(c => c.nombre !== nombreEliminar);
+        
+        // Guardar y notificar
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(nuevaLista));
+        setListaCuerdas(nuevaLista);
+        onGuardar && onGuardar(nuevaLista);
+    };
   };
 
   return (
@@ -115,7 +149,13 @@ export default function Cuerda({ cuerdas = [] }) {
                       <td>{i + 1}</td>
                       <td>{c.nombre}</td>
                       <td>
-                        <button className="cuerda-edit">Editar</button>
+                        <Button 
+                                        variant="danger"
+                                        className="btn-eliminar-cuerda"
+                                        onClick={() => handleEliminar(c.nombre)}
+                                    >
+                                        <TrashFill size={14} />
+                          </Button>
                       </td>
                     </tr>
                   ))}

@@ -108,6 +108,10 @@ function App() {
             element={<MiembrosModificar />}
           />
           <Route
+            path="/miembros/editar"
+            element={<MiembrosEditar />}
+          />
+          <Route
             path="/cuerdas"
             element={<Cuerda cuerda={{ nombre: '' }}/>}
           />

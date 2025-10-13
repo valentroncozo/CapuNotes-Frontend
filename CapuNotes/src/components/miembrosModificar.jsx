@@ -10,6 +10,13 @@ export default function MiembrosModificar() {
   const miembro = location.state?.miembro;
 
   const [nombre, setNombre] = useState(miembro?.nombre || "");
+  const [apellido, setApellido] = useState(miembro?.apellido || "");
+  const [tipoDocumento, setTipoDocumento] = useState(miembro?.tipoDocumento || "");
+  const [numeroDocumento, setNumeroDocumento] = useState(miembro?.numeroDocumento || "");
+  const [fechaNacimiento, setFechaNacimiento] = useState(miembro?.fechaNacimiento || "");
+  const [correo, setCorreo] = useState(miembro?.correo || "");
+  const [telefono, setTelefono] = useState(miembro?.telefono || "");
+  const [provincia, setProvincia] = useState(miembro?.provincia || "");
   const [cuerda, setCuerda] = useState(miembro?.cuerda || "");
   const [area, setArea] = useState(miembro?.area || "");
   const [estado, setEstado] = useState(miembro?.estado || "");
@@ -26,7 +33,7 @@ export default function MiembrosModificar() {
     const lista = JSON.parse(localStorage.getItem("capunotes_miembros")) || [];
     const nuevaLista = lista.map((m) =>
       m.nombre === miembro.nombre
-        ? { ...m, nombre, cuerda, area, estado }
+        ? { ...m, nombre, apellido, tipoDocumento, numeroDocumento, fechaNacimiento, correo, telefono, provincia, cuerda, area, estado  }
         : m
     );
     localStorage.setItem("capunotes_miembros", JSON.stringify(nuevaLista));
@@ -99,11 +106,82 @@ export default function MiembrosModificar() {
             <Form.Label>Nombre</Form.Label>
             <Form.Control
               type="text"
+              name="nombre"
+              placeholder="Nombre"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
+              className="form-control"
             />
           </Form.Group>
 
+          <Form.Group className="mb-3">
+            <Form.Label>Apellido</Form.Label>
+            <Form.Control
+              type="text"
+              value={apellido}
+              onChange={(e) => setApellido(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Tipo de Documento</Form.Label>
+            <Form.Select
+              type="text"
+              value={tipoDocumento}
+              onChange={(e) => setTipoDocumento(e.target.value)}
+            >
+                  <option value="">Tipo de documento</option>
+                  <option value="DNI">DNI</option>
+                  <option value="Pasaporte">Pasaporte</option>
+                  <option value="Libreta Cívica">Libreta Cívica</option>
+            </Form.Select>
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Numero de Documento</Form.Label>
+            <Form.Control
+              type="text"
+              value={numeroDocumento}
+              onChange={(e) => setNumeroDocumento(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Fecha de Nacimiento</Form.Label>
+            <Form.Control
+              type="text"
+              value={fechaNacimiento}
+              onChange={(e) => setFechaNacimiento(e.target.value)}
+            />
+          </Form.Group>
+          
+          <Form.Group className="mb-3">
+            <Form.Label>Correo</Form.Label>
+            <Form.Control
+              type="text"
+              value={correo}
+              onChange={(e) => setCorreo(e.target.value)}
+            />
+          </Form.Group>
+          
+          <Form.Group className="mb-3">
+            <Form.Label>Teléfono</Form.Label>
+            <Form.Control
+              type="text"
+              value={telefono}
+              onChange={(e) => setTelefono(e.target.value)}
+            />
+          </Form.Group>
+          
+          <Form.Group className="mb-3">
+            <Form.Label>Provincia</Form.Label>
+            <Form.Control
+              type="text"
+              value={provincia}
+              onChange={(e) => setProvincia(e.target.value)}
+            />
+          </Form.Group>
+          
           <Form.Group className="mb-3">
             <Form.Label>Cuerda</Form.Label>
             <Form.Control

@@ -13,13 +13,11 @@
   --color-accent: #ffc107;
 }
 
-
-
 html, body {
   height: auto;
   margin: 0;
   padding: 0;
-  background: var(--bg) !important;
+  background: #0d0c2b;
   font-family: var(--font);
   overflow-x: auto;
 }
@@ -50,37 +48,27 @@ html, body {
 }
 .form-dni-group .col:first-child { padding-left: 0; }
 .form-dni-group .col:last-child { padding-right: 0; }
-
-.form-header {
-  text-align: center;
-  margin-bottom: 30px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--color-accent); /* línea amarilla */
-  position: relative;
+.form-header-wrapper { /* 👈 Clase que envuelve el título y la flecha */
+    /* ✅ 1. Usar Flexbox para la alineación */
+    display: flex;
+    align-items: center;
+    
+    /* 2. Empujar la flecha a la izquierda y el título al centro */
+    justify-content: space-between; 
+    
+    margin-bottom: 30px;
+    padding-bottom: 12px;
+    position: relative; /* Para el posicionamiento absoluto si lo necesitas */
 }
 
-.form-header h2 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--color-text-light);
-  margin: 0;
-  text-align: center;
-  width: 100%;
+/* ❌ Elimina la regla text-align: center; de .form-header h2 */
+.form-header h1 {
+    /* Mantenemos el estilo, pero quitamos el width: 100%; y el text-align: center; */
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-text-light);
+    margin: 0 auto; /* ✅ CLAVE: Margen automático para centrar el título como un bloque */
 }
-
-
-/* Línea amarilla extendida */
-.form-header::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 5%;
-  width: 90%;
-  height: 2px;
-  background-color: var(--color-accent);
-  z-index: 0;
-}
-
 
 .btn-add-cuerda-form {
   background-color: var(--color-accent);
@@ -125,10 +113,11 @@ html, body {
 
 
 .pantalla-miembros {
-  background: var(--bg);
-  min-height: 100dvh;
   padding-top: 100px;
-  padding-bottom: 40px;
+  min-height: 100vh; /* ocupa al menos la altura completa */
+  overflow-y: visible; /* permite el scroll vertical */
+  padding-bottom: 50px; /* espacio al final */
+  background: var(--bg) !important;
 }
 
 body {
@@ -236,4 +225,22 @@ body {
 .formulario-miembros select {
   color: var(--color-text-light);
   background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Evita que el navbar o el offcanvas corten el flujo del scroll */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1050;
+  background-color: #0d0c2b !important;
+}
+
+.offcanvas {
+  z-index: 1100;
+}
+
+/* Solo si Bootstrap te está forzando el body a overflow hidden al abrir el menú */
+body.offcanvas-open {
+  overflow: hidden;
 }
