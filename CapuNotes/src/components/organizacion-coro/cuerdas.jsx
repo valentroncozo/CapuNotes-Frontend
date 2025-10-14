@@ -158,11 +158,8 @@ export default function Cuerda({ cuerdas = [] }) {
                 </Button>
             </div>
             
-            <h2 className="lab-title">Laboratorio: Edición de Cuerdas</h2>
-
-            <p className="lab-note">
-              Probá el pop-up para modificar el nombre de una cuerda.
-            </p>
+            <h2 className="lab-title">Cuerdas</h2>
+            <hr className="divisor-amarillo" />
 
             <form className="lab-row add-cuerda-form" onSubmit={handleSubmit}>
                 <input
@@ -183,15 +180,15 @@ export default function Cuerda({ cuerdas = [] }) {
               <table className="cuerda-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    {/* <th></th> */}
                     <th>Nombre</th>
-                    <th>Acciones</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
                   {listaCuerdas.map((c, i) => (
                     <tr key={i}>
-                      <td>{i + 1}</td>
+                      {/* <td>{i + 1}</td> */}
                       <td>{c.nombre}</td>
                       <td>
                         <Button onClick={() => handleEliminar(c.id)}>Eliminar</Button>

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Container, Row, Col, Form } from 'react-bootstrap';
+import { Button, Container, Form } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { useNavigate, Link } from 'react-router-dom';
 import '../../styles/miembrosAgregar.css';
 
 import BackButton from '../utils/BackButton';
 
+
 export default function MiembrosAgregar() {
   const emptyMiembro = { nombre: '', cuerda: '', area: '', estado: '' };
   const [miembro, setMiembro] = useState(emptyMiembro);
   const [listaMiembros, setListaMiembros] = useState([]);
   const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
-  const [editIndex, setEditIndex] = useState(null);
   const areasDisponibles = [
     { nombre: 'Técnica Vocal' },
     { nombre: 'Guitarra' },
@@ -26,8 +26,9 @@ export default function MiembrosAgregar() {
 }, []);
 
   useEffect(() => {
-    localStorage.setItem('capunotes_miembros', JSON.stringify(listaMiembros));
-  }, [listaMiembros]);
+    const guardados = JSON.parse(localStorage.getItem("capunotes_miembros")) || [];
+    setListaMiembros(guardados);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,29 +36,38 @@ export default function MiembrosAgregar() {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!miembro.nombre || !miembro.cuerda) {
+      e.preventDefault();
+
+      if (!miembro.nombre || !miembro.cuerda) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Campos obligatorios',
+          text: 'Por favor completá al menos Nombre y Cuerda.',
+        });
+        return;
+      }
+
+      const nuevoMiembro = {
+        ...miembro,
+        id: Date.now(),
+        estado: miembro.estado || 'Activo',
+      };
+
+      const miembrosActualizados = [...listaMiembros, nuevoMiembro];
+      setListaMiembros(miembrosActualizados);
+      localStorage.setItem("capunotes_miembros", JSON.stringify(miembrosActualizados));
+
       Swal.fire({
-        icon: 'warning',
-        title: 'Campos obligatorios',
-        text: 'Por favor completá al menos Nombre y Cuerda.',
+        icon: 'success',
+        title: 'Miembro registrado',
+        text: `Se registró ${miembro.nombre} exitosamente.`,
+        timer: 1800,
+        showConfirmButton: false,
       });
-      return;
-    }
 
-    if (editIndex !== null) {
-      const nueva = [...listaMiembros];
-      nueva[editIndex] = miembro;
-      setListaMiembros(nueva);
-      setEditIndex(null);
-      Swal.fire({ icon: 'success', title: 'Miembro actualizado', text: `${miembro.nombre} actualizado correctamente.`, timer: 1800, showConfirmButton: false });
-    } else {
-      setListaMiembros([...listaMiembros, miembro]);
-      Swal.fire({ icon: 'success', title: 'Miembro registrado', text: `Se registró ${miembro.nombre} exitosamente.`, timer: 1800, showConfirmButton: false });
-    }
-
-    setMiembro(emptyMiembro);
-  };
+      setMiembro(emptyMiembro);
+      navigate("/miembros");
+    };
 
   return (
     <>
@@ -144,7 +154,7 @@ export default function MiembrosAgregar() {
         {/* Esto es solo para que el contenido no quede debajo de la navbar */}
         <div style={{ marginTop: '60px' }}></div>
       </div>
-    
+
       {/* === CONTENIDO PRINCIPAL === */}
       <div className="pantalla-miembros" style={{ marginTop: '70px' }}>
         <Container className="pt-5">
@@ -253,11 +263,10 @@ export default function MiembrosAgregar() {
                   className="form-control"
                 />
               </Form.Group>
-
-              <Row className="mb-3 align-items-center">
-                <Col xs={10}>
-                <Form.Group className='form-group-miembro'>
-                <Form.Select
+              
+              <Form.Group className='form-group-agregar-cuerda'>
+                <label className="label-cuerda">Cuerda</label>
+                <Form.Select className='select-cuerda'
                   name="cuerda"
                   value={miembro.cuerda}
                   onChange={handleChange}
@@ -269,10 +278,7 @@ export default function MiembrosAgregar() {
                     </option>
                   ))}
                 </Form.Select>
-                </Form.Group>
-                </Col>
 
-                <Col xs={1} className="text-end">
                   <Button
                     variant="warning"
                     className="btn-agregar-cuerda"
@@ -281,12 +287,10 @@ export default function MiembrosAgregar() {
                   >
                     +
                   </Button>
-                </Col>
-              </Row>
+              </Form.Group>
 
-              <Row className="mb-3 align-items-center">
-                <Col xs={13}>
               <Form.Group className='form-group-miembro'>
+                <label className="label-cuerda">Área</label>
                 <Form.Select
                   name="area"
                   value={miembro.area}
@@ -300,15 +304,13 @@ export default function MiembrosAgregar() {
                   ))}
                 </Form.Select>
               </Form.Group>
-              </Col>
-              </Row>
 
               <div className="d-flex justify-content-between mt-4">
                 <button type="button" className="btn btn-secondary w-50 me-2" onClick={() => navigate("/miembros")}>
                   Cancelar
                 </button>
                 <button type="submit" className="btn btn-warning w-50">
-                  Guardar Cambios
+                  Agregar
                 </button>
               </div>
             </Form>
