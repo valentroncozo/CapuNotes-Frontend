@@ -1,0 +1,26 @@
+
+@import url('convenio.css');
+
+.back-button {
+    background: transparent !important;
+    border: none !important;
+    color: var(--primary-text-color);
+}
+
+.back-button:hover {
+    background: transparent !important;
+    opacity: inherit;
+    cursor: pointer;
+}
+
+.back-icon {
+    font-size: 1.5rem;
+    color: var(--primary-text-color);
+    background-color: transparent;
+}
+
+.back-icon:hover {
+    transition: all .5s ease-in-out !important;
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+}

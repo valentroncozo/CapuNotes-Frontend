@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import Modal from "./Modal";
-import "./popup.css";
+import Modal from "../utils/Modal";
+import "../../styles/popup.css";
 
 /**
  * Pop-up para editar un Área del sistema (nombre y descripción).

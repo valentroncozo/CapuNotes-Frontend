@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import './login.css';
+import '../../styles/login.css';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import WavyClipPath from '../assets/WavyClipPath';
-import MobileWavyClipPath from '../assets/MobileWavyClipPath';
-import AccountUser from '../assets/AccountUserIcon' 
-import PasswordToggleIcon from '../assets/PasswordToggleIcon';
+import WavyClipPath from '../../assets/WavyClipPath';
+import MobileWavyClipPath from '../../assets/MobileWavyClipPath';
+import AccountUser from '../../assets/AccountUserIcon' 
+import PasswordToggleIcon from '../../assets/PasswordToggleIcon';
 
 
 const validateField = (name,value, currentErrors) => {

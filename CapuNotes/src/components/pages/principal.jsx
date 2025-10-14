@@ -1,4 +1,3 @@
-import "./principal.css";
 import WelcomeCard from "./titulo-cards.jsx";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ScheduleIcon from '@mui/icons-material/Schedule';
@@ -8,6 +7,7 @@ import EventIcon from '@mui/icons-material/Event'; // 🗓️ Eventos
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic'; // 🎶 Actividades complementarias
 import MicIcon from '@mui/icons-material/Mic'; // 🎤 Audiciones
 import { Link } from 'react-router-dom';
+import "../../styles/principal.css";
 
 
 
@@ -55,7 +55,7 @@ export default function Principal({ username, onLogout }) {
       {/* Botón cerrar sesión CORREGIDO */}
       <button
           type="button"
-          className="nav-link btn" // Mantenemos nav-link para el estilo de color y btn
+          className="nav-link" // Mantenemos nav-link para el estilo de color y btn
           // ✅ CORRECCIÓN: Quitamos los estilos en línea que fuerzan el padding y el textAlign
           // Dejamos solo los estilos esenciales que no pueden ir en CSS
           style={{ color: '#E8EAED', background: 'transparent', border: 'none' }} 
@@ -66,7 +66,7 @@ export default function Principal({ username, onLogout }) {
       </button>
     </div>
     <div className="offcanvas-body">
-      <Link className="nav-link" to="/inicio">
+      <Link className="nav-link" to="/inicio" >
         Inicio
       </Link>
       <Link className="nav-link" to="/asistencias">

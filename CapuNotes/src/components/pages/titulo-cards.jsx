@@ -1,4 +1,4 @@
-import './titulo-cards.css';
+import '../../styles/titulo-cards.css';
 
 export default function WelcomeCard({ title}) {
   return (

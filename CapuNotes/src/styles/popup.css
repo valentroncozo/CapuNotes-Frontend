@@ -1,6 +1,6 @@
 /* === TIPOGRAFÍA GLOBAL === */
 @import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
-
+@import url('./nav-bar.css');
 /* === VARIABLES DE COLOR === */
 :root {
   --color-primario: #11103a;   /* Fondo */
