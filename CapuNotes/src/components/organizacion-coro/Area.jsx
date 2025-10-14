@@ -1,8 +1,8 @@
 import '../../styles/organizacionCoro.css';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Link } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import BackButton from '../utils/BackButton';
 
 {
   /* --- Ajuste para mantener la flecha blanca y alinear el título "Áreas" con los textos "Nombre" y "Descripción" --- */
@@ -18,7 +18,6 @@ export default function Area() {
           */}
             <nav
               className="navbar  navbar-dark"
-              style={{ padding: '10px' }}
             >
               <button
                 className="navbar-toggler"
@@ -93,7 +92,6 @@ export default function Area() {
       </div>
     
             {/* Esto es solo para que el contenido no quede debajo de la navbar */}
-            <div style={{ marginTop: '60px' }}></div>
           </div>
     <main className="organizacion-bg ">
       {/* Botón menú hamburguesa siempre visible */}
@@ -101,42 +99,23 @@ export default function Area() {
           {/* Header */}
           <header className="header-organizacion">
            
-              <ArrowBackIcon
-                onClick={() => console.log('Regresar')}
-                className="arrow-back-icon"
-                style={{
-                  cursor: 'pointer',
-                  color: '#fff',
-                  fontSize: '2rem',
-                  marginRight: '10px',
-                  transition: 'transform 0.2s, color 0.2s',
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = '#e0a800';
-                  e.target.style.transform = 'scale(1.1)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = '#fff';
-                  e.target.style.transform = 'scale(1)';
-                }}
-              />
+            <BackButton />
         
-              <h1 className="organizacion-title">Áreas</h1>
+            <h1 className="organizacion-title">Áreas</h1>
           </header>
-          <hr className="divisor-amarillo" />
 
-          {/* Formulario */}
-          <Form className="mb-4">
-            <Form.Group className="mb-3">
-              <Form.Label className="text-white">Nombre:</Form.Label>
+          <Form className="form-area">
+          <hr className="divisor-amarillo" />
+            <Form.Group className="form-group mb-3">
+              <Form.Label className="text-white">Nombre</Form.Label>
               <Form.Control
                 type="text"
                 className="form-control organizacion-input"
                 placeholder="Nombre del área"
               />
             </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label className="form-label text-white">Descripción:</Form.Label>
+            <Form.Group className="form-group mb-3">
+              <Form.Label className="form-label text-white">Descripción</Form.Label>
               <Form.Control
                 type="text"
                 className="form-control organizacion-input"
@@ -149,10 +128,14 @@ export default function Area() {
             >
               Agregar
             </Button>
+          <hr className="divisor-amarillo" />
           </Form>
-
+          {/* Formulario */}
           {/* Áreas registradas */}
-          <div className="fw-semibold mb-2">Áreas registradas</div>
+          <h2 className="organizacion-title">
+            Áreas registradas
+            <hr className="divisor-amarillo" />
+          </h2>
           <div className="areas-list-scroll">
             {[1, 2, 3].map((i) => (
               <div className="area-card mb-3" key={i}>

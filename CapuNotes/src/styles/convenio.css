@@ -1,0 +1,11 @@
+:root {
+  --primary-color: #11103a;
+  --secondary-color: #ffc107; 
+  --terciary-color: #b3cdfa;
+  --primary-text-color: #E8EAED;
+  --secondary-text-color: #202124;
+
+  --border-radius:  100%;
+  --shadow: 0 4px 14px rgba(0,0,0,.35);
+  --font-family: 'Manjari', sans-serif;
+}

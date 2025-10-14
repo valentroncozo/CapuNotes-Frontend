@@ -3,7 +3,8 @@ import { Button, Container, Row, Col, Form } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { useNavigate, Link } from 'react-router-dom';
 import '../../styles/miembrosAgregar.css';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+import BackButton from '../utils/BackButton';
 
 export default function MiembrosAgregar() {
   const emptyMiembro = { nombre: '', cuerda: '', area: '', estado: '' };
@@ -150,11 +151,7 @@ export default function MiembrosAgregar() {
           <div className="formulario-miembros">
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
               {/* VOLVER */}
-            <Button variant="link" className="p-0" onClick={() => navigate(-1)} title="Volver">
-              <ArrowBackIcon 
-                    style={{ color: '#fff', fontSize: '28px' }} // Ajusta el tamaño y color
-                /> 
-            </Button>
+            <BackButton />
               <h1 className="titulo-formulario-miembros" style={{ margin: 0 }}>Registro de miembro</h1>
             </div>
             <hr className="divisor-amarillo" />

@@ -16,37 +16,57 @@
 
 /* --- Fondo principal --- */
 .organizacion-bg {
+  width: 100%;
   height: 100vh;
   background: var(--color-primario) !important;
   display: flex;
   flex-direction: column;
   position: relative;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
+  gap: 1rem;
+  color: var(--primary-text-color);
 }
-
 
 .header-organizacion {
   width: 50%;
-  height: 1.5rem;
+  height: 3rem;
   max-height: 2rem;
   gap: 1rem;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap !important;
-  justify-content: flex-end;
-  align-items: flex-end;
+  justify-content: space-between;
+  align-content: center;
+  align-items: center;
 }
 
 .header-organizacion h1 {
+  flex: 2;
   height: 100%;
   display: block;
-  left: 0;
-  right: 0;
   position:relative;
-  font-size: 1.5rem;
+  font-size: 2rem;
   padding: 0%;
   margin: 0%;
+}
+
+.form-area {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+  align-items: flex-start;
+  gap: .3rem;
+} 
+
+.form-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 
@@ -54,7 +74,7 @@
 .organizacion-title {
   color: var(--color-texto-principal);
   font-family: var(--font-primary);
-  font-size: 1.6rem;
+  font-size: 1.3rem;
   font-weight: 600;
 }
 
@@ -65,6 +85,7 @@
   border-radius: var(--border-radius) !important;
   border: none !important;
   font-family: var(--font-primary);
+  font-weight: 600 !important;
   box-shadow: var(--box-shadow-standard) !important;
 }
 
@@ -106,7 +127,7 @@
 .divisor-amarillo {
   border: none;
   border-top: 2.5px solid var(--color-secundario);
-  width: 100%;
+  width: 50%;
   margin: 0.5rem 0 1.2rem 0;
   border-radius: 2px;
 }
