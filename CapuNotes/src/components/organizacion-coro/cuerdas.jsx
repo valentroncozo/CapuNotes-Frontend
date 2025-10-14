@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../styles/cuerdas.css";
 import { PlusCircleFill } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BackButton from '../utils/BackButton';
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 // Clave de persistencia
@@ -151,11 +151,7 @@ export default function Cuerda({ cuerdas = [] }) {
         <div className="lab-page-content"> 
             <div className="lab-card">
             <div className="cuerda-header-flex">
-                <Button variant="link" className="p-0 back-btn-inline" onClick={() => navigate(-1)} title="Volver">
-                    <ArrowBackIcon 
-                        style={{ color: '#fff', fontSize: '28px' }} 
-                    /> 
-                </Button>
+              <BackButton />
             </div>
             
             <h2 className="lab-title">Cuerdas</h2>

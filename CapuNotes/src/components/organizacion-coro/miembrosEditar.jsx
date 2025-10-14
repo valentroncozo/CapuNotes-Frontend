@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Container, Row, Col, Form } from 'react-bootstrap';
-import Swal from 'sweetalert2';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import '../../styles/miembrosAgregar.css';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BackButton from '../utils/BackButton';
 
 
 export default function MiembrosEditar() {
@@ -125,11 +124,7 @@ export default function MiembrosEditar() {
       <div className="formulario-miembros">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
               {/* VOLVER */}
-            <Button variant="link" className="p-0" onClick={() => navigate(-1)} title="Volver">
-              <ArrowBackIcon 
-                    style={{ color: '#fff', fontSize: '28px' }} // Ajusta el tamaño y color
-                /> 
-            </Button>
+              <BackButton />
               <h1 className="titulo-formulario-miembros" style={{ margin: 0 }}>Modificacion de miembro</h1>
             </div>
             <hr className="divisor-amarillo" />
@@ -226,36 +221,30 @@ export default function MiembrosEditar() {
             />
           </Form.Group>
 
-        <Row className="mb-3 align-items-center">
-                <Col xs={10}>
-                <Form.Group className='form-group-miembro'>
-                  <label className="form-label text-white">Cuerda</label>
-                  <Form.Select
-                    name="cuerda"
-                    value={formData .cuerda}
-                    onChange={handleChange}
-                  >
-                    <option value="">Seleccionar cuerda</option>
-                    {cuerdasDisponibles.map((c, index) => (
-                      <option key={index} value={c.nombre}>
-                        {c.nombre}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
-                </Col>
-
-                <Col xs={1} className="text-end">
-                  <Button
-                    variant="warning"
-                    className="btn-agregar-cuerda"
-                    onClick={() => navigate('/cuerdas')}
-                    title="Gestionar cuerdas"
-                  >
-                    +
-                  </Button>
-                </Col>
-              </Row>
+          <Form.Group className='form-group-agregar-cuerda'>
+                    <label className="label-cuerda">Cuerda</label>
+                    <Form.Select className='select-cuerda'
+                      name="cuerda"
+                      value={miembro.cuerda}
+                      onChange={handleChange}
+                    >
+                      <option value="">Seleccionar cuerda</option>
+                      {cuerdasDisponibles.map((c, index) => (
+                        <option key={index} value={c.nombre}>
+                          {c.nombre}
+                        </option>
+                      ))}
+                    </Form.Select>
+    
+                      <Button
+                        variant="warning"
+                        className="btn-agregar-cuerda"
+                        onClick={() => navigate('/cuerdas')}
+                        title="Gestionar cuerdas"
+                      >
+                        +
+                      </Button>
+                  </Form.Group>
 
               <Row className="mb-3 align-items-center">
                 <Col xs={13}>
