@@ -1,7 +1,7 @@
 // src/pages/PopupLab.jsx
 import { useState } from "react";
-import AreaEditPopup from "../components/AreaEditPopup"; // <-- nuevo popup para Áreas
-import "./popup-lab.css";
+import AreaEditPopup from "./AreaEditPopup.jsx"; // <-- nuevo popup para Áreas
+import "../../styles/popup-lab.css";
 
 export default function PopupLab() {
   // Áreas de prueba (simulan lo que tendría tu sistema)
@@ -29,9 +29,15 @@ export default function PopupLab() {
 
   return (
     <div className="lab-page">
-      {/* === NavBar estándar requerido (según guía) === */}
+      {/* Botón menú hamburguesa */}
       <div>
-        <nav className="navbar fixed-top w-100 navbar-dark" style={{ padding: "10px" }}>
+        {/* Añadimos 'navbar-dark' para el ícono blanco.
+        Usamos 'backgroundColor' en 'style' para forzar el color exacto. 
+      */}
+        <nav
+          className="navbar fixed-top w-100 navbar-dark"
+          style={{ padding: '10px' }}
+        >
           <button
             className="navbar-toggler"
             type="button"
@@ -44,33 +50,69 @@ export default function PopupLab() {
           </button>
         </nav>
 
-        <div
-          className="offcanvas offcanvas-start"
-          tabIndex="-1"
-          id="offcanvasMenu"
-          aria-labelledby="offcanvasMenuLabel"
-        >
-          <div className="offcanvas-header">
-            <h5 className="offcanvas-title" id="offcanvasMenuLabel">Menú</h5>
-            <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-          </div>
-          <div className="offcanvas-body">
-            <a className="nav-link" href="#">Inicio</a>
-            <a className="nav-link" href="#">Asistencias</a>
-            <a className="nav-link" href="#">Audiciones</a>
-            <a className="nav-link" href="#">Canciones</a>
-            <a className="nav-link" href="#">Eventos</a>
-            <a className="nav-link" href="#">Fraternidades</a>
-            <a className="nav-link" href="#">Miembros</a>
-            <a className="nav-link" href="#">Organización del Coro</a>
-            <a className="nav-link" href="#">Usuarios y roles</a>
-          </div>
-        </div>
+  <div
+    className="offcanvas offcanvas-start"
+    tabIndex="-1"
+    id="offcanvasMenu"
+    aria-labelledby="offcanvasMenuLabel"
+  >
+    <div className="offcanvas-header">
+      <h5 className="offcanvas-title" id="offcanvasMenuLabel">
+        Menú
+      </h5>
+      <button
+        type="button"
+        className="btn-close"
+        data-bs-dismiss="offcanvas"
+        aria-label="Close"
+      ></button>
+      {/* Botón cerrar sesión CORREGIDO */}
+      <button
+          type="button"
+          className="nav-link" // Mantenemos nav-link para el estilo de color y btn
+          // ✅ CORRECCIÓN: Quitamos los estilos en línea que fuerzan el padding y el textAlign
+          // Dejamos solo los estilos esenciales que no pueden ir en CSS
+          style={{ color: '#E8EAED', background: 'transparent', border: 'none' }} 
+          data-bs-dismiss="offcanvas"
+          onClick={() => { if (onLogout) onLogout(); }}
+      >
+          Cerrar sesión
+      </button>
+    </div>
+    <div className="offcanvas-body">
+      <Link className="nav-link" to="/inicio" >
+        Inicio
+      </Link>
+      <Link className="nav-link" to="/asistencias">
+        Asistencias
+      </Link>
+      <Link className="nav-link" to="/audiciones">
+        Audiciones
+      </Link>
+      <Link className="nav-link" to="/canciones">
+        Canciones
+      </Link>
+      <Link className="nav-link" to="/eventos">
+        Eventos
+      </Link>
+      <Link className="nav-link" to="/fraternidades">
+        Fraternidades
+      </Link>
+      <Link className="nav-link" to="/miembros">
+        Miembros
+      </Link>
+      <Link className="nav-link" to="/organizacion-coro">
+        Organización del Coro 
+      </Link>
+      <Link className="nav-link" to="/usuarios-roles">
+        Usuarios y roles
+      </Link>
+    </div>
+  </div>
 
-        {/* separador para que el contenido no quede debajo del navbar */}
-        <div style={{ marginTop: "60px" }}></div>
+        {/* Esto es solo para que el contenido no quede debajo de la navbar */}
+        <div style={{ marginTop: '60px' }}></div>
       </div>
-
       {/* === Contenido del laboratorio: listado de Áreas con botón Editar === */}
       <div className="lab-card">
         <h1 className="lab-title">Laboratorio: Edición de Áreas</h1>

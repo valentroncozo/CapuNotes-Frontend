@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Table, Button, Form, Row, Col, Container, InputGroup } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import './miembros.css';
+import '../../styles/miembros.css';
 import { Link } from 'react-router-dom';
 import { Search, PlusCircleFill, PencilFill, XCircleFill } from 'react-bootstrap-icons';  
 

@@ -7,7 +7,7 @@ import EventIcon from '@mui/icons-material/Event'; // 🗓️ Eventos
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic'; // 🎶 Actividades complementarias
 import MicIcon from '@mui/icons-material/Mic'; // 🎤 Audiciones
 import { Link } from 'react-router-dom';
-import "./principal.css";
+import "../../styles/principal.css";
 
 
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Container, Row, Col, Form } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { useNavigate, Link } from 'react-router-dom';
-import './miembrosAgregar.css';
+import '../../styles/miembrosAgregar.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 export default function MiembrosAgregar() {

@@ -6,17 +6,17 @@ import {
   Navigate,
   BrowserRouter,
 } from 'react-router-dom';
-import './App.css';
+import './styles/App.css';
 
 // 👉 Componentes
-import Principal from './components/principal.jsx';
-import Miembros from './components/miembros.jsx';
-import MiembrosAgregar from './components/miembrosAgregar.jsx';
-import MiembrosEditar from './components/miembrosEditar.jsx';
-import Cuerda from './components/cuerdas.jsx';
-import PopupLab from './pages/PopupLab.jsx';
-import Login from './components/login.jsx';
-import OrganizacionCoro from './components/organizacionCoro.jsx';
+import Principal from './components/pages/principal.jsx';
+import Miembros from './components/organizacion-coro/miembros.jsx';
+import MiembrosAgregar from './components/organizacion-coro/miembrosAgregar.jsx';
+import MiembrosEditar from './components/organizacion-coro/miembrosEditar.jsx';
+import Cuerda from './components/organizacion-coro/cuerdas.jsx';
+import PopupLab from './components/popUp/PopupLab.jsx';
+import Login from './components/pages/login.jsx';
+import Area from './components/organizacion-coro/Area.jsx';
 
 function App() {
   // ✅ Persistencia de sesión
@@ -94,7 +94,7 @@ function App() {
           <Route path="/inicio" element={<Navigate to="/principal" />} />
 
           {/* Organización */}
-          <Route path="/organizacion-coro" element={<OrganizacionCoro />} />
+          <Route path="/organizacion-coro" element={<Area />} />
 
           {/* Miembros */}
           <Route

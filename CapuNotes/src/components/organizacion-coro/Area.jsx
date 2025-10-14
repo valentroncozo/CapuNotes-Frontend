@@ -1,10 +1,10 @@
-import './organizacionCoro.css';
+import '../../styles/organizacionCoro.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Link } from 'react-router-dom';
 {
   /* --- Ajuste para mantener la flecha blanca y alinear el título "Áreas" con los textos "Nombre" y "Descripción" --- */
 }
-export default function OrganizacionCoro() {
+export default function Area() {
   return (
     <>  
           {/* Botón menú hamburguesa */}

@@ -1,6 +1,6 @@
 // src/components/Modal.jsx
 import { useEffect, useRef } from "react";
-import "./popup.css";
+import "../../styles/popup.css";
 
 export default function Modal({ isOpen, onClose, title, children, actions }) {
   const dialogRef = useRef(null);
