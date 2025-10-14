@@ -3,52 +3,66 @@ import { Table, Button, Form, Row, Col, Container, InputGroup } from 'react-boot
 import { useNavigate } from 'react-router-dom';
 import './miembros.css';
 import { Link } from 'react-router-dom';
+import { Search, PlusCircleFill, PencilFill, XCircleFill } from 'react-bootstrap-icons';  
 
 export default function Miembros() {
   const navigate = useNavigate();
   const [listaMiembros, setListaMiembros] = useState([]);
   const [filtro, setFiltro] = useState('');
 
-  useEffect(() => {
-    const dataGuardada = localStorage.getItem('capunotes_miembros');
-    if (dataGuardada) setListaMiembros(JSON.parse(dataGuardada));
-  }, []);
 
   const miembrosFiltrados = listaMiembros.filter((m) => {
     if (!filtro) return true;
     const q = filtro.toLowerCase();
     return m.nombre && m.nombre.toLowerCase().includes(q);
   });
-
-  const handleAgregar = () => {
-    navigate('/miembros/agregar');
-  };
+  
+  //funcion para guardar los miembros con useEffect
+  useEffect(() => {
+    const dataGuardada = localStorage.getItem('capunotes_miembros');
+    if (dataGuardada) setListaMiembros(JSON.parse(dataGuardada));
+  }, []);
 
   const handleBuscar = () => {
     // filtro ya se aplica automáticamente
   };
 
+  // 0. AGREGAR: Función limpia que usa la lógica de navegación
+  const handleAgregar = () => {
+    navigate('/miembros/agregar');
+  };
+
+  // 1. EDITAR: Función limpia que usa la lógica de navegación
+  const handleEditar = (miembro) => {
+    navigate("/miembros/editar", { state: { miembro } });
+  };
+
+  // 2. ELIMINAR: Función limpia que usa la lógica de tu estado (listaMiembros)
+  const handleEliminar = (index) => {
+      if (!window.confirm(`¿Eliminar miembro: ${listaMiembros[index].nombre}?`)) {
+          return;
+      }
+      
+      // Lógica de eliminación (debería estar en el componente padre si esta es solo la tabla)
+      const nuevaLista = listaMiembros.filter((_, i) => i !== index);
+      setListaMiembros(nuevaLista);
+  };
+
   return (
     <>
-            <div>
-        {/* Añadimos 'navbar-dark' para el ícono blanco.
-        Usamos 'backgroundColor' en 'style' para forzar el color exacto. 
-      */}
-        <nav
-          className="navbar fixed-top w-100 navbar-dark"
-          style={{ padding: '10px' }}
+      {/* === NAVBAR CON OFFCANVAS === */}
+      <nav className="navbar fixed-top navbar-dark">
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasMenu"
+          aria-controls="offcanvasMenu"
+          aria-label="Toggle navigation"
         >
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#offcanvasMenu"
-            aria-controls="offcanvasMenu"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-        </nav>
+          <span className="navbar-toggler-icon"></span>
+        </button>
+      </nav>
 
   <div
     className="offcanvas offcanvas-start"
@@ -115,12 +129,13 @@ export default function Miembros() {
       </div>
 
       {/* === CONTENIDO PRINCIPAL === */}
-      <div className="pantalla-miembros" style={{ marginTop: '70px' }}>
-        <Container>
+      <div className="pantalla-miembros">
+         <div className="miembros-container">
           {/* Título */}
           <Row className="mb-4">
             <Col xs={12}>
               <h2 className="miembros-title text-center">Miembros del Coro</h2>
+            <hr className="divisor-amarillo" />
             </Col>
           </Row>
 
@@ -157,6 +172,7 @@ export default function Miembros() {
                   <th>Cuerda</th>
                   <th>Área</th>
                   <th>Estado</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -167,17 +183,35 @@ export default function Miembros() {
                       <td>{m.cuerda || '-'}</td>
                       <td>{m.area || '-'}</td>
                       <td>{m.estado || '-'}</td>
+                      {/* ✅ BOTÓN DE EDITAR (Usando tu estilo .btn-accion) */}
+                      <td className="acciones">
+                          <Button 
+                              className="btn-accion me-2" 
+                              variant="warning"
+                              onClick={() => handleEditar(m)} // Llama a la función de navegación
+                          >
+                              <PencilFill size={18} />
+                          </Button>
+                      {/* ✅ BOTÓN DE ELIMINAR (Usando tu estilo .btn-accion eliminar) */}
+                          <Button 
+                              className="btn-accion eliminar" 
+                              variant="danger"
+                              onClick={() => handleEliminar(index)} // Llama a la función de eliminación
+                          >
+                              <XCircleFill size={18} />
+                          </Button>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="4" className="text-center">No hay miembros registrados</td>
+                    <td colSpan="5" className="text-center">No hay miembros registrados</td>
                   </tr>
                 )}
               </tbody>
             </Table>
           </div>
-        </Container>
+          </div>
       </div>
     </>
   );

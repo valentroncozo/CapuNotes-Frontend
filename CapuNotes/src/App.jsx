@@ -4,17 +4,19 @@ import {
   Routes,
   Route,
   Navigate,
+  BrowserRouter,
 } from 'react-router-dom';
 import './App.css';
 
 // 👉 Componentes
-import Login from './components/login.jsx';
 import Principal from './components/principal.jsx';
 import OrganizacionCoro from './components/organizacionCoro.jsx';
 import Miembros from './components/miembros.jsx';
 import MiembrosAgregar from './components/miembrosAgregar.jsx';
+import MiembrosEditar from './components/miembrosEditar.jsx';
 import Cuerda from './components/cuerdas.jsx';
-import PopupLab from './pages/popupLab.jsx';
+import PopupLab from './pages/PopupLab.jsx';
+import Login from './components/login.jsx';
 
 function App() {
   // ✅ Persistencia de sesión
@@ -96,14 +98,20 @@ function App() {
 
           {/* Miembros */}
           <Route
-            path="/miembros" element={<Miembros/>}
+            path="/miembros" 
+            element={<Miembros/>}
           />
           <Route
-            path="/miembros/agregar" element={<MiembrosAgregar/>}
+            path="/miembros/agregar" 
+            element={<MiembrosAgregar/>}
           />
           <Route
             path="/cuerdas"
             element={<Cuerda cuerda={{ nombre: '' }}/>}
+          />
+          <Route
+            path="/miembros/editar"
+            element={<MiembrosEditar />}
           />
           <Route
             path="/popup-lab"

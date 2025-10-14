@@ -1,0 +1,224 @@
+/* Styles specific to the "Agregar Miembro" form */
+:root {
+  /* keep only the variables used by the form here so they are scoped when this file is loaded */
+  --bg: #11103a; 
+  --color-card-dark: #1c1b3f; 
+  --color-text-light: #e8eaed;
+  --color-text-dark: #202124;
+  --shadow-deep: 0 6px 20px rgba(0,0,0,0.45);
+  --radius-lg: 16px;
+  --radius-sm: 10px;
+  --font: 'Manjari', system-ui, sans-serif;
+  --transition-fast: 0.15s ease;
+  --color-accent: #ffc107;
+}
+
+html, body {
+  height: auto;
+  margin: 0;
+  padding: 0;
+  background: var(--bg ) !important;
+  font-family: var(--font);
+  overflow-x: auto;
+}
+
+
+.formulario-miembros {
+  background-color: transparent !important;
+  color: var(--color-text-light);
+  padding: 0;
+  border-radius: var(--radius-lg);
+  max-width: 550px;
+  width: 100%;
+  margin: auto;
+  box-shadow: none;
+  transition: transform 0.3s ease;
+  border: none;
+}
+
+.formulario-miembros .form-group label {
+  font-weight: 500;
+  color: var(--color-text-light);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.form-dni-group .col {
+  padding: 0 5px;
+}
+.form-dni-group .col:first-child { padding-left: 0; }
+.form-dni-group .col:last-child { padding-right: 0; }
+.form-header-wrapper { /* 👈 Clase que envuelve el título y la flecha */
+    /* ✅ 1. Usar Flexbox para la alineación */
+    display: flex;
+    align-items: center;
+    
+    /* 2. Empujar la flecha a la izquierda y el título al centro */
+    justify-content: space-between; 
+    
+    margin-bottom: 30px;
+    padding-bottom: 12px;
+    position: relative; /* Para el posicionamiento absoluto si lo necesitas */
+}
+
+/* ❌ Elimina la regla text-align: center; de .form-header h2 */
+.form-header h2 {
+    /* Mantenemos el estilo, pero quitamos el width: 100%; y el text-align: center; */
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-text-light) !important;
+    margin: 0 auto; /* ✅ CLAVE: Margen automático para centrar el título como un bloque */
+}
+
+.btn-submit-form {
+  background-color: var(--color-accent) !important;
+  color: var(--color-text-dark);
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 12px 25px;
+  border-radius: var(--radius-lg);
+  width: 100%;
+  margin-top: 30px;
+  transition: var(--transition-fast);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.btn-submit-form:hover {
+  background-color: #ffcd38;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+
+.pantalla-miembros {
+  padding-top: 100px;
+  min-height: 100vh; /* ocupa al menos la altura completa */
+  overflow-y: visible; /* permite el scroll vertical */
+  padding-bottom: 50px; /* espacio al final */
+  background: var(--bg) !important;
+}
+
+body {
+  overflow-y: auto;
+}
+
+.formulario-miembros { background-clip: padding-box; }
+
+.form-group-miembro {
+  margin-bottom: 20px;
+}
+
+/* Corrección para eliminar el contorno de los campos */
+.formulario-miembros .form-control {
+    /* Mantenemos el fondo sutilmente más claro que la tarjeta */
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: var(--color-text-light) !important;
+    
+    /* ✅ FUNDAMENTAL: ELIMINAR EL BORDE PREDETERMINADO */
+    border: none !important; 
+    
+    /* Eliminar el padding vertical (si lo tiene) o ajustarlo */
+    padding: 12px 14px !important;
+    
+    /* Aseguramos que no haya margen en el fondo */
+    box-shadow: none !important; 
+    
+    border-radius: var(--radius-sm);
+    margin-bottom: 25px; /* Aumentar el margen inferior para la separación visible */
+    transition: all 0.3s ease;
+}
+
+/* 2. Suavizar el Foco (Focus) */
+.formulario-miembros .form-control:focus {
+    /* El borde de foco ya no es una línea sino una sombra sutil */
+    border-color: transparent !important; 
+    
+    /* ✅ CLAVE: Usar solo una sombra del color de acento para indicar que está activo */
+    box-shadow: 0 0 0 1px var(--color-accent) !important; /* Una sombra muy delgada en lugar de un borde */
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.12) !important; 
+}
+
+.container {
+  background-color: transparent !important;
+}
+
+.formulario-miembros .form-control::placeholder {
+  color:  rgba(255, 255, 255, 0.8) !important; /* gris claro sobre fondo oscuro */
+  font-weight: 400;
+}
+
+/* ✅ REGLA CLAVE: FUERZA EL COLOR NEGRO AL TEXTO DENTRO DE LAS OPCIONES */
+.formulario-miembros option {
+    /* Usamos el color oscuro que definiste para textos en fondos claros */
+    color: var(--color-text-dark) !important; 
+    
+    /* Opcional: Aseguramos que el fondo de cada opción sea el blanco nativo 
+       o un color claro para el contraste si el navegador lo permite. */
+    background-color: white !important; 
+    
+    /* Si no tienes acceso a la variable --color-text-dark, usa un negro directo: */
+    /* color: #000000 !important; */
+}
+
+/* 2. Limpieza del Select (Asegura el input general se mantenga oscuro) */
+.formulario-miembros .form-control {
+    /* Aseguramos que el texto DENTRO del INPUT/SELECT principal sea blanco */
+    color: var(--color-text-light) !important; 
+    background-color: rgba(255, 255, 255, 0.08) !important; 
+    /* ... otros estilos ... */
+}
+
+.formulario-miembros .form-control,
+.formulario-miembros select {
+  background-color: rgba(255, 255, 255, 0.08) !important; /* azul oscuro/gris */
+  color: var(--color-text-light) !important; /* texto blanco */
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 20px;
+  box-shadow: none;
+  transition: all 0.3s ease;
+}
+
+.formulario-miembros .form-control:focus,
+.formulario-miembros select:focus {
+  box-shadow: 0 0 0 1px var(--color-accent) ;
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  outline: none;
+}
+
+/* Placeholder para inputs */
+.formulario-miembros input::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+  font-weight: 400;
+}
+
+/* Placeholder para selects (solo visible si usás <option disabled selected>) */
+.formulario-miembros select:invalid {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Aseguramos que el texto dentro del select también sea blanco */
+.formulario-miembros select {
+  color: var(--color-text-light);
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Evita que el navbar o el offcanvas corten el flujo del scroll */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1050;
+  background-color: #0d0c2b !important;
+}
+
+.offcanvas {
+  z-index: 1100;
+}
+
+/* Solo si Bootstrap te está forzando el body a overflow hidden al abrir el menú */
+body.offcanvas-open {
+  overflow: hidden;
+}
