@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button, Container, Row, Col, Form } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { useNavigate, Link } from 'react-router-dom';
 import './miembrosAgregar.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 
 export default function MiembrosAgregar() {
   const emptyMiembro = { nombre: '', cuerda: '', area: '', estado: '' };
@@ -18,6 +19,9 @@ export default function MiembrosAgregar() {
     { nombre: 'Batería' },
   ];
   const navigate = useNavigate();
+  const nuevaLista = useMemo(() => {
+    return [...listaMiembros, miembro];
+  }, [listaMiembros, miembro]);
 
   useEffect(() => {
     const cuerdasGuardadas = JSON.parse(localStorage.getItem('capunotes_cuerdas')) || [];
@@ -25,8 +29,8 @@ export default function MiembrosAgregar() {
 }, []);
 
   useEffect(() => {
-    localStorage.setItem('capunotes_miembros', JSON.stringify(listaMiembros));
-  }, [listaMiembros]);
+    localStorage.setItem("capunotes_miembros", JSON.stringify(nuevaLista));
+  }, [nuevaLista]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -114,7 +118,7 @@ export default function MiembrosAgregar() {
           </Link>
         </div>
       </div>
-    
+
       {/* === CONTENIDO PRINCIPAL === */}
       <div className="pantalla-miembros" style={{ marginTop: '70px' }}>
         <Container className="pt-5">
@@ -282,7 +286,7 @@ export default function MiembrosAgregar() {
                   Cancelar
                 </button>
                 <button type="submit" className="btn btn-warning w-50">
-                  Guardar Cambios
+                  Agregar
                 </button>
               </div>
             </Form>

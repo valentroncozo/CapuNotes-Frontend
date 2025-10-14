@@ -128,13 +128,16 @@ export default function Miembros() {
                   onChange={(e) => setFiltro(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleBuscar()}
                 />
+                <Button variant="outline-light" onClick={handleBuscar} title="Buscar" className="ms-2">
+                  <Search />
+                </Button>
               </InputGroup>
             </Col>
 
             <Col xs={12} md={4} className="text-md-end">
               <div className="botonera-miembros">
                 <Button className="btn-agregar" onClick={handleAgregar}>
-                  Agregar Miembro
+                  Agregar miembro
                 </Button>
               </div>
             </Col>
