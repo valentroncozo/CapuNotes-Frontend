@@ -15,7 +15,7 @@ import Miembros from './components/miembros.jsx';
 import MiembrosAgregar from './components/miembrosAgregar.jsx';
 import MiembrosEditar from './components/miembrosEditar.jsx';
 import Cuerda from './components/cuerdas.jsx';
-import PopupLab from './pages/popupLab.jsx';
+import PopupLab from './pages/PopupLab.jsx';
 import Login from './components/login.jsx';
 
 function App() {
