@@ -1,12 +1,64 @@
 import '../../styles/organizacionCoro.css';
+import '../../styles/area-card.css';
 import { Link } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import BackButton from '../utils/BackButton';
+import CardArea from './Card-area.jsx';
+import { useState } from 'react';
 {
   /* --- Ajuste para mantener la flecha blanca y alinear el título "Áreas" con los textos "Nombre" y "Descripción" --- */
 }
 export default function Area() {
+  const [areas, setAreas] = useState([
+    {
+      id: 1,
+      name: "Soprano",
+      description: "Voces agudas femeninas"
+    },
+    {
+      id: 2,
+      name: "Alto",
+      description: "Voces graves femeninas"
+    },
+    {
+      id: 3,
+      name: "Tenor",
+      description: "Voces agudas masculinas"
+    },  
+    {
+      id: 4,
+      name: "Bajo",
+      description: "Voces graves masculinas"
+    }
+  ]);
+
+  const [formData, setFormData] = useState({
+    name: '',   
+    description: ''
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));  
+  };  
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (formData.name.trim() && formData.description.trim()) {
+      const newArea = {
+        id: Math.max(...areas.map(area => area.id), 0) + 1,
+        name: formData.name.trim(),
+        description: formData.description.trim()
+      };
+      setAreas(prev => [...prev, newArea]);
+      setFormData({ name: '', description: '' }); // Limpiar formulario
+    }
+  };
+
 
 
   return (
@@ -104,22 +156,30 @@ export default function Area() {
           </header>
 
           {/* Formulario */}
-          <Form className="form-area">
+          <Form className="form-area" onSubmit={handleSubmit}>
           <hr className="divisor-amarillo" />
             <Form.Group className="form-group">
               <Form.Label className="text-white">Nombre</Form.Label>
               <Form.Control
                 type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
                 className="form-control organizacion-input"
                 placeholder="Nombre del área"
+                required
               />
             </Form.Group>
             <Form.Group className="form-group">
               <Form.Label className="form-label text-white">Descripción</Form.Label>
               <Form.Control
                 type="text"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
                 className="form-control organizacion-input"
                 placeholder="Descripción"
+                required
               />
             </Form.Group>
             <Button
@@ -138,31 +198,11 @@ export default function Area() {
           </h2>
 
           <div className="areas-list-scroll">
-            {[1, 2, 3].map((i) => (
-              <div className="area-card mb-3" key={i}>
-                <div className="row">
-                  <div className="col-12 fw-bold">Administración</div>
-                </div>
-                <div className="row">
-                  <div className="col-12 area-desc">
-                    Aquí va la descripción, aquí va la descripción, aquí va la
-                    descripción
-                  </div>
-                </div>
-                <div className="row mt-2">
-                  <div className="col-6">
-                    <button className="btn btn-primary btn-sm w-100">
-                      Consultar
-                    </button>
-                  </div>
-                  <div className="col-6">
-                    <button className="btn btn-warning btn-sm w-100">
-                      Eliminar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+            {
+              areas.map((area) => (
+                <CardArea key={area.id} id={area.id} name={area.name} description={area.description} />
+              ))
+            }
           </div>
     </main>
   </>
