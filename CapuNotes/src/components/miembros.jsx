@@ -50,83 +50,83 @@ export default function Miembros() {
 
   return (
     <>
-      {/* === NAVBAR CON OFFCANVAS === */}
-      <nav className="navbar fixed-top navbar-dark">
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasMenu"
-          aria-controls="offcanvasMenu"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-      </nav>
+        {/* === NAVBAR CON OFFCANVAS === */}
+        <nav className="navbar fixed-top navbar-dark">
+          <button
+            className="navbar-toggler"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasMenu"
+            aria-controls="offcanvasMenu"
+            aria-label="Toggle navigation"
+          >
+            <span className="navbar-toggler-icon"></span>
+          </button>
+        </nav>
 
-  <div
-    className="offcanvas offcanvas-start"
-    tabIndex="-1"
-    id="offcanvasMenu"
-    aria-labelledby="offcanvasMenuLabel"
-  >
-    <div className="offcanvas-header">
-      <h5 className="offcanvas-title" id="offcanvasMenuLabel">
-        Menú
-      </h5>
-      <button
-        type="button"
-        className="btn-close"
-        data-bs-dismiss="offcanvas"
-        aria-label="Close"
-      ></button>
-      {/* Botón cerrar sesión CORREGIDO */}
-      <button
+    <div
+      className="offcanvas offcanvas-start"
+      tabIndex="-1"
+      id="offcanvasMenu"
+      aria-labelledby="offcanvasMenuLabel"
+    >
+      <div className="offcanvas-header">
+        <h5 className="offcanvas-title" id="offcanvasMenuLabel">
+          Menú
+        </h5>
+        <button
           type="button"
-          className="nav-link btn" // Mantenemos nav-link para el estilo de color y btn
-          // ✅ CORRECCIÓN: Quitamos los estilos en línea que fuerzan el padding y el textAlign
-          // Dejamos solo los estilos esenciales que no pueden ir en CSS
-          style={{ color: '#E8EAED', background: 'transparent', border: 'none' }} 
+          className="btn-close"
           data-bs-dismiss="offcanvas"
-          onClick={() => { if (onLogout) onLogout(); }}
-      >
-          Cerrar sesión
-      </button>
+          aria-label="Close"
+        ></button>
+        {/* Botón cerrar sesión CORREGIDO */}
+        <button
+            type="button"
+            className="nav-link btn" // Mantenemos nav-link para el estilo de color y btn
+            // ✅ CORRECCIÓN: Quitamos los estilos en línea que fuerzan el padding y el textAlign
+            // Dejamos solo los estilos esenciales que no pueden ir en CSS
+            style={{ color: '#E8EAED', background: 'transparent', border: 'none' }} 
+            data-bs-dismiss="offcanvas"
+            onClick={() => { if (onLogout) onLogout(); }}
+        >
+            Cerrar sesión
+        </button>
+      </div>
+      <div className="offcanvas-body">
+        <Link className="nav-link" to="/inicio" >
+          Inicio
+        </Link>
+        <Link className="nav-link" to="/asistencias">
+          Asistencias
+        </Link>
+        <Link className="nav-link" to="/audiciones">
+          Audiciones
+        </Link>
+        <Link className="nav-link" to="/canciones">
+          Canciones
+        </Link>
+        <Link className="nav-link" to="/eventos">
+          Eventos
+        </Link>
+        <Link className="nav-link" to="/fraternidades">
+          Fraternidades
+        </Link>
+        <Link className="nav-link" to="/miembros">
+          Miembros
+        </Link>
+        <Link className="nav-link" to="/organizacion-coro">
+          Organización del Coro 
+        </Link>
+        <Link className="nav-link" to="/usuarios-roles">
+          Usuarios y roles
+        </Link>
+      </div>
     </div>
-    <div className="offcanvas-body">
-      <Link className="nav-link" to="/inicio" >
-        Inicio
-      </Link>
-      <Link className="nav-link" to="/asistencias">
-        Asistencias
-      </Link>
-      <Link className="nav-link" to="/audiciones">
-        Audiciones
-      </Link>
-      <Link className="nav-link" to="/canciones">
-        Canciones
-      </Link>
-      <Link className="nav-link" to="/eventos">
-        Eventos
-      </Link>
-      <Link className="nav-link" to="/fraternidades">
-        Fraternidades
-      </Link>
-      <Link className="nav-link" to="/miembros">
-        Miembros
-      </Link>
-      <Link className="nav-link" to="/organizacion-coro">
-        Organización del Coro 
-      </Link>
-      <Link className="nav-link" to="/usuarios-roles">
-        Usuarios y roles
-      </Link>
-    </div>
-  </div>
 
         {/* Esto es solo para que el contenido no quede debajo de la navbar */}
         <div style={{ marginTop: '60px' }}></div>
-      </div>
+     
 
       {/* === CONTENIDO PRINCIPAL === */}
       <div className="pantalla-miembros">
