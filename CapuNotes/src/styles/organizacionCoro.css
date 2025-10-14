@@ -6,7 +6,7 @@
   --color-primario: #11103a;
   --color-secundario: #ffc107;
   --color-terciario: #b3cdfa;
-  --color-texto-principal: #e8eaed;
+  --color-texto-principal: #e8eaed !important;
   --color-texto-cards: #202124;
   --font-primary: 'Manjari', sans-serif;
   --font-title: 'Mr Dafoe', cursive;
@@ -16,8 +16,39 @@
 
 /* --- Fondo principal --- */
 .organizacion-bg {
+  height: 100vh;
   background: var(--color-primario) !important;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
+
+
+.header-organizacion {
+  width: 50%;
+  height: 1.5rem;
+  max-height: 2rem;
+  gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap !important;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.header-organizacion h1 {
+  height: 100%;
+  display: block;
+  left: 0;
+  right: 0;
+  position:relative;
+  font-size: 1.5rem;
+  padding: 0%;
+  margin: 0%;
+}
+
 
 /* --- Títulos --- */
 .organizacion-title {
@@ -259,4 +290,9 @@
 /* --- Ajuste definitivo para la flecha atrás --- */
 .arrow-back-icon {
   color: #fff !important; /* Forzar color blanco */
+  height: 100% !important;
+  max-width: 2rem;
+  padding: 0%;
+  margin: 0%;
+  box-sizing: border-box;
 }

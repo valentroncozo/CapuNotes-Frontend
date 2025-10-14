@@ -6,8 +6,11 @@ body {
 
 /* --- Botón menú hamburguesa --- */
 .navbar {
-    /* Este es el color azul oscuro que quieres: #213547 */
+    /* Este es
+     el color azul oscuro que quieres: #213547 */
     background: transparent !important; 
+    top:0;
+    width: 100%;
     border: none;
 }
 
