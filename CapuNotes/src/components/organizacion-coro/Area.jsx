@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import BackButton from '../utils/BackButton';
-import { useState } from 'react';
 {
   /* --- Ajuste para mantener la flecha blanca y alinear el título "Áreas" con los textos "Nombre" y "Descripción" --- */
 }
@@ -12,7 +11,7 @@ export default function Area() {
 
   return (
     <>  
-<div>
+    <div>
         {/* Añadimos 'navbar-dark' para el ícono blanco.
         Usamos 'backgroundColor' en 'style' para forzar el color exacto. 
       */}
@@ -100,9 +99,7 @@ export default function Area() {
 
           {/* Header */}
           <header className="header-organizacion">
-           
             <BackButton/>
-        
             <h1 className="organizacion-title">Áreas</h1>
           </header>
 

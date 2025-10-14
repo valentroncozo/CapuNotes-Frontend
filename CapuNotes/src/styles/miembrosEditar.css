@@ -1,4 +1,7 @@
 /* Styles specific to the "Agregar Miembro" form */
+
+@import url("./nav-bar.css");
+
 :root {
   /* keep only the variables used by the form here so they are scoped when this file is loaded */
   --bg: #11103a; 

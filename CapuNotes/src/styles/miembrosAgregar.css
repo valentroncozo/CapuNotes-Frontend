@@ -1,3 +1,5 @@
+
+@import url('./nav-bar.css');
 /* Styles specific to the "Agregar Miembro" form */
 :root {
   /* keep only the variables used by the form here so they are scoped when this file is loaded */
@@ -105,10 +107,8 @@ html, body {
 
 
 .pantalla-miembros {
-  padding-top: 100px;
   min-height: 100vh; /* ocupa al menos la altura completa */
   overflow-y: visible; /* permite el scroll vertical */
-  padding-bottom: 50px; /* espacio al final */
   background: var(--bg) !important;
 }
 
