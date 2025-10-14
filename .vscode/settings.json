@@ -1,0 +1,29 @@
+{
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.suggest.autoImports": true,
+  "javascript.suggest.autoImports": true,
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "javascript.preferences.includePackageJsonAutoImports": "on",
+  "files.associations": {
+    "*.css": "css",
+    "*.scss": "scss",
+    "*.html": "html",
+    "*.png": "image",
+    "*.jpg": "image",
+    "*.jpeg": "image",
+    "*.svg": "xml",
+    "*.ico": "image"
+  },
+  "css.validate": true,
+  "scss.validate": true,
+  "html.validate.html": true,
+  "html.validate.scripts": true,
+  "html.validate.styles": true,
+  "explorer.confirmDragAndDrop": false,
+  "explorer.confirmDelete": false,
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact",
+    "html": "html"
+  }
+}
