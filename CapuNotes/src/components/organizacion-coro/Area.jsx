@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import BackButton from '../utils/BackButton';
-
+import { useState } from 'react';
 {
   /* --- Ajuste para mantener la flecha blanca y alinear el título "Áreas" con los textos "Nombre" y "Descripción" --- */
 }
 export default function Area() {
+
+
   return (
     <>  
 <div>
@@ -99,14 +101,15 @@ export default function Area() {
           {/* Header */}
           <header className="header-organizacion">
            
-            <BackButton />
+            <BackButton/>
         
             <h1 className="organizacion-title">Áreas</h1>
           </header>
 
+          {/* Formulario */}
           <Form className="form-area">
           <hr className="divisor-amarillo" />
-            <Form.Group className="form-group mb-3">
+            <Form.Group className="form-group">
               <Form.Label className="text-white">Nombre</Form.Label>
               <Form.Control
                 type="text"
@@ -114,7 +117,7 @@ export default function Area() {
                 placeholder="Nombre del área"
               />
             </Form.Group>
-            <Form.Group className="form-group mb-3">
+            <Form.Group className="form-group">
               <Form.Label className="form-label text-white">Descripción</Form.Label>
               <Form.Control
                 type="text"
@@ -130,12 +133,13 @@ export default function Area() {
             </Button>
           <hr className="divisor-amarillo" />
           </Form>
-          {/* Formulario */}
+
           {/* Áreas registradas */}
-          <h2 className="organizacion-title">
-            Áreas registradas
+          <h2 className="areas-title">
+          Áreas registradas
             <hr className="divisor-amarillo" />
           </h2>
+
           <div className="areas-list-scroll">
             {[1, 2, 3].map((i) => (
               <div className="area-card mb-3" key={i}>

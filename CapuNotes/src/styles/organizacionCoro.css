@@ -24,7 +24,6 @@
   position: relative;
   align-items: center;
   justify-content: flex-start;
-  gap: 1rem;
   color: var(--primary-text-color);
 }
 
@@ -59,10 +58,11 @@
   align-items: flex-start;
   align-content: flex-start;
   align-items: flex-start;
-  gap: .3rem;
+  gap: 1rem;
 } 
 
 .form-group {
+  gap: .3rem;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -77,6 +77,17 @@
   font-size: 1.3rem;
   font-weight: 600;
 }
+
+.areas-title {
+  width: 50%;
+  display: block;
+  color: var(--color-texto-principal);
+  font-family: var(--font-primary);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+
 
 /* --- Botones --- */
 .organizacion-btn {
