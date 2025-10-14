@@ -55,7 +55,7 @@ export default function Principal({ username, onLogout }) {
       {/* Botón cerrar sesión CORREGIDO */}
       <button
           type="button"
-          className="nav-link btn" // Mantenemos nav-link para el estilo de color y btn
+          className="nav-link" // Mantenemos nav-link para el estilo de color y btn
           // ✅ CORRECCIÓN: Quitamos los estilos en línea que fuerzan el padding y el textAlign
           // Dejamos solo los estilos esenciales que no pueden ir en CSS
           style={{ color: '#E8EAED', background: 'transparent', border: 'none' }} 

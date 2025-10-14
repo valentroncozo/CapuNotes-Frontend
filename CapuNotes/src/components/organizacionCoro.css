@@ -1,3 +1,6 @@
+
+@import url('./nav-bar.css');
+
 /* --- Variables de colores y estilos --- */
 :root {
   --color-primario: #11103a;
@@ -7,7 +10,7 @@
   --color-texto-cards: #202124;
   --font-primary: 'Manjari', sans-serif;
   --font-title: 'Mr Dafoe', cursive;
-  --border-radius: 16px;
+  --border-radius: 16px !important;
   --box-shadow-standard: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
@@ -31,7 +34,7 @@
   border-radius: var(--border-radius) !important;
   border: none !important;
   font-family: var(--font-primary);
-  box-shadow: var(--box-shadow-standard);
+  box-shadow: var(--box-shadow-standard) !important;
 }
 
 .organizacion-btn:hover {
@@ -40,18 +43,18 @@
 
 /* --- Cards --- */
 .area-card {
-  background: var(--color-terciario);
-  color: var(--color-texto-cards);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow-standard);
-  padding: 1rem;
-  font-weight: 600; /* Igualar grosor al formulario */
+  background: var(--color-terciario) !important;
+  color: var(--color-texto-cards) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--box-shadow-standard) !important;
+  padding: 1rem !important;
+  font-weight: 600 !important; /* Igualar grosor al formulario */
 }
 
 .area-desc {
   font-size: 0.95rem;
   color: var(--color-texto-cards);
-  font-weight: 600; /* Igualar grosor al formulario */
+  font-weight: 600 !important; /* Igualar grosor al formulario */
   margin-top: 4px;
 }
 

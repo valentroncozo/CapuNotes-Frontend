@@ -10,13 +10,13 @@ import './App.css';
 
 // 👉 Componentes
 import Principal from './components/principal.jsx';
-import OrganizacionCoro from './components/organizacionCoro.jsx';
 import Miembros from './components/miembros.jsx';
 import MiembrosAgregar from './components/miembrosAgregar.jsx';
 import MiembrosEditar from './components/miembrosEditar.jsx';
 import Cuerda from './components/cuerdas.jsx';
 import PopupLab from './pages/PopupLab.jsx';
 import Login from './components/login.jsx';
+import OrganizacionCoro from './components/organizacionCoro.jsx';
 
 function App() {
   // ✅ Persistencia de sesión
