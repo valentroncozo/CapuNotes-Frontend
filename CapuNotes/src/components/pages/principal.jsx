@@ -2,104 +2,15 @@ import WelcomeCard from "./titulo-cards.jsx";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import AssignmentIcon from '@mui/icons-material/Assignment'; // 📋 Asistencia
-import EventIcon from '@mui/icons-material/Event'; // 🗓️ Eventos
-import LibraryMusicIcon from '@mui/icons-material/LibraryMusic'; // 🎶 Actividades complementarias
-import MicIcon from '@mui/icons-material/Mic'; // 🎤 Audiciones
-import { Link } from 'react-router-dom';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import EventIcon from '@mui/icons-material/Event';
+import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
+import MicIcon from '@mui/icons-material/Mic';
 import "../../styles/principal.css";
 
-
-
-export default function Principal({ username, onLogout }) {
-
+export default function Principal({ username }) {
   return (
     <div className="principal-container">
-      {/* Botón menú hamburguesa */}
-      <div>
-        {/* Añadimos 'navbar-dark' para el ícono blanco.
-        Usamos 'backgroundColor' en 'style' para forzar el color exacto. 
-      */}
-        <nav
-          className="navbar fixed-top w-100 navbar-dark"
-          style={{ padding: '10px' }}
-        >
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#offcanvasMenu"
-            aria-controls="offcanvasMenu"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-        </nav>
-
-  <div
-    className="offcanvas offcanvas-start"
-    tabIndex="-1"
-    id="offcanvasMenu"
-    aria-labelledby="offcanvasMenuLabel"
-  >
-    <div className="offcanvas-header">
-      <h5 className="offcanvas-title" id="offcanvasMenuLabel">
-        Menú
-      </h5>
-      <button
-        type="button"
-        className="btn-close"
-        data-bs-dismiss="offcanvas"
-        aria-label="Close"
-      ></button>
-      {/* Botón cerrar sesión CORREGIDO */}
-      <button
-          type="button"
-          className="nav-link" // Mantenemos nav-link para el estilo de color y btn
-          // ✅ CORRECCIÓN: Quitamos los estilos en línea que fuerzan el padding y el textAlign
-          // Dejamos solo los estilos esenciales que no pueden ir en CSS
-          style={{ color: '#E8EAED', background: 'transparent', border: 'none' }} 
-          data-bs-dismiss="offcanvas"
-          onClick={() => { if (onLogout) onLogout(); }}
-      >
-          Cerrar sesión
-      </button>
-    </div>
-    <div className="offcanvas-body">
-      <Link className="nav-link" to="/inicio" >
-        Inicio
-      </Link>
-      <Link className="nav-link" to="/asistencias">
-        Asistencias
-      </Link>
-      <Link className="nav-link" to="/audiciones">
-        Audiciones
-      </Link>
-      <Link className="nav-link" to="/canciones">
-        Canciones
-      </Link>
-      <Link className="nav-link" to="/eventos">
-        Eventos
-      </Link>
-      <Link className="nav-link" to="/fraternidades">
-        Fraternidades
-      </Link>
-      <Link className="nav-link" to="/miembros">
-        Miembros
-      </Link>
-      <Link className="nav-link" to="/organizacion-coro">
-        Organización del Coro 
-      </Link>
-      <Link className="nav-link" to="/usuarios-roles">
-        Usuarios y roles
-      </Link>
-    </div>
-  </div>
-
-        {/* Esto es solo para que el contenido no quede debajo de la navbar */}
-        <div style={{ marginTop: '60px' }}></div>
-      </div>
-
       {/* Contenido principal */}
       <div className="home-container">
         {/* Bienvenida */}
@@ -113,7 +24,6 @@ export default function Principal({ username, onLogout }) {
           <h4 className="section-title">Tus próximos eventos</h4>
 
           <div className="eventos-scroll">
-            {/* === CARD 1 === */}
             <div className="evento-card">
               <h5>Peña</h5>
               <div className="evento-info">
@@ -130,7 +40,6 @@ export default function Principal({ username, onLogout }) {
               </div>
             </div>
 
-            {/* === CARD 2 === */}
             <div className="evento-card">
               <h5>Concierto</h5>
               <div className="evento-info">
@@ -147,7 +56,6 @@ export default function Principal({ username, onLogout }) {
               </div>
             </div>
 
-            {/* === CARD 3 === */}
             <div className="evento-card">
               <h5>Ensayo</h5>
               <div className="evento-info">

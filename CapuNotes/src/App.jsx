@@ -1,4 +1,3 @@
-// src/App.jsx
 import { useState } from 'react';
 import {
   BrowserRouter as Router,
@@ -8,7 +7,8 @@ import {
 } from 'react-router-dom';
 import './styles/App.css';
 
-// 👉 Componentes
+import AppShell from './components/layout/AppShell.jsx';
+
 import Principal from './components/pages/principal.jsx';
 import Miembros from './components/organizacion-coro/miembros.jsx';
 import MiembrosAgregar from './components/organizacion-coro/miembrosAgregar.jsx';
@@ -19,7 +19,6 @@ import Login from './components/pages/login.jsx';
 import Area from './components/organizacion-coro/Area.jsx';
 
 function App() {
-  // ✅ Persistencia de sesión
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     try {
       const saved = localStorage.getItem('capunotes_auth');
@@ -42,7 +41,6 @@ function App() {
     }
   });
 
-  // ✅ Login
   const handleLogin = (usernameInput, password) => {
     if (usernameInput === 'admin' && password === '1234') {
       const session = { isAuthenticated: true, username: usernameInput };
@@ -54,7 +52,6 @@ function App() {
     }
   };
 
-  // ✅ Logout
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUsername('');
@@ -65,70 +62,45 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          {/* Login */}
+          {/* Redirección raíz según auth */}
           <Route
             path="/"
             element={
-              isAuthenticated ? (
-                <Navigate to="/principal" />
-              ) : (
-                <Login onLogin={handleLogin} />
-              )
+              isAuthenticated
+                ? <Navigate to="/principal" />
+                : <Navigate to="/login" />
             }
           />
 
-          {/* Principal */}
+          {/* Login público en /login */}
           <Route
-            path="/principal"
+            path="/login"
             element={
-              isAuthenticated ? (
-                <Principal username={username} onLogout={handleLogout} />
-              ) : (
-                <Navigate to="/" />
-              )
+              isAuthenticated
+                ? <Navigate to="/principal" />
+                : <Login onLogin={handleLogin} />
             }
           />
 
-          {/* Alias para inicio */}
-          <Route path="/inicio" element={<Navigate to="/principal" />} />
-
-          {/* Organización -> Áreas */}
+          {/* Layout privado y rutas hijas relativas */}
           <Route
-            path="/organizacion-coro"
+            path="/"
             element={
-              isAuthenticated ? (
-                <Area onLogout={handleLogout} />
-              ) : (
-                <Navigate to="/" />
-              )
+              isAuthenticated
+                ? <AppShell username={username} onLogout={handleLogout} />
+                : <Navigate to="/login" />
             }
-          />
+          >
+            <Route path="principal" element={<Principal username={username} />} />
+            <Route path="organizacion-coro" element={<Area />} />
+            <Route path="miembros" element={<Miembros />} />
+            <Route path="miembros/agregar" element={<MiembrosAgregar />} />
+            <Route path="miembros/editar" element={<MiembrosEditar />} />
+            <Route path="cuerdas" element={<Cuerda cuerda={{ nombre: '' }} />} />
+            <Route path="popup-lab" element={<PopupLab />} />
+          </Route>
 
-          {/* Miembros */}
-          <Route
-            path="/miembros"
-            element={isAuthenticated ? <Miembros /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/miembros/agregar"
-            element={isAuthenticated ? <MiembrosAgregar /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/cuerdas"
-            element={isAuthenticated ? <Cuerda cuerda={{ nombre: '' }} /> : <Navigate to="/" />}
-          />
-          <Route
-            path="/miembros/editar"
-            element={isAuthenticated ? <MiembrosEditar /> : <Navigate to="/" />}
-          />
-
-          {/* Popup-Lab (dev) */}
-          <Route
-            path="/popup-lab"
-            element={isAuthenticated ? <PopupLab /> : <Navigate to="/" />}
-          />
-
-          {/* Cualquier ruta inválida redirige a principal */}
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>

@@ -1,0 +1,93 @@
+/* ===== AppShell Navbar ===== */
+.appshell-navbar {
+  background: transparent !important;
+  border: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  padding: 10px !important;
+  z-index: 1046;
+}
+
+.navbar-toggler { margin-left: 8px; }
+
+/* Usuario */
+.appshell-user { margin-left: auto; color: #E8EAED; font-family: Manjari, sans-serif; }
+.appshell-hello { opacity: .9; font-weight: 600; }
+
+/* ===== Offcanvas ===== */
+.offcanvas,
+.offcanvas-start,
+.offcanvas-body,
+.offcanvas-header {
+  background-color: #11103a !important;
+  color: #E8EAED !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Header del offcanvas: título a la izquierda, X centrada visualmente y logout a la derecha */
+.appshell-offcanvas-header {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+}
+.offcanvas-title {
+  color: #E8EAED !important;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* X */
+.btn-close.appshell-close {
+  position: relative;
+  width: 1.25rem; height: 1.25rem;
+  opacity: 1 !important;
+}
+.btn-close.appshell-close::before,
+.btn-close.appshell-close::after {
+  content: "";
+  position: absolute; top: 50%; left: 50%;
+  width: 1.25rem; height: 2px;
+  background-color: #E8EAED;
+  transform-origin: center;
+}
+.btn-close.appshell-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.btn-close.appshell-close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
+.btn-close.appshell-close svg { display: none !important; }
+
+/* Cerrar sesión a la derecha */
+.appshell-logout {
+  color: #E8EAED !important;
+  background: transparent !important;
+  border: none !important;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+/* Items del menú */
+.offcanvas-body .nav-link {
+  color: #E8EAED !important;
+  font-weight: 500;
+  font-size: 1rem;
+  text-decoration: none;
+  margin: .4rem 0;
+  display: block;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 4px 6px;
+}
+
+.offcanvas-body .nav-link:hover { color: #ffc107 !important; }
+.offcanvas-body .nav-link.active { color: #ffc107 !important; font-weight: 800; }
+
+/* Focus accesible pero sin ese rectángulo azul feo */
+.offcanvas-body .nav-link:focus-visible {
+  outline: 2px solid #243a7a;
+  outline-offset: 2px;
+}
+
+/* Backdrop (por si quedan restos en rarezas) */
+.offcanvas-backdrop { background-color: rgba(0,0,0,.5); }

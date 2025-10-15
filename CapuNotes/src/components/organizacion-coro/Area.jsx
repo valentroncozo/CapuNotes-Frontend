@@ -1,6 +1,6 @@
+// src/components/organizacion-coro/Area.jsx
 import '../../styles/organizacionCoro.css';
 import '../../styles/area-card.css';
-import { Link } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import BackButton from '../utils/BackButton';
@@ -8,27 +8,23 @@ import CardArea from './Card-area.jsx';
 import { useEffect, useState } from 'react';
 import useAreas from '../../hooks/useAreas';
 import AreaEditPopup from '../popUp/AreaEditPopup.jsx';
+import { validateAreaFields, hasErrors } from '../utils/validators';
 
-// ✅ validaciones centralizadas
-import { validateAreaFields, hasErrors } from "../utils/validators";
+// ✅ confirm lindo y consistente
+import Swal from 'sweetalert2';
 
-export default function Area({ onLogout }) {
+export default function Area() {
   const { areas, loading, error, addArea, editArea, removeArea } = useAreas();
 
-  // formulario alta
   const [formData, setFormData] = useState({ nombre: '', descripcion: '' });
   const [fieldErrors, setFieldErrors] = useState({ nombre: null, descripcion: null });
 
-  // popup edición
   const [openEdit, setOpenEdit] = useState(false);
   const [areaSel, setAreaSel] = useState(null);
 
-  // error general (API/operación)
   const [formError, setFormError] = useState('');
 
-  useEffect(() => {
-    setFormError(error || '');
-  }, [error]);
+  useEffect(() => { setFormError(error || ''); }, [error]);
 
   const runValidation = (nextState) => {
     const nextErrors = validateAreaFields(nextState);
@@ -40,7 +36,6 @@ export default function Area({ onLogout }) {
     const { name, value } = e.target;
     const draft = { ...formData, [name]: value };
     setFormData(draft);
-    // validación en vivo
     runValidation(draft);
   };
 
@@ -73,68 +68,47 @@ export default function Area({ onLogout }) {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('¿Eliminar esta área?')) return;
+    const result = await Swal.fire({
+      title: '¿Eliminar esta área?',
+      text: 'Esta acción no se puede deshacer.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ffc107',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      background: '#11103a',
+      color: '#E8EAED',
+    });
+
+    if (!result.isConfirmed) return;
+
     setFormError('');
     try {
       await removeArea(id);
+      await Swal.fire({
+        title: 'Eliminado',
+        text: 'El área fue eliminada correctamente.',
+        icon: 'success',
+        timer: 1200,
+        showConfirmButton: false,
+        background: '#11103a',
+        color: '#E8EAED',
+      });
     } catch (err) {
-      setFormError(err.message || 'No se pudo eliminar el área.');
+      await Swal.fire({
+        title: 'Error',
+        text: err.message || 'No se pudo eliminar el área.',
+        icon: 'error',
+        confirmButtonColor: '#ffc107',
+        background: '#11103a',
+        color: '#E8EAED',
+      });
     }
   };
 
   return (
     <>
-      <div>
-        <nav className="navbar fixed-top w-100 navbar-dark" style={{ padding: '10px' }}>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="offcanvas"
-            data-bs-target="#offcanvasMenu"
-            aria-controls="offcanvasMenu"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-        </nav>
-
-        <div
-          className="offcanvas offcanvas-start"
-          tabIndex="-1"
-          id="offcanvasMenu"
-          aria-labelledby="offcanvasMenuLabel"
-        >
-          <div className="offcanvas-header">
-            <h5 className="offcanvas-title" id="offcanvasMenuLabel">Menú</h5>
-            <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-
-            <button
-              type="button"
-              className="nav-link"
-              style={{ color: '#E8EAED', background: 'transparent', border: 'none' }}
-              data-bs-dismiss="offcanvas"
-              onClick={() => { onLogout?.(); }}
-            >
-              Cerrar sesión
-            </button>
-          </div>
-
-          <div className="offcanvas-body">
-            <Link className="nav-link" to="/inicio">Inicio</Link>
-            <Link className="nav-link" to="/asistencias">Asistencias</Link>
-            <Link className="nav-link" to="/audiciones">Audiciones</Link>
-            <Link className="nav-link" to="/canciones">Canciones</Link>
-            <Link className="nav-link" to="/eventos">Eventos</Link>
-            <Link className="nav-link" to="/fraternidades">Fraternidades</Link>
-            <Link className="nav-link" to="/miembros">Miembros</Link>
-            <Link className="nav-link" to="/organizacion-coro">Organización del Coro</Link>
-            <Link className="nav-link" to="/usuarios-roles">Usuarios y roles</Link>
-          </div>
-        </div>
-
-        <div style={{ marginTop: '60px' }}></div>
-      </div>
-
       <main className="organizacion-bg">
         <header className="header-organizacion">
           <BackButton />

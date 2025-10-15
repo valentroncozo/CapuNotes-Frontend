@@ -1,50 +1,49 @@
-import { useEffect, useState } from "react";
-import Modal from "../utils/Modal";
+// src/components/popUp/AreaEditPopup.jsx
+import { useEffect, useMemo, useState } from "react";
+import Modal from "../utils/Modal.jsx";
 import "../../styles/popup.css";
 
-/**
- * Pop-up para editar un Área del sistema (nombre y descripción).
- *
- * Props:
- * - isOpen: boolean
- * - onClose: fn()
- * - area: { id: string|number, nombre: string, descripcion?: string } | null
- * - onSave: fn({ id, nombre, descripcion })
- */
+// ✅ validador centralizado
+import { validateAreaFields, hasErrors } from "../utils/validators";
+
 export default function AreaEditPopup({ isOpen, onClose, area, onSave }) {
-  const [nombre, setNombre] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [error, setError] = useState("");
+  const initial = useMemo(
+    () => ({
+      id: area?.id ?? null,
+      nombre: area?.nombre ?? "",
+      descripcion: area?.descripcion ?? "",
+    }),
+    [area]
+  );
+
+  const [form, setForm] = useState(initial);
+  const [errors, setErrors] = useState({ nombre: null, descripcion: null });
 
   useEffect(() => {
-    if (!isOpen) return;
-    setNombre(area?.nombre ?? "");
-    setDescripcion(area?.descripcion ?? "");
-    setError("");
-  }, [isOpen, area]);
+    setForm(initial);
+    setErrors(validateAreaFields(initial));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial, isOpen]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const nombreTrim = (nombre || "").trim();
-    const descTrim = (descripcion || "").trim();
+  const runValidation = (next) => {
+    const nextErrors = validateAreaFields(next);
+    setErrors(nextErrors);
+    return !hasErrors(nextErrors);
+  };
 
-    if (!nombreTrim) {
-      setError("El nombre es obligatorio.");
-      return;
-    }
-    if (nombreTrim.length > 80) {
-      setError("El nombre no puede superar los 80 caracteres.");
-      return;
-    }
-    if (descTrim.length > 300) {
-      setError("La descripción no puede superar los 300 caracteres.");
-      return;
-    }
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    const draft = { ...form, [name]: value };
+    setForm(draft);
+    runValidation(draft); // validación en vivo
+  };
 
+  const handleSave = () => {
+    if (!runValidation(form)) return;
     onSave?.({
-      id: area?.id,
-      nombre: nombreTrim,
-      descripcion: descTrim,
+      id: form.id,
+      nombre: form.nombre.trim(),
+      descripcion: form.descripcion.trim(),
     });
     onClose?.();
   };
@@ -56,57 +55,63 @@ export default function AreaEditPopup({ isOpen, onClose, area, onSave }) {
       title="Editar área"
       actions={
         <>
-          <button type="button" className="btn btn-secondary" onClick={onClose}>
+          <button className="btn btn-secondary" onClick={onClose}>
             Cancelar
           </button>
-          <button type="submit" form="area-edit-form" className="btn btn-primary">
-            Guardar
+          <button
+            className="btn btn-primary"
+            onClick={handleSave}
+            disabled={hasErrors(errors)}
+          >
+            Guardar cambios
           </button>
         </>
       }
     >
-      <form id="area-edit-form" onSubmit={handleSubmit} className="form-grid">
+      <div className="form-grid">
         <div className="field">
-          <label htmlFor="area-nombre">Nombre del área</label>
+          <label htmlFor="area-nombre">Nombre</label>
           <input
             id="area-nombre"
+            name="nombre"
             className="input"
-            placeholder="Ej: Comunicación"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            required
+            type="text"
+            value={form.nombre}
+            onChange={onChange}
             maxLength={80}
+            placeholder="Nombre del área"
+            aria-invalid={!!errors.nombre}
+            aria-describedby="err-nombre"
+            autoFocus
           />
+          {errors.nombre && (
+            <small id="err-nombre" style={{ color: "#ffc107" }}>
+              {errors.nombre}
+            </small>
+          )}
         </div>
 
         <div className="field">
-          <label htmlFor="area-descripcion">Descripción</label>
+          <label htmlFor="area-desc">Descripción</label>
           <textarea
-            id="area-descripcion"
+            id="area-desc"
+            name="descripcion"
             className="input"
-            placeholder="Breve descripción del área…"
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-            rows={4}
+            value={form.descripcion}
+            onChange={onChange}
             maxLength={300}
+            placeholder="Descripción (opcional)"
+            rows={3}
+            aria-invalid={!!errors.descripcion}
+            aria-describedby="err-desc"
           />
+          {errors.descripcion && (
+            <small id="err-desc" style={{ color: "#ffc107" }}>
+              {errors.descripcion}
+            </small>
+          )}
         </div>
-
-        {error && (
-          <div
-            style={{
-              background: "rgba(255,193,7,.12)",
-              border: "1px solid rgba(255,193,7,.35)",
-              color: "var(--text-light)",
-              borderRadius: "var(--radius)",
-              padding: "10px 12px",
-              fontSize: ".9rem",
-            }}
-          >
-            {error}
-          </div>
-        )}
-      </form>
+      </div>
     </Modal>
   );
 }
