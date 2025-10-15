@@ -1,10 +1,10 @@
+// src/App.jsx
 import { useState } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
-  BrowserRouter,
 } from 'react-router-dom';
 import './styles/App.css';
 
@@ -64,7 +64,6 @@ function App() {
   return (
     <Router>
       <div className="App">
-        {console.log("isAuthenticated:", isAuthenticated)}
         <Routes>
           {/* Login */}
           <Route
@@ -93,30 +92,42 @@ function App() {
           {/* Alias para inicio */}
           <Route path="/inicio" element={<Navigate to="/principal" />} />
 
-          {/* Organización */}
-          <Route path="/organizacion-coro" element={<Area />} />
+          {/* Organización -> Áreas */}
+          <Route
+            path="/organizacion-coro"
+            element={
+              isAuthenticated ? (
+                <Area onLogout={handleLogout} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
 
           {/* Miembros */}
           <Route
-            path="/miembros" 
-            element={<Miembros/>}
+            path="/miembros"
+            element={isAuthenticated ? <Miembros /> : <Navigate to="/" />}
           />
           <Route
-            path="/miembros/agregar" 
-            element={<MiembrosAgregar/>}
+            path="/miembros/agregar"
+            element={isAuthenticated ? <MiembrosAgregar /> : <Navigate to="/" />}
           />
           <Route
             path="/cuerdas"
-            element={<Cuerda cuerda={{ nombre: '' }}/>}
+            element={isAuthenticated ? <Cuerda cuerda={{ nombre: '' }} /> : <Navigate to="/" />}
           />
           <Route
             path="/miembros/editar"
-            element={<MiembrosEditar />}
+            element={isAuthenticated ? <MiembrosEditar /> : <Navigate to="/" />}
           />
+
+          {/* Popup-Lab (dev) */}
           <Route
             path="/popup-lab"
-            element={<PopupLab/>}
+            element={isAuthenticated ? <PopupLab /> : <Navigate to="/" />}
           />
+
           {/* Cualquier ruta inválida redirige a principal */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

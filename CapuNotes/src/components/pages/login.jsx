@@ -4,89 +4,61 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import WavyClipPath from '../../assets/WavyClipPath';
 import MobileWavyClipPath from '../../assets/MobileWavyClipPath';
-import AccountUser from '../../assets/AccountUserIcon' 
+import AccountUser from '../../assets/AccountUserIcon';
 import PasswordToggleIcon from '../../assets/PasswordToggleIcon';
-
-
-const validateField = (name,value, currentErrors) => {
-    let errors = '';
-    
-    if(value.trim() === ''){
-      errors = `* El campo ${name.toLowerCase()} no puede estar vacío.`;
-    } else {
-      errors = null;
-    }
-    return {...currentErrors, [name.toLowerCase()]: errors };
-  }
-
-
+import { validateLoginFields, hasErrors } from '../utils/validators';
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
   const [showPassword, setShowPassword] = useState(false);
-  
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({ usuario: null, contraseña: null });
 
+  const runValidation = (nextState) => {
+    const nextErrors = validateLoginFields(nextState);
+    setErrors(nextErrors);
+    return !hasErrors(nextErrors);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Construir el objeto final de errores usando la función validateField
-    let finalErrors = {};
-    finalErrors = validateField('Usuario', username, finalErrors);
-    finalErrors = validateField('Contraseña', password, finalErrors);
-
-    // La función validateField devuelve un objeto con claves en minúsculas
-    const isValid = !finalErrors.usuario && !finalErrors.contraseña;
-    setErrors(finalErrors);
-
-    if (isValid) {
-      onLogin(username, password);
-    }
-
+    const isValid = runValidation({ username, password });
+    if (isValid) onLogin(username, password);
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  }
-
+  const togglePasswordVisibility = () => setShowPassword((v) => !v);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if(name === 'Usuario'){
-      setUsername(value);
-    } else if (name === 'Contraseña'){
-      setPassword(value);
-    }
-    const updatedErrors = validateField(name, value, errors);
-    setErrors(updatedErrors);
-  }
+    if (name === 'Usuario') setUsername(value);
+    if (name === 'Contraseña') setPassword(value);
+
+    const draft = {
+      username: name === 'Usuario' ? value : username,
+      password: name === 'Contraseña' ? value : password,
+    };
+    runValidation(draft);
+  };
 
   return (
     <main className="login-container">
-
-      <WavyClipPath/>
-
-      {/* Bloque azul con onda */}
-      <div className="login-form-container"> 
+      <WavyClipPath />
+      <div className="login-form-container">
         <MobileWavyClipPath />
 
-        {/* Formulario */}
-        <Form onSubmit={handleSubmit} 
-        noValidate 
-        className="formulario-login">
-          <h1 className="logo-text">Iniciar sesión en su cuenta de 
-            <strong> CapuNotes </strong>
-              <img src="../public/Logo coro sin fondo.png" 
-              alt="Logo" 
-              className="logo-coro" />
+        <Form onSubmit={handleSubmit} noValidate className="formulario-login">
+          <h1 className="logo-text">
+            Iniciar sesión en su cuenta de <strong>CapuNotes</strong>
+            {/* ✅ Logo actualizado sin espacio ni carpeta /public */}
+            <img
+              src="/logo-coro-sin-fondo.png"
+              alt="Logo"
+              className="logo-coro"
+            />
           </h1>
 
-          <Form.Group className='custom-input-group'>
-           
-            <AccountUser className="account-icon"/>
-           
+          <Form.Group className="custom-input-group">
+            <AccountUser className="account-icon" />
             <Form.Control
               type="text"
               className="custom-input"
@@ -96,51 +68,32 @@ export default function Login({ onLogin }) {
               name="Usuario"
               required
             />
-
-
           </Form.Group>
-          <p className='menssaje-error-login'>{errors.usuario}</p>
+          <p className="menssaje-error-login">{errors.usuario}</p>
 
-              
-        
           <Form.Group className="custom-input-group">
-            
-              <PasswordToggleIcon 
-                isVisible={showPassword} 
-                onToggle={togglePasswordVisibility} 
-              />
-
-              <Form.Control
-                type={showPassword ? "text" : "password"}
-                className="custom-input"
-                placeholder="Contraseña"
-                value={password}
-                onChange={handleInputChange}
-                name="Contraseña"
-                required
-              />
-
+            <PasswordToggleIcon isVisible={showPassword} onToggle={togglePasswordVisibility} />
+            <Form.Control
+              type={showPassword ? 'text' : 'password'}
+              className="custom-input"
+              placeholder="Contraseña"
+              value={password}
+              onChange={handleInputChange}
+              name="Contraseña"
+              required
+            />
           </Form.Group>
-          
-          <p className='menssaje-error-login'>{errors.contraseña}</p>
+          <p className="menssaje-error-login">{errors.contraseña}</p>
 
-          <Form.Group className='custom-input-group'>
-            <Button type="submit" 
-            className="button-login">
+          <Form.Group className="custom-input-group">
+            <Button type="submit" className="button-login">
               Ingresar
             </Button>
           </Form.Group>
-
         </Form>
-
       </div>
 
-      <img
-        src="../public/fondo.jpg"
-        alt="fondo"
-        className="img-fondo"
-      />
-
+      <img src="/fondo.jpg" alt="fondo" className="img-fondo" />
     </main>
   );
 }

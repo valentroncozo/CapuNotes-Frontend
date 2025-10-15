@@ -5,72 +5,87 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import BackButton from '../utils/BackButton';
 import CardArea from './Card-area.jsx';
-import { useState } from 'react';
-{
-  /* --- Ajuste para mantener la flecha blanca y alinear el título "Áreas" con los textos "Nombre" y "Descripción" --- */
-}
-export default function Area() {
-  const [areas, setAreas] = useState([
-    {
-      id: 1,
-      name: "Soprano",
-      description: "Voces agudas femeninas"
-    },
-    {
-      id: 2,
-      name: "Alto",
-      description: "Voces graves femeninas"
-    },
-    {
-      id: 3,
-      name: "Tenor",
-      description: "Voces agudas masculinas"
-    },  
-    {
-      id: 4,
-      name: "Bajo",
-      description: "Voces graves masculinas"
-    }
-  ]);
+import { useEffect, useState } from 'react';
+import useAreas from '../../hooks/useAreas';
+import AreaEditPopup from '../popUp/AreaEditPopup.jsx';
 
-  const [formData, setFormData] = useState({
-    name: '',   
-    description: ''
-  });
+// ✅ validaciones centralizadas
+import { validateAreaFields, hasErrors } from "../utils/validators";
+
+export default function Area({ onLogout }) {
+  const { areas, loading, error, addArea, editArea, removeArea } = useAreas();
+
+  // formulario alta
+  const [formData, setFormData] = useState({ nombre: '', descripcion: '' });
+  const [fieldErrors, setFieldErrors] = useState({ nombre: null, descripcion: null });
+
+  // popup edición
+  const [openEdit, setOpenEdit] = useState(false);
+  const [areaSel, setAreaSel] = useState(null);
+
+  // error general (API/operación)
+  const [formError, setFormError] = useState('');
+
+  useEffect(() => {
+    setFormError(error || '');
+  }, [error]);
+
+  const runValidation = (nextState) => {
+    const nextErrors = validateAreaFields(nextState);
+    setFieldErrors(nextErrors);
+    return !hasErrors(nextErrors);
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));  
-  };  
+    const draft = { ...formData, [name]: value };
+    setFormData(draft);
+    // validación en vivo
+    runValidation(draft);
+  };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.name.trim() && formData.description.trim()) {
-      const newArea = {
-        id: Math.max(...areas.map(area => area.id), 0) + 1,
-        name: formData.name.trim(),
-        description: formData.description.trim()
-      };
-      setAreas(prev => [...prev, newArea]);
-      setFormData({ name: '', description: '' }); // Limpiar formulario
+    setFormError('');
+    const ok = runValidation(formData);
+    if (!ok) return;
+    try {
+      await addArea({ nombre: formData.nombre, descripcion: formData.descripcion });
+      setFormData({ nombre: '', descripcion: '' });
+      setFieldErrors({ nombre: null, descripcion: null });
+    } catch (err) {
+      setFormError(err.message || 'No se pudo crear el área.');
     }
   };
 
+  const handleEditOpen = (area) => {
+    setAreaSel(area);
+    setOpenEdit(true);
+  };
 
+  const handleEditSave = async ({ id, nombre, descripcion }) => {
+    setFormError('');
+    try {
+      await editArea({ id, nombre, descripcion });
+    } catch (err) {
+      setFormError(err.message || 'No se pudo actualizar el área.');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('¿Eliminar esta área?')) return;
+    setFormError('');
+    try {
+      await removeArea(id);
+    } catch (err) {
+      setFormError(err.message || 'No se pudo eliminar el área.');
+    }
+  };
 
   return (
-    <>  
-    <div>
-        {/* Añadimos 'navbar-dark' para el ícono blanco.
-        Usamos 'backgroundColor' en 'style' para forzar el color exacto. 
-      */}
-        <nav
-          className="navbar fixed-top w-100 navbar-dark"
-          style={{ padding: '10px' }}
-        >
+    <>
+      <div>
+        <nav className="navbar fixed-top w-100 navbar-dark" style={{ padding: '10px' }}>
           <button
             className="navbar-toggler"
             type="button"
@@ -83,128 +98,142 @@ export default function Area() {
           </button>
         </nav>
 
-  <div
-    className="offcanvas offcanvas-start"
-    tabIndex="-1"
-    id="offcanvasMenu"
-    aria-labelledby="offcanvasMenuLabel"
-  >
-    <div className="offcanvas-header">
-      <h5 className="offcanvas-title" id="offcanvasMenuLabel">
-        Menú
-      </h5>
-      <button
-        type="button"
-        className="btn-close"
-        data-bs-dismiss="offcanvas"
-        aria-label="Close"
-      ></button>
-      {/* Botón cerrar sesión CORREGIDO */}
-      <button
-          type="button"
-          className="nav-link" // Mantenemos nav-link para el estilo de color y btn
-          // ✅ CORRECCIÓN: Quitamos los estilos en línea que fuerzan el padding y el textAlign
-          // Dejamos solo los estilos esenciales que no pueden ir en CSS
-          style={{ color: '#E8EAED', background: 'transparent', border: 'none' }} 
-          data-bs-dismiss="offcanvas"
-          onClick={() => { if (onLogout) onLogout(); }}
-      >
-          Cerrar sesión
-      </button>
-    </div>
-    <div className="offcanvas-body">
-      <Link className="nav-link" to="/inicio" >
-        Inicio
-      </Link>
-      <Link className="nav-link" to="/asistencias">
-        Asistencias
-      </Link>
-      <Link className="nav-link" to="/audiciones">
-        Audiciones
-      </Link>
-      <Link className="nav-link" to="/canciones">
-        Canciones
-      </Link>
-      <Link className="nav-link" to="/eventos">
-        Eventos
-      </Link>
-      <Link className="nav-link" to="/fraternidades">
-        Fraternidades
-      </Link>
-      <Link className="nav-link" to="/miembros">
-        Miembros
-      </Link>
-      <Link className="nav-link" to="/organizacion-coro">
-        Organización del Coro 
-      </Link>
-      <Link className="nav-link" to="/usuarios-roles">
-        Usuarios y roles
-      </Link>
-    </div>
-  </div>
+        <div
+          className="offcanvas offcanvas-start"
+          tabIndex="-1"
+          id="offcanvasMenu"
+          aria-labelledby="offcanvasMenuLabel"
+        >
+          <div className="offcanvas-header">
+            <h5 className="offcanvas-title" id="offcanvasMenuLabel">Menú</h5>
+            <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 
-        {/* Esto es solo para que el contenido no quede debajo de la navbar */}
+            <button
+              type="button"
+              className="nav-link"
+              style={{ color: '#E8EAED', background: 'transparent', border: 'none' }}
+              data-bs-dismiss="offcanvas"
+              onClick={() => { onLogout?.(); }}
+            >
+              Cerrar sesión
+            </button>
+          </div>
+
+          <div className="offcanvas-body">
+            <Link className="nav-link" to="/inicio">Inicio</Link>
+            <Link className="nav-link" to="/asistencias">Asistencias</Link>
+            <Link className="nav-link" to="/audiciones">Audiciones</Link>
+            <Link className="nav-link" to="/canciones">Canciones</Link>
+            <Link className="nav-link" to="/eventos">Eventos</Link>
+            <Link className="nav-link" to="/fraternidades">Fraternidades</Link>
+            <Link className="nav-link" to="/miembros">Miembros</Link>
+            <Link className="nav-link" to="/organizacion-coro">Organización del Coro</Link>
+            <Link className="nav-link" to="/usuarios-roles">Usuarios y roles</Link>
+          </div>
+        </div>
+
         <div style={{ marginTop: '60px' }}></div>
       </div>
-    <main className="organizacion-bg ">
-      {/* Botón menú hamburguesa siempre visible */}
 
-          {/* Header */}
-          <header className="header-organizacion">
-            <BackButton/>
-            <h1 className="organizacion-title">Áreas</h1>
-          </header>
+      <main className="organizacion-bg">
+        <header className="header-organizacion">
+          <BackButton />
+          <h1 className="organizacion-title">Áreas</h1>
+        </header>
 
-          {/* Formulario */}
-          <Form className="form-area" onSubmit={handleSubmit}>
+        {/* Formulario alta */}
+        <Form className="form-area" onSubmit={handleSubmit} noValidate>
           <hr className="divisor-amarillo" />
-            <Form.Group className="form-group">
-              <Form.Label className="text-white">Nombre</Form.Label>
-              <Form.Control
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="form-control organizacion-input"
-                placeholder="Nombre del área"
-                required
-              />
-            </Form.Group>
-            <Form.Group className="form-group">
-              <Form.Label className="form-label text-white">Descripción</Form.Label>
-              <Form.Control
-                type="text"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                className="form-control organizacion-input"
-                placeholder="Descripción"
-                required
-              />
-            </Form.Group>
-            <Button
-              type="submit"
-              className="organizacion-btn"
+
+          <Form.Group className="form-group">
+            <Form.Label className="text-white">Nombre</Form.Label>
+            <Form.Control
+              type="text"
+              name="nombre"
+              value={formData.nombre}
+              onChange={handleInputChange}
+              className="form-control organizacion-input"
+              placeholder="Nombre del área"
+              maxLength={80}
+              isInvalid={!!fieldErrors.nombre}
+              required
+            />
+            <Form.Control.Feedback type="invalid">
+              {fieldErrors.nombre}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Form.Group className="form-group">
+            <Form.Label className="form-label text-white">Descripción</Form.Label>
+            <Form.Control
+              type="text"
+              name="descripcion"
+              value={formData.descripcion}
+              onChange={handleInputChange}
+              className="form-control organizacion-input"
+              placeholder="Descripción"
+              maxLength={300}
+              isInvalid={!!fieldErrors.descripcion}
+            />
+            <Form.Control.Feedback type="invalid">
+              {fieldErrors.descripcion}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Button type="submit" className="organizacion-btn">Agregar</Button>
+          <hr className="divisor-amarillo" />
+
+          {formError && (
+            <div
+              style={{
+                background: 'rgba(255,193,7,.12)',
+                border: '1px solid rgba(255,193,7,.35)',
+                color: '#E8EAED',
+                borderRadius: '16px',
+                padding: '10px 12px',
+                fontSize: '.9rem',
+                width: '100%',
+                maxWidth: '600px',
+              }}
             >
-              Agregar
-            </Button>
-          <hr className="divisor-amarillo" />
-          </Form>
+              {formError}
+            </div>
+          )}
+        </Form>
 
-          {/* Áreas registradas */}
-          <h2 className="areas-title">
+        {/* Listado */}
+        <h2 className="areas-title">
           Áreas registradas
-            <hr className="divisor-amarillo" />
-          </h2>
+          <hr className="divisor-amarillo" />
+        </h2>
 
-          <div className="areas-list-scroll">
-            {
-              areas.map((area) => (
-                <CardArea key={area.id} id={area.id} name={area.name} description={area.description} />
-              ))
-            }
-          </div>
-    </main>
-  </>
+        <div className="areas-list-scroll">
+          {loading ? (
+            <p style={{ color: '#E8EAED' }}>Cargando...</p>
+          ) : areas.length === 0 ? (
+            <p style={{ color: '#E8EAED' }}>No hay áreas registradas</p>
+          ) : (
+            areas.map((a) => (
+              <CardArea
+                key={a.id}
+                id={a.id}
+                nombre={a.nombre}
+                descripcion={a.descripcion}
+                onEdit={handleEditOpen}
+                onDelete={handleDelete}
+              />
+            ))
+          )}
+        </div>
+      </main>
+
+      {/* Popup edición */}
+      <AreaEditPopup
+        isOpen={openEdit}
+        onClose={() => { setOpenEdit(false); setAreaSel(null); }}
+        area={areaSel}
+        onSave={handleEditSave}
+      />
+    </>
   );
 }
