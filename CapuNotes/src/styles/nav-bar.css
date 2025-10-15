@@ -8,7 +8,9 @@ body {
 .navbar {
     /* Este es
      el color azul oscuro que quieres: #213547 */
-    background: transparent !important; 
+    background-color:transparent !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     top:0 !important;
     width: 100%;
     border: none;

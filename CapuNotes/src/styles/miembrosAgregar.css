@@ -72,6 +72,7 @@ html, body {
 }
 
 .btn-agregar-cuerda {
+  margin-bottom: auto !important;
   background-color: var(--color-accent) !important;
   color: var(--color-text-dark) !important;
   flex: 1;

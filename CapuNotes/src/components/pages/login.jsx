@@ -48,7 +48,7 @@ export default function Login({ onLogin }) {
 
         <Form onSubmit={handleSubmit} noValidate className="formulario-login">
           <h1 className="logo-text">
-            Iniciar sesión en su cuenta de <strong>CapuNotes</strong>
+            Iniciar sesión en su cuenta de <strong>CapuNotes </strong>
             {/* ✅ Logo actualizado sin espacio ni carpeta /public */}
             <img
               src="/logo-coro-sin-fondo.png"
