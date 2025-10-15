@@ -149,11 +149,7 @@
   border-radius: var(--border-radius);
   max-width: 400px;
   margin: 0 auto;
-<<<<<<< HEAD:CapuNotes/src/components/organizacionCoro.css
-    box-shadow: 0 4px 16px #0003;
-=======
   box-shadow: var(--box-shadow-standard);
->>>>>>> 083ad47fee6b44d053ff0b9eb5c2020e369b70a6:CapuNotes/src/styles/organizacionCoro.css
   position: relative;
 }
 
