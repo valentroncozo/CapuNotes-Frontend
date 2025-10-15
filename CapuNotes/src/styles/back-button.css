@@ -1,0 +1,35 @@
+
+@import url('convenio.css');
+
+body .back-button {
+    background: transparent !important;
+    border: none !important;
+    color: var(--primary-text-color);
+    box-shadow: none !important;
+}
+
+
+
+body .back-button:hover {
+    background: transparent !important;
+    opacity: inherit;
+    cursor: pointer;
+    box-shadow: none !important;
+
+}
+
+.back-icon {
+    font-size: 1.5rem;
+    color: var(--primary-text-color);
+    background-color: transparent !important;
+    box-shadow: none !important;
+
+}
+
+.back-icon:hover {
+    transition: all .5s ease-in-out !important;
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    box-shadow: none !important;
+
+}

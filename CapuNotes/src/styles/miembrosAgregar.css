@@ -1,3 +1,5 @@
+
+@import url('./nav-bar.css');
 /* Styles specific to the "Agregar Miembro" form */
 :root {
   /* keep only the variables used by the form here so they are scoped when this file is loaded */
@@ -43,54 +45,46 @@ html, body {
   display: block;
 }
 
-.form-dni-group .col {
-  padding: 0 5px;
-}
-.form-dni-group .col:first-child { padding-left: 0; }
-.form-dni-group .col:last-child { padding-right: 0; }
-.form-header-wrapper { /* 👈 Clase que envuelve el título y la flecha */
-    /* ✅ 1. Usar Flexbox para la alineación */
-    display: flex;
-    align-items: center;
-    
-    /* 2. Empujar la flecha a la izquierda y el título al centro */
-    justify-content: space-between; 
-    
-    margin-bottom: 30px;
-    padding-bottom: 12px;
-    position: relative; /* Para el posicionamiento absoluto si lo necesitas */
+.label-cuerda {
+  font-weight: 500;
+  color: var(--color-text-light);
+  width: 100%;
+  display: block;
 }
 
-/* ❌ Elimina la regla text-align: center; de .form-header h2 */
-.form-header h1 {
-    /* Mantenemos el estilo, pero quitamos el width: 100%; y el text-align: center; */
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--color-text-light);
-    margin: 0 auto; /* ✅ CLAVE: Margen automático para centrar el título como un bloque */
-}
-
-.btn-add-cuerda-form {
-  background-color: var(--color-accent);
-  color: var(--color-text-dark);
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+.form-group-agregar-cuerda {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  padding: 0;
-  transition: var(--transition-fast);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  align-content: center;
+  width: 100%;
+  gap: 10px; /* Espacio entre el select y el botón */
+  flex-direction: row;
+  height: 3rem;
+  margin-bottom: 40px;
+  flex-wrap: wrap !important;
 }
 
-.btn-add-cuerda-form:hover {
+
+.select-cuerda {
+  height: 100%;
+  flex: 10;
+}
+
+.btn-agregar-cuerda {
+  background-color: var(--color-accent) !important;
+  color: var(--color-text-dark) !important;
+  flex: 1;
+  height: 100% !important;
+
+}
+
+.btn-agregar-cuerda:hover {
   background-color: #ffcd38;
   transform: scale(1.1);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
+
 
 .btn-submit-form {
   background-color: var(--color-accent);
@@ -113,18 +107,14 @@ html, body {
 
 
 .pantalla-miembros {
-  padding-top: 100px;
   min-height: 100vh; /* ocupa al menos la altura completa */
   overflow-y: visible; /* permite el scroll vertical */
-  padding-bottom: 50px; /* espacio al final */
   background: var(--bg) !important;
 }
 
 body {
   overflow-y: auto;
 }
-
-.formulario-miembros { background-clip: padding-box; }
 
 .form-group-miembro {
   margin-bottom: 20px;
@@ -198,7 +188,6 @@ body {
   border: none;
   border-radius: var(--radius-sm);
   padding: 12px 14px;
-  margin-bottom: 20px;
   box-shadow: none;
   transition: all 0.3s ease;
 }

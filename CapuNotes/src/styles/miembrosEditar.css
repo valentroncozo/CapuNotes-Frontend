@@ -1,4 +1,7 @@
 /* Styles specific to the "Agregar Miembro" form */
+
+@import url("./nav-bar.css");
+
 :root {
   /* keep only the variables used by the form here so they are scoped when this file is loaded */
   --bg: #11103a; 
@@ -17,14 +20,14 @@ html, body {
   height: auto;
   margin: 0;
   padding: 0;
-  background: #0d0c2b;
+  background: var(--bg ) !important;
   font-family: var(--font);
   overflow-x: auto;
 }
 
 
 .formulario-miembros {
-  background-color: transparent;
+  background-color: transparent !important;
   color: var(--color-text-light);
   padding: 0;
   border-radius: var(--radius-lg);
@@ -62,38 +65,16 @@ html, body {
 }
 
 /* ❌ Elimina la regla text-align: center; de .form-header h2 */
-.form-header h1 {
+.form-header h2 {
     /* Mantenemos el estilo, pero quitamos el width: 100%; y el text-align: center; */
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--color-text-light);
+    color: var(--color-text-light) !important;
     margin: 0 auto; /* ✅ CLAVE: Margen automático para centrar el título como un bloque */
 }
 
-.btn-add-cuerda-form {
-  background-color: var(--color-accent);
-  color: var(--color-text-dark);
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  padding: 0;
-  transition: var(--transition-fast);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
-
-.btn-add-cuerda-form:hover {
-  background-color: #ffcd38;
-  transform: scale(1.1);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-}
-
 .btn-submit-form {
-  background-color: var(--color-accent);
+  background-color: var(--color-accent) !important;
   color: var(--color-text-dark);
   font-size: 1.1rem;
   font-weight: 600;
@@ -166,7 +147,7 @@ body {
 }
 
 .formulario-miembros .form-control::placeholder {
-  color: rgba(255, 255, 255, 0.8) !important; /* gris claro sobre fondo oscuro */
+  color:  rgba(255, 255, 255, 0.8) !important; /* gris claro sobre fondo oscuro */
   font-weight: 400;
 }
 

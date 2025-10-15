@@ -1,10 +1,11 @@
-import './titulo-cards.css';
+import '../../styles/titulo-cards.css';
 
-export default function WelcomeCard({ title}) {
+export default function WelcomeCard({ title }) {
   return (
     <div className="welcome-card">
+      {/* ✅ Logo actualizado sin espacio ni /public */}
       <img
-        src="/Logo coro sin fondo.png"
+        src="/logo-coro-sin-fondo.png"
         alt="Logo CapuNotes"
         className="welcome-card__logo"
       />
