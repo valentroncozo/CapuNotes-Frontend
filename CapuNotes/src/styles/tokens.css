@@ -1,17 +1,16 @@
 /* src/styles/tokens.css */
-/* === Design Tokens unificados === */
 :root {
-  /* Colores base */
+  /* Colores */
   --bg: #11103a;
   --accent: #ffc107;
   --card: #b3cdfa;
   --text-light: #E8EAED;
   --text-dark: #202124;
 
-  /* Layout / efectos */
+  /* Layout */
   --radius: 16px;
   --shadow: 0 4px 14px rgba(0,0,0,.35);
 
-  /* Tipografía — RESTAURADA a la original del sistema */
-  --font-sans: 'Comic Neue', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  /* Tipografía global */
+  --font-sans: 'Manjari', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
 }
