@@ -14,11 +14,12 @@ export function buildMiembroSchema() {
   const estadoOptions = ["Activo", "Inactivo"];
 
   return [
-    { key: "nombre",   label: "Nombre", required: true, max: 80 },
-    { key: "apellido", label: "Apellido", required: true, max: 80 },
-    { key: "cuerda",   label: "Cuerda", type: "select", options: cuerdaOptions },
-    { key: "area",     label: "Área",   type: "select", options: areaOptions },
-    { key: "estado",   label: "Estado", type: "select", options: estadoOptions },
+    { key: "nombre",   label: "Nombre",  type: "text", required: true, max: 80 },
+    { key: "apellido", label: "Apellido", type: "text", required: true, max: 80 },
+    { key: "cuerda",   label: "Cuerda",  type: "select", required: true, options: cuerdaOptions },
+    { key: "area",     label: "Área",     type: "select", required: false, options: areaOptions },
+    { key: "estado",   label: "Estado",   type: "select", required: true, options: estadoOptions },
+    { key: "primary",  label: "Agregar",  type: "button" },
   ];
 }
 

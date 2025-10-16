@@ -45,6 +45,7 @@
 /* Topbar: alta + buscar */
 .abmc-topbar {
   display: flex;
+  align-items: center;
   gap: 8px;
   margin-bottom: 12px;
   flex-wrap: wrap;

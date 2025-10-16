@@ -122,11 +122,19 @@ export default function EntityTableABMC({
     load();
   };
 
-  const columnas = schema.map((f) => f.label);
+  // Campos visibles en la tabla (excluir controles: button, submit, label)
+  const visibleFields = schema.filter(
+    (f) => !["button", "submit", "label"].includes(f.type)
+  );
+
+  const columnas = visibleFields.map((f) => f.label);
+
   const filtrados = items.filter((i) => {
     if (!filtro) return true;
     const q = filtro.toLowerCase();
-    return schema.some((f) => String(i[f.key] ?? "").toLowerCase().includes(q));
+    return visibleFields.some((f) =>
+      String(i[f.key] ?? "").toLowerCase().includes(q)
+    );
   });
 
   const displayKey = uniqueBy || schema[0]?.key;
@@ -161,7 +169,7 @@ export default function EntityTableABMC({
                   );
                 })}
               </select>
-            ) : (
+            ) : f.type === "text" ? (
               <input
                 key={f.key}
                 type={f.type || "text"}
@@ -172,11 +180,23 @@ export default function EntityTableABMC({
                 className="abmc-input"
                 aria-label={f.label}
               />
-            )
-          )}
-          <button type="submit" className="abmc-btn abmc-btn-primary">
-            Agregar
-          </button>
+            ) : f.type === "button" ? (
+              <button
+                key={f.key}
+                type="button"
+                onClick={f.handler}
+                className={`abmc-btn abmc-btn-${f.key}`}
+              >
+                {f.label}
+              </button>
+            ) :   f.type === "submit" ? (
+              <button type="submit" className="abmc-btn abmc-btn-primary">
+                {f.label}
+              </button>
+            ) : f.type === "label" ? (
+              <label key={f.key} className="abmc-label">{f.label}</label>
+          ) : null
+        )}
         </form>
 
         <div className="abmc-topbar" style={{ marginTop: 0 }}>
@@ -210,7 +230,7 @@ export default function EntityTableABMC({
 
             {filtrados.map((item) => (
               <tr key={item.id} className="abmc-row">
-                {schema.map((f) => (
+                {visibleFields.map((f) => (
                   <td key={f.key}>{item[f.key] ?? "—"}</td>
                 ))}
                 <td>

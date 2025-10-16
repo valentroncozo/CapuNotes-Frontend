@@ -1,5 +1,6 @@
 export const cuerdaSchema = [
-  { key: "nombre", label: "Nombre", required: true, max: 80 },
+  { key: "nombre", label: "Nombre", required: true, max: 80, type: "text" },
+  { key: "primary", label: "Agregar", type: "button" },
 ];
 
 export const cuerdaUniqueBy = "nombre";
