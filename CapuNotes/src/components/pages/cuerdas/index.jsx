@@ -1,15 +1,13 @@
-// src/pages/cuerdas/index.jsx
+// src/components/pages/cuerdas/index.jsx
 import EntityTableABMC from "@/components/abmc/EntityTableABMC";
-import { localStorageApi } from "@/services/localStorageApi";
-import { cuerdaSchema, cuerdaUniqueBy, cuerdaEntityName, CUERDA_STORAGE_KEY } from "@/schemas/cuerdas";
-
-const cuerdasApi = localStorageApi(CUERDA_STORAGE_KEY);
+import { cuerdasService } from "@/services/cuerdasService";
+import { cuerdaSchema, cuerdaUniqueBy, cuerdaEntityName } from "@/schemas/cuerdas";
 
 export default function CuerdasPage() {
   return (
     <EntityTableABMC
       title="Cuerdas"
-      service={cuerdasApi}
+      service={cuerdasService}
       schema={cuerdaSchema}
       uniqueBy={cuerdaUniqueBy}
       entityName={cuerdaEntityName}

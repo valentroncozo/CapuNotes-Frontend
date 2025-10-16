@@ -1,18 +1,18 @@
-// src/app/App.jsx
+// src/App.jsx
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
 import AppShell from "@/components/layout/AppShell.jsx";
 
-// Pages (👈 corregido: van desde components/pages)
+// Pages
 import Login from "@/components/pages/login/index.jsx";
 import Principal from "@/components/pages/principal/index.jsx";
 import Cuerdas from "@/components/pages/cuerdas/index.jsx";
 import Areas from "@/components/pages/areas/index.jsx";
 import Miembros from "@/components/pages/miembros/index.jsx";
 
-// Estilos
-import "@/styles/index.css";
+// Estilos base (usar globals como fuente de verdad)
+import "@/styles/globals.css";
 import "@/styles/App.css";
 
 function ProtectedRoute({ children }) {

@@ -1,7 +1,7 @@
 // src/components/layout/AppShell.jsx
 import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import "../../styles/offcanvas.css";
+import "@/styles/offcanvas.css";
 
 /* Ícono de cierre (X) */
 function CloseIcon(props) {

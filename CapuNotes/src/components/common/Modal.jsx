@@ -1,6 +1,6 @@
-// src/components/Modal.jsx
+// src/components/common/Modal.jsx
 import { useEffect, useRef } from "react";
-import "../../styles/popup.css";
+import "@/styles/popup.css";
 
 export default function Modal({ isOpen, onClose, title, children, actions }) {
   const dialogRef = useRef(null);
@@ -9,7 +9,6 @@ export default function Modal({ isOpen, onClose, title, children, actions }) {
     if (!isOpen) return;
     const onKey = (e) => e.key === "Escape" && onClose?.();
     document.addEventListener("keydown", onKey);
-    // foco inicial
     const t = setTimeout(() => dialogRef.current?.focus(), 0);
     return () => {
       document.removeEventListener("keydown", onKey);

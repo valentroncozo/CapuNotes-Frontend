@@ -4,7 +4,6 @@ import "@/styles/login.css";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-// 👇 Usamos alias "@/..." para que Vite resuelva bien desde src/
 import WavyClipPath from "@/assets/WavyClipPath.jsx";
 import MobileWavyClipPath from "@/assets/MobileWavyClipPath.jsx";
 import AccountUser from "@/assets/AccountUserIcon.jsx";

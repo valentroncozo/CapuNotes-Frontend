@@ -1,20 +1,28 @@
+/* src/styles/globals.css */
+/* Fuente + tokens */
 @import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
 @import "./tokens.css";
 
 /* Reset mínimo + base */
 * { box-sizing: border-box; }
-html, body, #root {
-  height: 100%;
-  margin: 0;
+html, body, #root { height: 100%; margin: 0; }
+
+html, body {
   background: var(--bg);
   color: var(--text-light);
   font-family: var(--font-sans) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Accesibilidad mínima */
 :focus-visible { outline: 3px solid rgba(255,193,7,.75); outline-offset: 2px; }
 
-/* Botón primario (fallback) */
+/* Links base */
+a { color: var(--card); text-decoration: none; }
+a:hover { opacity: .9; }
+
+/* Botón primario (fallback / override Bootstrap) */
 button.btn-primary, .btn.btn-warning {
   background: var(--accent) !important;
   color: var(--text-dark) !important;
@@ -23,10 +31,13 @@ button.btn-primary, .btn.btn-warning {
   box-shadow: var(--shadow) !important;
 }
 
-/* Utilidades frecuentes */
+/* Utilidad simple */
 .divisor-amarillo {
   border: none;
   border-top: 2px solid var(--accent);
   border-radius: 2px;
   margin: .5rem 0 1rem;
 }
+
+/* Previene scroll lateral accidental */
+html, body { overflow-x: hidden; }

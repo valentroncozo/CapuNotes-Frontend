@@ -1,11 +1,15 @@
-:root {
-  --primary-color: #11103a;
-  --secondary-color: #ffc107; 
-  --terciary-color: #b3cdfa;
-  --primary-text-color: #E8EAED;
-  --secondary-text-color: #202124;
+/* src/styles/convenio.css */
+/* Alias de variables legacy a tokens centralizados */
+@import "./tokens.css";
 
-  --border-radius:  100%;
-  --shadow: 0 4px 14px rgba(0,0,0,.35);
-  --font-family: 'Manjari', sans-serif;
+:root {
+  --primary-color: var(--bg);
+  --secondary-color: var(--accent);
+  --terciary-color: var(--card);
+  --primary-text-color: var(--text-light);
+  --secondary-text-color: var(--text-dark);
+
+  --border-radius: var(--radius);
+  --shadow: var(--shadow);
+  --font-family: var(--font-sans);
 }

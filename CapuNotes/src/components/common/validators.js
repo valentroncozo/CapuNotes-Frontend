@@ -1,4 +1,4 @@
-// src/utils/validators.js
+// src/components/common/validators.js
 
 // Helpers
 export const isEmpty = (v) => (v ?? '').toString().trim().length === 0;

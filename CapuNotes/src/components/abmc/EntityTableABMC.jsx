@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import GenericEditPopup from "./GenericEditPopup";
 import BackButton from "../common/BackButton";
-import "../../styles/abmc.css";
+import "@/styles/abmc.css";
 
 /* Iconitos inline (SVG) */
 function EditIcon(props) {
@@ -26,7 +26,7 @@ export default function EntityTableABMC({
   title = "Entidad",
   service,
   schema = [],
-  uniqueBy = "nombre",   // puede ser null/undefined para no chequear duplicados
+  uniqueBy = "nombre",
   entityName = "registro",
   showBackButton = true,
 }) {
@@ -41,10 +41,7 @@ export default function EntityTableABMC({
     setItems(Array.isArray(data) ? data : []);
   };
 
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
 
   const handleChangeNuevo = (e) => {
     const { name, value } = e.target;
@@ -126,7 +123,6 @@ export default function EntityTableABMC({
   };
 
   const columnas = schema.map((f) => f.label);
-
   const filtrados = items.filter((i) => {
     if (!filtro) return true;
     const q = filtro.toLowerCase();
@@ -143,7 +139,6 @@ export default function EntityTableABMC({
           <h1 className="abmc-title">{title}</h1>
         </div>
 
-        {/* Topbar de alta */}
         <form className="abmc-topbar" onSubmit={handleAgregar}>
           {schema.map((f) =>
             f.type === "select" ? (
@@ -184,7 +179,6 @@ export default function EntityTableABMC({
           </button>
         </form>
 
-        {/* Buscar */}
         <div className="abmc-topbar" style={{ marginTop: 0 }}>
           <input
             type="text"
@@ -196,7 +190,6 @@ export default function EntityTableABMC({
           />
         </div>
 
-        {/* Tabla */}
         <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
             <tr>
@@ -253,7 +246,6 @@ export default function EntityTableABMC({
         </table>
       </div>
 
-      {/* Popup genérico estilo AreaEditPopup */}
       {editOpen && (
         <GenericEditPopup
           isOpen={editOpen}
