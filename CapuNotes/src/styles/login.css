@@ -1,20 +1,7 @@
 /* src/styles/login.css */
 
-/* === Fuentes específicas para el LOGIN === */
-@import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
+/* Solo tipografía especial del logo/texto destacado */
 @import url("https://fonts.googleapis.com/css2?family=Mr+Dafoe&display=swap");
-
-/* Forzar la tipografía del login a MANJARI (sin afectar el resto del sistema) */
-.login-container,
-.login-form-container,
-.formulario-login,
-.formulario-login input,
-.formulario-login button,
-.formulario-login h1,
-.formulario-login p,
-.formulario-login label {
-  font-family: 'Manjari', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
-}
 
 /* Contenedor principal */
 .login-container {
@@ -59,53 +46,27 @@
   padding: 2rem;
   overflow: hidden;
 }
-
 .login-form-container > svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
+  position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;
 }
-
-/* Contenido sobre el SVG */
-.login-form-container > *:not(svg) {
-  position: relative;
-  z-index: 2;
-}
+.login-form-container > *:not(svg) { position: relative; z-index: 2; }
 
 /* Interactivos */
 .login-form-container input,
 .login-form-container textarea,
 .login-form-container button,
-.login-form-container .form-control {
-  pointer-events: auto;
-}
+.login-form-container .form-control { pointer-events: auto; }
 
 /* No selección en no-editables */
-.login-form-container,
-.login-form-container * {
-  -webkit-user-select: none;
-  user-select: none;
-  cursor: default;
-}
-.login-form-container input,
-.login-form-container textarea,
-.login-form-container button,
-.login-form-container .form-control {
-  -webkit-user-select: text;
-  user-select: text;
-  cursor: text;
-}
+.login-form-container, .login-form-container * { -webkit-user-select: none; user-select: none; cursor: default; }
+.login-form-container input, .login-form-container textarea,
+.login-form-container button, .login-form-container .form-control { -webkit-user-select: text; user-select: text; cursor: text; }
 
-/* Logo texto */
+/* Logo / títulos */
 .container-logo-coro { width: 100%; display: flex; justify-content: center; align-items: center; }
 .logo-coro { max-width: clamp(40px, 6vw, 60%); object-fit: contain; }
 
 .logo-text {
-  /* Manjari para el texto normal del título */
-  font-family: 'Manjari', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif !important;
   font-size: clamp(1rem, 1.5rem, 3rem);
   color: var(--text-light);
   margin: 0;
@@ -114,11 +75,9 @@
   text-align: center;
 }
 .logo-text strong {
-  /* Mr Dafoe para "CapuNotes" */
   font-size: clamp(2.5rem, 4.5vw, 6rem);
   font-family: "Mr Dafoe", cursive !important;
   font-weight: 400;
-  font-style: normal;
 }
 
 /* Formulario */
@@ -126,27 +85,17 @@
   width: 60%;
   min-width: 325px;
   min-height: 60vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  text-align: start;
-  align-items: flex-start;
-  padding: 1rem;
-  color: var(--text-light);
+  display: flex; flex-direction: column; justify-content: space-around;
+  text-align: start; align-items: flex-start;
+  padding: 1rem; color: var(--text-light);
 }
 
 /* Inputs */
 .formulario-login .custom-input-group {
-  position: relative;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  background-color: transparent;
-  border-radius: var(--radius);
-  border: none;
+  position: relative; width: 100%;
+  display: flex; align-items: center; text-align: center;
+  background-color: transparent; border-radius: var(--radius); border: none;
 }
-
 .formulario-login .custom-input-group .form-control {
   background-color: rgba(0, 0, 0, 0.3);
   color: var(--text-light);
@@ -156,10 +105,7 @@
   font-size: 1rem;
   transition: all 0.2s ease;
 }
-.formulario-login .custom-input-group .form-control[type="password"] {
-  padding-right: 3.2rem;
-}
-
+.formulario-login .custom-input-group .form-control[type="password"] { padding-right: 3.2rem; }
 .formulario-login .custom-input-group .form-control:focus,
 .formulario-login .custom-input-group .form-control:hover {
   background-color: rgba(0, 0, 0, 0.3);
@@ -167,12 +113,10 @@
   color: var(--text-light);
   outline: none;
 }
-
 .formulario-login .custom-input-group .form-control::placeholder { color: var(--text-light); }
 
 input[type="password"] { -webkit-appearance: none; appearance: none; }
-input[type="password"]::-ms-reveal,
-input[type="password"]::-ms-clear { display: none; }
+input[type="password"]::-ms-reveal, input[type="password"]::-ms-clear { display: none; }
 input[type="password"]::-webkit-textfield-decoration-button,
 input[type="password"]::-webkit-textfield-decoration-container,
 input[type="password"]::-webkit-password-toggle-button { display: none !important; }
@@ -190,94 +134,40 @@ input[type="password"]::-webkit-password-toggle-button { display: none !importan
   color: var(--text-light) !important;
 }
 
-.account-icon {
-  right: 5px;
-  position: absolute;
-  font-size: 1.2rem;
-  color: var(--text-light);
-}
+.account-icon { right: 5px; position: absolute; font-size: 1.2rem; color: var(--text-light); }
 
 /* Botón */
 .custom-input-group .button-login{
   width: 30%;
   padding: clamp(0px, .5rem, .5rem);
-  margin: 0;
-  min-width: 120px;
+  margin: 0; min-width: 120px;
   border-radius: var(--radius);
-  background-color: var(--accent);
-  color: var(--text-dark);
-  border: none;
-  font-weight: 600;
-  box-shadow: var(--shadow);
+  background-color: var(--accent); color: var(--text-dark);
+  border: none; font-weight: 600; box-shadow: var(--shadow);
 }
 .custom-input-group .button-login:focus,
 .custom-input-group .button-login:focus-visible,
-.custom-input-group .button-login:hover{
-  background-color: var(--accent);
-  color: var(--text-dark);
-  box-shadow: var(--shadow);
-  border: 1px solid var(--text-light);
+.custom-input-group .button-login:hover {
+  background-color: var(--accent); color: var(--text-dark);
+  box-shadow: var(--shadow); border: 1px solid var(--text-light);
 }
 
 /* Errores */
-.menssaje-error-login{
-  color: var(--accent);
-  font-size: 0.9rem;
-  padding-left: clamp(0px, 1.5vw, 1rem);
-  font-weight: 500;
-  margin: 0;
-  align-self: start;
-}
+.menssaje-error-login{ color: var(--accent); font-size: .9rem; padding-left: clamp(0px, 1.5vw, 1rem); font-weight: 500; margin: 0; align-self: start; }
 
 /* Responsive */
 @media (max-width: 510px) {
-  .login-container {
-    width: 100%;
-    min-width: 344px;
-    max-width: 509px;
-    flex-direction: column;
-  }
-
-  .img-fondo {
-    position: absolute;
-    width: 100%;
-    min-width: 344px;
-    max-width: 509px;
-    top:0;
-    max-height: 50%;
-    object-fit: cover;
-    object-position: center;
-  }
-
+  .login-container { width: 100%; min-width: 344px; max-width: 509px; flex-direction: column; }
+  .img-fondo { position: absolute; width: 100%; min-width: 344px; max-width: 509px; top:0; max-height: 50%; object-fit: cover; object-position: center; }
   .login-form-container {
-    width: 100%;
-    max-height: 90%;
-    max-width: 509px;
-    min-width: 344px;
-    left: initial;
-    bottom: 0;
-    position: absolute;
-    justify-content: flex-end;
-    -webkit-clip-path: url(#mobile-wavy-shape-clip);
-    clip-path: url(#mobile-wavy-shape-clip);
-    background: var(--bg);
-    display: flex;
-    flex-direction: column;
-    z-index: 1;
-    gap: 1.5rem;
+    width: 100%; max-height: 90%; max-width: 509px; min-width: 344px;
+    left: initial; bottom: 0; position: absolute; justify-content: flex-end;
+    -webkit-clip-path: url(#mobile-wavy-shape-clip); clip-path: url(#mobile-wavy-shape-clip);
+    background: var(--bg); display: flex; flex-direction: column; z-index: 1; gap: 1.5rem;
   }
-
   .formulario-login {
-    width: inherit;
-    min-width: 300px;
-    min-height: 60vh;
-    display: flex;
-    flex-direction: column;
-    gap: .5rem;
-    justify-content: center;
-    text-align: start;
-    align-items: flex-start;
-    padding: 0;
+    width: inherit; min-width: 300px; min-height: 60vh; display: flex; flex-direction: column;
+    gap: .5rem; justify-content: center; text-align: start; align-items: flex-start; padding: 0;
     color: var(--text-light);
   }
 }

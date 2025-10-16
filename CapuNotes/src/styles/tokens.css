@@ -11,6 +11,21 @@
   --radius: 16px;
   --shadow: 0 4px 14px rgba(0,0,0,.35);
 
-  /* Tipografía global */
+  /* Tipografía (global del sistema) */
   --font-sans: 'Manjari', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+
+  /* Escala (por si la necesitás en adelante) */
+  --space-1: .25rem;
+  --space-2: .5rem;
+  --space-3: .75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+
+  --fs-1: .875rem;
+  --fs-2: 1rem;
+  --fs-3: 1.125rem;
+  --fs-4: 1.25rem;
+  --fs-5: 1.5rem;
+  --fs-6: 1.75rem;
 }

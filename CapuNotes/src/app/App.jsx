@@ -13,7 +13,6 @@ import Miembros from "@/components/pages/miembros/index.jsx";
 
 // Estilos base (usar globals como fuente de verdad)
 import "@/styles/globals.css";
-import "@/styles/App.css";
 
 function ProtectedRoute({ children }) {
   const isAuth = localStorage.getItem("capunotes_auth") === "1";

@@ -1,7 +1,7 @@
 /* src/styles/globals.css */
 /* === Base Global Styles === */
 
-/* Manjari como fuente global */
+/* Manjari como fuente global (pedido del cliente) */
 @import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
 @import "./tokens.css";
 
@@ -34,7 +34,7 @@ button, .btn { cursor: pointer; border: none; border-radius: var(--radius); tran
 /* FORMULARIOS */
 input, select, textarea {
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: var(--fs-2);
   border: 1px solid rgba(255,255,255,.2);
   border-radius: var(--radius);
   padding: .5rem .75rem;
