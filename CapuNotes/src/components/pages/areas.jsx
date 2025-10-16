@@ -1,21 +1,22 @@
-// src/components/organizacion-coro/Area.jsx
-import EntityTableABMC from "../abmc/EntityTableABMC";
-import { areasApi } from "../../services/areasApi";
+import useCrud from "../../hooks/useCrud";
+import { AreasService } from "../../services/areas";
+import AreasSchema from "../../schemas/areas.jsx";
+import EntityTableABMC from "../../components/abmc/EntityTableABMC";
 
-// ABMC genérico para Áreas (sin columna ID)
-export default function Area() {
-  const schema = [
-    { key: "nombre", label: "Nombre", required: true, max: 80 },
-    { key: "descripcion", label: "Descripción", max: 300 },
-  ];
+export default function AreasPage() {
+  const { items, loading, error, create, update, remove } = useCrud(AreasService);
 
   return (
-    <EntityTableABMC
-      title="Áreas"
-      service={areasApi}
-      schema={schema}
-      uniqueBy="nombre"
-      entityName="área"
-    />
+    <div className="container mt-3">
+      <EntityTableABMC
+        schema={AreasSchema}
+        data={items}
+        loading={loading}
+        error={error}
+        onCreate={create}
+        onUpdate={update}
+        onDelete={remove}
+      />
+    </div>
   );
 }

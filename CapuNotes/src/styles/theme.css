@@ -1,0 +1,26 @@
+:root{
+  --primary-color: #11103a;
+  --primary-color-2: #151246;
+  --card-color: #0f1036;
+  --ink: #E8EAED;
+  --muted: #bfc4cc;
+  --accent: #ffc107;
+  --line: rgba(255,255,255,.08);
+  --shadow: 0 6px 16px rgba(0,0,0,.35);
+  --radius: 12px;
+  --radius-lg: 16px;
+
+  --row-even: #121646; /* alternado oscuro */
+  --row-odd:  #0f133d; /* alternado claro */
+
+  --danger: #ff5b5b;
+  --success: #23d18b;
+}
+
+*{ box-sizing:border-box; }
+html,body,#root{ height:100%; }
+body{
+  color:var(--ink);
+  background:#0b0d2a;
+}
+a{ color:inherit; }

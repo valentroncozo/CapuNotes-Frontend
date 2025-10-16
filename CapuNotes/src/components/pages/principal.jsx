@@ -1,104 +1,86 @@
-import WelcomeCard from "./titulo-cards.jsx";
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import ScheduleIcon from '@mui/icons-material/Schedule';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import EventIcon from '@mui/icons-material/Event';
-import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
-import MicIcon from '@mui/icons-material/Mic';
 import "../../styles/principal.css";
+import WelcomeCard from "./titulo-cards.jsx";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import ScheduleIcon from "@mui/icons-material/Schedule";
+import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
+import GroupsIcon from "@mui/icons-material/Groups";
 
-export default function Principal({ username }) {
+export default function Principal() {
   return (
-    <div className="principal-container">
-      {/* Contenido principal */}
-      <div className="home-container">
-        {/* Bienvenida */}
-        <WelcomeCard title={`Bienvenido, ${username}!`} />
+    <div className="container mt-4">
+      {/* Cabecera simple del dashboard */}
+      <div className="d-flex align-items-center justify-content-between mb-3">
+        <h2 className="text-light m-0">Inicio</h2>
+        {/* si tenías un logo, usá SIEMPRE la ruta raíz, no /public/... */}
+        {/* <img src="/Logo coro sin fondo.png" alt="Logo" style={{ height: 40 }} /> */}
+      </div>
 
-        {/* Línea divisora */}
-        <hr className="divisor-amarillo" />
+      {/* Tarjeta de bienvenida (reutilizable) */}
+      <WelcomeCard
+        title="Bienvenido/a"
+        subtitle="Panel principal"
+        description="Accesos rápidos a tus secciones más usadas."
+      />
 
-        {/* Próximos eventos */}
-        <section className="eventos-section">
-          <h4 className="section-title">Tus próximos eventos</h4>
+      {/* Grid de accesos rápidos (de ejemplo, ajustá a tu gusto) */}
+      <div className="row g-3 mt-2">
+        <div className="col-12 col-md-6 col-lg-3">
+          <QuickLink
+            icon={<CalendarMonthIcon />}
+            title="Eventos"
+            text="Calendario y próximos ensayos"
+          />
+        </div>
+        <div className="col-12 col-md-6 col-lg-3">
+          <QuickLink
+            icon={<ScheduleIcon />}
+            title="Asistencias"
+            text="Control y estadísticas"
+          />
+        </div>
+        <div className="col-12 col-md-6 col-lg-3">
+          <QuickLink
+            icon={<LibraryMusicIcon />}
+            title="Canciones"
+            text="Repertorio y material"
+          />
+        </div>
+        <div className="col-12 col-md-6 col-lg-3">
+          <QuickLink
+            icon={<GroupsIcon />}
+            title="Miembros"
+            text="Gestión del coro"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
-          <div className="eventos-scroll">
-            <div className="evento-card">
-              <h5>Peña</h5>
-              <div className="evento-info">
-                <CalendarMonthIcon className="evento-icon" />
-                <p>Viernes 12/09</p>
-              </div>
-              <div className="evento-info">
-                <ScheduleIcon className="evento-icon" />
-                <p>13:00 hs</p>
-              </div>
-              <div className="evento-info">
-                <LocationOnIcon className="evento-icon" />
-                <p>Villa Allende</p>
-              </div>
-            </div>
-
-            <div className="evento-card">
-              <h5>Concierto</h5>
-              <div className="evento-info">
-                <CalendarMonthIcon className="evento-icon" />
-                <p>Sábado 14/09</p>
-              </div>
-              <div className="evento-info">
-                <ScheduleIcon className="evento-icon" />
-                <p>18:00 hs</p>
-              </div>
-              <div className="evento-info">
-                <LocationOnIcon className="evento-icon" />
-                <p>Córdoba</p>
-              </div>
-            </div>
-
-            <div className="evento-card">
-              <h5>Ensayo</h5>
-              <div className="evento-info">
-                <CalendarMonthIcon className="evento-icon" />
-                <p>Domingo 15/09</p>
-              </div>
-              <div className="evento-info">
-                <ScheduleIcon className="evento-icon" />
-                <p>10:00 hs</p>
-              </div>
-              <div className="evento-info">
-                <LocationOnIcon className="evento-icon" />
-                <p>Sede Central</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Tareas principales */}
-        <section className="tareas-section">
-          <h4 className="section-title">Tareas principales</h4>
-          <div className="tareas-grid">
-            <div className="tarea-card">
-              <AssignmentIcon className="tarea-icon" />
-              <span>Asistencia</span>
-            </div>
-
-            <div className="tarea-card tarea-activa">
-              <EventIcon className="tarea-icon" />
-              <span>Eventos</span>
-            </div>
-
-            <div className="tarea-card">
-              <LibraryMusicIcon className="tarea-icon" />
-              <span>Actividades complementarias</span>
-            </div>
-
-            <div className="tarea-card">
-              <MicIcon className="tarea-icon" />
-              <span>Audiciones</span>
-            </div>
-          </div>
-        </section>
+function QuickLink({ icon, title, text }) {
+  return (
+    <div
+      className="p-3 rounded-4 h-100"
+      style={{
+        background: "var(--surface, #0c0f2b)",
+        color: "var(--ink, #eae9ff)",
+        border: "1px solid var(--line, rgba(255,255,255,.12))",
+      }}
+    >
+      <div
+        className="d-inline-flex align-items-center justify-content-center rounded-3 mb-2"
+        style={{
+          width: 44,
+          height: 44,
+          background: "var(--accent, #f5b800)",
+          color: "#1b1b1b",
+        }}
+      >
+        {icon}
+      </div>
+      <div className="fw-semibold">{title}</div>
+      <div className="opacity-75" style={{ fontSize: ".95rem" }}>
+        {text}
       </div>
     </div>
   );

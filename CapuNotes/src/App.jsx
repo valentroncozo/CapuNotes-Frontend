@@ -8,8 +8,6 @@ import AppShell from "./components/layout/AppShell.jsx";
 import Login from "./components/pages/login.jsx";
 import Principal from "./components/pages/principal.jsx";
 import Miembros from "./components/pages/miembros.jsx";
-import MiembrosAgregar from "./components/pages/miembrosAgregar.jsx";
-import MiembrosEditar from "./components/pages/miembrosEditar.jsx";
 import Cuerdas from "./components/pages/cuerdas.jsx";
 import Area from "./components/pages/areas.jsx";
 
@@ -60,8 +58,6 @@ function AppRoutes() {
 
         {/* Miembros */}
         <Route path="miembros" element={<Miembros />} />
-        <Route path="miembros/agregar" element={<MiembrosAgregar />} />
-        <Route path="miembros/editar" element={<MiembrosEditar />} />
 
         {/* Cuerdas (ABMC sin ID) */}
         <Route path="cuerdas" element={<Cuerdas />} />

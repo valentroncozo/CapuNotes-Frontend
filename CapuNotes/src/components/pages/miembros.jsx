@@ -1,63 +1,38 @@
-// src/components/pages/miembros.jsx
-import EntityTableABMC from "../abmc/EntityTableABMC";
+import useCrud from "../../hooks/useCrud";
+import { MiembrosService } from "../../services/miembros";
+import { CuerdasService } from "../../services/cuerdas";
+import MiembrosSchemaFactory from "../../schemas/miembros.jsx";
+import EntityTableABMC from "../../components/abmc/EntityTableABMC";
+import { useEffect, useMemo, useState } from "react";
 
-const STORAGE = "capunotes_miembros";
-const AREAS_KEY = "capunotes_areas";
-const CUERDAS_KEY = "capunotes_cuerdas";
+export default function MiembrosPage() {
+  const miembrosCrud = useCrud(MiembrosService);
+  const cuerdasCrud = useCrud(CuerdasService);
+  const [schema, setSchema] = useState(MiembrosSchemaFactory([]));
 
-const miembrosApi = {
-  list: async () => JSON.parse(localStorage.getItem(STORAGE) || "[]"),
-  create: async (m) => {
-    const list = JSON.parse(localStorage.getItem(STORAGE) || "[]");
-    const id = crypto?.randomUUID?.() || Date.now();
-    const nuevo = { id, estado: "Activo", ...m };
-    localStorage.setItem(STORAGE, JSON.stringify([...list, nuevo]));
-    return nuevo;
-  },
-  update: async (updated) => {
-    const list = JSON.parse(localStorage.getItem(STORAGE) || "[]");
-    const newList = list.map((l) => (l.id === updated.id ? { ...l, ...updated } : l));
-    localStorage.setItem(STORAGE, JSON.stringify(newList));
-    return updated;
-  },
-  remove: async (id) => {
-    const list = JSON.parse(localStorage.getItem(STORAGE) || "[]");
-    const newList = list.filter((l) => l.id !== id);
-    localStorage.setItem(STORAGE, JSON.stringify(newList));
-    return { ok: true };
-  },
-};
+  // Cuando cargan las cuerdas, armamos las opciones del select
+  const cuerdaOptions = useMemo(() => {
+    return (cuerdasCrud.items || []).map(c => ({
+      value: c.id ?? c._id ?? c.value ?? c.nombre, // intenta cubrir mocks/real
+      label: c.nombre ?? c.label ?? "",
+    }));
+  }, [cuerdasCrud.items]);
 
-function getOptionsFromLS(key, field = "nombre") {
-  try {
-    const arr = JSON.parse(localStorage.getItem(key) || "[]");
-    return (arr || []).map((x) => x?.[field]).filter(Boolean);
-  } catch {
-    return [];
-  }
-}
-
-export default function MiembrosABMC() {
-  const cuerdaOptions = getOptionsFromLS(CUERDAS_KEY);
-  const areaOptions = getOptionsFromLS(AREAS_KEY);
-  const estadoOptions = ["Activo", "Inactivo"];
-
-  const schema = [
-    { key: "nombre", label: "Nombre", required: true, max: 80 },
-    { key: "apellido", label: "Apellido", required: true, max: 80 },
-    { key: "cuerda", label: "Cuerda", type: "select", options: cuerdaOptions },
-    { key: "area", label: "Área", type: "select", options: areaOptions },
-    { key: "estado", label: "Estado", type: "select", options: estadoOptions },
-  ];
+  useEffect(() => {
+    setSchema(MiembrosSchemaFactory(cuerdaOptions));
+  }, [cuerdaOptions]);
 
   return (
-    <EntityTableABMC
-      title="Miembros del coro"
-      service={miembrosApi}
-      schema={schema}
-      uniqueBy={null}         // no forzar duplicados por 'nombre'
-      entityName="miembro"
-      showBackButton={true}   // flechita en el header
-    />
+    <div className="container mt-3">
+      <EntityTableABMC
+        schema={schema}
+        data={miembrosCrud.items}
+        loading={miembrosCrud.loading || cuerdasCrud.loading}
+        error={miembrosCrud.error || cuerdasCrud.error}
+        onCreate={miembrosCrud.create}
+        onUpdate={miembrosCrud.update}
+        onDelete={miembrosCrud.remove}
+      />
+    </div>
   );
 }
