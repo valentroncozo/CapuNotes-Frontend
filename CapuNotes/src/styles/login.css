@@ -1,5 +1,10 @@
 /* src/styles/login.css */
 
+/* Sobrescribir fuente global solo en el login */
+.login-container {
+  font-family: 'Comic Neue', 'Poppins', 'Segoe UI', sans-serif !important;
+}
+
 /* Contenedor principal */
 .login-container {
   height: 100vh;

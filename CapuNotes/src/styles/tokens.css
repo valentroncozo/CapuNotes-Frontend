@@ -2,25 +2,16 @@
 /* === Design Tokens unificados === */
 :root {
   /* Colores base */
-  --bg: #11103a;          /* fondo primario */
-  --accent: #ffc107;      /* acento/acciones primarias */
-  --card: #b3cdfa;        /* superficies secundarias (cards) */
-  --text-light: #E8EAED;  /* texto sobre fondo oscuro */
-  --text-dark: #202124;   /* texto sobre superficies claras */
+  --bg: #11103a;
+  --accent: #ffc107;
+  --card: #b3cdfa;
+  --text-light: #E8EAED;
+  --text-dark: #202124;
 
   /* Layout / efectos */
   --radius: 16px;
   --shadow: 0 4px 14px rgba(0,0,0,.35);
 
-  /* Tipografía */
-  --font-sans: 'Manjari', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
-
-  /* ====== Alias de compatibilidad (CSS legado) ====== */
-  --primary-color: var(--bg);
-  --secondary-color: var(--accent);
-  --terciary-color: var(--card);
-  --primary-text-color: var(--text-light);
-  --secondary-text-color: var(--text-dark);
-  --border-radius: var(--radius);
-  --box-shadow-standard: var(--shadow);
+  /* Tipografía — RESTAURADA a la original del sistema */
+  --font-sans: 'Comic Neue', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
 }
