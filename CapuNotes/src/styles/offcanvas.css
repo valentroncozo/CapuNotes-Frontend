@@ -1,93 +1,168 @@
-/* ===== AppShell Navbar ===== */
-.appshell-navbar {
-  background: transparent !important;
-  border: none !important;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 56px;
-  padding: 10px !important;
-  z-index: 1046;
+:root {
+  --primary-color: #11103a;
+  --primary-color-2: #151246;
+  --card-color: #0f1036;
+  --ink: #E8EAED;
+  --accent: #ffc107;
+  --line: rgba(255,255,255,.08);
+  --radius: 16px;
+  --shadow: 0 6px 16px rgba(0,0,0,.35);
+  --pill: rgba(179,205,250,.12);
 }
 
-.navbar-toggler { margin-left: 8px; }
+/* NAVBAR SUPERIOR */
+.appshell-navbar{
+  background:var(--primary-color);
+  border-bottom:1px solid var(--line);
+  box-shadow:var(--shadow);
+  min-height:56px;
+  padding-inline:8px;
+}
+.appshell-toggle{
+  border:none!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  padding:6px 8px;
+}
+.appshell-toggle:focus{ box-shadow:none!important; outline:none!important; }
 
-/* Usuario */
-.appshell-user { margin-left: auto; color: #E8EAED; font-family: Manjari, sans-serif; }
-.appshell-hello { opacity: .9; font-weight: 600; }
+/* ===== Drawer custom (sin Bootstrap JS) ===== */
+.drawer{
+  position:fixed;
+  inset:0 auto 0 0;
+  width:320px;
+  max-width:86vw;
+  background:var(--primary-color);
+  color:var(--ink);
+  border-right:1px solid var(--line);
+  box-shadow:var(--shadow);
+  transform:translateX(-100%);
+  transition:transform .25s ease;
+  z-index:1050; /* por encima del contenido, sin backdrop */
+}
+.drawer.open{ transform:translateX(0); }
 
-/* ===== Offcanvas ===== */
-.offcanvas,
-.offcanvas-start,
-.offcanvas-body,
-.offcanvas-header {
-  background-color: #11103a !important;
-  color: #E8EAED !important;
-  border: none !important;
-  box-shadow: none !important;
+.drawer-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--line);
+  padding:.75rem 1rem;
+}
+.offcanvas-title{ color:var(--ink); font-weight:600; }
+
+.drawer-body{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:12px;
 }
 
-/* Header del offcanvas: título a la izquierda, X centrada visualmente y logout a la derecha */
-.appshell-offcanvas-header {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-items: center;
-  gap: 12px;
-}
-.offcanvas-title {
-  color: #E8EAED !important;
-  font-weight: 700;
-  margin: 0;
+/* Controles derecha */
+.appshell-header-controls{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
-/* X */
-.btn-close.appshell-close {
-  position: relative;
-  width: 1.25rem; height: 1.25rem;
-  opacity: 1 !important;
+/* Tuerquita */
+.appshell-gearbtn{
+  background:transparent;
+  border:1px solid var(--line);
+  color:#fff;
+  width:36px; height:36px;
+  border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  transition:all .2s ease;
+  padding:0;
 }
-.btn-close.appshell-close::before,
-.btn-close.appshell-close::after {
-  content: "";
-  position: absolute; top: 50%; left: 50%;
-  width: 1.25rem; height: 2px;
-  background-color: #E8EAED;
-  transform-origin: center;
+.appshell-gearbtn:hover{ color:var(--accent); transform:scale(1.1); }
+
+/* Panel de ajustes */
+.appshell-gear-panel{
+  position:absolute;
+  right:46px; top:40px;
+  background:var(--card-color);
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:var(--shadow);
+  padding:6px;
+  min-width:170px;
+  z-index:10;
 }
-.btn-close.appshell-close::before { transform: translate(-50%, -50%) rotate(45deg); }
-.btn-close.appshell-close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
-.btn-close.appshell-close svg { display: none !important; }
+.appshell-gear-item{
+  width:100%;
+  text-align:left;
+  padding:.55rem .7rem;
+  border:none;
+  background:transparent;
+  color:var(--ink);
+  border-radius:10px;
+  cursor:pointer;
+}
+.appshell-gear-item:hover{ background:var(--pill); color:var(--accent); }
 
-/* Cerrar sesión a la derecha */
-.appshell-logout {
-  color: #E8EAED !important;
-  background: transparent !important;
-  border: none !important;
-  margin-left: auto;
-  cursor: pointer;
+/* X personalizada */
+.appshell-closebtn{
+  background:transparent;
+  border:1px solid var(--line);
+  color:#fff;
+  width:36px; height:36px;
+  border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  transition:all .2s ease;
+  padding:0;
+}
+.appshell-closebtn:hover{ color:var(--accent); transform:scale(1.1); }
+
+/* LINKS DEL MENÚ */
+.appshell-menu .nav-link{
+  color:var(--ink);
+  padding:.6rem .75rem;
+  border-radius:12px;
+  transition:.15s ease;
+  text-align:center;
+  display:block;
+}
+.appshell-menu .nav-link:hover{
+  background:var(--pill);
+  color:var(--accent);
+  text-decoration:none;
 }
 
-/* Items del menú */
-.offcanvas-body .nav-link {
-  color: #E8EAED !important;
-  font-weight: 500;
-  font-size: 1rem;
-  text-decoration: none;
-  margin: .4rem 0;
-  display: block;
-  cursor: pointer;
-  border-radius: 8px;
-  padding: 4px 6px;
+/* ACORDEÓN (React) */
+.appshell-accordion-outer{
+  border:1px solid #000;
+  border-radius:12px;
+  overflow:hidden;
 }
-
-.offcanvas-body .nav-link:hover { color: #ffc107 !important; }
-.offcanvas-body .nav-link.active { color: #ffc107 !important; font-weight: 800; }
-
-/* Focus accesible pero sin ese rectángulo azul feo */
-.offcanvas-body .nav-link:focus-visible {
-  outline: 2px solid #243a7a;
-  outline-offset: 2px;
+.appshell-accordion-trigger{
+  width:100%;
+  background:var(--primary-color);
+  color:var(--ink);
+  font-weight:700;
+  padding:.75rem .9rem;
+  border:none;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:.5rem;
 }
-
-/* Backdrop (por si quedan restos en rarezas) */
-.offcanvas-backdrop { background-color: rgba(0,0,0,.5); }
+.appshell-accordion-trigger:hover{ filter:brightness(1.05); }
+.appshell-accordion-trigger.open{ background:var(--primary-color-2); }
+.appshell-accordion-caret{ opacity:.9; }
+.appshell-accordion-content{
+  background:var(--card-color);
+  border-top:1px solid var(--line);
+  padding:.6rem;
+}
+.appshell-accordion-content .nav-link{
+  display:block;
+  padding:.55rem .6rem;
+  border-radius:10px;
+  color:var(--ink);
+  font-weight:500;
+  text-align:center;
+}
+.appshell-accordion-content .nav-link:hover{ background:var(--pill); color:var(--accent); }

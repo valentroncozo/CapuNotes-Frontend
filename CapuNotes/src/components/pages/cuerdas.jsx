@@ -1,6 +1,7 @@
 // src/components/pages/cuerdas.jsx
 import EntityTableABMC from "../abmc/EntityTableABMC";
 
+// Persistencia local para cuerdas
 const STORAGE = "capunotes_cuerdas";
 
 const cuerdasApi = {
@@ -26,7 +27,8 @@ const cuerdasApi = {
   },
 };
 
-function Cuerdas() {
+export default function Cuerdas() {
+  // ⚠️ Sin columna ID: el schema solo define "Nombre"
   const schema = [{ key: "nombre", label: "Nombre", required: true, max: 80 }];
 
   return (
@@ -39,6 +41,3 @@ function Cuerdas() {
     />
   );
 }
-
-export default Cuerdas;
-export { Cuerdas };

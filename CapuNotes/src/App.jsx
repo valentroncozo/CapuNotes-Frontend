@@ -1,111 +1,86 @@
-import { useState } from 'react';
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from 'react-router-dom';
-import './styles/App.css';
+// src/App.jsx
+import { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
-import AppShell from './components/layout/AppShell.jsx';
+import AppShell from "./components/layout/AppShell.jsx";
 
-import Principal from './components/pages/principal.jsx';
-import Miembros from './components/organizacion-coro/miembros.jsx';
-import MiembrosAgregar from './components/organizacion-coro/miembrosAgregar.jsx';
-import MiembrosEditar from './components/organizacion-coro/miembrosEditar.jsx';
-import Cuerda from './components/organizacion-coro/cuerdas.jsx';
-import PopupLab from './components/popUp/PopupLab.jsx';
-import Login from './components/pages/login.jsx';
-import Area from './components/organizacion-coro/Area.jsx';
+// Pages
+import Login from "./components/pages/login.jsx";
+import Principal from "./components/pages/principal.jsx";
+import Miembros from "./components/pages/miembros.jsx";
+import MiembrosAgregar from "./components/pages/miembrosAgregar.jsx";
+import MiembrosEditar from "./components/pages/miembrosEditar.jsx";
+import Cuerdas from "./components/pages/cuerdas.jsx";
+import Area from "./components/pages/areas.jsx";
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    try {
-      const saved = localStorage.getItem('capunotes_auth');
-      if (!saved) return false;
-      const { isAuthenticated } = JSON.parse(saved);
-      return !!isAuthenticated;
-    } catch {
-      return false;
-    }
-  });
+// Global styles
+import "./styles/index.css";
+import "./styles/App.css";
 
-  const [username, setUsername] = useState(() => {
-    try {
-      const saved = localStorage.getItem('capunotes_auth');
-      if (!saved) return '';
-      const { username } = JSON.parse(saved);
-      return username || '';
-    } catch {
-      return '';
-    }
-  });
+function ProtectedRoute({ children }) {
+  const isAuth = localStorage.getItem("capunotes_auth") === "1";
+  return isAuth ? children : <Navigate to="/login" replace />;
+}
 
-  const handleLogin = (usernameInput, password) => {
-    if (usernameInput === 'admin' && password === '1234') {
-      const session = { isAuthenticated: true, username: usernameInput };
-      setIsAuthenticated(true);
-      setUsername(usernameInput);
-      localStorage.setItem('capunotes_auth', JSON.stringify(session));
-    } else {
-      alert('Usuario o contraseña incorrectos');
-    }
+function AppRoutes() {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState(localStorage.getItem("capunotes_user") || "");
+
+  const handleLogin = (user) => {
+    // Guardar sesión
+    localStorage.setItem("capunotes_auth", "1");
+    localStorage.setItem("capunotes_user", user);
+    setUsername(user);
+
+    // 🔐 Navegar a la home protegida
+    navigate("/principal", { replace: true });
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUsername('');
-    localStorage.removeItem('capunotes_auth');
+    localStorage.removeItem("capunotes_auth");
+    localStorage.removeItem("capunotes_user");
+    setUsername("");
+    // (AppShell también navega a /login al cerrar sesión)
   };
 
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          {/* Redirección raíz según auth */}
-          <Route
-            path="/"
-            element={
-              isAuthenticated
-                ? <Navigate to="/principal" />
-                : <Navigate to="/login" />
-            }
-          />
+    <Routes>
+      <Route path="/login" element={<Login onLogin={(u) => handleLogin(u)} />} />
 
-          {/* Login público en /login */}
-          <Route
-            path="/login"
-            element={
-              isAuthenticated
-                ? <Navigate to="/principal" />
-                : <Login onLogin={handleLogin} />
-            }
-          />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <AppShell username={username} onLogout={handleLogout} />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Navigate to="/principal" replace />} />
+        <Route path="principal" element={<Principal username={username} />} />
 
-          {/* Layout privado y rutas hijas relativas */}
-          <Route
-            path="/"
-            element={
-              isAuthenticated
-                ? <AppShell username={username} onLogout={handleLogout} />
-                : <Navigate to="/login" />
-            }
-          >
-            <Route path="principal" element={<Principal username={username} />} />
-            <Route path="organizacion-coro" element={<Area />} />
-            <Route path="miembros" element={<Miembros />} />
-            <Route path="miembros/agregar" element={<MiembrosAgregar />} />
-            <Route path="miembros/editar" element={<MiembrosEditar />} />
-            <Route path="cuerdas" element={<Cuerda cuerda={{ nombre: '' }} />} />
-            <Route path="popup-lab" element={<PopupLab />} />
-          </Route>
+        {/* Miembros */}
+        <Route path="miembros" element={<Miembros />} />
+        <Route path="miembros/agregar" element={<MiembrosAgregar />} />
+        <Route path="miembros/editar" element={<MiembrosEditar />} />
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </div>
-    </Router>
+        {/* Cuerdas (ABMC sin ID) */}
+        <Route path="cuerdas" element={<Cuerdas />} />
+
+        {/* Áreas (ABMC genérico) */}
+        <Route path="organizacion-coro" element={<Area />} />
+
+
+      </Route>
+
+      <Route path="*" element={<Navigate to="/principal" replace />} />
+    </Routes>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  );
+}
