@@ -119,6 +119,16 @@ export default function AppShell({ onLogout }) {
         </div>
       </div>
 
+      {/* 👇 Overlay para cerrar al click fuera del drawer */}
+      {open && (
+        <div
+          className="drawer-backdrop"
+          role="presentation"
+          aria-hidden="true"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
       <div style={{ height: "56px" }} />
       <Outlet />
     </>

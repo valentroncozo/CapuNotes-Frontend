@@ -136,3 +136,12 @@
   text-align:center;
 }
 .appshell-accordion-content .nav-link:hover{ background: rgba(179,205,250,.12); color:var(--accent); }
+
+/* ========= NEW: Backdrop para cerrar al click fuera ========= */
+.drawer-backdrop{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.45);
+  backdrop-filter: blur(1px);
+  z-index:1040; /* debajo del drawer (1050) */
+}
