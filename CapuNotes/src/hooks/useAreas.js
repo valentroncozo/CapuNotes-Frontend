@@ -1,6 +1,6 @@
 // src/hooks/useAreas.js
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { areasApi } from '../services/areasApi';
+import { areasApi } from '../services/localStorageApi';
 
 function normalize(str) {
   return (str || '').trim();

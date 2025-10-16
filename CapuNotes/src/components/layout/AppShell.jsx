@@ -1,5 +1,5 @@
 // src/components/layout/AppShell.jsx
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../../styles/offcanvas.css";
 
@@ -26,23 +26,27 @@ function GearIcon(props) {
   );
 }
 
+const MENU_ITEMS = [
+  ["/asistencias", "Asistencias"],
+  ["/audiciones", "Audiciones"],
+  ["/canciones", "Canciones"],
+  ["/eventos", "Eventos"],
+  ["/fraternidades", "Fraternidades"],
+  ["/usuarios-roles", "Usuarios y roles"],
+];
+
 export default function AppShell({ onLogout }) {
   const navigate = useNavigate();
-
-  // Estado del drawer (offcanvas custom)
   const [open, setOpen] = useState(false);
-  // UI secundaria
-  const [orgOpen, setOrgOpen] = useState(false);   // acordeón Organización del Coro
-  const [gearOpen, setGearOpen] = useState(false); // menú de la tuerquita
+  const [orgOpen, setOrgOpen] = useState(false);
+  const [gearOpen, setGearOpen] = useState(false);
 
-  // Cerrar con ESC
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Al cerrar el drawer, cerramos sub-menú
   useEffect(() => { if (!open) setGearOpen(false); }, [open]);
 
   const handleNavigate = (to) => {
@@ -58,7 +62,6 @@ export default function AppShell({ onLogout }) {
 
   return (
     <>
-      {/* Navbar superior fija (solo el botón hamburguesa) */}
       <nav className="navbar fixed-top navbar-dark appshell-navbar">
         <button
           className="navbar-toggler appshell-toggle"
@@ -70,7 +73,6 @@ export default function AppShell({ onLogout }) {
         </button>
       </nav>
 
-      {/* Drawer custom (sin Bootstrap JS) */}
       <div className={`drawer ${open ? "open" : ""}`} role="dialog" aria-modal="true">
         <div className="drawer-header">
           <h5 className="offcanvas-title">Menú</h5>
@@ -93,7 +95,6 @@ export default function AppShell({ onLogout }) {
                 <button className="appshell-gear-item" onClick={handleLogout}>
                   Cerrar sesión
                 </button>
-                {/* futuros ítems */}
               </div>
             )}
 
@@ -118,7 +119,6 @@ export default function AppShell({ onLogout }) {
         </div>
       </div>
 
-      {/* Spacer para no tapar contenido con la navbar */}
       <div style={{ height: "56px" }} />
       <Outlet />
     </>
@@ -136,7 +136,6 @@ function Menu({ orgOpen, setOrgOpen, onNavigate }) {
         Inicio
       </a>
 
-      {/* Acordeón controlado por React */}
       <div className="appshell-accordion-outer">
         <button
           className={`appshell-accordion-trigger ${orgOpen ? "open" : ""}`}
@@ -174,14 +173,7 @@ function Menu({ orgOpen, setOrgOpen, onNavigate }) {
         )}
       </div>
 
-      {[
-        ["/asistencias", "Asistencias"],
-        ["/audiciones", "Audiciones"],
-        ["/canciones", "Canciones"],
-        ["/eventos", "Eventos"],
-        ["/fraternidades", "Fraternidades"],
-        ["/usuarios-roles", "Usuarios y roles"],
-      ].map(([to, label]) => (
+      {MENU_ITEMS.map(([to, label]) => (
         <a
           key={to}
           href={to}

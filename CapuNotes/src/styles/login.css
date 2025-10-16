@@ -1,17 +1,4 @@
-/* VARIABLES DE ESTILOS */
-:root {
-  --primary-color: #11103a;
-  --secondary-color: #ffc107; 
-  --terciary-color: #b3cdfa;
-  --primary-text-color: #E8EAED;
-  --secondary-text-color: #202124;
-
-  --border-radius:  100%;
-  --box-shadow: 0 4px 14px rgba(0,0,0,.35);
-  --font-family: 'Manjari', sans-serif;
-}
-
-
+/* src/styles/login.css */
 
 /* Contenedor principal */
 .login-container {
@@ -22,6 +9,9 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  background: var(--bg);
+  color: var(--text-light);
+  font-family: var(--font-sans);
 }
 
 /* Fondo de la imagen */
@@ -34,9 +24,9 @@
   height: 100%;
   object-fit: cover;
   object-position: center;
-} 
+}
 
-/* Bloque azul condulado */
+/* Bloque azul ondulado (clipPath) */
 .login-form-container {
   width: 100%;
   max-width: 90vw;
@@ -44,75 +34,72 @@
   left: 0;
   position: absolute;
   clip-path: url(#wavy-shape-clip);
-  background: var(--primary-color);
+  background: var(--bg);
   display: flex;
   flex-direction: column;
   align-items:flex-start;
-  justify-content: center;    
+  justify-content: center;
   z-index: 1;
   gap: 1.5rem;
   padding: 2rem;
-  overflow: hidden; /* asegurar que la clip-path recorte el contenido */
+  overflow: hidden;
 }
 
-/* Asegurar que el SVG de clip no capture eventos y quede detrás del contenido */
 .login-form-container > svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* importante */
+  pointer-events: none;
   z-index: 0;
 }
 
-/* Forzar que el contenido del formulario esté por encima y reciba eventos */
+/* Contenido sobre el SVG */
 .login-form-container > *:not(svg) {
   position: relative;
   z-index: 2;
 }
 
-/* Asegurar que inputs y botones sean interactivos */
 .login-form-container input,
 .login-form-container textarea,
 .login-form-container button,
 .login-form-container .form-control {
   pointer-events: auto;
-  cursor: text;
 }
 
-/* Evitar que aparezca el cursor de texto y la selección en elementos no editables */
+/* No selección en no-editables */
 .login-form-container,
 .login-form-container * {
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
   cursor: default;
 }
-
-/* Permitir selección e interacción sólo en controles de formulario */
 .login-form-container input,
 .login-form-container textarea,
 .login-form-container button,
 .login-form-container .form-control {
   -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
   user-select: text;
   cursor: text;
 }
 
-/* Logos del coro */
-.container-logo-coro {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+/* Logo texto */
+.container-logo-coro { width: 100%; display: flex; justify-content: center; align-items: center; }
+.logo-coro { max-width: clamp(40px, 6vw, 60%); object-fit: contain; }
 
-.logo-coro {
-  max-width: clamp(40px, 6vw, 60%);
-  object-fit: contain;
+.logo-text {
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 1.5rem, 3rem);
+  color: var(--text-light);
+  margin: 0;
+  width: 100%;
+  text-shadow: 2px 2px 8px #0008;
+  text-align: center;
+}
+.logo-text strong {
+  font-size: clamp(2.5rem, 4.5vw, 6rem);
+  font-family: "Mr Dafoe", cursive !important;
+  font-weight: 400;
 }
 
 /* Formulario */
@@ -126,181 +113,112 @@
   text-align: start;
   align-items: flex-start;
   padding: 1rem;
-  color: var(--primary-text-color);
-
+  color: var(--text-light);
 }
 
-/* contenedor de inputs*/
-
-/* Estilos para inputs personalizados */
-.formulario-login .custom-input-group .form-control {
-  background-color: rgba(0, 0, 0, 0.3);
-  color: var(--primary-text-color);
-  border: inherit;
-  border-radius: 16px;
-  padding: clamp(0px, 1rem, 1rem);
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
-
-/* Ajuste: espacio a la derecha para el icono personalizado y evitar solapamiento */
-.formulario-login .custom-input-group .form-control[type="password"] {
-  padding-right: 3.2rem; /* espacio para el ojo */
-}
-
-/* Ocultar el control nativo de mostrar contraseña en Edge/IE */
-input[type="password"]::-ms-reveal,
-input[type="password"]::-ms-clear {
-  display: none;
-}
-
-/* Intentar ocultar el botón de decoración en WebKit/Blink (Chrome/Safari)
-   no todos los navegadores exponen los mismos pseudo-elementos, por eso
-   usamos varias variantes y !important donde aplica. */
-input[type="password"] {
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-/* WebKit/Blink pseudo-elements (varios intentos para cubrir navegadores) */
-input[type="password"]::-webkit-textfield-decoration-button,
-input[type="password"]::-webkit-textfield-decoration-container,
-input[type="password"]::-webkit-password-toggle-button {
-  display: none !important;
-}
-
-/* Fallback: si el navegador sigue mostrando un icono, lo cubriremos con nuestro botón */
-.formulario-login .custom-input-group .container-toggle {
-  right: 0.6rem;
-}
-
-.formulario-login .custom-input-group .form-control:focus {
-  background-color: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--terciary-color);
- /* terciary-color con transparencia */
-  box-shadow: inherit;
-  color: var(--primary-text-color);
-  outline: none;
-}
-
-.formulario-login .custom-input-group .form-control:hover {
-  background-color: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--terciary-color);
- /* terciary-color con transparencia */
-  box-shadow: inherit;
-  color: var(--primary-text-color);
-  outline: none;
-}
-
-.formulario-login .custom-input-group .form-control::placeholder {
-  color: var(--primary-text-color);
-}
-
-/* Mantener el contenedor como está pero sin opacity */
+/* Inputs */
 .formulario-login .custom-input-group {
   position: relative;
   width: 100%;
   display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: center;
   text-align: center;
-  background-color: transparent; /* cambiar de #000 */
-  opacity: 1; /* cambiar de 0.8 */
-  border-radius: 16px;
+  background-color: transparent;
+  border-radius: var(--radius);
   border: none;
 }
 
-/* Estilos para el autocompletado */
+.formulario-login .custom-input-group .form-control {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: var(--text-light);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: clamp(0px, 1rem, 1rem);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+.formulario-login .custom-input-group .form-control[type="password"] {
+  padding-right: 3.2rem;
+}
+
+.formulario-login .custom-input-group .form-control:focus,
+.formulario-login .custom-input-group .form-control:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--card);
+  color: var(--text-light);
+  outline: none;
+}
+
+.formulario-login .custom-input-group .form-control::placeholder { color: var(--text-light); }
+
+input[type="password"] { -webkit-appearance: none; appearance: none; }
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear { display: none; }
+input[type="password"]::-webkit-textfield-decoration-button,
+input[type="password"]::-webkit-textfield-decoration-container,
+input[type="password"]::-webkit-password-toggle-button { display: none !important; }
+
+.formulario-login .custom-input-group .container-toggle { right: 0.6rem; }
+
 .formulario-login .custom-input-group .form-control:-webkit-autofill,
 .formulario-login .custom-input-group .form-control:-webkit-autofill:hover,
 .formulario-login .custom-input-group .form-control:-webkit-autofill:focus,
 .formulario-login .custom-input-group .form-control:-webkit-autofill:active {
-  -webkit-text-fill-color: var(--primary-text-color) !important;
+  -webkit-text-fill-color: var(--text-light) !important;
   -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.3) inset !important;
   transition: background-color 5000s ease-in-out 0s !important;
   background-color: rgba(0, 0, 0, 0.3) !important;
-  color: var(--primary-text-color) !important;
+  color: var(--text-light) !important;
 }
 
 .account-icon {
   right: 5px;
   position: absolute;
   font-size: 1.2rem;
-  color: var(--primary-text-color);
+  color: var(--text-light);
 }
 
-
-/* Logo texto */
-.logo-text {
-  font-family: 'Manjari', system-ui, sans-serif;
-  font-size: clamp(1rem, 1.5rem, 3rem);
-  color: var(--primary-text-color);
-  margin: 0;
-  position: relative;
-  width: 100%;
-  z-index: 10;
-  text-shadow: 2px 2px 8px #0008;
-  text-align: center;
-}
-
-.logo-text strong {
-    font-size: clamp(2.5rem, 4.5vw, 6rem);
-    font-family: "Mr Dafoe", cursive !important;
-    font-weight: 400;
-    font-style: normal;
-  }
-
+/* Botón */
 .custom-input-group .button-login{
   width: 30%;
   padding: clamp(0px, .5rem, .5rem);
   margin: 0;
   min-width: 120px;
-  border-radius: 16px;
-  background-color: var(--secondary-color);
-  color: var(--secondary-text-color);
-  border: inherit;
+  border-radius: var(--radius);
+  background-color: var(--accent);
+  color: var(--text-dark);
+  border: none;
   font-weight: 600;
-  box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  box-shadow: var(--shadow);
 }
-
-/* Igualar el estilo al recibir foco por teclado (TAB), y hover */
 .custom-input-group .button-login:focus,
 .custom-input-group .button-login:focus-visible,
 .custom-input-group .button-login:hover{
-  background-color: var(--secondary-color);
-  color: var(--secondary-text-color);
-  box-shadow: 0 4px 14px rgba(0,0,0,.35);
-  justify-content: center;
-  align-items: center;
-  border: 1px solid var(--primary-text-color);
+  background-color: var(--accent);
+  color: var(--text-dark);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--text-light);
 }
 
-
+/* Errores */
 .menssaje-error-login{
-  color: var(--secondary-color);
+  color: var(--accent);
   font-size: 0.9rem;
   padding-left: clamp(0px, 1.5vw, 1rem);
   font-weight: 500;
   margin: 0;
   align-self: start;
-
 }
 
+/* Responsive */
 @media (max-width: 510px) {
-
-  /* Contenedor principal */
   .login-container {
     width: 100%;
     min-width: 344px;
     max-width: 509px;
-    position: relative;
-    display: flex;
     flex-direction: column;
   }
 
-
-  /* Fondo de la imagen */
   .img-fondo {
     position: absolute;
     width: 100%;
@@ -310,28 +228,27 @@ input[type="password"]::-webkit-password-toggle-button {
     max-height: 50%;
     object-fit: cover;
     object-position: center;
-  } 
+  }
 
   .login-form-container {
     width: 100%;
     max-height: 90%;
     max-width: 509px;
     min-width: 344px;
-    left: inherit;
+    left: initial;
     bottom: 0;
     position: absolute;
     justify-content: flex-end;
     -webkit-clip-path: url(#mobile-wavy-shape-clip);
     clip-path: url(#mobile-wavy-shape-clip);
-    background: var(--primary-color);
+    background: var(--bg);
     display: flex;
     flex-direction: column;
     z-index: 1;
     gap: 1.5rem;
-  
   }
 
-    .formulario-login {
+  .formulario-login {
     width: inherit;
     min-width: 300px;
     min-height: 60vh;
@@ -342,7 +259,6 @@ input[type="password"]::-webkit-password-toggle-button {
     text-align: start;
     align-items: flex-start;
     padding: 0;
-    color: var(--primary-text-color);
-
+    color: var(--text-light);
   }
 }

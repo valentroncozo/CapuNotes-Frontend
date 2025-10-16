@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Container, Row, Col, Form } from 'react-bootstrap';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../../styles/miembrosEditar.css';
-import BackButton from '../utils/BackButton';
+import BackButton from '../common/BackButton';
 import Swal from 'sweetalert2';
 
 const STORAGE_KEY = 'capunotes_miembros';

@@ -1,0 +1,32 @@
+@import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
+@import "./tokens.css";
+
+/* Reset mínimo + base */
+* { box-sizing: border-box; }
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-light);
+  font-family: var(--font-sans) !important;
+}
+
+/* Accesibilidad mínima */
+:focus-visible { outline: 3px solid rgba(255,193,7,.75); outline-offset: 2px; }
+
+/* Botón primario (fallback) */
+button.btn-primary, .btn.btn-warning {
+  background: var(--accent) !important;
+  color: var(--text-dark) !important;
+  border: none !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+/* Utilidades frecuentes */
+.divisor-amarillo {
+  border: none;
+  border-top: 2px solid var(--accent);
+  border-radius: 2px;
+  margin: .5rem 0 1rem;
+}

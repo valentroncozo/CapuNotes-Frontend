@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import GenericEditPopup from "./GenericEditPopup";
-import BackButton from "../utils/BackButton";
+import BackButton from "../common/BackButton";
 import "../../styles/abmc.css";
 
 /* Iconitos inline (SVG) */

@@ -3,7 +3,7 @@ import { Button, Container, Form } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/miembrosAgregar.css';
-import BackButton from '../utils/BackButton';
+import BackButton from '../common/BackButton';
 
 const STORAGE_KEY = 'capunotes_miembros';
 const AREAS_KEY = 'capunotes_areas';

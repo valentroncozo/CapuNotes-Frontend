@@ -1,10 +1,10 @@
 // src/components/popUp/AreaEditPopup.jsx
 import { useEffect, useMemo, useState } from "react";
-import Modal from "../utils/Modal.jsx";
+import Modal from "../common/Modal.jsx";
 import "../../styles/popup.css";
 
 // ✅ validador centralizado
-import { validateAreaFields, hasErrors } from "../utils/validators";
+import { validateAreaFields, hasErrors } from "../common/validators.js";
 
 export default function AreaEditPopup({ isOpen, onClose, area, onSave }) {
   const initial = useMemo(

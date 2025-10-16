@@ -1,27 +1,20 @@
-/* === FUENTE GLOBAL === */
-@import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
-@import url('./nav-bar.css');
+/* src/styles/principal.css */
+@import url("./nav-bar.css");
 
-/* --- Variables globales --- */
+/* Usa variables de tokens globales */
 :root {
-  --bg: #11103a;
-  --accent: #f3a21d;
-  --card: #b3cdfa;
-  --text-light: #e8eaed;
-  --text-dark: #202124;
-  --shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  --radius: 16px;
-  --font: "Manjari", "Segoe UI", sans-serif;
+  /* Nada acá: las variables vienen de styles/tokens.css */
+  /* Placeholder variable to avoid an empty ruleset; actual tokens are defined in styles/tokens.css */
+  --capunotes-root-placeholder: 1;
 }
 
-/* --- Estructura general --- */
-html,
-body {
+/* Estructura general */
+html, body {
   margin: 0;
   padding: 0;
   background-color: var(--bg);
   color: var(--text-light);
-  font-family: var(--font);
+  font-family: var(--font-sans);
   overflow-x: hidden;
 }
 
@@ -40,52 +33,24 @@ body {
   cursor: default;
 }
 
-
-
-/* --- Contenedor principal --- */
+/* Contenedor principal */
 .home-container {
-  padding: 0 2rem 2rem 2rem; /* 🟡 más aire lateral */
+  padding: 0 2rem 2rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-/* --- Bienvenida --- */
+/* Bienvenida */
 .welcome {
-  background-color: #11103a;
+  background-color: var(--bg);
   padding: 1.5rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   text-align: center;
 }
 
-.welcome-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.welcome-logo {
-  width: 70px;
-  height: 70px;
-  object-fit: contain;
-}
-
-.welcome-texts h2 {
-  font-weight: 700;
-  margin: 0;
-  font-size: 1.4rem;
-}
-
-.welcome-texts p {
-  font-size: 0.95rem;
-  margin: 0;
-  color: #d4d7dd;
-}
-
-/* --- Línea divisoria --- */
+/* Línea divisoria (usa util global) */
 .divisor-amarillo {
   border: none;
   border-top: 2px solid var(--accent);
@@ -93,7 +58,7 @@ body {
   margin: 0.5rem 0 1rem 0;
 }
 
-/* --- Sección de eventos --- */
+/* Sección de eventos */
 .eventos-section {
   display: flex;
   flex-direction: column;
@@ -108,10 +73,10 @@ body {
   text-align: center;
 }
 
-/* --- Scroll horizontal de eventos --- */
+/* Scroll horizontal de eventos */
 .eventos-scroll {
   display: flex;
-  justify-content: flex-start; /* 🟡 alineado a la izquierda */
+  justify-content: flex-start;
   gap: 1rem;
   overflow-x: auto;
   padding-bottom: 0.5rem;
@@ -119,12 +84,11 @@ body {
   scrollbar-width: thin;
 }
 
-/* --- Card individual de evento --- */
-/* --- Card individual de evento --- */
+/* Card individual de evento */
 .evento-card {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* alineado a la izquierda */
+  align-items: flex-start;
   text-align: left;
   gap: 0.6rem;
   background-color: var(--card);
@@ -135,18 +99,14 @@ body {
   padding: 1.2rem 1rem;
   flex-shrink: 0;
   scroll-snap-align: start;
-  /* 🔹 Ya no necesitamos transición de movimiento */
   transition: background-color 0.2s ease;
 }
 
-/* --- Hover sin movimiento --- */
 .evento-card:hover {
-  /* ❌ transform: translateY(-3px); */
-  background-color: #c6d9ff; /* opcional: leve aclarado al hover */
+  background-color: #c6d9ff; /* leve aclarado */
 }
 
-
-/* --- Título de evento --- */
+/* Título de evento */
 .evento-card h5 {
   font-weight: 700;
   font-size: 1.1rem;
@@ -156,11 +116,11 @@ body {
   text-align: center;
 }
 
-/* --- Ícono + texto alineados --- */
+/* Ícono + texto alineados */
 .evento-info {
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* 🟡 ícono + texto a la izquierda */
+  justify-content: flex-start;
   gap: 0.5rem;
   font-size: 0.95rem;
   color: var(--text-dark);
@@ -173,7 +133,7 @@ body {
   flex-shrink: 0;
 }
 
-/* --- Tareas principales --- */
+/* Tareas principales */
 .tareas-section {
   display: flex;
   flex-direction: column;
@@ -198,15 +158,13 @@ body {
   cursor: pointer;
 }
 
-/* --- Hover mejorado --- */
 .tarea-card:hover {
-  background-color: var(--accent); /* 🟡 color acento */
-  color: var(--text-light); /* texto claro */
+  background-color: var(--accent);
+  color: var(--text-light);
   transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4); /* sombra más visible */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-/* Ícono dentro de tarea-card */
 .tarea-icon {
   font-size: 1.8rem;
   color: var(--text-dark);
@@ -214,13 +172,11 @@ body {
   transition: color 0.25s ease;
 }
 
-/* Al pasar el mouse, también cambia el color del ícono */
 .tarea-card:hover .tarea-icon {
   color: var(--text-light);
 }
 
-
-/* --- Responsivo --- */
+/* Responsivo */
 @media (max-width: 768px) {
   .home-container {
     padding: 0 1rem 2rem 1rem;

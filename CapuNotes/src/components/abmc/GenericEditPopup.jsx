@@ -1,6 +1,6 @@
 // src/components/abmc/GenericEditPopup.jsx
 import { useEffect, useState } from "react";
-import Modal from "../utils/Modal";
+import Modal from "../common/Modal";
 import "../../styles/popup.css";
 import Swal from "sweetalert2";
 

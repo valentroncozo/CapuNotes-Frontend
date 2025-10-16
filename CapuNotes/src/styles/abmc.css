@@ -1,27 +1,11 @@
 /* src/styles/abmc.css */
 
-/* Paleta */
-:root {
-  --primary-color: #11103a;
-  --secondary-color: #ffc107;
-  --terciary-color: #b3cdfa;
-  --primary-text-color: #E8EAED;
-  --secondary-text-color: #202124;
-
-  --radius-card: 16px;      /* radio del card contenedor */
-  --shadow: 0 4px 14px rgba(0,0,0,.35);
-
-  --row-dark: #1f1e46;
-  --row-darker: #24224f;
-  --row-hover: #2a285e;
-}
-
-/* Página y card contenedor */
 .abmc-page {
   min-height: 100vh;
-  background: var(--primary-color);
-  color: var(--primary-text-color);
+  background: var(--bg);
+  color: var(--text-light);
   padding: 24px;
+  font-family: var(--font-sans);
 }
 
 .abmc-card {
@@ -29,7 +13,7 @@
   width: min(980px, 96vw);
   background: #0f1036;
   border: 1px solid rgba(255,255,255,.08);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 20px;
 }
@@ -70,16 +54,17 @@
 .abmc-select {
   flex: 1 1 200px;
   background: rgba(255,255,255,.08);
-  color: var(--primary-text-color);
+  color: var(--text-light);
   border: 1px solid rgba(255,255,255,.15);
   border-radius: 12px;
   padding: 10px 12px;
   outline: none;
+  font-family: var(--font-sans);
 }
 .abmc-input::placeholder { color: rgba(232,234,237,.75); }
 .abmc-input:focus,
 .abmc-select:focus {
-  border-color: var(--terciary-color);
+  border-color: var(--card);
   box-shadow: 0 0 0 3px rgba(179,205,250,.25);
 }
 
@@ -91,18 +76,19 @@
   font-weight: 700;
   cursor: pointer;
   transition: .15s ease;
+  font-family: var(--font-sans);
 }
 .abmc-btn-primary {
-  background: var(--secondary-color);
-  color: var(--secondary-text-color);
+  background: var(--accent);
+  color: var(--text-dark);
   box-shadow: var(--shadow);
 }
 .abmc-btn-primary:hover { filter: brightness(.95); }
 
 /* Botones icono (editar/eliminar) */
 .abmc-btn-icon {
-  background: var(--secondary-color);
-  color: var(--secondary-text-color);
+  background: var(--accent);
+  color: var(--text-dark);
   padding: 8px 10px;
   border-radius: 10px;
   display: inline-flex;
@@ -114,54 +100,30 @@
 }
 .abmc-btn-icon:hover { filter: brightness(.95); }
 
-/* Tabla rectangular (sin puntas redondeadas) */
-.abmc-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 12px; /* separa las filas como tarjetas */
-}
+/* Tabla rectangular con filas separadas como cards */
+.abmc-table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
 
-/* Header rectangular y prolijo */
 .abmc-thead th {
-  background: var(--terciary-color);
-  color: var(--secondary-text-color);
+  background: var(--card);
+  color: var(--text-dark);
   font-weight: 700;
   padding: 12px 14px;
   text-align: left;
-
-  /* 🔧 SIN bordes redondeados */
   border-radius: 0 !important;
 }
 
-/* Filas alternadas (oscuro/menos oscuro) */
-.abmc-row {
-  color: var(--primary-text-color);
-  background: var(--row-dark);
-}
-.abmc-row:nth-child(even) { background: var(--row-darker); }
+/* Filas alternadas */
+.abmc-row { color: var(--text-light); background: #1f1e46; }
+.abmc-row:nth-child(even) { background: #24224f; }
+.abmc-row td { padding: 14px; vertical-align: middle; }
+.abmc-row:hover { background: #2a285e; }
 
-.abmc-row td {
-  padding: 14px;
-  vertical-align: middle;
-}
-
-/* Hover */
-.abmc-row:hover { background: var(--row-hover); }
-
-/* 🔧 Sin redondeo en celdas de filas */
+/* Sin redondeo en extremos */
 .abmc-row td:first-child,
-.abmc-row td:last-child {
-  border-radius: 0 !important;
-}
+.abmc-row td:last-child { border-radius: 0 !important; }
 
 /* Acciones */
-.abmc-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-start;
-}
+.abmc-actions { display: flex; gap: 8px; justify-content: flex-start; }
 
-/* Responsivo */
-@media (max-width: 640px) {
-  .abmc-actions { flex-wrap: wrap; }
-}
+/* Responsive */
+@media (max-width: 640px) { .abmc-actions { flex-wrap: wrap; } }

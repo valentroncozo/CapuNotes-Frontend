@@ -1,0 +1,16 @@
+/* Design tokens unificados */
+:root {
+  /* Colores base */
+  --bg: #11103a;
+  --accent: #ffc107;
+  --card: #b3cdfa;
+  --text-light: #E8EAED;
+  --text-dark: #202124;
+
+  /* Layout / efectos */
+  --radius: 16px;
+  --shadow: 0 4px 14px rgba(0,0,0,.35);
+
+  /* Tipografía */
+  --font-sans: 'Manjari', 'Segoe UI', system-ui, sans-serif;
+}

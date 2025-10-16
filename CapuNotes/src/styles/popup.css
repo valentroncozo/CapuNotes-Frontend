@@ -1,18 +1,7 @@
-/* === TIPOGRAFÍA GLOBAL === */
+/* src/styles/popup.css */
 @import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
-@import url('./nav-bar.css');
-/* === VARIABLES DE COLOR === */
-:root {
-  --color-primario: #11103a;   /* Fondo */
-  --color-secundario: #ffc107; /* Amarillo (botón principal y detalles) */
-  --color-terciario: #b3cdfa;  /* Cards / botones secundarios */
-  --text-light: #E8EAED;
-  --text-dark: #202124;
-  --radius: 16px;
-  --shadow: 0 4px 14px rgba(0,0,0,.35);
-}
 
-/* === BACKDROP === */
+/* Usa tokens globales (colors, radius, shadow, font) */
 .pop-backdrop {
   position: fixed;
   inset: 0;
@@ -23,27 +12,23 @@
   padding: 24px;
 }
 
-/* === CONTENEDOR DEL POPUP === */
 .pop-dialog {
   width: min(560px, 96vw);
-  background: var(--color-primario);
+  background: var(--bg);
   color: var(--text-light);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   overflow: hidden;
-  font-family: "Manjari", sans-serif;
+  font-family: var(--font-sans);
 }
 
-/* === HEADER === */
 .pop-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px 18px;
-
-  /* Línea divisoria en color secundario */
-  border-bottom: 2px solid var(--color-secundario);
+  border-bottom: 2px solid var(--accent);
 }
 
 .pop-title {
@@ -62,15 +47,10 @@
   border-radius: 10px;
   transition: all 0.15s;
 }
-.icon-btn:hover {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.08);
-}
+.icon-btn:hover { opacity: 1; background: rgba(255, 255, 255, 0.08); }
 
-/* === BODY Y FOOTER === */
-.pop-body {
-  padding: 18px;
-}
+.pop-body { padding: 18px; }
+
 .pop-footer {
   display: flex;
   justify-content: flex-end;
@@ -79,46 +59,35 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* === BOTONES === */
+/* Botones coherentes con tokens */
 .btn {
   border: none;
   border-radius: var(--radius);
   padding: 10px 18px;
   font-weight: 700;
-  font-family: inherit;
+  font-family: var(--font-sans);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
-/* BOTÓN PRINCIPAL → amarillo #ffc107 con texto oscuro */
 .btn-primary {
-  background: var(--color-secundario) !important;
+  background: var(--accent) !important;
   color: var(--text-dark) !important;
   box-shadow: var(--shadow);
-  border: none !important;
 }
-.btn-primary:hover {
-  filter: brightness(0.95);
-}
-.btn-primary:active {
-  filter: brightness(0.9);
-}
+.btn-primary:hover { filter: brightness(0.95); }
+.btn-primary:active { filter: brightness(0.9); }
 
-/* BOTÓN SECUNDARIO → borde y texto color terciario */
 .btn-secondary {
   background: transparent !important;
-  color: var(--color-terciario) !important;
-  border: 2px solid var(--color-terciario) !important;
+  color: var(--card) !important;
+  border: 2px solid var(--card) !important;
 }
-.btn-secondary:hover {
-  background: rgba(179, 205, 250, 0.1);
-}
+.btn-secondary:hover { background: rgba(179, 205, 250, 0.1); }
 
-/* === FORMULARIO === */
-.form-grid {
-  display: grid;
-  gap: 16px;
-}
+/* Form grid */
+.form-grid { display: grid; gap: 16px; }
+
 .field label {
   display: block;
   margin-bottom: 6px;
@@ -126,6 +95,7 @@
   color: var(--text-light);
   opacity: 0.9;
 }
+
 .input,
 textarea.input {
   width: 100%;
@@ -134,16 +104,14 @@ textarea.input {
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius);
   padding: 10px 12px;
-  font-family: inherit;
+  font-family: var(--font-sans);
   outline: none;
   resize: vertical;
 }
 .input:focus,
 textarea.input:focus {
-  border-color: var(--color-terciario);
+  border-color: var(--card);
   box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25);
 }
 .input::placeholder,
-textarea.input::placeholder {
-  color: rgba(232, 234, 237, 0.6);
-}
+textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }

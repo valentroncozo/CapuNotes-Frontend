@@ -1,7 +1,7 @@
 // src/components/abmc/EntityEditForm.jsx
 import { useEffect, useState } from "react";
-import Modal from "../utils/Modal";
-import { required, maxLength, hasErrors } from "../utils/validators";
+import Modal from "../common/Modal";
+import { required, maxLength, hasErrors } from "../common/validators";
 
 export default function EntityEditForm({ isOpen, onClose, entityName, schema, entity, onSave }) {
   const [formData, setFormData] = useState({});
