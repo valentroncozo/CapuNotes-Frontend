@@ -1,0 +1,200 @@
+
+body .abmc-input,
+body .abmc-select {
+  flex: 1 1 200px;
+  background: rgba(255,255,255,.08);
+  color: var(--text-light);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+  font-family: var(--font-sans);
+}
+
+body .abmc-input::placeholder { color: rgba(232,234,237,.75); }
+body .abmc-input:focus,
+body .abmc-input:active,
+body .abmc-select:active,
+body .abmc-select:focus {
+  color: var(--text-light);
+  border-color: var(--card) !important;
+  background: rgba(255,255,255,.08) !important;
+  box-shadow: 0 0 0 3px rgba(179,205,250,.25) !important;
+}
+
+body .abmc-select option {
+  background: var(--bg);
+  color: var(--text-light);
+}
+
+
+body .abmc-select:focus {
+  color: var(--pr) !important;
+  border-color: var(--card) !important;
+  background: rgba(255,255,255,.08) !important;
+  box-shadow: 0 0 0 3px rgba(179,205,250,.25) !important;
+}
+
+/* Botones */
+body .abmc-btn {
+
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 700 !important;
+  cursor: pointer;
+  transition: .15s ease;
+  font-family: var(--font-sans);
+}
+
+body .abmc-btn-primary {
+  background: var(--accent);
+  color: var(--text-dark);
+  box-shadow: var(--shadow);
+}
+
+body.abmc-btn-primary:hover { filter: brightness(.95); }
+
+.btn {
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--accent) !important;
+  color: var(--text-dark) !important;
+  box-shadow: var(--shadow);
+}
+.btn-primary:hover { filter: brightness(0.95); }
+.btn-primary:active { filter: brightness(0.9); }
+
+.btn-secondary {
+  background: transparent !important;
+  color: var(--card) !important;
+  border: 2px solid var(--card) !important;
+}
+.btn-secondary:hover { background: rgba(179, 205, 250, 0.1); }
+
+/* Form grid */
+.form-grid { display: grid; gap: 16px; }
+
+.field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  opacity: 0.9;
+}
+
+.input,
+textarea.input {
+  width: 100%;
+  background: #0f1036;
+  color: var(--text-light);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-family: var(--font-sans);
+  outline: none;
+  resize: vertical;
+}
+.input:focus,
+textarea.input:focus {
+  border-color: var(--card);
+  box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25);
+}
+.input::placeholder,
+textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
+
+.form-group-miembro {
+  padding: 2.5rem 0rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  height: 3rem;
+}
+
+.btn-close {
+  background: none !important;
+  border: none !important;
+  width: 1.2rem;
+  height: 1.2rem;
+  position: relative;
+  opacity: 1 !important;
+}
+
+/* Crear la X blanca manualmente */
+.btn-close::before,
+.btn-close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.2rem;
+  height: 2px;
+  background-color: #E8EAED; /* blanco */
+  transform-origin: center;
+}
+
+.btn-close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.btn-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* Quita el SVG original de Bootstrap */
+.btn-close svg,
+.btn-close::after svg {
+  display: none !important;
+}
+
+/* --- ACCIONES --- */
+.btn-accion {
+  background: var(--color-accent) !important;
+  color: black !important;
+  border: none !important;
+  border-radius: 12px;
+  padding: 6px 10px;
+  transition: transform 0.2s;
+}
+
+.btn-accion:hover {
+  background-color: #e0a800 !important; /* Tono más oscuro del botón al hacer hover */
+  transform: scale(1.05);
+}
+
+.btn-accion.eliminar {
+  background: var(--color-danger) !important;
+  color: white !important;
+}
+
+.btn-accion.eliminar:hover {
+  background: var(--color-danger-dark) !important;
+  transform: scale(1.1);
+}
+
+/* --- BOTONES PRINCIPALES (Bootstrap + personalizados) --- */
+.btn-agregar {
+  background-color: var(--color-accent) !important; /* amarillo principal */
+  border: none !important;
+  border-radius: 20px !important;
+  padding: 0.5rem 1.2rem !important;
+  color: #fff !important;
+  font-weight: 500 !important;
+  font-family: 'Manjari', sans-serif;
+  transition: background-color 0.2s ease, transform 0.2s ease !important;}
+
+.btn-agregar:hover {
+  background-color: #e0a800 !important; /* tono más oscuro del amarillo */
+  color: #fff !important;
+  transform: scale(1.05) !important;
+}
+

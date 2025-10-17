@@ -1,0 +1,52 @@
+/* Tabla rectangular con filas separadas como cards */
+.abmc-table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
+
+.abmc-thead th {
+  text-align: center;
+  background: var(--card);
+  color: var(--text-dark);
+  font-weight: 700;
+  padding: 12px 14px;
+  text-align: left;
+  border-radius: 0 !important;
+}
+
+/* Filas alternadas */
+.abmc-row { color: var(--text-light); background: #1f1e46; }
+.abmc-row:nth-child(even) { background: #24224f; }
+.abmc-row td { padding: 14px; vertical-align: middle; }
+.abmc-row:hover { background: #2a285e; }
+
+/* Sin redondeo en extremos */
+.abmc-row td:first-child,
+.abmc-row td:last-child { border-radius: 0 !important; }
+
+
+
+/* Acciones */
+.abmc-actions { display: flex; gap: 8px; justify-content: center; }
+
+/* Responsive */
+@media (width < 460px) { 
+  .abmc-actions { flex-wrap: wrap !important; }
+
+.abmc-row td,th {
+  text-align: center;
+  min-width: 0;                 /* permite que el item se reduzca dentro del flex */
+  overflow-wrap: break-word;
+}
+
+  .abmc-row td:nth-child(4) { display: none; }
+
+  .abmc-row th:nth-child(4) { display: none; }
+
+ }
+
+
+ @media (width < 408px) { 
+  .abmc-row td:nth-child(3) { display: none; }
+
+  .abmc-row th:nth-child(3) { display: none; }
+
+ }
+

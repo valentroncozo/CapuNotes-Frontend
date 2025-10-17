@@ -10,6 +10,9 @@ import Principal from "@/components/pages/principal/index.jsx";
 import Cuerdas from "@/components/pages/cuerdas/index.jsx";
 import Areas from "@/components/pages/areas/index.jsx";
 import Miembros from "@/components/pages/miembros/index.jsx";
+import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
+import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
+
 
 // Estilos base (usar globals como fuente de verdad)
 import "@/styles/globals.css";
@@ -51,8 +54,10 @@ function AppRoutes() {
         <Route index element={<Navigate to="/principal" replace />} />
         <Route path="principal" element={<Principal username={username} />} />
         <Route path="miembros" element={<Miembros />} />
+        <Route path="miembros/agregar" element={<MiembrosAgregar />} />
+        <Route path="miembros/editar" element={<MiembrosEditar />} />
         <Route path="cuerdas" element={<Cuerdas />} />
-        <Route path="organizacion-coro" element={<Areas />} />
+        <Route path="areas" element={<Areas />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/principal" replace />} />

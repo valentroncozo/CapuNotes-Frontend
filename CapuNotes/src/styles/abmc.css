@@ -1,4 +1,8 @@
 /* src/styles/abmc.css */
+@import url('./forms.css');
+@import url('./table.css');
+
+
 
 .abmc-page {
   min-height: 100vh;
@@ -23,19 +27,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  justify-content: center;
+  justify-content: flex-end;
   position: relative;
   margin-bottom: 14px;
-}
-.abmc-header .back-button {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 /* Título */
 .abmc-title {
+  flex: 2;
   margin: 0;
   font-weight: 700;
   text-align: center;
@@ -46,85 +45,45 @@
 .abmc-topbar {
   display: flex;
   align-items: center;
+  justify-content: center;
+  align-content: center;
   gap: 8px;
   margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
-.abmc-input,
-.abmc-select {
-  flex: 1 1 200px;
-  background: rgba(255,255,255,.08);
-  color: var(--text-light);
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 12px;
-  padding: 10px 12px;
-  outline: none;
-  font-family: var(--font-sans);
-}
-.abmc-input::placeholder { color: rgba(232,234,237,.75); }
-.abmc-input:focus,
-.abmc-select:focus {
-  border-color: var(--card);
-  box-shadow: 0 0 0 3px rgba(179,205,250,.25);
+
+.form-group-agregar {
+  width: 90%;
+  height: auto;
+  display: flex;
+  gap: 0.8rem;
+  flex: row;
+  flex-wrap: wrap;
 }
 
-/* Botones */
-.abmc-btn {
-  border: none;
-  border-radius: 12px;
-  padding: 10px 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: .15s ease;
-  font-family: var(--font-sans);
-}
-.abmc-btn-primary {
-  background: var(--accent);
-  color: var(--text-dark);
-  box-shadow: var(--shadow);
-}
-.abmc-btn-primary:hover { filter: brightness(.95); }
-
-/* Botones icono (editar/eliminar) */
-.abmc-btn-icon {
-  background: var(--accent);
-  color: var(--text-dark);
-  padding: 8px 10px;
-  border-radius: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  min-height: 36px;
-  box-shadow: var(--shadow);
-}
-.abmc-btn-icon:hover { filter: brightness(.95); }
-
-/* Tabla rectangular con filas separadas como cards */
-.abmc-table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
-
-.abmc-thead th {
-  background: var(--card);
-  color: var(--text-dark);
-  font-weight: 700;
-  padding: 12px 14px;
-  text-align: left;
-  border-radius: 0 !important;
+.form-group-agregar label {
+  width: 100%;
 }
 
-/* Filas alternadas */
-.abmc-row { color: var(--text-light); background: #1f1e46; }
-.abmc-row:nth-child(even) { background: #24224f; }
-.abmc-row td { padding: 14px; vertical-align: middle; }
-.abmc-row:hover { background: #2a285e; }
+.form-group-agregar .abmc-select {
+  flex:3;
+}
 
-/* Sin redondeo en extremos */
-.abmc-row td:first-child,
-.abmc-row td:last-child { border-radius: 0 !important; }
+.form-group-agregar-acciones {
+  width: 90%;
+  padding-top: calc(24px + 0.8rem);
+  display: flex;
+  gap: 0.8rem;
+  flex: row;
+  flex-wrap: wrap;
+}
 
-/* Acciones */
-.abmc-actions { display: flex; gap: 8px; justify-content: flex-start; }
 
-/* Responsive */
-@media (max-width: 640px) { .abmc-actions { flex-wrap: wrap; } }
+.form-group-miembro {
+  width: 90%;
+  display: flex;
+  gap: 0.8rem;
+  flex: row;
+
+}

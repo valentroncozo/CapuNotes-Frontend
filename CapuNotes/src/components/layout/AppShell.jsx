@@ -166,9 +166,9 @@ function Menu({ orgOpen, setOrgOpen, onNavigate }) {
               Cuerdas
             </a>
             <a
-              href="/organizacion-coro"
+              href="/areas"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/organizacion-coro"); }}
+              onClick={(e) => { e.preventDefault(); onNavigate("/areas"); }}
             >
               Áreas
             </a>
