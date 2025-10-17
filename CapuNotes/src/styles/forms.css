@@ -22,6 +22,19 @@ body .abmc-select:focus {
   box-shadow: 0 0 0 3px rgba(179,205,250,.25) !important;
 }
 
+body .abmc-input[type="date"]::-webkit-calendar-picker-indicator {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  cursor: pointer;
+  opacity: 0.95;
+  /* Ajusta el filtro para el color deseado */
+  filter: invert(92%) sepia(6%) saturate(8%) hue-rotate(180deg) brightness(99%) contrast(95%);
+}
+
+
+
 body .abmc-select option {
   background: var(--bg);
   color: var(--text-light);

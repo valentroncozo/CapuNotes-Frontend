@@ -39,3 +39,23 @@ select, input, textarea{
   flex-direction: column;
 }
 
+/* === Date picker native icon (Chromium/WebKit) recolor === */
+/* Aplica un filtro para aproximar el color --accent; funciona en Chrome/Edge/Safari */
+input[type="date"].input-date::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.95;
+  /* Ajusta el filtro para el color deseado */
+  filter: invert(74%) sepia(47%) saturate(500%) hue-rotate(330deg) brightness(95%);
+}
+
+/* Añadir espacio a la derecha para que el icono no tape el texto */
+input[type="date"].input-date {
+  padding-right: 2.6rem;
+  box-sizing: border-box;
+}
+
+/* Fallback visual para navegadores que no aplican ::-webkit-calendar-picker-indicator */
+input[type="date"].input-date::placeholder {
+  color: rgba(232,234,237,0.5);
+}
+
