@@ -29,9 +29,6 @@ export default function EntityTableABMC({ title = "Miembros del coro", showBackB
     return (m.nombre || '').toLowerCase().includes(q);
   });
 
-  const handleBuscar = () => {
-    // el filtro ya aplica al vuelo, acá no hace falta nada
-  };
 
   const handleAgregar = () => {
     navigate('/miembros/agregar');
