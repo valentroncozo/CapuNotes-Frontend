@@ -43,7 +43,7 @@
   justify-content: center;
   z-index: 1;
   gap: 1.5rem;
-  padding: 2rem;
+  padding: 0rem 2rem;
   overflow: hidden;
 }
 .login-form-container > svg {
@@ -160,7 +160,7 @@ input[type="password"]::-webkit-password-toggle-button { display: none !importan
   .login-container { width: 100%; min-width: 344px; max-width: 509px; flex-direction: column; }
   .img-fondo { position: absolute; width: 100%; min-width: 344px; max-width: 509px; top:0; max-height: 50%; object-fit: cover; object-position: center; }
   .login-form-container {
-    width: 100%; max-height: 90%; max-width: 509px; min-width: 344px;
+    width: 100%; max-width: 509px; min-width: 344px;
     left: initial; bottom: 0; position: absolute; justify-content: flex-end;
     -webkit-clip-path: url(#mobile-wavy-shape-clip); clip-path: url(#mobile-wavy-shape-clip);
     background: var(--bg); display: flex; flex-direction: column; z-index: 1; gap: 1.5rem;
