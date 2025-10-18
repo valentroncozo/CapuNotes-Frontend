@@ -1,3 +1,4 @@
+/* src/styles/forms.css */
 
 body .abmc-input,
 body .abmc-select {
@@ -24,22 +25,16 @@ body .abmc-select:focus {
 
 body .abmc-input[type="date"]::-webkit-calendar-picker-indicator {
   -webkit-user-select: none !important;
-  -moz-user-select: none !important;
-  -ms-user-select: none !important;
   user-select: none !important;
   cursor: pointer;
   opacity: 0.95;
-  /* Ajusta el filtro para el color deseado */
   filter: invert(92%) sepia(6%) saturate(8%) hue-rotate(180deg) brightness(99%) contrast(95%);
 }
-
-
 
 body .abmc-select option {
   background: var(--bg);
   color: var(--text-light);
 }
-
 
 body .abmc-select:focus {
   color: var(--pr) !important;
@@ -48,9 +43,8 @@ body .abmc-select:focus {
   box-shadow: 0 0 0 3px rgba(179,205,250,.25) !important;
 }
 
-/* Botones */
+/* Botones base */
 body .abmc-btn {
-
   border: none;
   border-radius: 12px;
   padding: 10px 16px;
@@ -65,8 +59,6 @@ body .abmc-btn-primary {
   color: var(--text-dark);
   box-shadow: var(--shadow);
 }
-
-body.abmc-btn-primary:hover { filter: brightness(.95); }
 
 .btn {
   border: none;
@@ -141,8 +133,6 @@ textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
   position: relative;
   opacity: 1 !important;
 }
-
-/* Crear la X blanca manualmente */
 .btn-close::before,
 .btn-close::after {
   content: "";
@@ -151,63 +141,57 @@ textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
   left: 50%;
   width: 1.2rem;
   height: 2px;
-  background-color: #E8EAED; /* blanco */
+  background-color: #E8EAED;
   transform-origin: center;
 }
-
-.btn-close::before {
-  transform: translate(-50%, -50%) rotate(45deg);
-}
-
-.btn-close::after {
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-
-/* Quita el SVG original de Bootstrap */
+.btn-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.btn-close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
 .btn-close svg,
-.btn-close::after svg {
-  display: none !important;
-}
+.btn-close::after svg { display: none !important; }
 
-/* --- ACCIONES --- */
+/* --- ACCIONES (UNIFICADAS) --- */
 .btn-accion {
-  background: var(--color-accent) !important;
-  color: black !important;
+  background: var(--accent) !important;
+  color: var(--text-dark) !important;
   border: none !important;
   border-radius: 12px;
   padding: 6px 10px;
-  transition: transform 0.2s;
+  box-shadow: var(--shadow);
+  transition: transform .2s ease, filter .2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-
 .btn-accion:hover {
-  background-color: #e0a800 !important; /* Tono más oscuro del botón al hacer hover */
   transform: scale(1.05);
+  filter: brightness(0.95);
 }
 
+/* Eliminar (mismo estilo base, pero ícono distinto) */
 .btn-accion.eliminar {
-  background: var(--color-danger) !important;
-  color: white !important;
+  background: var(--accent) !important;
+  color: var(--text-dark) !important;
+  border: none !important;
+  box-shadow: var(--shadow);
 }
-
 .btn-accion.eliminar:hover {
-  background: var(--color-danger-dark) !important;
-  transform: scale(1.1);
+  transform: scale(1.05);
+  filter: brightness(0.9);
 }
 
-/* --- BOTONES PRINCIPALES (Bootstrap + personalizados) --- */
+/* --- BOTONES PRINCIPALES --- */
 .btn-agregar {
-  background-color: var(--color-accent) !important; /* amarillo principal */
+  background-color: var(--accent) !important;
   border: none !important;
   border-radius: 20px !important;
   padding: 0.5rem 1.2rem !important;
   color: #fff !important;
   font-weight: 500 !important;
   font-family: 'Manjari', sans-serif;
-  transition: background-color 0.2s ease, transform 0.2s ease !important;}
-
+  transition: background-color 0.2s ease, transform 0.2s ease !important;
+}
 .btn-agregar:hover {
-  background-color: #e0a800 !important; /* tono más oscuro del amarillo */
+  background-color: #e0a800 !important;
   color: #fff !important;
   transform: scale(1.05) !important;
 }
-

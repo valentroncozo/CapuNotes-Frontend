@@ -1,108 +1,139 @@
 // src/components/abmc/EntityTableABMC.jsx
-import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
-import GenericEditPopup from "./GenericEditPopup";
+import { useEffect, useMemo, useState } from "react";
 import BackButton from "../common/BackButton";
+import { PencilFill, Trash3Fill, PlusLg } from "react-bootstrap-icons";
+import Swal from "sweetalert2";
+
+import EntityEditForm from "./EntityEditForm.jsx";
 import "@/styles/abmc.css";
+import "@/styles/miembros.css";
 
-/* Iconitos inline (SVG) */
-function EditIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" {...props}>
-      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="currentColor"/>
-      <path d="M20.71 7.04a1.003 1.003 0 0 0 0-1.42L18.37 3.29a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.83z" fill="currentColor"/>
-    </svg>
-  );
-}
-function TrashIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" {...props}>
-      <path d="M6 7h12l-1 13a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 7zm3-3h6l1 2H8l1-2z" fill="currentColor"/>
-    </svg>
-  );
-}
-
+/**
+ * ABMC Genérico (versión modal)
+ */
 export default function EntityTableABMC({
-  title = "Entidad",
+  title = "Catálogo",
   service,
   schema = [],
-  uniqueBy = "nombre",
-  entityName = "registro",
+  uniqueBy = null,
+  entityName = "elemento",
   showBackButton = true,
 }) {
   const [items, setItems] = useState([]);
-  const [nuevo, setNuevo] = useState({});
-  const [filtro, setFiltro] = useState("");
-  const [editOpen, setEditOpen] = useState(false);
-  const [selected, setSelected] = useState(null);
+  const [q, setQ] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const load = async () => {
-    const data = await service.list();
-    setItems(Array.isArray(data) ? data : []);
+  // Popup state
+  const [isOpen, setIsOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const list = await service.list();
+        if (mounted) setItems(Array.isArray(list) ? list : []);
+      } catch {
+        if (mounted) setItems([]);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [service]);
+
+  const visibleFields = useMemo(
+    () => schema.filter((f) => f.type !== "submit" && f.type !== "button"),
+    [schema]
+  );
+
+  const filtrados = useMemo(() => {
+    if (!q) return items;
+    const t = q.toLowerCase();
+    return items.filter((row) =>
+      visibleFields.some((f) =>
+        String(row?.[f.key] ?? "").toLowerCase().includes(t)
+      )
+    );
+  }, [items, q, visibleFields]);
+
+  const openAdd = () => {
+    setEditing(null);
+    setIsOpen(true);
+  };
+  const openEdit = (row) => {
+    setEditing(row);
+    setIsOpen(true);
+  };
+  const closeModal = () => {
+    setIsOpen(false);
+    setEditing(null);
   };
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
-
-  const handleChangeNuevo = (e) => {
-    const { name, value } = e.target;
-    setNuevo((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const missingRequiredLabels = (obj) => {
-    const labels = [];
-    for (const f of schema) {
-      if (f.required && !String(obj[f.key] ?? "").trim()) labels.push(f.label);
-    }
-    return labels;
-  };
-
-  const isDuplicate = (obj) => {
+  const isDuplicate = (payload) => {
     if (!uniqueBy) return false;
-    const base = String(obj[uniqueBy] ?? "").trim().toLowerCase();
-    if (!base) return false;
-    return items.some((it) => String(it[uniqueBy] ?? "").toLowerCase() === base);
-  };
-
-  const showMissingAlert = (labels) => {
-    const list = labels.map((l) => `<li>${l}</li>`).join("");
-    Swal.fire({
-      icon: "warning",
-      title: "Campos obligatorios",
-      html: `<p>Completá los campos requeridos:</p><ul style="text-align:left;margin:0 auto;max-width:300px">${list}</ul>`,
-      confirmButtonText: "OK",
-      background: "#11103a",
-      color: "#E8EAED",
-      confirmButtonColor: "#7c83ff",
+    const keys = Array.isArray(uniqueBy) ? uniqueBy : [uniqueBy];
+    const normalized = (v) => String(v ?? "").trim().toLowerCase();
+    return items.some((it) => {
+      if (payload.id && it.id === payload.id) return false;
+      return keys.every((k) => normalized(it[k]) === normalized(payload[k]));
     });
   };
 
-  const handleAgregar = async (e) => {
-    e.preventDefault();
+  const handleSave = async (data) => {
+    try {
+      if (isDuplicate(data)) {
+        await Swal.fire({
+          icon: "warning",
+          title: "Ya existe",
+          text: `Ya existe ${entityName} con ese/estos dato(s) único(s).`,
+          background: "#11103a",
+          color: "#E8EAED",
+        });
+        return;
+      }
 
-    const missing = missingRequiredLabels(nuevo);
-    if (missing.length) return showMissingAlert(missing);
-
-    if (isDuplicate(nuevo)) {
-      Swal.fire({
-        icon: "warning",
-        title: "Duplicado",
-        text: `Ya existe un registro con ese ${uniqueBy}.`,
+      if (editing) {
+        const updated = await service.update({ ...editing, ...data });
+        setItems((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
+        await Swal.fire({
+          icon: "success",
+          title: "Cambios guardados",
+          timer: 1200,
+          showConfirmButton: false,
+          background: "#11103a",
+          color: "#E8EAED",
+        });
+      } else {
+        const created = await service.create(data);
+        setItems((prev) => [...prev, created]);
+        await Swal.fire({
+          icon: "success",
+          title: "Registrado",
+          timer: 1200,
+          showConfirmButton: false,
+          background: "#11103a",
+          color: "#E8EAED",
+        });
+      }
+    } catch (e) {
+      await Swal.fire({
+        icon: "error",
+        title: "Ups",
+        text: e?.message || "No se pudo guardar.",
         background: "#11103a",
         color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
       });
-      return;
     }
-
-    await service.create(nuevo);
-    setNuevo({});
-    load();
   };
 
-  const handleEliminar = async (id, displayName) => {
-    const res = await Swal.fire({
-      title: `¿Eliminar ${displayName}?`,
-      text: "Esta acción no se puede deshacer.",
+  const handleDelete = async (row) => {
+    const confirm = await Swal.fire({
+      title: `¿Eliminar ${entityName}?`,
+      text: row?.nombre || "Se quitará de la lista.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#ffc107",
@@ -112,32 +143,19 @@ export default function EntityTableABMC({
       background: "#11103a",
       color: "#E8EAED",
     });
-    if (!res.isConfirmed) return;
-    await service.remove(id);
-    load();
+    if (!confirm.isConfirmed) return;
+
+    await service.remove(row.id);
+    setItems((prev) => prev.filter((x) => x.id !== row.id));
+    await Swal.fire({
+      icon: "success",
+      title: "Eliminado",
+      timer: 1000,
+      showConfirmButton: false,
+      background: "#11103a",
+      color: "#E8EAED",
+    });
   };
-
-  const handleEditSave = async (updated) => {
-    await service.update(updated);
-    load();
-  };
-
-  // Campos visibles en la tabla (excluir controles: button, submit, label)
-  const visibleFields = schema.filter(
-    (f) => !["button", "submit", "label"].includes(f.type)
-  );
-
-  const columnas = visibleFields.map((f) => f.label);
-
-  const filtrados = items.filter((i) => {
-    if (!filtro) return true;
-    const q = filtro.toLowerCase();
-    return visibleFields.some((f) =>
-      String(i[f.key] ?? "").toLowerCase().includes(q)
-    );
-  });
-
-  const displayKey = uniqueBy || schema[0]?.key;
 
   return (
     <main className="abmc-page">
@@ -147,135 +165,83 @@ export default function EntityTableABMC({
           <h1 className="abmc-title">{title}</h1>
         </div>
 
-        <form className="abmc-topbar" onSubmit={handleAgregar}>
-          {schema.map((f) =>
-            f.type === "select" ? (
-              <select
-                key={f.key}
-                name={f.key}
-                value={nuevo[f.key] || ""}
-                onChange={handleChangeNuevo}
-                className="abmc-select"
-                aria-label={f.label}
-              >
-                <option value="">{f.label}</option>
-                {(f.options || []).map((opt) => {
-                  const value = opt.value ?? opt;
-                  const label = opt.label ?? opt;
-                  return (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  );
-                })}
-              </select>
-            ) : f.type === "text" ? (
-              <input
-                key={f.key}
-                type={f.type || "text"}
-                name={f.key}
-                placeholder={f.label}
-                value={nuevo[f.key] || ""}
-                onChange={handleChangeNuevo}
-                className="abmc-input"
-                aria-label={f.label}
-              />
-            ) : f.type === "button" ? (
-              <button
-                key={f.key}
-                type="button"
-                onClick={f.handler}
-                className={`abmc-btn abmc-btn-${f.key}`}
-              >
-                {f.label}
-              </button>
-            ) :   f.type === "submit" ? (
-              <button type="submit" className="abmc-btn abmc-btn-primary">
-                {f.label}
-              </button>
-            ) : f.type === "label" ? (
-              <label key={f.key} className="abmc-label">{f.label}</label>
-          ) : null
-        )}
-        </form>
-
-        <div className="abmc-topbar" style={{ marginTop: 0 }}>
+        <div className="abmc-topbar">
           <input
             type="text"
-            placeholder="Buscar..."
-            value={filtro}
-            onChange={(e) => setFiltro(e.target.value)}
             className="abmc-input"
-            aria-label="Buscar"
+            placeholder={`Buscar ${entityName}...`}
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
           />
+
+          <button
+            className="abmc-btn abmc-btn-primary"
+            onClick={openAdd}
+            title={`Agregar ${entityName}`}
+          >
+            <PlusLg className="me-1" /> Agregar
+          </button>
         </div>
 
         <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
-            <tr>
-              {columnas.map((c) => (
-                <th key={c}>{c}</th>
+            <tr className="abmc-row">
+              {visibleFields.map((f) => (
+                <th key={f.key}>{f.label}</th>
               ))}
-              <th>Acciones</th>
+              <th style={{ textAlign: "center" }}>Acciones</th>
             </tr>
           </thead>
+
           <tbody>
-            {filtrados.length === 0 && (
+            {loading && (
               <tr className="abmc-row">
-                <td colSpan={columnas.length + 1} style={{ textAlign: "center" }}>
-                  No hay registros
-                </td>
+                <td colSpan={visibleFields.length + 1}>Cargando...</td>
               </tr>
             )}
 
-            {filtrados.map((item) => (
-              <tr key={item.id} className="abmc-row">
-                {visibleFields.map((f) => (
-                  <td key={f.key}>{item[f.key] ?? "—"}</td>
-                ))}
-                <td>
-                  <div className="abmc-actions">
-                    <button
-                      type="button"
-                      className="abmc-btn abmc-btn-icon"
-                      title="Editar"
-                      aria-label="Editar"
-                      onClick={() => {
-                        setSelected(item);
-                        setEditOpen(true);
-                      }}
-                    >
-                      <EditIcon />
-                    </button>
-                    <button
-                      type="button"
-                      className="abmc-btn abmc-btn-icon"
-                      title="Eliminar"
-                      aria-label="Eliminar"
-                      onClick={() =>
-                        handleEliminar(item.id, String(item[displayKey] ?? entityName))
-                      }
-                    >
-                      <TrashIcon />
-                    </button>
-                  </div>
-                </td>
+            {!loading && filtrados.length === 0 && (
+              <tr className="abmc-row">
+                <td colSpan={visibleFields.length + 1}>Sin registros</td>
               </tr>
-            ))}
+            )}
+
+            {!loading &&
+              filtrados.map((row) => (
+                <tr className="abmc-row" key={row.id}>
+                  {visibleFields.map((f) => (
+                    <td key={f.key}>{String(row?.[f.key] ?? "-")}</td>
+                  ))}
+                  <td className="abmc-actions">
+                    <button
+                      className="btn-accion me-2"
+                      onClick={() => openEdit(row)}
+                      title="Editar"
+                    >
+                      <PencilFill size={18} />
+                    </button>
+                    <button
+                      className="btn-accion eliminar"
+                      onClick={() => handleDelete(row)}
+                      title="Eliminar"
+                    >
+                      <Trash3Fill size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
 
-      {editOpen && (
-        <GenericEditPopup
-          isOpen={editOpen}
-          onClose={() => setEditOpen(false)}
-          entityName={entityName}
-          schema={schema}
-          entity={selected}
-          onSave={handleEditSave}
-        />
-      )}
+      <EntityEditForm
+        isOpen={isOpen}
+        onClose={closeModal}
+        entityName={entityName}
+        schema={visibleFields}
+        entity={editing}
+        onSave={handleSave}
+      />
     </main>
   );
 }

@@ -2,6 +2,7 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "@/styles/offcanvas.css";
+import AccordionMenu from "./AccordionMenu.jsx";
 
 /* Ícono de cierre (X) */
 function CloseIcon(props) {
@@ -40,6 +41,7 @@ export default function AppShell({ onLogout }) {
   const [open, setOpen] = useState(false);
   const [orgOpen, setOrgOpen] = useState(false);
   const [gearOpen, setGearOpen] = useState(false);
+  const [audOpen, setAudOpen] = useState(false); // acordeón Audiciones
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
@@ -114,12 +116,14 @@ export default function AppShell({ onLogout }) {
           <Menu
             orgOpen={orgOpen}
             setOrgOpen={setOrgOpen}
+            audOpen={audOpen}
+            setAudOpen={setAudOpen}
             onNavigate={handleNavigate}
           />
         </div>
       </div>
 
-      {/* 👇 Overlay para cerrar al click fuera del drawer */}
+      {/* Overlay para cerrar al click fuera del drawer */}
       {open && (
         <div
           className="drawer-backdrop"
@@ -135,7 +139,7 @@ export default function AppShell({ onLogout }) {
   );
 }
 
-function Menu({ orgOpen, setOrgOpen, onNavigate }) {
+function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
   return (
     <div className="appshell-menu">
       <a
@@ -146,43 +150,34 @@ function Menu({ orgOpen, setOrgOpen, onNavigate }) {
         Inicio
       </a>
 
-      <div className="appshell-accordion-outer">
-        <button
-          className={`appshell-accordion-trigger ${orgOpen ? "open" : ""}`}
-          onClick={() => setOrgOpen((v) => !v)}
-          aria-expanded={orgOpen}
-        >
-          Organización del Coro
-          <span className="appshell-accordion-caret">{orgOpen ? "▴" : "▾"}</span>
-        </button>
+      {/* Acordeón reutilizable: Organización del Coro */}
+      <AccordionMenu
+        title="Organización del Coro"
+        open={orgOpen}
+        setOpen={setOrgOpen}
+        onNavigate={onNavigate}
+        items={[
+          { label: "Cuerdas", path: "/cuerdas" },
+          { label: "Áreas", path: "/areas" },
+          { label: "Miembros", path: "/miembros" },
+        ]}
+      />
 
-        {orgOpen && (
-          <div className="appshell-accordion-content">
-            <a
-              href="/cuerdas"
-              className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/cuerdas"); }}
-            >
-              Cuerdas
-            </a>
-            <a
-              href="/areas"
-              className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/areas"); }}
-            >
-              Áreas
-            </a>
-            <a
-              href="/miembros"
-              className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/miembros"); }}
-            >
-              Miembros
-            </a>
-          </div>
-        )}
-      </div>
+      {/* Acordeón reutilizable: Audiciones */}
+      <AccordionMenu
+        title="Audiciones"
+        open={audOpen}
+        setOpen={setAudOpen}
+        onNavigate={onNavigate}
+        items={[
+          { label: "Audiciones", path: "/audiciones" },
+          { label: "Candidatos", path: "/candidatos" },
+          { label: "Configurar Cuestionario", path: "/configurar-cuestionario" },
+          { label: "Historial de Audiciones", path: "/historial-audiciones" },
+        ]}
+      />
 
+      {/* Otros accesos directos existentes */}
       {MENU_ITEMS.map(([to, label]) => (
         <a
           key={to}

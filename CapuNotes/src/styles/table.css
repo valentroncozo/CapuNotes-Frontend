@@ -1,3 +1,5 @@
+/* src/styles/table.css */
+
 /* Tabla rectangular con filas separadas como cards */
 .abmc-table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
 
@@ -21,8 +23,6 @@
 .abmc-row td:first-child,
 .abmc-row td:last-child { border-radius: 0 !important; }
 
-
-
 /* Acciones */
 .abmc-actions { display: flex; gap: 8px; justify-content: center; }
 
@@ -30,23 +30,55 @@
 @media (width < 460px) { 
   .abmc-actions { flex-wrap: wrap !important; }
 
-.abmc-row td,th {
-  text-align: center;
-  min-width: 0;                 /* permite que el item se reduzca dentro del flex */
-  overflow-wrap: break-word;
-}
+  .abmc-row td,th {
+    text-align: center;
+    min-width: 0;                 /* permite que el item se reduzca dentro del flex */
+    overflow-wrap: break-word;
+  }
 
   .abmc-row td:nth-child(4) { display: none; }
-
   .abmc-row th:nth-child(4) { display: none; }
+}
 
- }
-
-
- @media (width < 408px) { 
+@media (width < 408px) { 
   .abmc-row td:nth-child(3) { display: none; }
-
   .abmc-row th:nth-child(3) { display: none; }
+}
 
- }
+/* ========== Utilidades nuevas ========== */
 
+/* Pequeño botón con + para acciones laterales */
+.mini-plus-btn{
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: transparent;
+  border: 2px solid rgba(255,255,255,.5);
+  color: var(--text-light);
+  font-weight: 900;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: .15s ease;
+}
+.mini-plus-btn:hover{
+  transform: scale(1.06);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Badge para Resultado/Estado (usado en Candidatos) */
+.badge-resultado, .badge-estado{
+  display: inline-block;
+  min-width: 32px;
+  padding: .15rem .5rem;
+  border-radius: 999px;
+  text-align: center;
+  font-weight: 700;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+}
+.badge-resultado.ok, .badge-estado.ok   { color: #2ecc71; }
+.badge-resultado.bad, .badge-estado.bad { color: #ff6b6b; }
+.badge-resultado.pend, .badge-estado.pend { color: #f1c40f; }

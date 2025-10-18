@@ -1,91 +1,128 @@
 // src/components/abmc/EntityEditForm.jsx
-import { useEffect, useState } from "react";
-import Modal from "../common/Modal";
-import { required, maxLength, hasErrors } from "../common/validators";
+import { useEffect, useMemo, useState } from "react";
+import "@/styles/popup.css";
 
-export default function EntityEditForm({ isOpen, onClose, entityName, schema, entity, onSave }) {
-  const [formData, setFormData] = useState({});
+/**
+ * Popup genérico de Alta/Edición para ABMC
+ *
+ * Props:
+ *  - isOpen: boolean
+ *  - onClose: fn()
+ *  - entityName: string  (ej: "área", "cuerda")
+ *  - schema: [{ key, label, type, required, max, options? }, ...]  (NO incluir submit/button)
+ *  - entity: object|null  (null => Agregar; object => Editar)
+ *  - onSave: fn(payload)  (debe manejar create/update según `entity`)
+ */
+export default function EntityEditForm({
+  isOpen,
+  onClose,
+  entityName = "elemento",
+  schema = [],
+  entity = null,
+  onSave,
+}) {
+  const initial = useMemo(() => {
+    const base = {};
+    schema.forEach((f) => (base[f.key] = entity?.[f.key] ?? ""));
+    if (entity?.id) base.id = entity.id;
+    return base;
+  }, [schema, entity]);
+
+  const [form, setForm] = useState(initial);
   const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    setFormData(entity || {});
-    setErrors({});
-  }, [entity, isOpen]);
+  useEffect(() => { setForm(initial); setErrors({}); }, [initial, isOpen]);
 
-  const validateField = (field, value) => {
-    const rules = [];
-    if (field.required) rules.push(required(field.label));
-    if (field.max) rules.push(maxLength(field.label, field.max));
-    for (const rule of rules) {
-      const msg = rule(value);
-      if (msg) return msg;
-    }
-    return null;
-  };
+  const isEdit = !!entity;
+  const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : "");
+  const title = `${isEdit ? "Editar" : "Agregar"} ${cap(entityName)}`;
 
-  const validateAll = () => {
-    const nextErrors = {};
-    schema.forEach(f => {
-      nextErrors[f.key] = validateField(f, formData[f.key]);
+  const validate = () => {
+    const next = {};
+    schema.forEach((f) => {
+      const v = (form[f.key] ?? "").toString().trim();
+      if (f.required && !v) next[f.key] = "Obligatorio";
+      if (f.max && v.length > f.max) next[f.key] = `Máx. ${f.max} caracteres`;
     });
-    setErrors(nextErrors);
-    return !hasErrors(nextErrors);
+    setErrors(next);
+    return Object.keys(next).length === 0;
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleChange = (key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSave = () => {
-    if (!validateAll()) return;
-    onSave(formData);
-    onClose();
+  const handleConfirm = async () => {
+    if (!validate()) return;
+    await onSave?.(form);
+    onClose?.();
   };
+
+  if (!isOpen) return null;
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={`Editar ${entityName}`}
-      actions={
-        <>
-          <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
-          <button className="btn btn-primary" onClick={handleSave}>Guardar</button>
-        </>
-      }
-    >
-      <div className="form-grid">
-        {schema.map(f => (
-          <div className="field" key={f.key}>
-            <label>{f.label}</label>
-            {f.type === "select" ? (
-              <select
-                name={f.key}
-                value={formData[f.key] || ""}
-                onChange={handleChange}
-                className="input"
-              >
-                <option value="">Seleccionar</option>
-                {(f.options || []).map(opt => {
-                  const value = opt.value ?? opt;
-                  const label = opt.label ?? opt;
-                  return <option key={value} value={value}>{label}</option>;
-                })}
-              </select>
-            ) : (
-              <input
-                type={f.type || "text"}
-                name={f.key}
-                value={formData[f.key] || ""}
-                onChange={handleChange}
-                className="input"
-              />
-            )}
-            {errors[f.key] && <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>}
+    <div className="pop-backdrop" onMouseDown={onClose}>
+      <div className="pop-dialog" onMouseDown={(e) => e.stopPropagation()}>
+        <div className="pop-header">
+          <h3 className="pop-title">{title}</h3>
+          <button className="icon-btn" aria-label="Cerrar" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="pop-body">
+          <div className="form-grid">
+            {schema.map((f) => (
+              <div className="field" key={f.key}>
+                <label htmlFor={`inp-${f.key}`}>
+                  {f.label} {f.required ? "*" : ""}
+                </label>
+
+                {f.type === "select" ? (
+                  <select
+                    id={`inp-${f.key}`}
+                    className="input"
+                    value={form[f.key] ?? ""}
+                    onChange={(e) => handleChange(f.key, e.target.value)}
+                  >
+                    <option value="">...</option>
+                    {(f.options || []).map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : f.type === "textarea" ? (
+                  <textarea
+                    id={`inp-${f.key}`}
+                    className="input"
+                    rows={3}
+                    value={form[f.key] ?? ""}
+                    onChange={(e) => handleChange(f.key, e.target.value)}
+                    maxLength={f.max || undefined}
+                  />
+                ) : (
+                  <input
+                    id={`inp-${f.key}`}
+                    className="input"
+                    type={f.type || "text"}
+                    value={form[f.key] ?? ""}
+                    onChange={(e) => handleChange(f.key, e.target.value)}
+                    maxLength={f.max || undefined}
+                  />
+                )}
+
+                {errors[f.key] && (
+                  <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>
+                )}
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        <div className="pop-footer">
+          <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+          <button className="btn btn-primary" onClick={handleConfirm}>
+            Confirmar
+          </button>
+        </div>
       </div>
-    </Modal>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-// src/App.jsx
+// src/app/App.jsx
 import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
@@ -13,8 +13,14 @@ import Miembros from "@/components/pages/miembros/index.jsx";
 import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
 
+// Audiciones
+import Audiciones from "@/components/pages/audiciones/planificar.jsx";
+import Candidatos from "@/components/pages/audiciones/candidatos.jsx";              // evaluadores
+import CandidatosCoordinadores from "@/components/pages/audiciones/candidatosCoord.jsx"; // coordinadores
+import ConfigurarCuestionario from "@/components/pages/audiciones/cuestionario.jsx";
+import HistorialAudiciones from "@/components/pages/audiciones/historial.jsx";
 
-// Estilos base (usar globals como fuente de verdad)
+// Estilos base
 import "@/styles/globals.css";
 
 function ProtectedRoute({ children }) {
@@ -53,11 +59,20 @@ function AppRoutes() {
       >
         <Route index element={<Navigate to="/principal" replace />} />
         <Route path="principal" element={<Principal username={username} />} />
+
+        {/* Organización del Coro */}
         <Route path="miembros" element={<Miembros />} />
         <Route path="miembros/agregar" element={<MiembrosAgregar />} />
         <Route path="miembros/editar" element={<MiembrosEditar />} />
         <Route path="cuerdas" element={<Cuerdas />} />
         <Route path="areas" element={<Areas />} />
+
+        {/* Audiciones */}
+        <Route path="audiciones" element={<Audiciones />} />
+        <Route path="candidatos" element={<Candidatos />} /> {/* evaluadores */}
+        <Route path="candidatos-coordinadores" element={<CandidatosCoordinadores />} /> {/* coordinadores */}
+        <Route path="configurar-cuestionario" element={<ConfigurarCuestionario />} />
+        <Route path="historial-audiciones" element={<HistorialAudiciones />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/principal" replace />} />

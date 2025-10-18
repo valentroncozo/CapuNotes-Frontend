@@ -1,7 +1,7 @@
 // src/components/pages/areas/index.jsx
-import EntityTableABMC from "@/components/abmc/EntityTableABMC";
-import { areasService } from "@/services/areasService";
-import { areaSchema, areaUniqueBy, areaEntityName } from "@/schemas/areas";
+import EntityTableABMC from "@/components/abmc/EntityTableABMC.jsx";
+import { areasService } from "@/services/areasService.js";
+import { areaSchema, areaUniqueBy, areaEntityName } from "@/schemas/areas.js";
 
 export default function AreasPage() {
   return (
@@ -11,6 +11,7 @@ export default function AreasPage() {
       schema={areaSchema}
       uniqueBy={areaUniqueBy}
       entityName={areaEntityName}
+      showBackButton
     />
   );
 }
