@@ -2,7 +2,20 @@
 import { useEffect, useRef } from "react";
 import "@/styles/popup.css";
 
-export default function Modal({ isOpen, onClose, title, children, actions }) {
+/**
+ * Modal base genérico.
+ * - Muestra botón "✕" en el header por defecto (showHeaderClose = true)
+ * - Cierra con Escape y al hacer click en el backdrop.
+ */
+export default function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  actions,
+  showHeaderClose = true,   // 👈 ahora por defecto viene la cruz en el header
+  closeLabel = "Cerrar",
+}) {
   const dialogRef = useRef(null);
 
   useEffect(() => {
@@ -19,12 +32,11 @@ export default function Modal({ isOpen, onClose, title, children, actions }) {
   if (!isOpen) return null;
 
   const onBackdrop = (e) => {
-    // Click (no mousedown) para no interferir con selects nativos
     if (e.target === e.currentTarget) onClose?.();
   };
 
   return (
-    <div className="pop-backdrop" onClick={onBackdrop}>
+    <div className="pop-backdrop" onClick={onBackdrop} onMouseDown={onBackdrop}>
       <div
         className="pop-dialog"
         role="dialog"
@@ -32,12 +44,26 @@ export default function Modal({ isOpen, onClose, title, children, actions }) {
         aria-labelledby="modal-title"
         tabIndex={-1}
         ref={dialogRef}
+        onMouseDown={(e) => e.stopPropagation()}
       >
         <header className="pop-header">
           <h3 id="modal-title" className="pop-title">{title}</h3>
-          <button className="icon-btn" aria-label="Cerrar" onClick={onClose}>✕</button>
+
+          {showHeaderClose && (
+            <button
+              className="icon-btn"
+              aria-label={closeLabel}
+              onClick={onClose}
+              type="button"
+              title={closeLabel}
+            >
+              ✕
+            </button>
+          )}
         </header>
+
         <div className="pop-body">{children}</div>
+
         {actions && <footer className="pop-footer">{actions}</footer>}
       </div>
     </div>

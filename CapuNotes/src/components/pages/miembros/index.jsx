@@ -6,6 +6,7 @@ import { miembrosService } from "@/services/miembrosService.js";
 import { buildMiembroSchema, miembroUniqueBy, miembroEntityName } from "@/schemas/miembros.js";
 import { PencilFill, Trash3Fill } from "react-bootstrap-icons";
 import infoIcon from "/info.png";
+import Modal from "@/components/common/Modal.jsx"; // ← NUEVO
 
 export default function MiembrosPage() {
   const navigate = useNavigate();
@@ -60,32 +61,25 @@ export default function MiembrosPage() {
       />
 
       {infoRow && (
-        <div className="pop-backdrop" onMouseDown={() => setInfoRow(null)}>
-          <div className="pop-dialog" onMouseDown={(e) => e.stopPropagation()}>
-            <div className="pop-header">
-              <h3 className="pop-title">
-                {infoRow.nombre} {infoRow.apellido}
-              </h3>
-              <button className="icon-btn" onClick={() => setInfoRow(null)} type="button">
-                ✕
-              </button>
-            </div>
-            <div className="pop-body">
-              <dl style={{ display: "grid", gridTemplateColumns: "160px 1fr", gap: "8px 16px" }}>
-                {baseSchema
-                  .filter((f) => f.type !== "button" && f.type !== "submit")
-                  .map((f) => (
-                    <FragmentRow key={f.key} label={f.label} value={infoRow[f.key]} />
-                  ))}
-              </dl>
-            </div>
-            <div className="pop-footer">
-              <button className="btn btn-secondary" onClick={() => setInfoRow(null)} type="button">
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
+        <Modal
+          isOpen={true}
+          onClose={() => setInfoRow(null)}
+          title={`${infoRow.nombre} ${infoRow.apellido}`}
+          showHeaderClose={false}
+          actions={
+            <button className="btn btn-secondary" onClick={() => setInfoRow(null)} type="button">
+              Cerrar
+            </button>
+          }
+        >
+          <dl style={{ display: "grid", gridTemplateColumns: "160px 1fr", gap: "8px 16px" }}>
+            {baseSchema
+              .filter((f) => f.type !== "button" && f.type !== "submit")
+              .map((f) => (
+                <FragmentRow key={f.key} label={f.label} value={infoRow[f.key]} />
+              ))}
+          </dl>
+        </Modal>
       )}
     </div>
   );

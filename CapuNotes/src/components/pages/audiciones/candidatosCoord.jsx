@@ -5,17 +5,20 @@ import "@/styles/abmc.css";
 import "@/styles/table.css";
 import "@/styles/forms.css";
 import "@/styles/icons.css";
+import { PencilFill } from "react-bootstrap-icons";
 import infoIcon from "/info.png";
 
 import { candidatosService } from "@/services/candidatosService.js";
 import { horaToMinutes } from "@/components/common/datetime.js";
 import InscripcionView from "@/components/common/InscripcionView.jsx";
-import { info as alertInfo } from "@/utils/alerts.js";
+import { info as alertInfo, success } from "@/utils/alerts.js";
+import { TURNO_ESTADOS } from "@/constants/candidatos.js";
 
-// Íconos de turno
 import CanceladoIcon from "@/assets/icons/turno/CanceladoIcon.jsx";
 import ReservadoIcon from "@/assets/icons/turno/ReservadoIcon.jsx";
 import DisponibleIcon from "@/assets/icons/turno/DisponibleIcon.jsx";
+
+import TurnoEstadoModal from "./TurnoEstadoModal.jsx";
 
 export default function CandidatosCoordPage() {
   const [rows, setRows] = useState([]);
@@ -25,6 +28,7 @@ export default function CandidatosCoordPage() {
   const [sortDir, setSortDir] = useState("asc");
 
   const [viewRow, setViewRow] = useState(null);
+  const [editRow, setEditRow] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -40,10 +44,17 @@ export default function CandidatosCoordPage() {
     return nom || ape || r.nombre || r.nombreLabel || "";
   };
 
-  // Estado coordinador: Disponible / Reservado / Cancelado
   const estadoCoordinador = (r) => {
-    const est = String(r?.resultado?.estado || "").toLowerCase();
-    if (est === "cancelado" || est === "cancelada") return "Cancelado";
+    const explicit = String(r?.turnoEstado ?? r?.turno?.estado ?? "").toLowerCase();
+    if (TURNO_ESTADOS.includes(explicit)) {
+      return explicit === "disponible"
+        ? "Disponible"
+        : explicit === "reservado"
+        ? "Reservado"
+        : "Cancelado";
+    }
+    const estRes = String(r?.resultado?.estado || "").toLowerCase();
+    if (estRes === "cancelado" || estRes === "cancelada") return "Cancelado";
     const tieneCandidato = !!(r?.nombre || r?.apellido || r?.inscripcion);
     return tieneCandidato ? "Reservado" : "Disponible";
   };
@@ -84,7 +95,6 @@ export default function CandidatosCoordPage() {
     const e = String(estado || "").toLowerCase();
     if (e === "cancelado")  return <span className="icon-estado icon-turno--cancel icon-md" title="Cancelado"><CanceladoIcon /></span>;
     if (e === "reservado")  return <span className="icon-estado icon-turno--res icon-md" title="Reservado"><ReservadoIcon /></span>;
-    /* default disponible */
     return <span className="icon-estado icon-turno--disp icon-md" title="Disponible"><DisponibleIcon /></span>;
   };
 
@@ -157,9 +167,21 @@ export default function CandidatosCoordPage() {
                   <td>{r.hora}</td>
                   <td>{nombreApynom(r) || "—"}</td>
                   <td>{r.cancion || "—"}</td>
-                  <td>
+
+                  {/* Ícono + botón fijo a la derecha (mismo patrón que evaluadores) */}
+                  <td className="cell-right-action">
                     <TurnoIcon estado={key} />
+                    <button
+                      type="button"
+                      className="btn-accion btn-accion--icon right-action"
+                      title="Editar estado"
+                      aria-label="Editar estado"
+                      onClick={() => setEditRow(r)}
+                    >
+                      <PencilFill size={18} />
+                    </button>
                   </td>
+
                   <td className="abmc-actions">
                     <button
                       className="btn-accion"
@@ -183,6 +205,21 @@ export default function CandidatosCoordPage() {
           open={true}
           onClose={() => setViewRow(null)}
           editable={false}
+        />
+      )}
+
+      {editRow && (
+        <TurnoEstadoModal
+          row={editRow}
+          onClose={() => setEditRow(null)}
+          onSave={async (estado) => {
+            const updated = await candidatosService.updateTurnoEstado(editRow.id, estado);
+            if (updated) {
+              setRows((prev) => prev.map((r) => (String(r.id) === String(updated.id) ? { ...r, ...updated } : r)));
+              await success({ title: "Estado actualizado" });
+            }
+            setEditRow(null);
+          }}
         />
       )}
     </main>

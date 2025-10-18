@@ -1,17 +1,10 @@
+// src/components/abmc/EntityEditForm.jsx
 import { useEffect, useMemo, useState } from "react";
 import Modal from "@/components/common/Modal.jsx";
 import "@/styles/popup.css";
 
 /**
  * Popup genérico de Alta/Edición para ABMC
- *
- * Props:
- *  - isOpen: boolean
- *  - onClose: fn()
- *  - entityName: string
- *  - schema: [{ key, label, type, required, max, options? }]
- *  - entity: object|null
- *  - onSave: fn(payload) -> Promise  (las alertas se manejan en el padre)
  */
 export default function EntityEditForm({
   isOpen,
@@ -57,82 +50,87 @@ export default function EntityEditForm({
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (e) => {
+    e?.preventDefault?.();
     if (!validate() || saving) return;
     try {
       setSaving(true);
-      await onSave?.(form);   // ÉXITO/ERROR se avisa en el padre (EntityTableABMC)
+      await onSave?.(form);
       onClose?.();
     } finally {
       setSaving(false);
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="pop-backdrop" onMouseDown={onClose}>
-      <div className="pop-dialog" onMouseDown={(e) => e.stopPropagation()}>
-        <div className="pop-header">
-          <h3 className="pop-title">{title}</h3>
-          <button className="icon-btn" aria-label="Cerrar" onClick={onClose}>✕</button>
-        </div>
-
-        <div className="pop-body">
-          <div className="form-grid">
-            {schema.map((f) => (
-              <div className="field" key={f.key}>
-                <label htmlFor={`inp-${f.key}`}>
-                  {f.label} {f.required ? "*" : ""}
-                </label>
-
-                {f.type === "select" ? (
-                  <select
-                    id={`inp-${f.key}`}
-                    className="input"
-                    value={form[f.key] ?? ""}
-                    onChange={(e) => handleChange(f.key, e.target.value)}
-                  >
-                    <option value="">...</option>
-                    {(f.options || []).map((opt) => (
-                      <option key={opt} value={opt}>{opt}</option>
-                    ))}
-                  </select>
-                ) : f.type === "textarea" ? (
-                  <textarea
-                    id={`inp-${f.key}`}
-                    className="input"
-                    rows={3}
-                    value={form[f.key] ?? ""}
-                    onChange={(e) => handleChange(f.key, e.target.value)}
-                    maxLength={f.max || undefined}
-                  />
-                ) : (
-                  <input
-                    id={`inp-${f.key}`}
-                    className="input"
-                    type={f.type || "text"}
-                    value={form[f.key] ?? ""}
-                    onChange={(e) => handleChange(f.key, e.target.value)}
-                    maxLength={f.max || undefined}
-                  />
-                )}
-
-                {errors[f.key] && (
-                  <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="pop-footer">
-          <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
-          <button className={`btn ${saving ? "btn-disabled" : "btn-primary"}`} onClick={handleConfirm} disabled={saving}>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      showHeaderClose={true}  // ✅ cruz visible
+      actions={
+        <>
+          <button className="btn btn-secondary" onClick={onClose} type="button">Cancelar</button>
+          <button
+            className={`btn ${saving ? "btn-disabled" : "btn-primary"}`}
+            onClick={handleConfirm}
+            type="submit"
+            disabled={saving}
+          >
             {saving ? "Guardando..." : "Confirmar"}
           </button>
+        </>
+      }
+    >
+      <form onSubmit={handleConfirm}>
+        <div className="form-grid">
+          {schema.map((f) => (
+            <div className="field" key={f.key}>
+              <label htmlFor={`inp-${f.key}`}>
+                {f.label} {f.required ? "*" : ""}
+              </label>
+
+              {f.type === "select" ? (
+                <select
+                  id={`inp-${f.key}`}
+                  className="input"
+                  value={form[f.key] ?? ""}
+                  onChange={(e) => handleChange(f.key, e.target.value)}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <option value="">...</option>
+                  {(f.options || []).map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              ) : f.type === "textarea" ? (
+                <textarea
+                  id={`inp-${f.key}`}
+                  className="input"
+                  rows={3}
+                  value={form[f.key] ?? ""}
+                  onChange={(e) => handleChange(f.key, e.target.value)}
+                  maxLength={f.max || undefined}
+                />
+              ) : (
+                <input
+                  id={`inp-${f.key}`}
+                  className="input"
+                  type={f.type || "text"}
+                  value={form[f.key] ?? ""}
+                  onChange={(e) => handleChange(f.key, e.target.value)}
+                  maxLength={f.max || undefined}
+                />
+              )}
+
+              {errors[f.key] && (
+                <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>
+              )}
+            </div>
+          ))}
         </div>
-      </div>
-    </div>
+      </form>
+    </Modal>
   );
 }
