@@ -67,6 +67,10 @@ const Audicion = ({ title ='Audicion'}) => {
           data={filteredData}
           actions={actions}
           columns={['dia','cantidadTurnos','turnosDisponibles']}
+          emptyMenssage={ filteredData.length === 0 && data.length > 0 
+            ? 'No se encuentran días que coincidan con el filtro.' 
+            : 'No hay audiciones disponibles.' 
+          }
           />
 
           <footer className="audicion-footer">

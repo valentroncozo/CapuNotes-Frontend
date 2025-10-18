@@ -7,7 +7,7 @@ const getValueByPath = (obj, path) => {
   return path.split('.').reduce((acc, key) => (acc ? acc[key] : undefined), obj);
 };
 
-const TableABMC = ({ headers = [], data = [], actions = [], columns = [] }) => {
+const TableABMC = ({ headers = [], data = [], actions = [], columns = [], emptyMenssage = 'No hay registros' }) => {
   return (
     <table className="abmc-table abmc-table-rect">
       <thead className="abmc-thead">
@@ -53,7 +53,7 @@ const TableABMC = ({ headers = [], data = [], actions = [], columns = [] }) => {
         ) : (
           <tr>
             <td colSpan={headers.length} className="text-center">
-              No hay registros
+              {emptyMenssage}
             </td>
           </tr>
         )}
