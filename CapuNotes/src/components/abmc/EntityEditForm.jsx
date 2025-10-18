@@ -1,5 +1,6 @@
 // src/components/abmc/EntityEditForm.jsx
 import { useEffect, useMemo, useState } from "react";
+import Swal from "sweetalert2";
 import "@/styles/popup.css";
 
 /**
@@ -8,10 +9,10 @@ import "@/styles/popup.css";
  * Props:
  *  - isOpen: boolean
  *  - onClose: fn()
- *  - entityName: string  (ej: "área", "cuerda")
- *  - schema: [{ key, label, type, required, max, options? }, ...]  (NO incluir submit/button)
- *  - entity: object|null  (null => Agregar; object => Editar)
- *  - onSave: fn(payload)  (debe manejar create/update según `entity`)
+ *  - entityName: string
+ *  - schema: [{ key, label, type, required, max, options? }]
+ *  - entity: object|null
+ *  - onSave: fn(payload)
  */
 export default function EntityEditForm({
   isOpen,
@@ -31,7 +32,10 @@ export default function EntityEditForm({
   const [form, setForm] = useState(initial);
   const [errors, setErrors] = useState({});
 
-  useEffect(() => { setForm(initial); setErrors({}); }, [initial, isOpen]);
+  useEffect(() => {
+    setForm(initial);
+    setErrors({});
+  }, [initial, isOpen]);
 
   const isEdit = !!entity;
   const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : "");
@@ -54,8 +58,38 @@ export default function EntityEditForm({
 
   const handleConfirm = async () => {
     if (!validate()) return;
-    await onSave?.(form);
-    onClose?.();
+
+    try {
+      await onSave?.(form);
+
+      Swal.fire({
+        icon: "success",
+        title: isEdit ? "Actualizado correctamente" : "Creado correctamente",
+        text: `${cap(entityName)} guardado.`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      onClose?.();
+    } catch (err) {
+      console.error(err);
+
+      let msg = "Error al guardar los datos.";
+      if (err.name === "DuplicateError") {
+        msg = err.message || "Ya existe un registro con los mismos datos únicos.";
+      } else if (err.message) {
+        msg = err.message;
+      }
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: msg,
+        confirmButtonColor: "#ffc107",
+        background: "#11103a",
+        color: "#E8EAED",
+      });
+    }
   };
 
   if (!isOpen) return null;
@@ -65,7 +99,9 @@ export default function EntityEditForm({
       <div className="pop-dialog" onMouseDown={(e) => e.stopPropagation()}>
         <div className="pop-header">
           <h3 className="pop-title">{title}</h3>
-          <button className="icon-btn" aria-label="Cerrar" onClick={onClose}>✕</button>
+          <button className="icon-btn" aria-label="Cerrar" onClick={onClose}>
+            ✕
+          </button>
         </div>
 
         <div className="pop-body">
@@ -85,7 +121,9 @@ export default function EntityEditForm({
                   >
                     <option value="">...</option>
                     {(f.options || []).map((opt) => (
-                      <option key={opt} value={opt}>{opt}</option>
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
                     ))}
                   </select>
                 ) : f.type === "textarea" ? (
@@ -117,7 +155,9 @@ export default function EntityEditForm({
         </div>
 
         <div className="pop-footer">
-          <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+          <button className="btn btn-secondary" onClick={onClose}>
+            Cancelar
+          </button>
           <button className="btn btn-primary" onClick={handleConfirm}>
             Confirmar
           </button>

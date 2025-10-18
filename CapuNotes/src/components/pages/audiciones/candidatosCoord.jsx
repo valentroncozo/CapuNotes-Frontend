@@ -15,7 +15,7 @@ export default function CandidatosCoordPage() {
   const [rows, setRows] = useState([]);
   const [q, setQ] = useState("");
 
-  const [sortBy, setSortBy] = useState(null); // 'hora' | 'resultado'
+  const [sortBy, setSortBy] = useState(null); // 'hora' | 'resultado' | 'apynom'
   const [sortDir, setSortDir] = useState("asc");
 
   const [viewRow, setViewRow] = useState(null);
@@ -27,10 +27,22 @@ export default function CandidatosCoordPage() {
     })();
   }, []);
 
+  const nombreApynom = (r) => {
+    const ape = (r.apellido || "").trim();
+    const nom = (r.nombre || "").trim();
+    if (ape && nom) return `${ape}, ${nom}`;
+    return nom || ape || r.nombre || "";
+  };
+
   const filtered = useMemo(() => {
     if (!q) return rows;
     const t = q.toLowerCase();
-    return rows.filter((r) => r.nombre.toLowerCase().includes(t));
+    return rows.filter((r) => {
+      const ape = String(r.apellido || "").toLowerCase();
+      const nom = String(r.nombre || "").toLowerCase();
+      const apynom = `${ape}, ${nom}`.trim();
+      return ape.includes(t) || nom.includes(t) || apynom.includes(t);
+    });
   }, [rows, q]);
 
   const sorted = useMemo(() => {
@@ -41,6 +53,11 @@ export default function CandidatosCoordPage() {
       if (sortBy === "resultado") {
         return estadoLabel(a.resultado?.estado ?? "sin")
           .localeCompare(estadoLabel(b.resultado?.estado ?? "sin")) * dir;
+      }
+      if (sortBy === "apynom") {
+        const av = nombreApynom(a).toLowerCase();
+        const bv = nombreApynom(b).toLowerCase();
+        return av.localeCompare(bv) * dir;
       }
       return 0;
     });
@@ -61,7 +78,7 @@ export default function CandidatosCoordPage() {
         </div>
 
         <div className="abmc-topbar">
-          <input className="abmc-input" placeholder="Buscar por nombre" value={q} onChange={(e) => setQ(e.target.value)} />
+          <input className="abmc-input" placeholder="Buscar por apellido o nombre" value={q} onChange={(e) => setQ(e.target.value)} />
           <select className="abmc-input" defaultValue="Viernes 14">
             <option>Viernes 14</option>
             <option>Sábado 15</option>
@@ -78,8 +95,16 @@ export default function CandidatosCoordPage() {
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
-              <th><span className="th-label">Nombre</span></th>
+
+              <th className={thClass("apynom")}>
+                <span className="th-label">Apellido, Nombre</span>
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("apynom")} aria-label="Ordenar por Apellido, Nombre">
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+
               <th><span className="th-label">Canción</span></th>
+
               <th className={thClass("resultado")}>
                 <span className="th-label">Estado</span>
                 <button type="button" className="th-caret-btn" onClick={() => toggleSort("resultado")} aria-label="Ordenar por Estado">
@@ -94,7 +119,7 @@ export default function CandidatosCoordPage() {
             {sorted.map((r) => (
               <tr key={r.id} className="abmc-row">
                 <td>{r.hora}</td>
-                <td>{r.nombre}</td>
+                <td>{nombreApynom(r)}</td>
                 <td>{r.cancion}</td>
                 <td>{estadoLabel(r.resultado?.estado)}</td>
                 <td className="abmc-actions">

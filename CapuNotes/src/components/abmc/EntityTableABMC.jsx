@@ -10,13 +10,12 @@ export default function EntityTableABMC({
   title = "Catálogo",
   service,
   schema = [],
-  uniqueBy = null,
   entityName = "elemento",
   showBackButton = true,
-  renderActions,
-  onAdd = null,
   usePopupForm = true,
-  sortable = false, // ordenar solo donde se necesite (p.ej. Miembros)
+  sortable = false,
+  onAdd = null,
+  renderActions,
 }) {
   const [items, setItems] = useState([]);
   const [q, setQ] = useState("");
@@ -42,7 +41,9 @@ export default function EntityTableABMC({
         if (mounted) setLoading(false);
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [service]);
 
   const formFields = useMemo(
@@ -58,9 +59,7 @@ export default function EntityTableABMC({
     if (!q) return items;
     const t = q.toLowerCase();
     return items.filter((row) =>
-      formFields.some((f) =>
-        String(row?.[f.key] ?? "").toLowerCase().includes(t)
-      )
+      formFields.some((f) => String(row?.[f.key] ?? "").toLowerCase().includes(t))
     );
   }, [items, q, formFields]);
 
@@ -78,8 +77,12 @@ export default function EntityTableABMC({
 
   const toggleSort = (key) => {
     if (!sortable) return;
-    if (sortBy !== key) { setSortBy(key); setSortDir("asc"); }
-    else { setSortDir((d) => (d === "asc" ? "desc" : "asc")); }
+    if (sortBy !== key) {
+      setSortBy(key);
+      setSortDir("asc");
+    } else {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    }
   };
 
   const headerClass = (key) => {
@@ -88,18 +91,40 @@ export default function EntityTableABMC({
     return `th-sortable sorted-${sortDir}`;
   };
 
-  const openAdd = () => { if (onAdd) return onAdd(); setEditing(null); setIsOpen(true); };
-  const closeModal = () => { setIsOpen(false); setEditing(null); };
+  // Abrir alta: respeta onAdd si viene (Miembros navega), si no, usa popup
+  const openAdd = () => {
+    if (typeof onAdd === "function") return onAdd();
+    if (usePopupForm) {
+      setEditing(null);
+      setIsOpen(true);
+    }
+  };
+  const closeModal = () => {
+    setIsOpen(false);
+    setEditing(null);
+  };
 
   const handleSave = async (data) => {
-    if (editing) {
-      const updated = await service.update({ ...editing, ...data });
-      setItems((p) => p.map((x) => (x.id === updated.id ? updated : x)));
-    } else {
-      const created = await service.create(data);
-      setItems((p) => [...p, created]);
+    try {
+      if (editing) {
+        const updated = await service.update({ ...editing, ...data });
+        setItems((p) => p.map((x) => (x.id === updated.id ? updated : x)));
+      } else {
+        const created = await service.create(data);
+        setItems((p) => [...p, created]);
+      }
+      closeModal();
+    } catch (err) {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Error al guardar",
+        text: err.message || "No se pudo guardar el registro.",
+        confirmButtonColor: "#ffc107",
+        background: "#11103a",
+        color: "#E8EAED",
+      });
     }
-    closeModal();
   };
 
   const requestDelete = async (row) => {
@@ -116,8 +141,24 @@ export default function EntityTableABMC({
       color: "#E8EAED",
     });
     if (!confirm.isConfirmed) return;
-    await service.remove(row.id);
-    setItems((prev) => prev.filter((x) => x.id !== row.id));
+
+    try {
+      await service.remove(row.id);
+      setItems((prev) => prev.filter((x) => x.id !== row.id));
+      Swal.fire({
+        icon: "success",
+        title: "Eliminado correctamente",
+        timer: 1400,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Error al eliminar",
+        text: err.message || "No se pudo eliminar el registro.",
+        confirmButtonColor: "#ffc107",
+      });
+    }
   };
 
   return (
@@ -137,6 +178,7 @@ export default function EntityTableABMC({
             onChange={(e) => setQ(e.target.value)}
           />
           <button
+            type="button"
             className="abmc-btn abmc-btn-primary"
             onClick={openAdd}
             title={`Agregar ${entityName}`}
@@ -155,11 +197,6 @@ export default function EntityTableABMC({
                     <button
                       type="button"
                       className="th-caret-btn"
-                      aria-label={
-                        sortBy !== f.key
-                          ? `Ordenar por ${f.label}`
-                          : `Cambiar orden ${sortDir === "asc" ? "descendente" : "ascendente"}`
-                      }
                       onClick={() => toggleSort(f.key)}
                     >
                       <span className="th-caret" aria-hidden />
@@ -192,13 +229,18 @@ export default function EntityTableABMC({
                     ) : (
                       <>
                         <button
+                          type="button"
                           className="btn-accion me-2"
                           title="Editar"
-                          onClick={() => { setEditing(row); setIsOpen(true); }}
+                          onClick={() => {
+                            setEditing(row);
+                            setIsOpen(true);
+                          }}
                         >
                           <PencilFill size={18} />
                         </button>
                         <button
+                          type="button"
                           className="btn-accion eliminar"
                           title="Eliminar"
                           onClick={() => requestDelete(row)}

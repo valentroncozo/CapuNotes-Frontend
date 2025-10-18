@@ -5,6 +5,7 @@ import EntityTableABMC from "@/components/abmc/EntityTableABMC.jsx";
 import { miembrosService } from "@/services/miembrosService.js";
 import { buildMiembroSchema, miembroUniqueBy, miembroEntityName } from "@/schemas/miembros.js";
 import { PencilFill, Trash3Fill } from "react-bootstrap-icons";
+import infoIcon from "/info.png";
 
 export default function MiembrosPage() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function MiembrosPage() {
   );
 
   return (
-    <>
+    <div className="pantalla-miembros">
       <EntityTableABMC
         title="Miembros"
         service={miembrosService}
@@ -27,16 +28,31 @@ export default function MiembrosPage() {
         showBackButton
         usePopupForm={false}
         onAdd={() => navigate("/miembros/agregar")}
-        sortable={true}  // <— Activamos ordenamiento SOLO acá
+        sortable={true}
         renderActions={(row, { requestDelete }) => (
           <>
-            <button className="btn-accion me-2" title="Más información" onClick={() => setInfoRow(row)}>
-              <img src="/info.png" alt="Info" style={{ width: 18, height: 18 }} />
+            <button
+              type="button"
+              className="btn-accion me-2"
+              title="Más información"
+              onClick={() => setInfoRow(row)}
+            >
+              <img src={infoIcon} alt="Info" style={{ width: 18, height: 18 }} />
             </button>
-            <button className="btn-accion me-2" title="Editar" onClick={() => navigate(`/miembros/editar?id=${row.id}`)}>
+            <button
+              type="button"
+              className="btn-accion me-2"
+              title="Editar"
+              onClick={() => navigate(`/miembros/editar?id=${row.id}`)}
+            >
               <PencilFill size={18} />
             </button>
-            <button className="btn-accion eliminar" title="Eliminar" onClick={() => requestDelete(row)}>
+            <button
+              type="button"
+              className="btn-accion eliminar"
+              title="Eliminar"
+              onClick={() => requestDelete(row)}
+            >
               <Trash3Fill size={18} />
             </button>
           </>
@@ -47,8 +63,12 @@ export default function MiembrosPage() {
         <div className="pop-backdrop" onMouseDown={() => setInfoRow(null)}>
           <div className="pop-dialog" onMouseDown={(e) => e.stopPropagation()}>
             <div className="pop-header">
-              <h3 className="pop-title">{infoRow.nombre} {infoRow.apellido}</h3>
-              <button className="icon-btn" onClick={() => setInfoRow(null)}>✕</button>
+              <h3 className="pop-title">
+                {infoRow.nombre} {infoRow.apellido}
+              </h3>
+              <button className="icon-btn" onClick={() => setInfoRow(null)} type="button">
+                ✕
+              </button>
             </div>
             <div className="pop-body">
               <dl style={{ display: "grid", gridTemplateColumns: "160px 1fr", gap: "8px 16px" }}>
@@ -60,12 +80,14 @@ export default function MiembrosPage() {
               </dl>
             </div>
             <div className="pop-footer">
-              <button className="btn btn-secondary" onClick={() => setInfoRow(null)}>Cerrar</button>
+              <button className="btn btn-secondary" onClick={() => setInfoRow(null)} type="button">
+                Cerrar
+              </button>
             </div>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
 

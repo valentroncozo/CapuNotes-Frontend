@@ -5,14 +5,23 @@
   box-shadow:var(--shadow);
   min-height:56px;
   padding-inline:8px;
+  z-index:1060; /* por encima de backdrop y contenido */
+  display:flex;
+  align-items:center;
 }
+
+/* Botón hamburguesa propio */
 .appshell-toggle{
   border:none!important;
   box-shadow:none!important;
   background:transparent!important;
   padding:6px 8px;
+  color:#fff;
+  border-radius:12px;
 }
-.appshell-toggle:focus{ box-shadow:none!important; outline:none!important; }
+.appshell-toggle:hover{
+  background: rgba(255,255,255,.08);
+}
 
 /* Drawer custom */
 .drawer{
@@ -137,11 +146,11 @@
 }
 .appshell-accordion-content .nav-link:hover{ background: rgba(179,205,250,.12); color:var(--accent); }
 
-/* ========= NEW: Backdrop para cerrar al click fuera ========= */
+/* Backdrop para cerrar al click fuera */
 .drawer-backdrop{
   position:fixed;
   inset:0;
   background: rgba(0,0,0,.45);
   backdrop-filter: blur(1px);
-  z-index:1040; /* debajo del drawer (1050) */
+  z-index:1040; /* debajo del drawer (1050) y navbar (1060) */
 }

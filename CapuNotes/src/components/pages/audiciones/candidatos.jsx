@@ -18,7 +18,7 @@ export default function CandidatosPage() {
   const [rows, setRows] = useState([]);
   const [q, setQ] = useState("");
 
-  const [sortBy, setSortBy] = useState(null); // 'hora' | 'resultado'
+  const [sortBy, setSortBy] = useState(null); // 'hora' | 'resultado' | 'apynom'
   const [sortDir, setSortDir] = useState("asc");
 
   const [editRow, setEditRow] = useState(null);
@@ -31,10 +31,22 @@ export default function CandidatosPage() {
     })();
   }, []);
 
+  const nombreApynom = (r) => {
+    const ape = (r.apellido || "").trim();
+    const nom = (r.nombre || "").trim();
+    if (ape && nom) return `${ape}, ${nom}`;
+    return nom || ape || r.nombre || ""; // fallback si solo viene nombre
+  };
+
   const filtered = useMemo(() => {
     if (!q) return rows;
     const t = q.toLowerCase();
-    return rows.filter((r) => r.nombre.toLowerCase().includes(t));
+    return rows.filter((r) => {
+      const ape = String(r.apellido || "").toLowerCase();
+      const nom = String(r.nombre || "").toLowerCase();
+      const apynom = `${ape}, ${nom}`.trim();
+      return ape.includes(t) || nom.includes(t) || apynom.includes(t);
+    });
   }, [rows, q]);
 
   const sorted = useMemo(() => {
@@ -45,8 +57,16 @@ export default function CandidatosPage() {
         return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
       }
       if (sortBy === "resultado") {
-        return estadoLabel(a.resultado?.estado ?? "sin")
-          .localeCompare(estadoLabel(b.resultado?.estado ?? "sin")) * dir;
+        return (
+          estadoLabel(a.resultado?.estado ?? "sin").localeCompare(
+            estadoLabel(b.resultado?.estado ?? "sin")
+          ) * dir
+        );
+      }
+      if (sortBy === "apynom") {
+        const av = nombreApynom(a).toLowerCase();
+        const bv = nombreApynom(b).toLowerCase();
+        return av.localeCompare(bv) * dir;
       }
       return 0;
     });
@@ -69,7 +89,7 @@ export default function CandidatosPage() {
         <div className="abmc-topbar">
           <input
             className="abmc-input"
-            placeholder="Buscar por nombre"
+            placeholder="Buscar por apellido o nombre"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
@@ -85,15 +105,38 @@ export default function CandidatosPage() {
             <tr className="abmc-row">
               <th className={thClass("hora")}>
                 <span className="th-label">Hora</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("hora")} aria-label="Ordenar por Hora">
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("hora")}
+                  aria-label="Ordenar por Hora"
+                >
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
-              <th><span className="th-label">Nombre</span></th>
+
+              <th className={thClass("apynom")}>
+                <span className="th-label">Apellido, Nombre</span>
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("apynom")}
+                  aria-label="Ordenar por Apellido, Nombre"
+                >
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+
               <th><span className="th-label">Canción</span></th>
+
               <th className={thClass("resultado")}>
                 <span className="th-label">Resultado</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("resultado")} aria-label="Ordenar por Resultado">
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("resultado")}
+                  aria-label="Ordenar por Resultado"
+                >
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
@@ -101,42 +144,42 @@ export default function CandidatosPage() {
             </tr>
           </thead>
 
-        <tbody>
-          {sorted.map((r) => (
-            <tr key={r.id} className="abmc-row">
-              <td>{r.hora}</td>
-              <td>{r.nombre}</td>
-              <td>{r.cancion}</td>
+          <tbody>
+            {sorted.map((r) => (
+              <tr key={r.id} className="abmc-row">
+                <td>{r.hora}</td>
+                <td>{nombreApynom(r)}</td>
+                <td>{r.cancion}</td>
 
-              <td>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span className={`badge-estado ${estadoClass(r.resultado?.estado)}`}>
-                    {estadoLabel(r.resultado?.estado)}
-                  </span>
+                <td>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span className={`badge-estado ${estadoClass(r.resultado?.estado)}`}>
+                      {estadoLabel(r.resultado?.estado)}
+                    </span>
+                    <button
+                      className="btn-accion"
+                      title="Editar resultado"
+                      onClick={() => setEditRow(r)}
+                      aria-label="Editar resultado"
+                    >
+                      <PencilFill size={18} />
+                    </button>
+                  </div>
+                </td>
+
+                <td className="abmc-actions">
                   <button
                     className="btn-accion"
-                    title="Editar resultado"
-                    onClick={() => setEditRow(r)}
-                    aria-label="Editar resultado"
+                    title="Ver inscripción"
+                    aria-label="Ver inscripción"
+                    onClick={() => setViewRow(r)}
                   >
-                    <PencilFill size={18} />
+                    <img src={infoIcon} alt="Info" style={{ width: 18, height: 18 }} />
                   </button>
-                </div>
-              </td>
-
-              <td className="abmc-actions">
-                <button
-                  className="btn-accion"
-                  title="Ver inscripción"
-                  aria-label="Ver inscripción"
-                  onClick={() => setViewRow(r)}
-                >
-                  <img src={infoIcon} alt="Info" style={{ width: 18, height: 18 }} />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
 
         <p style={{ opacity: 0.7, marginTop: 10 }}>
@@ -150,7 +193,9 @@ export default function CandidatosPage() {
           onClose={() => setEditRow(null)}
           onSave={async (estado, obs) => {
             const res = await candidatosService.updateResultado(editRow.id, { estado, obs });
-            setRows((prev) => prev.map((r) => (r.id === res.id ? { ...r, resultado: res.resultado } : r)));
+            setRows((prev) =>
+              prev.map((r) => (r.id === res.id ? { ...r, resultado: res.resultado } : r))
+            );
             setEditRow(null);
           }}
         />

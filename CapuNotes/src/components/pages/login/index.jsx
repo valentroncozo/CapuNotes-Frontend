@@ -22,11 +22,12 @@ export default function Login({ onLogin }) {
     return !hasErrors(nextErrors);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const isValid = runValidation({ username, password });
-    if (isValid) onLogin(username, password);
-  };
+const handleSubmit = (e) => {
+  e.preventDefault();
+  const isValid = runValidation({ username, password });
+  if (isValid) onLogin(username);
+};
+
 
   const togglePasswordVisibility = () => setShowPassword((v) => !v);
 

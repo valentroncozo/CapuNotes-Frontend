@@ -1,0 +1,80 @@
+/* src/styles/buttons.css */
+/* === Botones globales (forma pill y variantes) ===
+   Este archivo se importa DESPUÉS de tokens/variable en globals.css
+*/
+
+/* Base pill para todos los .btn */
+.btn,
+button.btn,
+.pop-dialog .btn {
+  border: none;
+  border-radius: 999px; /* pill redondito sí o sí */
+  padding: 10px 18px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: transparent; /* base neutra */
+  color: inherit;
+}
+
+/* Efecto hover base */
+.btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
+
+/* === Primario (amarillo) ===
+   - Fondo sólido var(--accent)
+   - SIN borde visible
+*/
+.btn.btn-primary,
+button.btn.btn-primary,
+.pop-dialog .btn.btn-primary {
+  background: var(--accent) !important;
+  color: var(--text-dark) !important;
+  border: none !important;         /* <- sin borde */
+  box-shadow: var(--shadow);
+}
+.btn.btn-primary:hover,
+button.btn.btn-primary:hover,
+.pop-dialog .btn.btn-primary:hover {
+  filter: brightness(0.95);
+}
+.btn.btn-primary:active,
+button.btn.btn-primary:active,
+.pop-dialog .btn.btn-primary:active {
+  filter: brightness(0.9);
+}
+
+/* === Secundario (outline blanco) ===
+   - Fondo transparente
+   - Borde blanco del mismo color que la letra
+*/
+.btn.btn-secondary,
+button.btn.btn-secondary,
+.pop-dialog .btn.btn-secondary {
+  background: transparent !important;
+  color: #fff !important;
+  border: 1.5px solid #fff !important;  /* borde blanco igual que el texto */
+  letter-spacing: 0.3px;
+  padding: 0.45rem 1.4rem; /* pill visualmente más estilizado */
+}
+.btn.btn-secondary:hover,
+button.btn.btn-secondary:hover,
+.pop-dialog .btn.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: #fff !important;
+  color: #fff !important;
+  transform: translateY(-1px);
+}
+.btn.btn-secondary:active,
+button.btn.btn-secondary:active,
+.pop-dialog .btn.btn-secondary:active {
+  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Asegurar forma pill aunque algún CSS pise .btn */
+.btn,
+button.btn,
+.pop-dialog .btn {
+  border-radius: 999px !important;
+}

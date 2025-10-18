@@ -1,7 +1,8 @@
 /* src/styles/forms.css */
 
-body .abmc-input,
-body .abmc-select {
+/* === Campos base ABMC (inputs y selects) === */
+.abmc-input,
+.abmc-select {
   flex: 1 1 200px;
   background: rgba(255,255,255,.08);
   color: var(--text-light);
@@ -12,80 +13,40 @@ body .abmc-select {
   font-family: var(--font-sans);
 }
 
-body .abmc-input::placeholder { color: rgba(232,234,237,.75); }
-body .abmc-input:focus,
-body .abmc-input:active,
-body .abmc-select:active,
-body .abmc-select:focus {
+.abmc-input::placeholder { color: rgba(232,234,237,.75); }
+.abmc-input:focus,
+.abmc-select:focus {
   color: var(--text-light);
-  border-color: var(--card) !important;
-  background: rgba(255,255,255,.08) !important;
-  box-shadow: 0 0 0 3px rgba(179,205,250,.25) !important;
+  border-color: var(--card);
+  background: rgba(255,255,255,.08);
+  box-shadow: 0 0 0 3px rgba(179,205,250,.25);
 }
 
-body .abmc-input[type="date"]::-webkit-calendar-picker-indicator {
-  -webkit-user-select: none !important;
-  user-select: none !important;
+/* Date picker (Chromium/WebKit) */
+.abmc-input[type="date"]::-webkit-calendar-picker-indicator {
+  -webkit-user-select: none;
+  user-select: none;
   cursor: pointer;
   opacity: 0.95;
   filter: invert(92%) sepia(6%) saturate(8%) hue-rotate(180deg) brightness(99%) contrast(95%);
 }
 
-body .abmc-select option {
-  background: var(--bg);
-  color: var(--text-light);
-}
-
-body .abmc-select:focus {
-  color: var(--pr) !important;
-  border-color: var(--card) !important;
-  background: rgba(255,255,255,.08) !important;
-  box-shadow: 0 0 0 3px rgba(179,205,250,.25) !important;
-}
-
-/* Botones base */
-body .abmc-btn {
-  border: none;
-  border-radius: 12px;
-  padding: 10px 16px;
-  font-weight: 700 !important;
-  cursor: pointer;
-  transition: .15s ease;
-  font-family: var(--font-sans);
-}
-
-body .abmc-btn-primary {
+/* === Botones de acción compactos (no globales) === */
+.btn-accion {
   background: var(--accent);
   color: var(--text-dark);
+  border: 0;
+  border-radius: 12px;
+  padding: 6px 10px;
   box-shadow: var(--shadow);
+  transition: transform .2s ease, filter .2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
+.btn-accion:hover { transform: scale(1.05); filter: brightness(0.95); }
 
-.btn {
-  border: none;
-  border-radius: var(--radius);
-  padding: 10px 18px;
-  font-weight: 700;
-  font-family: var(--font-sans);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-primary {
-  background: var(--accent) !important;
-  color: var(--text-dark) !important;
-  box-shadow: var(--shadow);
-}
-.btn-primary:hover { filter: brightness(0.95); }
-.btn-primary:active { filter: brightness(0.9); }
-
-.btn-secondary {
-  background: transparent !important;
-  color: var(--card) !important;
-  border: 2px solid var(--card) !important;
-}
-.btn-secondary:hover { background: rgba(179, 205, 250, 0.1); }
-
-/* Form grid */
+/* === Grid y etiquetas de form === */
 .form-grid { display: grid; gap: 16px; }
 
 .field label {
@@ -96,7 +57,7 @@ body .abmc-btn-primary {
   opacity: 0.9;
 }
 
-/* Antes: background: #0f1036 —> usamos superficie coherente */
+/* === Inputs estándar del popup/form === */
 .input,
 textarea.input {
   width: 100%;
@@ -117,6 +78,7 @@ textarea.input:focus {
 .input::placeholder,
 textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
 
+/* === Grupo específico de Miembro (local) === */
 .form-group-miembro {
   padding: 2.5rem 0rem;
   display: flex;
@@ -124,75 +86,4 @@ textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
   justify-content: center;
   align-content: center;
   height: 3rem;
-}
-
-.btn-close {
-  background: none !important;
-  border: none !important;
-  width: 1.2rem;
-  height: 1.2rem;
-  position: relative;
-  opacity: 1 !important;
-}
-.btn-close::before,
-.btn-close::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 1.2rem;
-  height: 2px;
-  background-color: #E8EAED;
-  transform-origin: center;
-}
-.btn-close::before { transform: translate(-50%, -50%) rotate(45deg); }
-.btn-close::after  { transform: translate(-50%, -50%) rotate(-45deg); }
-.btn-close svg,
-.btn-close::after svg { display: none !important; }
-
-/* --- ACCIONES (UNIFICADAS) --- */
-.btn-accion {
-  background: var(--accent) !important;
-  color: var(--text-dark) !important;
-  border: none !important;
-  border-radius: 12px;
-  padding: 6px 10px;
-  box-shadow: var(--shadow);
-  transition: transform .2s ease, filter .2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.btn-accion:hover {
-  transform: scale(1.05);
-  filter: brightness(0.95);
-}
-
-/* Eliminar (mismo estilo base, pero ícono distinto) */
-.btn-accion.eliminar {
-  background: var(--accent) !important;
-  color: var(--text-dark) !important;
-  border: none !important;
-  box-shadow: var(--shadow);
-}
-.btn-accion.eliminar:hover {
-  transform: scale(1.05);
-  filter: brightness(0.9);
-}
-
-/* --- BOTONES PRINCIPALES --- */
-.btn-agregar {
-  background-color: var(--accent) !important;
-  border: none !important;
-  border-radius: 20px !important;
-  padding: 0.5rem 1.2rem !important;
-  color: #fff !important;
-  font-weight: 500 !important;
-  font-family: 'Manjari', sans-serif;
-  transition: background-color 0.2s ease, transform 0.2s ease !important;
-}
-.btn-agregar:hover {
-  background-color: #e0a800 !important;
-  color: #fff !important;
-  transform: scale(1.05) !important;
 }

@@ -1,5 +1,7 @@
 /* src/styles/popup.css */
 @import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
+@import "./forms.css";
+/* NO importamos buttons aquí para evitar duplicación; ya están globales. */
 
 .pop-backdrop {
   position: fixed;
@@ -57,61 +59,3 @@
   padding: 14px 18px 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
-
-/* Botones coherentes con tokens */
-.btn {
-  border: none;
-  border-radius: var(--radius);
-  padding: 10px 18px;
-  font-weight: 700;
-  font-family: var(--font-sans);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.btn-primary {
-  background: var(--accent) !important;
-  color: var(--text-dark) !important;
-  box-shadow: var(--shadow);
-}
-.btn-primary:hover { filter: brightness(0.95); }
-.btn-primary:active { filter: brightness(0.9); }
-
-.btn-secondary {
-  background: transparent !important;
-  color: var(--card) !important;
-  border: 2px solid var(--card) !important;
-}
-.btn-secondary:hover { background: rgba(179, 205, 250, 0.1); }
-
-/* Form grid */
-.form-grid { display: grid; gap: 16px; }
-
-.field label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 0.9rem;
-  color: var(--text-light);
-  opacity: 0.9;
-}
-
-/* Antes: background: #0f1036 —> usamos superficie coherente */
-.input,
-textarea.input {
-  width: 100%;
-  background: rgba(255,255,255,.05);
-  color: var(--text-light);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius);
-  padding: 10px 12px;
-  font-family: var(--font-sans);
-  outline: none;
-  resize: vertical;
-}
-.input:focus,
-textarea.input:focus {
-  border-color: var(--card);
-  box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25);
-}
-.input::placeholder,
-textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }

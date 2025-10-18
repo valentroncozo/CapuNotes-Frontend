@@ -1,12 +1,10 @@
 /* src/styles/globals.css */
 /* === Base Global Styles === */
 
-/* Manjari como fuente global (pedido del cliente) */
 @import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
-
-/* IMPORTS DE TOKENS Y VARIABLES — deben ir DESPUÉS y NO sobrescribir luego */
 @import "./tokens.css";
 @import "./variable.css";
+@import "./buttons.css";
 
 /* RESET + BASE */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,11 +28,17 @@ a { color: var(--card); text-decoration: none; transition: opacity .2s ease; }
 a:hover { opacity: .9; }
 
 /* BOTONES */
-button, .btn { cursor: pointer; border: none; border-radius: var(--radius); transition: all .2s ease-in-out; }
-.btn-primary, .btn-warning, .btn { background-color: var(--accent) !important; color: var(--text-dark) !important; box-shadow: var(--shadow); }
-.btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+button,
+.btn {
+  cursor: pointer;
+  border: none;
+  transition: all .2s ease-in-out;
+  background: transparent;
+  color: inherit;
+  font-family: var(--font-sans);
+}
 
-/* FORMULARIOS */
+/* FORMULARIOS base */
 input, select, textarea {
   font-family: var(--font-sans);
   font-size: var(--fs-2);
@@ -47,6 +51,57 @@ input, select, textarea {
   transition: border .2s ease;
 }
 input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+
+/* ==========================================================
+   SELECTS — caret único: blanco (reposo) → amarillo (hover/focus)
+   - Solo aplica a selects desplegables (no multiple/size)
+   - El caret se alinea pegado al borde derecho
+   ========================================================== */
+select:not([multiple]):not([size]) {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* espacio para el caret a la derecha */
+  padding-right: 2rem;
+
+  /* caret */
+  background-repeat: no-repeat;
+  background-position: calc(100% - 10px) 50%;
+  background-size: 12px 12px;
+  background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'>\
+<path fill='%23ffffff' d='M6 8l4 4 4-4z'/>\
+</svg>");
+}
+
+/* hover/focus: solo cambia el color del caret */
+select:not([multiple]):not([size]):hover,
+select:not([multiple]):not([size]):focus {
+  background-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'>\
+<path fill='%23ffc107' d='M6 8l4 4 4-4z'/>\
+</svg>");
+}
+
+/* opciones del desplegable */
+select option {
+  background: var(--bg);
+  color: var(--text-light);
+}
+
+/* Quitar flecha nativa (IE/antiguos) */
+select::-ms-expand { display: none; }
+
+/* iOS Safari */
+@supports (-webkit-touch-callout: none) {
+  select { background-clip: padding-box; }
+}
+
+/* Alto contraste (Windows) */
+@media (forced-colors: active) {
+  select { background-image: none; padding-right: .75rem; }
+}
 
 /* UTILS */
 .divisor-amarillo { border: none; border-top: 2px solid var(--accent); border-radius: 2px; margin: .75rem 0 1.25rem; }
@@ -61,7 +116,3 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 
 /* ACCESIBILIDAD */
 :focus-visible { outline: 3px solid rgba(255,193,7,.75); outline-offset: 2px; }
-
-/* 🔒 IMPORTANTE:
-   Quitamos el bloque :root con “fallbacks” que sobreescribía tokens/variables.
-   Si querés definir defaults, ponelos en tokens.css o variable.css. */

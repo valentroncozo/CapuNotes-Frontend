@@ -28,6 +28,15 @@ function GearIcon(props) {
   );
 }
 
+/* Ícono hamburguesa propio (3 líneas) */
+function HamburgerIcon(props) {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" {...props}>
+      <path fill="currentColor" d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z" />
+    </svg>
+  );
+}
+
 /* Sin el link suelto a /audiciones */
 const MENU_ITEMS = [
   ["/asistencias", "Asistencias"],
@@ -67,12 +76,13 @@ export default function AppShell({ onLogout }) {
     <>
       <nav className="navbar fixed-top navbar-dark appshell-navbar">
         <button
-          className="navbar-toggler appshell-toggle"
+          className="appshell-toggle"
           type="button"
           aria-label="Abrir menú"
           onClick={() => setOpen(true)}
+          title="Abrir menú"
         >
-          <span className="navbar-toggler-icon"></span>
+          <HamburgerIcon />
         </button>
       </nav>
 
@@ -134,6 +144,7 @@ export default function AppShell({ onLogout }) {
         />
       )}
 
+      {/* separador para que el contenido no quede debajo del navbar fijo */}
       <div style={{ height: "56px" }} />
       <Outlet />
     </>
@@ -164,14 +175,14 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         ]}
       />
 
-      {/* Acordeón reutilizable: Audiciones (incluye "Audiciones") */}
+      {/* Acordeón reutilizable: Audiciones */}
       <AccordionMenu
         title="Audiciones"
         open={audOpen}
         setOpen={setAudOpen}
         onNavigate={onNavigate}
         items={[
-          { label: "Audiciones", path: "/audiciones" },               // ✅ se mantiene
+          { label: "Audiciones", path: "/audiciones" },
           { label: "Candidatos", path: "/candidatos" },
           { label: "Configurar Cuestionario", path: "/configurar-cuestionario" },
           { label: "Historial de Audiciones", path: "/historial-audiciones" },
