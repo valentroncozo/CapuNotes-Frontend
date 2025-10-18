@@ -60,18 +60,19 @@ const Audicion = ({ title ='Audicion'}) => {
                 className="abmc-input"
               />
           </div>
-          
 
-          <TableABMC 
-          headers={headers}
-          data={filteredData}
-          actions={actions}
-          columns={['dia','cantidadTurnos','turnosDisponibles']}
-          emptyMenssage={ filteredData.length === 0 && data.length > 0 
-            ? 'No se encuentran días que coincidan con el filtro.' 
-            : 'No hay audiciones disponibles.' 
-          }
-          />
+          <div className="abmc-table-container">
+            <TableABMC
+              headers={headers}
+              data={filteredData}
+              actions={actions}
+              columns={['dia', 'cantidadTurnos', 'turnosDisponibles']}  
+              emptyMenssage={ filteredData.length === 0 && data.length > 0 
+                ? 'No se encuentran días que coincidan con el filtro.' 
+                : 'No hay audiciones disponibles.' 
+              }
+            />
+          </div>
 
           <footer className="audicion-footer">
             <button className="abmc-btn btn-secondary" onClick={() => {}}>
