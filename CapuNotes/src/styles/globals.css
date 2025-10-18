@@ -46,7 +46,7 @@ input, select, textarea {
 input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 
 /* UTILS */
-.divisor-amarillo { border: none; border-top: 2px solid var(--accent); border-radius: 2px; margin: .75rem 0 1.25rem; }
+.divisor-amarillo { border: none; border-top: 1px solid var(--accent); border-radius: 1px; margin: .75rem 0 1.25rem; }
 .text-center { text-align: center; }
 .text-right  { text-align: right; }
 .text-left   { text-align: left; }

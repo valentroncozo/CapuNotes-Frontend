@@ -60,6 +60,7 @@
   gap: 0.8rem;
   flex: row;
   flex-wrap: wrap;
+  
 }
 
 .form-group-agregar label {
@@ -87,3 +88,100 @@
   flex: row;
 
 }
+
+/* --- Mejorar alineación y espaciado de la columna de Acciones --- */
+
+/* Mueve un poco el título "Acciones" hacia el centro */
+.abmc-table th:last-child {
+  text-align: center;
+  padding-right: 20px; /* 👈 separa del borde derecho */
+}
+
+/* Centra y da más aire a los íconos */
+.abmc-actions {
+  display: flex;
+  justify-content: center;  /* centra horizontalmente los botones */
+  gap: 12px;                /* espacio entre los iconos */
+  padding-right: 12px;      /* 👈 corrimiento visual hacia adentro */
+}
+
+/* === Prioridad total para botones de acciones === */
+.abmc-actions .abmc-btn-icon,
+.abmc-actions .abmc-btn-icon:hover,
+.abmc-actions .abmc-btn-icon svg,
+.abmc-actions .abmc-btn-icon svg path {
+  opacity: 1 !important;
+  background-color: #ffc107 !important;
+  color: #202124 !important;
+  fill: #202124 !important;
+  stroke: none !important;
+  border: none !important;
+}
+
+/* === Hover refinado + sin borde celeste === */
+.abmc-actions .abmc-btn-icon {
+  outline: none !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  background-color: #ffc107; /* amarillo institucional */
+  color: #202124;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover: aclara el fondo e ícono, sin borde */
+.abmc-actions .abmc-btn-icon:hover {
+  background-color: #ffd54f; /* más claro */
+  color: #3a3a3a; /* ícono un poco más claro */
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  outline: none !important;
+  border: none !important;
+}
+
+/* Click o "active": efecto de hundimiento */
+.abmc-actions .abmc-btn-icon:active {
+  transform: translateY(1px) scale(0.98);
+  background-color: #e6ad00; /* tono más oscuro al presionar */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  outline: none !important;
+  border: none !important;
+}
+
+/* Asegura que los iconos sigan el color del botón */
+.abmc-actions .abmc-btn-icon svg path {
+  fill: currentColor !important;
+  stroke: none !important;
+}
+
+/* Quita cualquier borde/halo al enfocar con tab */
+.abmc-actions .abmc-btn-icon:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.4); /* un halo suave dorado */
+}
+/* === Igualar altura visual del select con el input === */
+.abmc-select {
+  height: 44px !important;
+  padding: 0 12px;
+  line-height: 1.4; /* un poco más alto para centrar el texto */
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: var(--radius);
+  background-color: rgba(255,255,255,.05);
+  color: var(--text-light);
+}
+
+/* === Hover y focus coherentes con el diseño === */
+.abmc-select:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent); /* mismo amarillo institucional */
+  transition: all 0.2s ease-in-out;
+}
+
+.abmc-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.35);
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+

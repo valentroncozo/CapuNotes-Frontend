@@ -66,43 +66,45 @@ export default function GenericEditPopup({
       }
     >
       <div className="form-grid">
-        {schema.map((f) => (
-          <div className="field" key={f.key}>
-            <label htmlFor={`field-${f.key}`}>{f.label}</label>
+        {schema
+          .filter((f) => !["submit", "button", "label"].includes(f.type))
+          .map((f) => (
+            <div className="field" key={f.key}>
+              <label htmlFor={`field-${f.key}`}>{f.label}</label>
 
-            {f.type === "select" ? (
-              <select
-                id={`field-${f.key}`}
-                name={f.key}
-                className="input"
-                value={form[f.key] || ""}
-                onChange={onChange}
-              >
-                <option value="">Seleccionar</option>
-                {(f.options || []).map((opt) => {
-                  const value = opt.value ?? opt;
-                  const label = opt.label ?? opt;
-                  return (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  );
-                })}
-              </select>
-            ) : (
-              <input
-                id={`field-${f.key}`}
-                type={f.type || "text"}
-                name={f.key}
-                className="input"
-                value={form[f.key] || ""}
-                onChange={onChange}
-                maxLength={f.max}
-                placeholder={f.label}
-              />
-            )}
-          </div>
-        ))}
+              {f.type === "select" ? (
+                <select
+                  id={`field-${f.key}`}
+                  name={f.key}
+                  className="input"
+                  value={form[f.key] || ""}
+                  onChange={onChange}
+                >
+                  <option value="">Seleccionar</option>
+                  {(f.options || []).map((opt) => {
+                    const value = opt.value ?? opt;
+                    const label = opt.label ?? opt;
+                    return (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    );
+                  })}
+                </select>
+              ) : (
+                <input
+                  id={`field-${f.key}`}
+                  type={f.type || "text"}
+                  name={f.key}
+                  className="input"
+                  value={form[f.key] || ""}
+                  onChange={onChange}
+                  maxLength={f.max}
+                  placeholder={f.label}
+                />
+              )}
+            </div>
+          ))}
       </div>
     </Modal>
   );

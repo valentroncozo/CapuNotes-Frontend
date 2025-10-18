@@ -1,14 +1,35 @@
 // src/services/cuerdasService.js
-import { localStorageApi } from "@/services/localStorageApi";
-import { CUERDA_STORAGE_KEY } from "@/schemas/cuerdas";
-// import { apiClient } from "@/services/apiClient";
+import axios from "axios";
 
-export const cuerdasService = localStorageApi(CUERDA_STORAGE_KEY);
+const API_URL = "/api/cuerdas";
 
-// Futuro backend:
-// export const cuerdasService = {
-//   list: () => apiClient.get('/cuerdas'),
-//   create: (payload) => apiClient.post('/cuerdas', { body: payload }),
-//   update: (payload) => apiClient.put(`/cuerdas/${payload.id}`, { body: payload }),
-//   remove: (id) => apiClient.delete(`/cuerdas/${id}`),
-// };
+export const cuerdasService = {
+  list: async () => {
+    const res = await axios.get(API_URL);
+    console.log("📡 Datos recibidos de CUERDAS:", res.data);
+    return res.data.map((c) => ({
+      id: c.id,
+      nombre: c.name || c.nombre || "(Sin nombre)",
+      descripcion: c.description || c.descripcion || "",
+    }));
+  },
+
+  getById: async (id) => {
+    const res = await axios.get(`${API_URL}/${id}`);
+    return res.data;
+  },
+
+  create: async (data) => {
+    const res = await axios.post(API_URL, data);
+    return res.data;
+  },
+
+  update: async (updated) => {
+    const res = await axios.put(`${API_URL}/${updated.id}`, updated);
+    return res.data;
+  },
+
+  remove: async (id) => {
+    await axios.delete(`${API_URL}/${id}`);
+  },
+};
