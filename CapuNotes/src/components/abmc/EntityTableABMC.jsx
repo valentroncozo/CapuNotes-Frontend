@@ -3,14 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import BackButton from "../common/BackButton";
 import { PencilFill, Trash3Fill, PlusLg } from "react-bootstrap-icons";
 import Swal from "sweetalert2";
-
 import EntityEditForm from "./EntityEditForm.jsx";
 import "@/styles/abmc.css";
-import "@/styles/miembros.css";
 
-/**
- * ABMC Genérico (versión modal)
- */
 export default function EntityTableABMC({
   title = "Catálogo",
   service,
@@ -18,14 +13,21 @@ export default function EntityTableABMC({
   uniqueBy = null,
   entityName = "elemento",
   showBackButton = true,
+  renderActions,
+  onAdd = null,
+  usePopupForm = true,
+  sortable = false, // ordenar solo donde se necesite (p.ej. Miembros)
 }) {
   const [items, setItems] = useState([]);
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Popup state
   const [isOpen, setIsOpen] = useState(false);
   const [editing, setEditing] = useState(null);
+
+  // Orden
+  const [sortBy, setSortBy] = useState(null);
+  const [sortDir, setSortDir] = useState("asc");
 
   useEffect(() => {
     let mounted = true;
@@ -40,100 +42,70 @@ export default function EntityTableABMC({
         if (mounted) setLoading(false);
       }
     })();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, [service]);
 
-  const visibleFields = useMemo(
+  const formFields = useMemo(
     () => schema.filter((f) => f.type !== "submit" && f.type !== "button"),
     [schema]
   );
+  const tableFields = useMemo(
+    () => formFields.filter((f) => f.table !== false),
+    [formFields]
+  );
 
-  const filtrados = useMemo(() => {
+  const filtered = useMemo(() => {
     if (!q) return items;
     const t = q.toLowerCase();
     return items.filter((row) =>
-      visibleFields.some((f) =>
+      formFields.some((f) =>
         String(row?.[f.key] ?? "").toLowerCase().includes(t)
       )
     );
-  }, [items, q, visibleFields]);
+  }, [items, q, formFields]);
 
-  const openAdd = () => {
-    setEditing(null);
-    setIsOpen(true);
-  };
-  const openEdit = (row) => {
-    setEditing(row);
-    setIsOpen(true);
-  };
-  const closeModal = () => {
-    setIsOpen(false);
-    setEditing(null);
-  };
-
-  const isDuplicate = (payload) => {
-    if (!uniqueBy) return false;
-    const keys = Array.isArray(uniqueBy) ? uniqueBy : [uniqueBy];
-    const normalized = (v) => String(v ?? "").trim().toLowerCase();
-    return items.some((it) => {
-      if (payload.id && it.id === payload.id) return false;
-      return keys.every((k) => normalized(it[k]) === normalized(payload[k]));
+  const sorted = useMemo(() => {
+    if (!sortable || !sortBy) return filtered;
+    const dir = sortDir === "desc" ? -1 : 1;
+    return [...filtered].sort((a, b) => {
+      const av = String(a?.[sortBy] ?? "").toLowerCase();
+      const bv = String(b?.[sortBy] ?? "").toLowerCase();
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
     });
+  }, [filtered, sortBy, sortDir, sortable]);
+
+  const toggleSort = (key) => {
+    if (!sortable) return;
+    if (sortBy !== key) { setSortBy(key); setSortDir("asc"); }
+    else { setSortDir((d) => (d === "asc" ? "desc" : "asc")); }
   };
+
+  const headerClass = (key) => {
+    if (!sortable) return "";
+    if (sortBy !== key) return "th-sortable";
+    return `th-sortable sorted-${sortDir}`;
+  };
+
+  const openAdd = () => { if (onAdd) return onAdd(); setEditing(null); setIsOpen(true); };
+  const closeModal = () => { setIsOpen(false); setEditing(null); };
 
   const handleSave = async (data) => {
-    try {
-      if (isDuplicate(data)) {
-        await Swal.fire({
-          icon: "warning",
-          title: "Ya existe",
-          text: `Ya existe ${entityName} con ese/estos dato(s) único(s).`,
-          background: "#11103a",
-          color: "#E8EAED",
-        });
-        return;
-      }
-
-      if (editing) {
-        const updated = await service.update({ ...editing, ...data });
-        setItems((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
-        await Swal.fire({
-          icon: "success",
-          title: "Cambios guardados",
-          timer: 1200,
-          showConfirmButton: false,
-          background: "#11103a",
-          color: "#E8EAED",
-        });
-      } else {
-        const created = await service.create(data);
-        setItems((prev) => [...prev, created]);
-        await Swal.fire({
-          icon: "success",
-          title: "Registrado",
-          timer: 1200,
-          showConfirmButton: false,
-          background: "#11103a",
-          color: "#E8EAED",
-        });
-      }
-    } catch (e) {
-      await Swal.fire({
-        icon: "error",
-        title: "Ups",
-        text: e?.message || "No se pudo guardar.",
-        background: "#11103a",
-        color: "#E8EAED",
-      });
+    if (editing) {
+      const updated = await service.update({ ...editing, ...data });
+      setItems((p) => p.map((x) => (x.id === updated.id ? updated : x)));
+    } else {
+      const created = await service.create(data);
+      setItems((p) => [...p, created]);
     }
+    closeModal();
   };
 
-  const handleDelete = async (row) => {
+  const requestDelete = async (row) => {
     const confirm = await Swal.fire({
       title: `¿Eliminar ${entityName}?`,
-      text: row?.nombre || "Se quitará de la lista.",
+      text: row?.nombre || "",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#ffc107",
@@ -144,17 +116,8 @@ export default function EntityTableABMC({
       color: "#E8EAED",
     });
     if (!confirm.isConfirmed) return;
-
     await service.remove(row.id);
     setItems((prev) => prev.filter((x) => x.id !== row.id));
-    await Swal.fire({
-      icon: "success",
-      title: "Eliminado",
-      timer: 1000,
-      showConfirmButton: false,
-      background: "#11103a",
-      color: "#E8EAED",
-    });
   };
 
   return (
@@ -173,7 +136,6 @@ export default function EntityTableABMC({
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-
           <button
             className="abmc-btn abmc-btn-primary"
             onClick={openAdd}
@@ -186,62 +148,83 @@ export default function EntityTableABMC({
         <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
             <tr className="abmc-row">
-              {visibleFields.map((f) => (
-                <th key={f.key}>{f.label}</th>
+              {tableFields.map((f) => (
+                <th key={f.key} className={headerClass(f.key)}>
+                  <span className="th-label">{f.label}</span>
+                  {sortable && (
+                    <button
+                      type="button"
+                      className="th-caret-btn"
+                      aria-label={
+                        sortBy !== f.key
+                          ? `Ordenar por ${f.label}`
+                          : `Cambiar orden ${sortDir === "asc" ? "descendente" : "ascendente"}`
+                      }
+                      onClick={() => toggleSort(f.key)}
+                    >
+                      <span className="th-caret" aria-hidden />
+                    </button>
+                  )}
+                </th>
               ))}
               <th style={{ textAlign: "center" }}>Acciones</th>
             </tr>
           </thead>
 
           <tbody>
-            {loading && (
+            {loading ? (
               <tr className="abmc-row">
-                <td colSpan={visibleFields.length + 1}>Cargando...</td>
+                <td colSpan={tableFields.length + 1}>Cargando...</td>
               </tr>
-            )}
-
-            {!loading && filtrados.length === 0 && (
+            ) : sorted.length === 0 ? (
               <tr className="abmc-row">
-                <td colSpan={visibleFields.length + 1}>Sin registros</td>
+                <td colSpan={tableFields.length + 1}>Sin registros</td>
               </tr>
-            )}
-
-            {!loading &&
-              filtrados.map((row) => (
+            ) : (
+              sorted.map((row) => (
                 <tr className="abmc-row" key={row.id}>
-                  {visibleFields.map((f) => (
+                  {tableFields.map((f) => (
                     <td key={f.key}>{String(row?.[f.key] ?? "-")}</td>
                   ))}
                   <td className="abmc-actions">
-                    <button
-                      className="btn-accion me-2"
-                      onClick={() => openEdit(row)}
-                      title="Editar"
-                    >
-                      <PencilFill size={18} />
-                    </button>
-                    <button
-                      className="btn-accion eliminar"
-                      onClick={() => handleDelete(row)}
-                      title="Eliminar"
-                    >
-                      <Trash3Fill size={18} />
-                    </button>
+                    {renderActions ? (
+                      renderActions(row, { requestDelete })
+                    ) : (
+                      <>
+                        <button
+                          className="btn-accion me-2"
+                          title="Editar"
+                          onClick={() => { setEditing(row); setIsOpen(true); }}
+                        >
+                          <PencilFill size={18} />
+                        </button>
+                        <button
+                          className="btn-accion eliminar"
+                          title="Eliminar"
+                          onClick={() => requestDelete(row)}
+                        >
+                          <Trash3Fill size={18} />
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
-              ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
-      <EntityEditForm
-        isOpen={isOpen}
-        onClose={closeModal}
-        entityName={entityName}
-        schema={visibleFields}
-        entity={editing}
-        onSave={handleSave}
-      />
+      {usePopupForm && (
+        <EntityEditForm
+          isOpen={isOpen}
+          onClose={closeModal}
+          entityName={entityName}
+          schema={formFields}
+          entity={editing}
+          onSave={handleSave}
+        />
+      )}
     </main>
   );
 }

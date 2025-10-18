@@ -1,54 +1,136 @@
 /* src/styles/table.css */
 
-/* Tabla rectangular con filas separadas como cards */
-.abmc-table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
+/* ================== BASE ================== */
+.abmc-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
 
 .abmc-thead th {
-  text-align: center;
-  background: var(--card);
-  color: var(--text-dark);
+  background: var(--table-head-bg);
+  color: var(--table-head-fg);
   font-weight: 700;
   padding: 12px 14px;
   text-align: left;
   border-radius: 0 !important;
+  transition: background-color 0.2s ease;
 }
 
-/* Filas alternadas */
-.abmc-row { color: var(--text-light); background: #1f1e46; }
-.abmc-row:nth-child(even) { background: #24224f; }
-.abmc-row td { padding: 14px; vertical-align: middle; }
-.abmc-row:hover { background: #2a285e; }
+/* Nunca cambiar color/fondo del TH por hover */
+.abmc-thead th:hover,
+.abmc-thead th:focus,
+.abmc-thead th:focus-within,
+.abmc-thead th:active {
+  background: var(--table-head-bg) !important;
+  color: var(--table-head-fg) !important;
+}
 
-/* Sin redondeo en extremos */
+/* Filas (100% vía variables — azules) */
+.abmc-row {
+  color: var(--text-light);
+  background: var(--table-row);
+}
+.abmc-row:nth-child(even) { background: var(--table-row-alt); }
+.abmc-row td {
+  padding: 14px;
+  vertical-align: middle;
+}
+.abmc-row:hover { background: var(--table-row-hover); }
+
 .abmc-row td:first-child,
 .abmc-row td:last-child { border-radius: 0 !important; }
 
 /* Acciones */
 .abmc-actions { display: flex; gap: 8px; justify-content: center; }
 
-/* Responsive */
-@media (width < 460px) { 
+/* ================== RESPONSIVE ================== */
+@media (width < 460px) {
   .abmc-actions { flex-wrap: wrap !important; }
-
-  .abmc-row td,th {
-    text-align: center;
-    min-width: 0;                 /* permite que el item se reduzca dentro del flex */
-    overflow-wrap: break-word;
-  }
-
-  .abmc-row td:nth-child(4) { display: none; }
-  .abmc-row th:nth-child(4) { display: none; }
+  .abmc-row td, th { text-align: center; min-width: 0; overflow-wrap: break-word; }
+  .abmc-row td:nth-child(4), .abmc-row th:nth-child(4) { display: none; }
+}
+@media (width < 408px) {
+  .abmc-row td:nth-child(3), .abmc-row th:nth-child(3) { display: none; }
 }
 
-@media (width < 408px) { 
-  .abmc-row td:nth-child(3) { display: none; }
-  .abmc-row th:nth-child(3) { display: none; }
+/* ==========================================================
+   ORDENABLE — SOLO la flecha es interactiva/hover
+   ========================================================== */
+.th-sortable {
+  position: relative;
+  user-select: none;
+  padding-right: 28px;
+  pointer-events: none; /* el TH no recibe hover ni click */
+}
+.th-sortable .th-label { pointer-events: none; }
+
+/* Botón que contiene la flecha (único interactivo) */
+.th-caret-btn {
+  all: unset;
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background-color .15s ease, transform .15s ease;
 }
 
-/* ========== Utilidades nuevas ========== */
+/* Hover SOLO en el botón de la flecha */
+.th-caret-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-50%) scale(1.04);
+}
 
-/* Pequeño botón con + para acciones laterales */
-.mini-plus-btn{
+/* Flecha */
+.th-caret {
+  display: block;
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  opacity: .6;
+  transition: transform .2s ease, opacity .2s ease;
+}
+
+/* Sin orden: “doble caret” sutil */
+.th-sortable:not(.sorted-asc):not(.sorted-desc) .th-caret {
+  border-top: 5px solid rgba(255,255,255,.38);
+  box-shadow: 0 7px 0 0 rgba(255,255,255,.38);
+}
+
+/* Ascendente */
+.th-sortable.sorted-asc .th-caret {
+  border-top: 6px solid var(--text-light);
+  opacity: 1;
+  box-shadow: none;
+}
+
+/* Descendente */
+.th-sortable.sorted-desc .th-caret {
+  border-bottom: 6px solid var(--text-light);
+  border-top: none;
+  opacity: 1;
+}
+
+/* Hover: sólo la flecha se “ilumina” */
+.th-caret-btn:hover .th-caret {
+  opacity: .95;
+  transform: translateY(-1px) scale(1.08);
+}
+
+/* Garantía extra: no permitir que el TH cambie de fondo */
+.th-sortable:hover {
+  background: var(--table-head-bg) !important;
+  color: var(--table-head-fg) !important;
+}
+
+/* ==========================================================
+   UTILIDADES
+   ========================================================== */
+.mini-plus-btn {
   width: 34px;
   height: 34px;
   border-radius: 10px;
@@ -62,14 +144,13 @@
   justify-content: center;
   transition: .15s ease;
 }
-.mini-plus-btn:hover{
+.mini-plus-btn:hover {
   transform: scale(1.06);
   border-color: var(--accent);
   color: var(--accent);
 }
 
-/* Badge para Resultado/Estado (usado en Candidatos) */
-.badge-resultado, .badge-estado{
+.badge-resultado, .badge-estado {
   display: inline-block;
   min-width: 32px;
   padding: .15rem .5rem;
@@ -79,6 +160,6 @@
   background: rgba(255,255,255,.08);
   border: 1px solid rgba(255,255,255,.12);
 }
-.badge-resultado.ok, .badge-estado.ok   { color: #2ecc71; }
+.badge-resultado.ok, .badge-estado.ok { color: #2ecc71; }
 .badge-resultado.bad, .badge-estado.bad { color: #ff6b6b; }
 .badge-resultado.pend, .badge-estado.pend { color: #f1c40f; }

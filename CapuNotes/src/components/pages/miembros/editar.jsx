@@ -1,264 +1,109 @@
-import { useState, useEffect } from 'react';
-import { Button, Container, Row, Col, Form } from 'react-bootstrap';
-import { useNavigate, useLocation } from 'react-router-dom';
+// src/components/pages/miembros/editar.jsx
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import BackButton from "@/components/common/BackButton.jsx";
-import Swal from 'sweetalert2';
+import { miembrosService } from "@/services/miembrosService.js";
+import { buildMiembroSchema, miembroEntityName } from "@/schemas/miembros.js";
+import "@/styles/abmc.css";
+import "@/styles/forms.css";
 
-import '@/styles/miembros.css';
-import '@/styles/abmc.css';
-
-const STORAGE_KEY = 'capunotes_miembros';
-const AREAS_KEY = 'capunotes_areas';
-const CUERDAS_KEY = 'capunotes_cuerdas';
-
-export default function MiembrosEditar({ title = "Editar miembro" }) {
-  const location = useLocation();
+export default function MiembrosEditarPage() {
   const navigate = useNavigate();
-  const miembro = location.state?.miembro;
+  const [sp] = useSearchParams();
+  const id = sp.get("id");
 
-  const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
-  const [areasDisponibles, setAreasDisponibles] = useState([]);
-  const [formData, setFormData] = useState({
-    id: null,
-    nombre: '',
-    apellido: '',
-    tipoDocumento: '',
-    numeroDocumento: '',
-    fechaNacimiento: '',
-    correo: '',
-    telefono: '',
-    provincia: '',
-    cuerda: '',
-    area: '',
-    estado: 'Activo',
-  });
+  const schema = useMemo(() => buildMiembroSchema(), []);
+  const [form, setForm] = useState(null);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    const cuerdasGuardadas = JSON.parse(localStorage.getItem(CUERDAS_KEY)) || [];
-    setCuerdasDisponibles(cuerdasGuardadas);
-    const areasGuardadas = JSON.parse(localStorage.getItem(AREAS_KEY)) || [];
-    setAreasDisponibles(areasGuardadas);
-  }, []);
+    (async () => {
+      const list = await miembrosService.list();
+      const current = list.find((m) => String(m.id) === String(id));
+      setForm(current || {});
+    })();
+  }, [id]);
 
-  useEffect(() => {
-    if (miembro) {
-      setFormData({
-        id: miembro.id ?? null,
-        nombre: miembro.nombre || '',
-        apellido: miembro.apellido || '',
-        tipoDocumento: miembro.tipoDocumento || '',
-        numeroDocumento: miembro.numeroDocumento || '',
-        fechaNacimiento: miembro.fechaNacimiento || '',
-        correo: miembro.correo || '',
-        telefono: miembro.telefono || '',
-        provincia: miembro.provincia || '',
-        cuerda: miembro.cuerda || '',
-        area: miembro.area || '',
-        estado: miembro.estado || 'Activo',
-      });
-    }
-  }, [miembro]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const miembros = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    const actualizados = miembros.map((m) =>
-      (m.id ?? m.nombre) === (formData.id ?? miembro?.id ?? miembro?.nombre)
-        ? { ...m, ...formData }
-        : m
-    );
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(actualizados));
-
-    await Swal.fire({
-      icon: 'success',
-      title: 'Miembro actualizado',
-      timer: 1200,
-      showConfirmButton: false,
-      background: '#11103a',
-      color: '#E8EAED',
+  const validate = () => {
+    const e = {};
+    schema.forEach((f) => {
+      const v = String(form?.[f.key] ?? "").trim();
+      if (f.required && !v) e[f.key] = "Obligatorio";
+      if (f.max && v.length > f.max) e[f.key] = `Máx. ${f.max} caracteres`;
     });
-
-    navigate('/miembros');
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  if (!miembro) {
-    return (
-      <main className="pantalla-miembros">
-        <Container className="pt-5">
-          <p>No se encontró el miembro a editar.</p>
-          <Button variant="secondary" onClick={() => navigate('/miembros')}>Volver</Button>
-        </Container>
-      </main>
-    );
-  }
+  const handleChange = (key, val) => setForm((prev) => ({ ...prev, [key]: val }));
+
+  const handleSave = async () => {
+    if (!validate()) return;
+    await miembrosService.update(form);
+    navigate("/miembros");
+  };
+
+  if (!form) return null;
 
   return (
-    <main className="pantalla-miembros">
-        <div className="abmc-card">
-          <div className="abmc-header">
-            <BackButton />
-            <h1 className="abmc-title">{title}</h1>
-          </div>
-
-          <Form onSubmit={handleSubmit} className="abmc-topbar">
-            <Form.Group className='form-group-miembro'>
-              <label>Nombre</label>
-              <Form.Control
-                type="text"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="form-group-miembro">
-              <label>Apellido</label>
-              <Form.Control
-                type="text"
-                name="apellido"
-                value={formData.apellido}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="form-group-miembro">
-              <label>Tipo de Documento</label>
-              <Form.Select
-                name="tipoDocumento"
-                value={formData.tipoDocumento}
-                onChange={handleChange}
-                className="abmc-select"
-              >
-                <option value="">...</option>
-                <option value="DNI">DNI</option>
-                <option value="Pasaporte">Pasaporte</option>
-              </Form.Select>
-            </Form.Group>
-
-            <Form.Group className="form-group-miembro">
-              <label>Número de Documento</label>
-              <Form.Control
-                type="text"
-                name="numeroDocumento"
-                value={formData.numeroDocumento}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="form-group-miembro">
-              <label>Fecha de Nacimiento</label>
-              <Form.Control
-                type="date"
-                name="fechaNacimiento"
-                value={formData.fechaNacimiento}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="form-group-miembro">
-              <label>Correo Electrónico</label>
-              <Form.Control
-                type="email"
-                name="correo"
-                value={formData.correo}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="form-group-miembro">
-              <label>Teléfono</label>
-              <Form.Control
-                type="text"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="form-group-miembro">
-              <label>Provincia</label>
-              <Form.Control
-                type="text"
-                name="provincia"
-                value={formData.provincia}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="form-group-agregar">
-                <label>Cuerda</label>
-                <select
-                  className="abmc-select"
-                  name="cuerda"
-                  value={miembro.cuerda}
-                  onChange={handleChange}
-                >
-                  <option value="">Seleccionar cuerda</option>
-                  {cuerdasDisponibles.map((c) => (
-                    <option key={c.id ?? c.nombre} value={c.nombre}>{c.nombre}</option>
-                  ))}
-                </select>
-
-                <Button
-                  variant="warning"
-                  className="abmc-btn"
-                  onClick={() => navigate('/cuerdas')}
-                  title="Gestionar cuerdas"
-                  type="button"
-                >
-                  +
-                </Button>
-              </Form.Group>
-
-              <Form.Group className="form-group-agregar">
-                <label>Área</label>
-                <select
-                  name="area"
-                  className="abmc-select"
-                  value={miembro.area}
-                  onChange={handleChange}
-                  >
-                  <option value="">Seleccionar área</option>
-                  {areasDisponibles.map((a) => (
-                    <option key={a.id ?? a.nombre} value={a.nombre}>{a.nombre}</option>
-                  ))}
-                </select>
-
-                <Button
-                  variant="warning"
-                  className="abmc-btn"
-                  onClick={() => navigate('/areas')}
-                  title="Gestionar áreas"
-                  type="button"
-                >
-                  +
-                </Button>
-            </Form.Group>
-
-            <Form.Group className="form-group-agregar-acciones">
-              <button type="button" className="abmc-btn abmc-btn-secondary btn btn-secondary" onClick={() => navigate('/miembros')}>
-                Cancelar
-              </button>
-              <button type="submit" className="abmc-btn abmc-btn-primary btn btn-primary">
-                Modificar
-              </button>
-            </Form.Group>
-          </Form>
-
+    <main className="abmc-page">
+      <div className="abmc-card">
+        <div className="abmc-header">
+          <BackButton />
+          <h1 className="abmc-title">Editar {capitalize(miembroEntityName)}</h1>
         </div>
+
+        <div className="form-grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          {schema
+            .filter((f) => f.type !== "button" && f.type !== "submit")
+            .map((f) => (
+              <div className="field" key={f.key} style={{ gridColumn: "span 1" }}>
+                <label htmlFor={`inp-${f.key}`}>{f.label}{f.required ? " *" : ""}</label>
+
+                {f.type === "select" ? (
+                  <select
+                    id={`inp-${f.key}`}
+                    className="input"
+                    value={form[f.key] ?? ""}
+                    onChange={(e) => handleChange(f.key, e.target.value)}
+                  >
+                    <option value="">...</option>
+                    {(f.options || []).map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : f.type === "textarea" ? (
+                  <textarea
+                    id={`inp-${f.key}`}
+                    rows={3}
+                    className="input"
+                    value={form[f.key] ?? ""}
+                    onChange={(e) => handleChange(f.key, e.target.value)}
+                    maxLength={f.max || undefined}
+                  />
+                ) : (
+                  <input
+                    id={`inp-${f.key}`}
+                    className="input"
+                    type={f.type || "text"}
+                    value={form[f.key] ?? ""}
+                    onChange={(e) => handleChange(f.key, e.target.value)}
+                    maxLength={f.max || undefined}
+                  />
+                )}
+
+                {errors[f.key] && <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>}
+              </div>
+            ))}
+        </div>
+
+        <div className="abmc-topbar" style={{ justifyContent: "flex-end", marginTop: 16 }}>
+          <button className="btn btn-secondary" onClick={() => navigate("/miembros")}>Cancelar</button>
+          <button className="btn btn-primary" onClick={handleSave}>Guardar cambios</button>
+        </div>
+      </div>
     </main>
   );
 }
+
+function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : ""; }

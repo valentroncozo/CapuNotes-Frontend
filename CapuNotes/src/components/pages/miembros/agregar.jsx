@@ -1,253 +1,98 @@
-import { useState, useEffect } from 'react';
-import { Button, Container, Form } from 'react-bootstrap';
-import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router-dom';
-import '@/styles/miembros.css';
-import '@/styles/abmc.css';
+// src/components/pages/miembros/agregar.jsx
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import BackButton from "@/components/common/BackButton.jsx";
+import { miembrosService } from "@/services/miembrosService.js";
+import { buildMiembroSchema, miembroEntityName } from "@/schemas/miembros.js";
+import "@/styles/abmc.css";
+import "@/styles/forms.css";
 
-
-const STORAGE_KEY = 'capunotes_miembros';
-const AREAS_KEY = 'capunotes_areas';
-const CUERDAS_KEY = 'capunotes_cuerdas';
-
-export default function MiembrosAgregar({title = "Registro de miembro"}) {
-  const empty = {
-    id: null,
-    nombre: '',
-    apellido: '',
-    tipoDocumento: '',
-    numeroDocumento: '',
-    fechaNacimiento: '',
-    correo: '',
-    telefono: '',
-    provincia: '',
-    cuerda: '',
-    area: '',
-    estado: 'Activo',
-  };
-
-  const [miembro, setMiembro] = useState(empty);
-  const [listaMiembros, setListaMiembros] = useState([]);
-  const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
-  const [areasDisponibles, setAreasDisponibles] = useState([]);
+export default function MiembrosAgregarPage() {
   const navigate = useNavigate();
+  const schema = useMemo(() => buildMiembroSchema(), []);
+  const [form, setForm] = useState(() =>
+    Object.fromEntries(schema.filter(f => f.type!=="button" && f.type!=="submit").map(f => [f.key, ""]))
+  );
+  const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    const cuerdasGuardadas = JSON.parse(localStorage.getItem(CUERDAS_KEY)) || [];
-    setCuerdasDisponibles(cuerdasGuardadas);
-    const areasGuardadas = JSON.parse(localStorage.getItem(AREAS_KEY)) || [];
-    setAreasDisponibles(areasGuardadas);
-    const guardados = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    setListaMiembros(guardados);
-  }, []);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setMiembro((prev) => ({ ...prev, [name]: value }));
+  const validate = () => {
+    const e = {};
+    schema.forEach((f) => {
+      const v = String(form?.[f.key] ?? "").trim();
+      if (f.required && !v) e[f.key] = "Obligatorio";
+      if (f.max && v.length > f.max) e[f.key] = `Máx. ${f.max} caracteres`;
+    });
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleChange = (key, val) => setForm((prev) => ({ ...prev, [key]: val }));
 
-    if (!miembro.nombre || !miembro.cuerda) {
-      await Swal.fire({
-        icon: 'warning',
-        title: 'Campos obligatorios',
-        text: 'Por favor completá al menos Nombre y Cuerda.',
-        background: '#11103a',
-        color: '#E8EAED',
-      });
-      return;
-    }
-
-    const nuevo = { ...miembro, id: crypto?.randomUUID?.() || Date.now() };
-    const actualizados = [...listaMiembros, nuevo];
-    setListaMiembros(actualizados);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(actualizados));
-
-    await Swal.fire({
-      icon: 'success',
-      title: 'Miembro registrado',
-      text: `Se registró ${miembro.nombre} exitosamente.`,
-      timer: 1600,
-      showConfirmButton: false,
-      background: '#11103a',
-      color: '#E8EAED',
-    });
-
-    setMiembro(empty);
-    navigate('/miembros');
+  const handleSave = async () => {
+    if (!validate()) return;
+    await miembrosService.create(form);
+    navigate("/miembros");
   };
 
   return (
-    <main className="pantalla-miembros">
+    <main className="abmc-page">
       <div className="abmc-card">
-          <div className="abmc-header">
-            <BackButton />
-            <h1 className="abmc-title">{title}</h1>
-          </div>
-  
-          <Form onSubmit={handleSubmit} className="abmc-topbar">
+        <div className="abmc-header">
+          <BackButton />
+          <h1 className="abmc-title">Agregar {capitalize(miembroEntityName)}</h1>
+        </div>
 
-            <Form.Group className="form-group-miembro">
-              <label>Nombre</label>
-              <Form.Control
-                type="text"
-                name="nombre"
-                placeholder="Ej: Juan"
-                value={miembro.nombre}
-              onChange={handleChange}
-              className="abmc-input"
-            />
-            </Form.Group>
+        <div className="form-grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          {schema
+            .filter((f) => f.type !== "button" && f.type !== "submit")
+            .map((f) => (
+              <div className="field" key={f.key} style={{ gridColumn: "span 1" }}>
+                <label htmlFor={`inp-${f.key}`}>{f.label}{f.required ? " *" : ""}</label>
 
-            <Form.Group className="form-group-miembro">
-              <label>Apellido</label>
-              <Form.Control
-                type="text"
-                name="apellido"
-                placeholder="Ej: Pérez"
-                value={miembro.apellido}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
+                {f.type === "select" ? (
+                  <select
+                    id={`inp-${f.key}`}
+                    className="input"
+                    value={form[f.key] ?? ""}
+                    onChange={(e) => handleChange(f.key, e.target.value)}
+                  >
+                    <option value="">...</option>
+                    {(f.options || []).map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : f.type === "textarea" ? (
+                  <textarea
+                    id={`inp-${f.key}`}
+                    rows={3}
+                    className="input"
+                    value={form[f.key] ?? ""}
+                    onChange={(e) => handleChange(f.key, e.target.value)}
+                    maxLength={f.max || undefined}
+                  />
+                ) : (
+                  <input
+                    id={`inp-${f.key}`}
+                    className="input"
+                    type={f.type || "text"}
+                    value={form[f.key] ?? ""}
+                    onChange={(e) => handleChange(f.key, e.target.value)}
+                    maxLength={f.max || undefined}
+                  />
+                )}
 
-            <Form.Group className="form-group-miembro">
-              <label>Tipo de Documento</label>
-              <Form.Select
-                name="tipoDocumento"
-                value={miembro.tipoDocumento}
-                onChange={handleChange}
-                className="abmc-select"
-              >
-                <option value="">Tipo de documento</option>
-                <option value="DNI">DNI</option>
-                <option value="Pasaporte">Pasaporte</option>
-                <option value="Libreta Cívica">Libreta Cívica</option>
-              </Form.Select>
-            </Form.Group>
+                {errors[f.key] && <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>}
+              </div>
+            ))}
+        </div>
 
-            <Form.Group className="form-group-miembro">
-              <label>Número de Documento</label>
-              <Form.Control
-                type="text"
-                name="numeroDocumento"
-                placeholder="Ej: 40123456"
-                value={miembro.numeroDocumento}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="form-group-miembro">
-              <label>Fecha de Nacimiento</label>
-              <Form.Control
-                type="date"
-                name="fechaNacimiento"
-                value={miembro.fechaNacimiento}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="form-group-miembro">
-              <label>Correo Electrónico</label>
-              <Form.Control
-                type="email"
-                name="correo"
-                placeholder="Ej: juanperez@mail.com"
-                value={miembro.correo}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="form-group-miembro">
-              <label>Teléfono</label>
-              <Form.Control
-                type="tel"
-                name="telefono"
-                placeholder="Ej: +54 11 1234-5678"
-                value={miembro.telefono}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="form-group-miembro">
-              <label>Provincia</label>
-              <Form.Control
-                type="text"
-                name="provincia"
-                placeholder="Ej: Buenos Aires"
-                value={miembro.provincia}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </Form.Group>
-
-            <Form.Group className="form-group-agregar">
-              <label>Cuerda</label>
-              <select
-                className="abmc-select"
-                name="cuerda"
-                value={miembro.cuerda}
-                onChange={handleChange}
-              >
-                <option value="">Seleccionar cuerda</option>
-                {cuerdasDisponibles.map((c) => (
-                  <option key={c.id ?? c.nombre} value={c.nombre}>{c.nombre}</option>
-                ))}
-              </select>
-
-              <Button
-                variant="warning"
-                className="abmc-btn"
-                onClick={() => navigate('/cuerdas')}
-                title="Gestionar cuerdas"
-                type="button"
-              >
-                +
-              </Button>
-            </Form.Group>
-
-            <Form.Group className="form-group-agregar">
-              <label>Área</label>
-              <select
-                name="area"
-                className="abmc-select"
-                value={miembro.area}
-                onChange={handleChange}
-              >
-                <option value="">Seleccionar área</option>
-                {areasDisponibles.map((a) => (
-                  <option key={a.id ?? a.nombre} value={a.nombre}>{a.nombre}</option>
-                ))}
-              </select>
-
-              <Button
-                variant="warning"
-                className="abmc-btn"
-                onClick={() => navigate('/areas')}
-                title="Gestionar áreas"
-                type="button"
-              >
-                +
-              </Button>
-            </Form.Group>
-
-            <Form.Group className="form-group-agregar-acciones">
-              <button type="button" className="abmc-btn abmc-btn-secondary btn btn-secondary" onClick={() => navigate('/miembros')}>
-                Cancelar
-              </button>
-              <button type="submit" className="abmc-btn abmc-btn-primary btn btn-primary">
-                Agregar
-              </button>
-            </Form.Group>
-          </Form>
+        <div className="abmc-topbar" style={{ justifyContent: "flex-end", marginTop: 16 }}>
+          <button className="btn btn-secondary" onClick={() => navigate("/miembros")}>Cancelar</button>
+          <button className="btn btn-primary" onClick={handleSave}>Confirmar</button>
+        </div>
       </div>
     </main>
   );
 }
+
+function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : ""; }
