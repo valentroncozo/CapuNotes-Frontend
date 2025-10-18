@@ -15,6 +15,7 @@ function CloseIcon(props) {
     </svg>
   );
 }
+
 /* Ícono de engranaje */
 function GearIcon(props) {
   return (
@@ -27,9 +28,9 @@ function GearIcon(props) {
   );
 }
 
+/* Sin el link suelto a /audiciones */
 const MENU_ITEMS = [
   ["/asistencias", "Asistencias"],
-  ["/audiciones", "Audiciones"],
   ["/canciones", "Canciones"],
   ["/eventos", "Eventos"],
   ["/fraternidades", "Fraternidades"],
@@ -163,14 +164,14 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         ]}
       />
 
-      {/* Acordeón reutilizable: Audiciones */}
+      {/* Acordeón reutilizable: Audiciones (incluye "Audiciones") */}
       <AccordionMenu
         title="Audiciones"
         open={audOpen}
         setOpen={setAudOpen}
         onNavigate={onNavigate}
         items={[
-          { label: "Audiciones", path: "/audiciones" },
+          { label: "Audiciones", path: "/audiciones" },               // ✅ se mantiene
           { label: "Candidatos", path: "/candidatos" },
           { label: "Configurar Cuestionario", path: "/configurar-cuestionario" },
           { label: "Historial de Audiciones", path: "/historial-audiciones" },

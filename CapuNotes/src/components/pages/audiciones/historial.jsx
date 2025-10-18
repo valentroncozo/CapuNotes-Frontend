@@ -1,56 +1,32 @@
 // src/components/pages/audiciones/historial.jsx
 import { useEffect, useMemo, useState } from "react";
 import BackButton from "@/components/common/BackButton.jsx";
+import InscripcionView from "@/components/common/InscripcionView.jsx";
+import { historialService } from "@/services/historialService.js";
 import "@/styles/abmc.css";
+import "@/styles/table.css";
+import "@/styles/forms.css";
+import infoIcon from "/info.png";
+import Modal from "@/components/common/Modal.jsx";
 
-import {
-  HISTORIAL_AUDICIONES_STORAGE_KEY,
-  fmtAudicionLabel,
-} from "@/schemas/audicionesHistorial";
-import { audicionesHistorialService } from "@/services/audicionesHistorialService";
-
-// Datos de ejemplo (se guardan 1 sola vez si no hay registros)
-const seed = [
-  {
-    nombre: "Juan Perez",
-    audicion: "Marzo 2023",
-    cancion: "Canción – Autor",
-    resultado: "Aprobado",
-  },
-  {
-    nombre: "Juan Perez",
-    audicion: "Abril 2024",
-    cancion: "Canción – Autor",
-    resultado: "Observado",
-  },
-];
-
-export default function HistorialAudiciones() {
+export default function HistorialAudicionesPage() {
+  const [rows, setRows] = useState([]);
   const [q, setQ] = useState("");
-  const [items, setItems] = useState([]);
+  const [viewRow, setViewRow] = useState(null);
+  const [verResultado, setVerResultado] = useState(null); // {estado, obs}
 
   useEffect(() => {
-    const init = async () => {
-      const exists = JSON.parse(localStorage.getItem(HISTORIAL_AUDICIONES_STORAGE_KEY) || "[]");
-      if (!exists.length) {
-        for (const s of seed) await audicionesHistorialService.create(s);
-      }
-      const list = await audicionesHistorialService.list();
-      setItems(list);
-    };
-    init();
+    (async () => {
+      const data = await historialService.list();
+      setRows(data);
+    })();
   }, []);
 
-  const filtrados = useMemo(() => {
-    if (!q) return items;
+  const filtered = useMemo(() => {
+    if (!q) return rows;
     const t = q.toLowerCase();
-    return items.filter(
-      (r) =>
-        (r.nombre || "").toLowerCase().includes(t) ||
-        (r.cancion || "").toLowerCase().includes(t) ||
-        (r.audicion || "").toLowerCase().includes(t)
-    );
-  }, [items, q]);
+    return rows.filter((r) => r.nombre.toLowerCase().includes(t));
+  }, [rows, q]);
 
   return (
     <main className="abmc-page">
@@ -60,10 +36,8 @@ export default function HistorialAudiciones() {
           <h1 className="abmc-title">Historial de audiciones</h1>
         </div>
 
-        {/* Buscador */}
         <div className="abmc-topbar">
           <input
-            type="text"
             className="abmc-input"
             placeholder="Buscar por nombre de candidatos"
             value={q}
@@ -71,49 +45,35 @@ export default function HistorialAudiciones() {
           />
         </div>
 
-        {/* Tabla */}
         <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
             <tr className="abmc-row">
-              <th>Nombre</th>
-              <th>Audición</th>
-              <th>Canción</th>
-              <th>Resultado</th>
-              <th style={{ textAlign: "center" }}>Acción</th>
+              <th><span className="th-label">Nombre</span></th>
+              <th><span className="th-label">Audición</span></th>
+              <th><span className="th-label">Canción</span></th>
+              <th style={{ textAlign: "center" }}><span className="th-label">Resultado</span></th>
+              <th style={{ textAlign: "center" }}><span className="th-label">Inscripción</span></th>
             </tr>
           </thead>
           <tbody>
-            {filtrados.length === 0 && (
-              <tr className="abmc-row">
-                <td colSpan={5} style={{ textAlign: "center" }}>
-                  Sin registros
-                </td>
-              </tr>
-            )}
-
-            {filtrados.map((r) => (
-              <tr className="abmc-row" key={r.id}>
+            {filtered.map((r) => (
+              <tr key={r.id} className="abmc-row">
                 <td>{r.nombre}</td>
-                <td>{fmtAudicionLabel(r.audicion)}</td>
+                <td>{r.fechaAudicion}</td>
                 <td>{r.cancion}</td>
-                <td>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => alert(`Ver resultado de ${r.nombre} (${r.audicion})`)}
-                  >
+                <td style={{ textAlign: "center" }}>
+                  <button className="btn-accion" onClick={() => setVerResultado(r.resultado)} title="Ver resultado">
                     Ver
                   </button>
                 </td>
-                <td style={{ textAlign: "center" }}>
-                  {/* Botón + (placeholder para abrir detalle / adjuntar) */}
+                <td className="abmc-actions">
                   <button
-                    type="button"
-                    className="mini-plus-btn"
-                    title="Agregar/adjuntar (a implementar)"
-                    onClick={() => alert("Abrir acción extra (a implementar)")}
+                    className="btn-accion"
+                    title="Ver inscripción"
+                    onClick={() => setViewRow(r)}
+                    aria-label="Ver inscripción"
                   >
-                    +
+                    <img src={infoIcon} alt="Info" style={{ width: 18, height: 18 }} />
                   </button>
                 </td>
               </tr>
@@ -121,6 +81,36 @@ export default function HistorialAudiciones() {
           </tbody>
         </table>
       </div>
+
+      {verResultado && (
+        <Modal isOpen onClose={() => setVerResultado(null)}>
+          <div className="modal-body">
+            <h3 className="pop-title" style={{ marginBottom: 10 }}>Resultado</h3>
+            <div className="form-grid">
+              <div className="field">
+                <label>Estado</label>
+                <input className="input" value={verResultado.estado || ""} readOnly disabled />
+              </div>
+              <div className="field">
+                <label>Observaciones</label>
+                <textarea className="input" rows={4} value={verResultado.obs || ""} readOnly disabled />
+              </div>
+            </div>
+            <div className="pop-footer" style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+              <button className="btn btn-secondary" onClick={() => setVerResultado(null)}>Cerrar</button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {viewRow && (
+        <InscripcionView
+          data={viewRow.inscripcion}
+          open={true}
+          onClose={() => setViewRow(null)}
+          editable={false}
+        />
+      )}
     </main>
   );
 }

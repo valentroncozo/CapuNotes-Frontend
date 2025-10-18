@@ -1,61 +1,68 @@
 // src/components/pages/audiciones/candidatosCoord.jsx
 import { useEffect, useMemo, useState } from "react";
 import BackButton from "@/components/common/BackButton.jsx";
-import { candidatosService } from "@/services/candidatosService";
-import { CANDIDATO_STORAGE_KEY, candidatoEstados, fmtHora } from "@/schemas/candidatos";
 import "@/styles/abmc.css";
+import "@/styles/table.css";
+import "@/styles/forms.css";
+import infoIcon from "/info.png";
 
-export default function CandidatosCoordinadores() {
-  const [dia, setDia] = useState("Viernes 14");
-  const [q, setQ]   = useState("");
-  const [items, setItems] = useState([]);
+import { candidatosService } from "@/services/candidatosService.js";
+import { estadoLabel } from "@/constants/candidatos.js";
+import { horaToMinutes } from "@/components/common/datetime.js";
+import InscripcionView from "@/components/common/InscripcionView.jsx";
+
+export default function CandidatosCoordPage() {
+  const [rows, setRows] = useState([]);
+  const [q, setQ] = useState("");
+
+  const [sortBy, setSortBy] = useState(null); // 'hora' | 'resultado'
+  const [sortDir, setSortDir] = useState("asc");
+
+  const [viewRow, setViewRow] = useState(null);
 
   useEffect(() => {
-    const load = async () => {
-      // si no hay estado en registros existentes, setear "—"
-      const list = await candidatosService.list();
-      if (list.some(l => l.estado === undefined)) {
-        const updated = list.map(l => ({ ...l, estado: "—" }));
-        localStorage.setItem(CANDIDATO_STORAGE_KEY, JSON.stringify(updated));
-      }
-      setItems(JSON.parse(localStorage.getItem(CANDIDATO_STORAGE_KEY) || "[]"));
-    };
-    load();
+    (async () => {
+      const data = await candidatosService.list();
+      setRows(data);
+    })();
   }, []);
 
-  const filtrados = useMemo(() => {
-    if (!q) return items;
-    const term = q.toLowerCase();
-    return items.filter(it =>
-      (it.nombre || "").toLowerCase().includes(term) ||
-      (it.cancion || "").toLowerCase().includes(term)
-    );
-  }, [items, q]);
+  const filtered = useMemo(() => {
+    if (!q) return rows;
+    const t = q.toLowerCase();
+    return rows.filter((r) => r.nombre.toLowerCase().includes(t));
+  }, [rows, q]);
+
+  const sorted = useMemo(() => {
+    if (!sortBy) return filtered;
+    const dir = sortDir === "desc" ? -1 : 1;
+    return [...filtered].sort((a, b) => {
+      if (sortBy === "hora") return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
+      if (sortBy === "resultado") {
+        return estadoLabel(a.resultado?.estado ?? "sin")
+          .localeCompare(estadoLabel(b.resultado?.estado ?? "sin")) * dir;
+      }
+      return 0;
+    });
+  }, [filtered, sortBy, sortDir]);
+
+  const toggleSort = (key) => {
+    if (sortBy !== key) { setSortBy(key); setSortDir("asc"); }
+    else { setSortDir((d) => (d === "asc" ? "desc" : "asc")); }
+  };
+  const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
 
   return (
     <main className="abmc-page">
       <div className="abmc-card">
         <div className="abmc-header">
           <BackButton />
-          <h1 className="abmc-title">Candidatos</h1>
+          <h1 className="abmc-title">Candidatos (Coordinadores)</h1>
         </div>
 
         <div className="abmc-topbar">
-          <input
-            type="text"
-            className="abmc-input"
-            placeholder="Buscar por nombre"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-          />
-
-          <select
-            className="abmc-select"
-            value={dia}
-            onChange={(e) => setDia(e.target.value)}
-            aria-label="Seleccionar día"
-            style={{ maxWidth: 220 }}
-          >
+          <input className="abmc-input" placeholder="Buscar por nombre" value={q} onChange={(e) => setQ(e.target.value)} />
+          <select className="abmc-input" defaultValue="Viernes 14">
             <option>Viernes 14</option>
             <option>Sábado 15</option>
             <option>Domingo 16</option>
@@ -65,48 +72,55 @@ export default function CandidatosCoordinadores() {
         <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
             <tr className="abmc-row">
-              <th>Hora</th>
-              <th>Nombre</th>
-              <th>Canción</th>
-              <th>Estado</th>
-              <th style={{ textAlign: "center" }}>Acción</th>
+              <th className={thClass("hora")}>
+                <span className="th-label">Hora</span>
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("hora")} aria-label="Ordenar por Hora">
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+              <th><span className="th-label">Nombre</span></th>
+              <th><span className="th-label">Canción</span></th>
+              <th className={thClass("resultado")}>
+                <span className="th-label">Estado</span>
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("resultado")} aria-label="Ordenar por Estado">
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+              <th style={{ textAlign: "center" }}><span className="th-label">Inscripción</span></th>
             </tr>
           </thead>
-          <tbody>
-            {filtrados.length === 0 && (
-              <tr className="abmc-row">
-                <td colSpan={5} style={{ textAlign: "center" }}>Sin candidatos</td>
-              </tr>
-            )}
 
-            {filtrados.map((c) => (
-              <tr className="abmc-row" key={c.id}>
-                <td style={{ whiteSpace: "nowrap" }}>{fmtHora(c.hora)}</td>
-                <td>{c.nombre}</td>
-                <td>{c.cancion}</td>
-                <td>
-                  <span className={`badge-estado ${c.estado === "Cancelado" ? "bad" : c.estado === "Reservado" ? "ok" : "pend"}`}>
-                    {c.estado || "—"}
-                  </span>
-                </td>
-                <td style={{ textAlign: "center" }}>
-                  {/* Botón para abrir formulario (placeholder) */}
+          <tbody>
+            {sorted.map((r) => (
+              <tr key={r.id} className="abmc-row">
+                <td>{r.hora}</td>
+                <td>{r.nombre}</td>
+                <td>{r.cancion}</td>
+                <td>{estadoLabel(r.resultado?.estado)}</td>
+                <td className="abmc-actions">
                   <button
-                    type="button"
-                    className="mini-plus-btn"
-                    title="Abrir detalle (a implementar)"
-                    onClick={() => alert("Abrir detalle (a implementar)")}
+                    className="btn-accion"
+                    title="Ver inscripción"
+                    aria-label="Ver inscripción"
+                    onClick={() => setViewRow(r)}
                   >
-                    +
+                    <img src={infoIcon} alt="Info" style={{ width: 18, height: 18 }} />
                   </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-
-        <small style={{ opacity: .8 }}>Vista de <b>coordinadores</b>: visualizan <i>Estado</i> (Reservado, Cancelado, …).</small>
       </div>
+
+      {viewRow && (
+        <InscripcionView
+          data={viewRow.inscripcion}
+          open={true}
+          onClose={() => setViewRow(null)}
+          editable={false}
+        />
+      )}
     </main>
   );
 }

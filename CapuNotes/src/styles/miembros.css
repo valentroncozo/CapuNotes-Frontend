@@ -1,21 +1,8 @@
-/* === FUENTE GLOBAL === */
-@import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
+/* src/styles/miembros.css */
+/* Solo estilos **locales** de la pantalla Miembros. Nada de redefinir :root aquí. */
 
-/* --- Variables globales (según guía) --- */
-:root {
-  --bg: #11103a;             /* primario/fondo */
-  --accent: #ffc107;         /* secundario / botones primarios */
-  --card: #b3cdfa;           /* terciario / cards */
-  --text-light: #E8EAED;     /* texto principal sobre fondo oscuro */
-  --text-dark: #202124;      /* texto en fondos claros */
-  --shadow: 0 4px 14px rgba(0,0,0,.35);
-  --radius: 16px;
-  --font: "Manjari", "Segoe UI", sans-serif;
-}
-
-/* --- Estructura general --- */
-
-* {
+/* Evitar select de texto solo dentro de la pantalla de Miembros — no global */
+.pantalla-miembros * {
   -webkit-user-select: none !important;
   -moz-user-select: none !important;
   -ms-user-select: none !important;
@@ -23,7 +10,10 @@
   cursor: default;
 }
 
-select, input, textarea{
+/* Inputs/Select/Textareas sí permiten seleccionar texto */
+.pantalla-miembros select,
+.pantalla-miembros input,
+.pantalla-miembros textarea {
   -webkit-user-select: text !important;
   -moz-user-select: text !important;
   -ms-user-select: text !important;
@@ -31,7 +21,7 @@ select, input, textarea{
   cursor: text;
 }
 
-
+/* Topbar en Miembros (vertical en mobile) */
 .pantalla-miembros .abmc-card .abmc-topbar {
   width: 100%;
   justify-content: flex-start;
@@ -39,23 +29,20 @@ select, input, textarea{
   flex-direction: column;
 }
 
-/* === Date picker native icon (Chromium/WebKit) recolor === */
-/* Aplica un filtro para aproximar el color --accent; funciona en Chrome/Edge/Safari */
+/* Date picker (Chromium/WebKit) recolor */
 input[type="date"].input-date::-webkit-calendar-picker-indicator {
   cursor: pointer;
   opacity: 0.95;
-  /* Ajusta el filtro para el color deseado */
   filter: invert(74%) sepia(47%) saturate(500%) hue-rotate(330deg) brightness(95%);
 }
 
-/* Añadir espacio a la derecha para que el icono no tape el texto */
+/* Espacio para el icono del date picker */
 input[type="date"].input-date {
   padding-right: 2.6rem;
   box-sizing: border-box;
 }
 
-/* Fallback visual para navegadores que no aplican ::-webkit-calendar-picker-indicator */
+/* Placeholder del date (fallback) */
 input[type="date"].input-date::placeholder {
   color: rgba(232,234,237,0.5);
 }
-

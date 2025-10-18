@@ -1,7 +1,6 @@
 /* src/styles/popup.css */
 @import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
 
-/* Usa tokens globales (colors, radius, shadow, font) */
 .pop-backdrop {
   position: fixed;
   inset: 0;
@@ -96,10 +95,11 @@
   opacity: 0.9;
 }
 
+/* Antes: background: #0f1036 —> usamos superficie coherente */
 .input,
 textarea.input {
   width: 100%;
-  background: #0f1036;
+  background: rgba(255,255,255,.05);
   color: var(--text-light);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius);

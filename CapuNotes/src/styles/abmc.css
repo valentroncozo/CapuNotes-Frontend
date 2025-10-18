@@ -2,8 +2,6 @@
 @import url('./forms.css');
 @import url('./table.css');
 
-
-
 .abmc-page {
   min-height: 100vh;
   background: var(--bg);
@@ -15,7 +13,8 @@
 .abmc-card {
   margin: 0 auto;
   width: min(980px, 96vw);
-  background: #0f1036;
+  /* Antes: #0f1036 —> pasamos a una superficie semitransparente consistente */
+  background: rgba(255, 255, 255, .05);
   border: 1px solid rgba(255,255,255,.08);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -52,7 +51,6 @@
   flex-wrap: wrap;
 }
 
-
 .form-group-agregar {
   width: 90%;
   height: auto;
@@ -62,13 +60,8 @@
   flex-wrap: wrap;
 }
 
-.form-group-agregar label {
-  width: 100%;
-}
-
-.form-group-agregar .abmc-select {
-  flex:3;
-}
+.form-group-agregar label { width: 100%; }
+.form-group-agregar .abmc-select { flex:3; }
 
 .form-group-agregar-acciones {
   width: 90%;
@@ -79,11 +72,9 @@
   flex-wrap: wrap;
 }
 
-
 .form-group-miembro {
   width: 90%;
   display: flex;
   gap: 0.8rem;
   flex: row;
-
 }

@@ -1,45 +1,62 @@
 // src/components/pages/audiciones/candidatos.jsx
 import { useEffect, useMemo, useState } from "react";
 import BackButton from "@/components/common/BackButton.jsx";
-import { candidatosService } from "@/services/candidatosService";
-import { CANDIDATO_STORAGE_KEY, candidatoResultados, fmtHora } from "@/schemas/candidatos";
 import "@/styles/abmc.css";
+import "@/styles/table.css";
+import "@/styles/forms.css";
+import { PencilFill } from "react-bootstrap-icons";
+import infoIcon from "/info.png";
 
-const seed = [
-  { hora: "17:00", nombre: "Beglardo, Francisco", cancion: "Ya me enteré, Reik", resultado: "—" },
-  { hora: "17:15", nombre: "Alejandro, Peréz",   cancion: "Aleluya", resultado: "✖" },
-  { hora: "17:30", nombre: "Contretas, Stefani", cancion: "Ella y yo, Don Omar", resultado: "—" },
-  { hora: "17:45", nombre: "Bottari, Juan Mauro", cancion: "Zamba para olvidar, Abel Pintos", resultado: "—" },
-  { hora: "18:00", nombre: "Acuña, Micaela Sol", cancion: "Intento, Ulises Bueno", resultado: "—" },
-  { hora: "18:15", nombre: "Cantarutti, Ariana Gabriela", cancion: "Eterno Amor, Juan Fuentes", resultado: "—" },
-];
+import { candidatosService } from "@/services/candidatosService.js";
+import { estadoClass, estadoLabel } from "@/constants/candidatos.js";
+import { horaToMinutes } from "@/components/common/datetime.js";
 
-export default function Candidatos() {
-  const [dia, setDia] = useState("Viernes 14");
-  const [q, setQ]   = useState("");
-  const [items, setItems] = useState([]);
+import ResultadosModal from "./ResultadosModal.jsx";
+import InscripcionView from "@/components/common/InscripcionView.jsx";
+
+export default function CandidatosPage() {
+  const [rows, setRows] = useState([]);
+  const [q, setQ] = useState("");
+
+  const [sortBy, setSortBy] = useState(null); // 'hora' | 'resultado'
+  const [sortDir, setSortDir] = useState("asc");
+
+  const [editRow, setEditRow] = useState(null);
+  const [viewRow, setViewRow] = useState(null);
 
   useEffect(() => {
-    const init = async () => {
-      const arr = JSON.parse(localStorage.getItem(CANDIDATO_STORAGE_KEY) || "[]");
-      if (!arr.length) {
-        // sembramos datos de ejemplo
-        for (const s of seed) await candidatosService.create(s);
-      }
-      const list = await candidatosService.list();
-      setItems(list);
-    };
-    init();
+    (async () => {
+      const data = await candidatosService.list();
+      setRows(data);
+    })();
   }, []);
 
-  const filtrados = useMemo(() => {
-    if (!q) return items;
-    const term = q.toLowerCase();
-    return items.filter(it =>
-      (it.nombre || "").toLowerCase().includes(term) ||
-      (it.cancion || "").toLowerCase().includes(term)
-    );
-  }, [items, q]);
+  const filtered = useMemo(() => {
+    if (!q) return rows;
+    const t = q.toLowerCase();
+    return rows.filter((r) => r.nombre.toLowerCase().includes(t));
+  }, [rows, q]);
+
+  const sorted = useMemo(() => {
+    if (!sortBy) return filtered;
+    const dir = sortDir === "desc" ? -1 : 1;
+    return [...filtered].sort((a, b) => {
+      if (sortBy === "hora") {
+        return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
+      }
+      if (sortBy === "resultado") {
+        return estadoLabel(a.resultado?.estado ?? "sin")
+          .localeCompare(estadoLabel(b.resultado?.estado ?? "sin")) * dir;
+      }
+      return 0;
+    });
+  }, [filtered, sortBy, sortDir]);
+
+  const toggleSort = (key) => {
+    if (sortBy !== key) { setSortBy(key); setSortDir("asc"); }
+    else { setSortDir((d) => (d === "asc" ? "desc" : "asc")); }
+  };
+  const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
 
   return (
     <main className="abmc-page">
@@ -49,23 +66,14 @@ export default function Candidatos() {
           <h1 className="abmc-title">Candidatos</h1>
         </div>
 
-        {/* Topbar: buscar + día */}
         <div className="abmc-topbar">
           <input
-            type="text"
             className="abmc-input"
             placeholder="Buscar por nombre"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-
-          <select
-            className="abmc-select"
-            value={dia}
-            onChange={(e) => setDia(e.target.value)}
-            aria-label="Seleccionar día"
-            style={{ maxWidth: 220 }}
-          >
+          <select className="abmc-input" defaultValue="Viernes 14">
             <option>Viernes 14</option>
             <option>Sábado 15</option>
             <option>Domingo 16</option>
@@ -75,48 +83,87 @@ export default function Candidatos() {
         <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
             <tr className="abmc-row">
-              <th>Hora</th>
-              <th>Nombre</th>
-              <th>Canción</th>
-              <th>Resultado</th>
-              <th style={{ textAlign: "center" }}>Acción</th>
+              <th className={thClass("hora")}>
+                <span className="th-label">Hora</span>
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("hora")} aria-label="Ordenar por Hora">
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+              <th><span className="th-label">Nombre</span></th>
+              <th><span className="th-label">Canción</span></th>
+              <th className={thClass("resultado")}>
+                <span className="th-label">Resultado</span>
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("resultado")} aria-label="Ordenar por Resultado">
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+              <th style={{ textAlign: "center" }}><span className="th-label">Inscripción</span></th>
             </tr>
           </thead>
-          <tbody>
-            {filtrados.length === 0 && (
-              <tr className="abmc-row">
-                <td colSpan={5} style={{ textAlign: "center" }}>Sin candidatos</td>
-              </tr>
-            )}
 
-            {filtrados.map((c) => (
-              <tr className="abmc-row" key={c.id}>
-                <td style={{ whiteSpace: "nowrap" }}>{fmtHora(c.hora)}</td>
-                <td>{c.nombre}</td>
-                <td>{c.cancion}</td>
-                <td>
-                  <span className={`badge-resultado ${c.resultado === "✔" ? "ok" : c.resultado === "✖" ? "bad" : "pend"}`}>
-                    {c.resultado}
+        <tbody>
+          {sorted.map((r) => (
+            <tr key={r.id} className="abmc-row">
+              <td>{r.hora}</td>
+              <td>{r.nombre}</td>
+              <td>{r.cancion}</td>
+
+              <td>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span className={`badge-estado ${estadoClass(r.resultado?.estado)}`}>
+                    {estadoLabel(r.resultado?.estado)}
                   </span>
-                </td>
-                <td style={{ textAlign: "center" }}>
-                  {/* Botón para abrir formulario (placeholder) */}
                   <button
-                    type="button"
-                    className="mini-plus-btn"
-                    title="Abrir formulario de evaluación"
-                    onClick={() => alert("Abrir formulario (a implementar)")}
+                    className="btn-accion"
+                    title="Editar resultado"
+                    onClick={() => setEditRow(r)}
+                    aria-label="Editar resultado"
                   >
-                    +
+                    <PencilFill size={18} />
                   </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
+                </div>
+              </td>
+
+              <td className="abmc-actions">
+                <button
+                  className="btn-accion"
+                  title="Ver inscripción"
+                  aria-label="Ver inscripción"
+                  onClick={() => setViewRow(r)}
+                >
+                  <img src={infoIcon} alt="Info" style={{ width: 18, height: 18 }} />
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
         </table>
 
-        <small style={{ opacity: .8 }}>Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i>.</small>
+        <p style={{ opacity: 0.7, marginTop: 10 }}>
+          Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i>.
+        </p>
       </div>
+
+      {editRow && (
+        <ResultadosModal
+          row={editRow}
+          onClose={() => setEditRow(null)}
+          onSave={async (estado, obs) => {
+            const res = await candidatosService.updateResultado(editRow.id, { estado, obs });
+            setRows((prev) => prev.map((r) => (r.id === res.id ? { ...r, resultado: res.resultado } : r)));
+            setEditRow(null);
+          }}
+        />
+      )}
+
+      {viewRow && (
+        <InscripcionView
+          data={viewRow.inscripcion}
+          open={true}
+          onClose={() => setViewRow(null)}
+          editable={true}
+        />
+      )}
     </main>
   );
 }
