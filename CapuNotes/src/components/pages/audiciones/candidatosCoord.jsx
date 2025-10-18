@@ -4,12 +4,18 @@ import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
 import "@/styles/table.css";
 import "@/styles/forms.css";
+import "@/styles/icons.css";
 import infoIcon from "/info.png";
 
 import { candidatosService } from "@/services/candidatosService.js";
 import { horaToMinutes } from "@/components/common/datetime.js";
 import InscripcionView from "@/components/common/InscripcionView.jsx";
 import { info as alertInfo } from "@/utils/alerts.js";
+
+// Íconos de turno
+import CanceladoIcon from "@/assets/icons/turno/CanceladoIcon.jsx";
+import ReservadoIcon from "@/assets/icons/turno/ReservadoIcon.jsx";
+import DisponibleIcon from "@/assets/icons/turno/DisponibleIcon.jsx";
 
 export default function CandidatosCoordPage() {
   const [rows, setRows] = useState([]);
@@ -74,12 +80,12 @@ export default function CandidatosCoordPage() {
   };
   const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
 
-  const badgeClass = (estado) => {
-    const e = estado.toLowerCase();
-    if (e === "disponible") return "badge-estado disponible";
-    if (e === "reservado") return "badge-estado reservado";
-    if (e === "cancelado") return "badge-estado cancelado";
-    return "badge-estado";
+  const TurnoIcon = ({ estado }) => {
+    const e = String(estado || "").toLowerCase();
+    if (e === "cancelado")  return <span className="icon-estado icon-turno--cancel icon-md" title="Cancelado"><CanceladoIcon /></span>;
+    if (e === "reservado")  return <span className="icon-estado icon-turno--res icon-md" title="Reservado"><ReservadoIcon /></span>;
+    /* default disponible */
+    return <span className="icon-estado icon-turno--disp icon-md" title="Disponible"><DisponibleIcon /></span>;
   };
 
   const handleOpenInscripcion = async (r) => {
@@ -144,13 +150,16 @@ export default function CandidatosCoordPage() {
 
           <tbody>
             {sorted.map((r) => {
-              const est = estadoCoordinador(r);
+              const est = estadoCoordinador(r); // "Disponible"/"Reservado"/"Cancelado"
+              const key = est.toLowerCase();
               return (
                 <tr key={r.id} className="abmc-row">
                   <td>{r.hora}</td>
                   <td>{nombreApynom(r) || "—"}</td>
                   <td>{r.cancion || "—"}</td>
-                  <td><span className={badgeClass(est)}>{est}</span></td>
+                  <td>
+                    <TurnoIcon estado={key} />
+                  </td>
                   <td className="abmc-actions">
                     <button
                       className="btn-accion"

@@ -10,12 +10,18 @@ button.btn,
   font-weight: 700;
   font-family: var(--font-sans);
   cursor: pointer;
-  transition: all 0.15s ease;
   background: transparent;
   color: inherit;
+  transition: filter .15s ease, background-color .15s ease, color .15s ease;
 }
 
-.btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
+/* Hover/active estándar (sin movimiento) */
+.btn:hover,
+button.btn:hover,
+.pop-dialog .btn:hover { filter: brightness(1.03); }
+.btn:active,
+button.btn:active,
+.pop-dialog .btn:active { filter: brightness(0.95); }
 
 /* Primario */
 .btn.btn-primary,
@@ -25,16 +31,6 @@ button.btn.btn-primary,
   color: var(--text-dark) !important;
   border: none !important;
   box-shadow: var(--shadow);
-}
-.btn.btn-primary:hover,
-button.btn.btn-primary:hover,
-.pop-dialog .btn.btn-primary:hover {
-  filter: brightness(0.95);
-}
-.btn.btn-primary:active,
-button.btn.btn-primary:active,
-.pop-dialog .btn.btn-primary:active {
-  filter: brightness(0.9);
 }
 
 /* Secundario (outline blanco) */
@@ -53,16 +49,9 @@ button.btn.btn-secondary:hover,
   background: rgba(255, 255, 255, 0.1) !important;
   border-color: #fff !important;
   color: #fff !important;
-  transform: translateY(-1px);
-}
-.btn.btn-secondary:active,
-button.btn.btn-secondary:active,
-.pop-dialog .btn.btn-secondary:active {
-  transform: scale(0.97);
-  background: rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Disabled (gris) */
+/* Disabled */
 .btn.btn-disabled,
 button.btn.btn-disabled,
 .pop-dialog .btn.btn-disabled,
@@ -72,13 +61,35 @@ button.btn.btn-disabled,
   border: 1px solid rgba(255,255,255,0.15) !important;
   box-shadow: none !important;
   cursor: not-allowed !important;
-  transform: none !important;
   filter: none !important;
 }
 
-/* Fuerza forma pill ante cualquier override */
-.btn,
-button.btn,
-.pop-dialog .btn {
-  border-radius: 999px !important;
+/* === Botones de acción (tablitas, icon-only, etc.) === */
+.btn-accion {
+  background: var(--accent);
+  color: var(--text-dark);
+  border: 0;
+  box-shadow: var(--shadow);
 }
+
+/* Icon-only cuadrado (lapicito, info, etc.) */
+.btn-accion--icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hover/active con el mismo brillo que el resto */
+.btn-accion:hover,
+.btn-accion--icon:hover,
+.btn-accion:active,
+.btn-accion--icon:active {
+  filter: brightness(0.95);
+}
+
+/* Evita “salto” por baseline del SVG */
+.btn-accion--icon svg { display: block; }

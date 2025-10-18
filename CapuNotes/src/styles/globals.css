@@ -27,7 +27,7 @@ p, li, label, input, select, button, span { font-weight: 400; letter-spacing: .0
 a { color: var(--card); text-decoration: none; transition: opacity .2s ease; }
 a:hover { opacity: .9; }
 
-/* BOTONES */
+/* BOTONES — estándar global sin movimiento */
 button,
 .btn {
   cursor: pointer;
@@ -37,6 +37,12 @@ button,
   color: inherit;
   font-family: var(--font-sans);
 }
+.btn-primary, .btn-warning, .btn {
+  background-color: var(--accent) !important;
+  color: var(--text-dark) !important;
+  box-shadow: var(--shadow);
+}
+.btn:hover { filter: brightness(1.05); } /* sin transform */
 
 /* FORMULARIOS base */
 input, select, textarea {
@@ -54,18 +60,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 
 /* ==========================================================
    SELECTS — caret único: blanco (reposo) → amarillo (hover/focus)
-   - Solo aplica a selects desplegables (no multiple/size)
-   - El caret se alinea pegado al borde derecho
    ========================================================== */
 select:not([multiple]):not([size]) {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-
-  /* espacio para el caret a la derecha */
-  padding-right: 2rem;
-
-  /* caret */
+  padding-right: 2rem; /* espacio para caret */
   background-repeat: no-repeat;
   background-position: calc(100% - 10px) 50%;
   background-size: 12px 12px;
@@ -74,8 +74,6 @@ select:not([multiple]):not([size]) {
 <path fill='%23ffffff' d='M6 8l4 4 4-4z'/>\
 </svg>");
 }
-
-/* hover/focus: solo cambia el color del caret */
 select:not([multiple]):not([size]):hover,
 select:not([multiple]):not([size]):focus {
   background-image: url("data:image/svg+xml;utf8,\
@@ -83,25 +81,10 @@ select:not([multiple]):not([size]):focus {
 <path fill='%23ffc107' d='M6 8l4 4 4-4z'/>\
 </svg>");
 }
-
-/* opciones del desplegable */
-select option {
-  background: var(--bg);
-  color: var(--text-light);
-}
-
-/* Quitar flecha nativa (IE/antiguos) */
+select option { background: var(--bg); color: var(--text-light); }
 select::-ms-expand { display: none; }
-
-/* iOS Safari */
-@supports (-webkit-touch-callout: none) {
-  select { background-clip: padding-box; }
-}
-
-/* Alto contraste (Windows) */
-@media (forced-colors: active) {
-  select { background-image: none; padding-right: .75rem; }
-}
+@supports (-webkit-touch-callout: none) { select { background-clip: padding-box; } }
+@media (forced-colors: active) { select { background-image: none; padding-right: .75rem; } }
 
 /* UTILS */
 .divisor-amarillo { border: none; border-top: 2px solid var(--accent); border-radius: 2px; margin: .75rem 0 1.25rem; }

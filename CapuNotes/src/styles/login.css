@@ -43,7 +43,7 @@
   justify-content: center;
   z-index: 1;
   gap: 1.5rem;
-  padding: 0rem 2rem;
+  padding: 2rem;               /* padding estable */
   overflow: hidden;
 }
 .login-form-container > svg {
@@ -90,22 +90,28 @@
   padding: 1rem; color: var(--text-light);
 }
 
-/* Inputs */
+/* Grupo de input */
 .formulario-login .custom-input-group {
-  position: relative; width: 100%;
+  position: relative;           /* ⬅️ referencia para íconos */
+  width: 100%;
   display: flex; align-items: center; text-align: center;
   background-color: transparent; border-radius: var(--radius); border: none;
 }
+
+/* Input dentro del grupo */
 .formulario-login .custom-input-group .form-control {
+  width: 100%;                  /* ⬅️ clave: ocupar todo el ancho del grupo */
+  display: block;               /* ⬅️ evita que quede “intrínseco” */
   background-color: rgba(0, 0, 0, 0.3);
   color: var(--text-light);
   border: 1px solid transparent;
   border-radius: var(--radius);
   padding: clamp(0px, 1rem, 1rem);
+  padding-right: 3.2rem;        /* ⬅️ espacio para iconos a la derecha */
   font-size: 1rem;
   transition: all 0.2s ease;
 }
-.formulario-login .custom-input-group .form-control[type="password"] { padding-right: 3.2rem; }
+
 .formulario-login .custom-input-group .form-control:focus,
 .formulario-login .custom-input-group .form-control:hover {
   background-color: rgba(0, 0, 0, 0.3);
@@ -121,20 +127,24 @@ input[type="password"]::-webkit-textfield-decoration-button,
 input[type="password"]::-webkit-textfield-decoration-container,
 input[type="password"]::-webkit-password-toggle-button { display: none !important; }
 
-.formulario-login .custom-input-group .container-toggle { right: 0.6rem; }
-
-.formulario-login .custom-input-group .form-control:-webkit-autofill,
-.formulario-login .custom-input-group .form-control:-webkit-autofill:hover,
-.formulario-login .custom-input-group .form-control:-webkit-autofill:focus,
-.formulario-login .custom-input-group .form-control:-webkit-autofill:active {
-  -webkit-text-fill-color: var(--text-light) !important;
-  -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.3) inset !important;
-  transition: background-color 5000s ease-in-out 0s !important;
-  background-color: rgba(0, 0, 0, 0.3) !important;
-  color: var(--text-light) !important;
+/* Íconos dentro del input (usuario + toggle) */
+.account-icon,
+.container-toggle {
+  position: absolute;
+  right: .6rem;
+  top: 50%;                     /* ⬅️ centra verticalmente */
+  transform: translateY(-50%);  /* ⬅️ centra verticalmente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
 }
+.account-icon { font-size: 1.2rem; color: var(--text-light); }
+.container-toggle { cursor: pointer; background-color: transparent; }
+.container-toggle:hover { opacity: .8; }
 
-.account-icon { right: 5px; position: absolute; font-size: 1.2rem; color: var(--text-light); }
+/* Errores */
+.menssaje-error-login{ color: var(--accent); font-size: .9rem; padding-left: clamp(0px, 1.5vw, 1rem); font-weight: 500; margin: 0; align-self: start; }
 
 /* Botón */
 .custom-input-group .button-login{
@@ -152,15 +162,12 @@ input[type="password"]::-webkit-password-toggle-button { display: none !importan
   box-shadow: var(--shadow); border: 1px solid var(--text-light);
 }
 
-/* Errores */
-.menssaje-error-login{ color: var(--accent); font-size: .9rem; padding-left: clamp(0px, 1.5vw, 1rem); font-weight: 500; margin: 0; align-self: start; }
-
 /* Responsive */
 @media (max-width: 510px) {
   .login-container { width: 100%; min-width: 344px; max-width: 509px; flex-direction: column; }
   .img-fondo { position: absolute; width: 100%; min-width: 344px; max-width: 509px; top:0; max-height: 50%; object-fit: cover; object-position: center; }
   .login-form-container {
-    width: 100%; max-width: 509px; min-width: 344px;
+    width: 100%; max-height: 90%; max-width: 509px; min-width: 344px;
     left: initial; bottom: 0; position: absolute; justify-content: flex-end;
     -webkit-clip-path: url(#mobile-wavy-shape-clip); clip-path: url(#mobile-wavy-shape-clip);
     background: var(--bg); display: flex; flex-direction: column; z-index: 1; gap: 1.5rem;

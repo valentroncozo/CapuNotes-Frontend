@@ -39,12 +39,12 @@
   border-radius: 12px;
   padding: 6px 10px;
   box-shadow: var(--shadow);
-  transition: transform .2s ease, filter .2s ease;
+  transition: filter .15s ease;    /* solo brillo, sin movimiento */
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
-.btn-accion:hover { transform: scale(1.05); filter: brightness(0.95); }
+.btn-accion:hover { filter: brightness(0.95); }
 
 /* === Grid y etiquetas de form === */
 .form-grid { display: grid; gap: 16px; }
