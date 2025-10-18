@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 const Audicion = ({ title ='Audicion'}) => {
 
   const headers = ['Día','Cantidad De Turnos','Turnos Disponibles','Acciones'];
+  const URLCRONOGRAMA = 'audicion/cronograma';
 
   const navigate = useNavigate();
   const [data, setData] = useState([
@@ -21,11 +22,12 @@ const Audicion = ({ title ='Audicion'}) => {
 
   const [filteredData, setFilteredData] = useState(data);
   const [filtroDia, setFiltroDia] = useState('');
+
   const actions = [{
     title: 'Ver Cronograma',
     className: 'abmc-btn btn-primary',
     label: 'Ver Cronograma',
-    onClick:() => { navigate('/principal'); }
+    onClick:(d) => { navigate(`audiciones/cronograma/${d.id}?dia=${d.dia}`); }
   }];
 
   const handleFilterChange = (e) => {
@@ -59,6 +61,13 @@ const Audicion = ({ title ='Audicion'}) => {
                 onChange={handleFilterChange}
                 className="abmc-input"
               />
+
+              <button 
+              className="abmc-btn btn-primary"
+              onClick={() => { navigate('audiciones/agregar'); }}
+              >
+                Agregar Audición
+              </button>
           </div>
 
           <div className="abmc-table-container">
@@ -75,18 +84,23 @@ const Audicion = ({ title ='Audicion'}) => {
           </div>
 
           <footer className="audicion-footer">
-            <button className="abmc-btn btn-secondary" onClick={() => {}}>
-              Visualizar Cuestionario
-            </button>
+
+            <div className='content-footer'>
+              <button className="abmc-btn btn-secondary" onClick={() => {}}>
+                Visualizar Cuestionario
+              </button>
+            </div>
+
+            <div className='content-footer'>
               <button className="abmc-btn btn-primary" onClick={() => {}}>
                 Publicar Audición
               </button>
               <button className="abmc-btn btn-secondary" onClick={() => {}}>
                 Modificar Audición
               </button>
+            </div>
 
           </footer>
-
         </div>
 
 

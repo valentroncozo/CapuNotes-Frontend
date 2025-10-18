@@ -10,23 +10,44 @@
   color: var(--text-light);
   padding: 24px;
   font-family: var(--font-sans);
+  gap: 1rem ;
 }
 
-.audicion-footer {
-  margin-top: 3rem;
-  padding: 12px 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  gap: 1.5rem;
-}
 
 .abmc-table-container {
   display: flex;
-  width: 90%;
+  width: 100%;
+  padding: 2rem 4rem;
   justify-content: center;
   align-items: center;
-
+  align-content: center;
   border-collapse: collapse;
-  margin-top: 1rem;
+  
+}
+
+.audicion-footer {
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.content-footer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap:1rem;
+}
+
+.content-footer .abmc-btn {
+  box-shadow: var(--shadow);
+}
+
+.content-footer .abmc-btn {
+  max-width: 208px;
+}
+
+.audicion-footer:last-child .abmc-btn {
+  min-width: 208px;
 }

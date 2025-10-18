@@ -52,7 +52,7 @@ body .abmc-select:focus {
 body .abmc-btn {
 
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 10px 16px;
   font-weight: 700 !important;
   cursor: pointer;

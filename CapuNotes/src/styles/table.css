@@ -20,9 +20,14 @@
 
 /* Sin redondeo en extremos */
 .abmc-row td:first-child,
-.abmc-row td:last-child { border-radius: 0 !important; }
+.abmc-row td:last-child { border-radius: 0 !important;}
 
 
+.abmc-row td,th {
+  text-align: center;
+  min-width: 0;                 /* permite que el item se reduzca dentro del flex */
+  overflow-wrap: break-word;
+}
 
 /* Acciones */
 .abmc-actions { display: flex; gap: 8px; justify-content: center; }
