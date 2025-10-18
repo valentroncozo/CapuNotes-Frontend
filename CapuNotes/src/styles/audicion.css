@@ -17,7 +17,7 @@
 .abmc-table-container {
   display: flex;
   width: 100%;
-  padding: 2rem 4rem;
+  padding: 0 2rem;
   justify-content: center;
   align-items: center;
   align-content: center;
@@ -26,6 +26,7 @@
 }
 
 .audicion-footer {
+  margin-top: 3rem;
   padding: 12px 0;
   display: flex;
   flex-direction: column;
@@ -40,14 +41,29 @@
   gap:1rem;
 }
 
-.content-footer .abmc-btn {
-  box-shadow: var(--shadow);
-}
-
-.content-footer .abmc-btn {
-  max-width: 208px;
-}
 
 .audicion-footer:last-child .abmc-btn {
-  min-width: 208px;
+  min-width: 207px;
+}
+
+
+@media (width < 477px) {
+
+  .content-footer .abmc-btn {
+    min-width: inherit;
+    margin: .5rem 3rem;
+  }
+  .content-footer {
+    flex-direction: column;
+  }
+
+  .abmc-table-container {
+    padding: 0;
+  }
+
+  .abmc-card {
+    margin: 0;
+  }
+
+
 }

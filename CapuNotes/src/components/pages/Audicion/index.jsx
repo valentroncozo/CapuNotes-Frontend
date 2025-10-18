@@ -13,6 +13,7 @@ const Audicion = ({ title ='Audicion'}) => {
   const URLCRONOGRAMA = 'audicion/cronograma';
 
   const navigate = useNavigate();
+
   const [data, setData] = useState([
     // Datos de ejemplo
     { id: 1, dia: 'Lunes 12', cantidadTurnos: 10, turnosDisponibles: 5 },
@@ -64,7 +65,7 @@ const Audicion = ({ title ='Audicion'}) => {
 
               <button 
               className="abmc-btn btn-primary"
-              onClick={() => { navigate('audiciones/agregar'); }}
+              onClick={() => { navigate('/audicion/agregar'); }}
               >
                 Agregar Audición
               </button>
