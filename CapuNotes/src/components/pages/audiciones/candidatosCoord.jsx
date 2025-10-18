@@ -5,11 +5,11 @@ import "@/styles/abmc.css";
 import "@/styles/table.css";
 import "@/styles/forms.css";
 import infoIcon from "/info.png";
-import Swal from "sweetalert2";
 
 import { candidatosService } from "@/services/candidatosService.js";
 import { horaToMinutes } from "@/components/common/datetime.js";
 import InscripcionView from "@/components/common/InscripcionView.jsx";
+import { info as alertInfo } from "@/utils/alerts.js";
 
 export default function CandidatosCoordPage() {
   const [rows, setRows] = useState([]);
@@ -82,9 +82,9 @@ export default function CandidatosCoordPage() {
     return "badge-estado";
   };
 
-  const handleOpenInscripcion = (r) => {
+  const handleOpenInscripcion = async (r) => {
     if (!r?.inscripcion) {
-      Swal.fire({ icon: "info", title: "Sin inscripción", text: "Este turno no tiene inscripción asignada.", timer: 1400, showConfirmButton: false });
+      await alertInfo({ title: "Sin inscripción", text: "Este turno no tiene inscripción asignada." });
       return;
     }
     setViewRow(r);

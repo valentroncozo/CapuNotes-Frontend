@@ -1,10 +1,11 @@
-// src/components/abmc/EntityTableABMC.jsx
 import { useEffect, useMemo, useState } from "react";
 import BackButton from "../common/BackButton";
 import { PencilFill, Trash3Fill, PlusLg } from "react-bootstrap-icons";
-import Swal from "sweetalert2";
 import EntityEditForm from "./EntityEditForm.jsx";
 import "@/styles/abmc.css";
+
+// ALERTAS unificadas
+import { success, error, confirmDelete } from "@/utils/alerts.js";
 
 export default function EntityTableABMC({
   title = "Catálogo",
@@ -35,15 +36,16 @@ export default function EntityTableABMC({
         setLoading(true);
         const list = await service.list();
         if (mounted) setItems(Array.isArray(list) ? list : []);
-      } catch {
-        if (mounted) setItems([]);
+      } catch (e) {
+        if (mounted) {
+          setItems([]);
+          error({ title: "Error al cargar", text: e?.message || "No se pudo obtener la lista." });
+        }
       } finally {
         if (mounted) setLoading(false);
       }
     })();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, [service]);
 
   const formFields = useMemo(
@@ -91,7 +93,7 @@ export default function EntityTableABMC({
     return `th-sortable sorted-${sortDir}`;
   };
 
-  // Abrir alta: respeta onAdd si viene (Miembros navega), si no, usa popup
+  // Abrir alta
   const openAdd = () => {
     if (typeof onAdd === "function") return onAdd();
     if (usePopupForm) {
@@ -104,60 +106,40 @@ export default function EntityTableABMC({
     setEditing(null);
   };
 
+  // Guardar (create/update) — ALERTA ÚNICA DESDE AQUÍ
   const handleSave = async (data) => {
     try {
       if (editing) {
         const updated = await service.update({ ...editing, ...data });
-        setItems((p) => p.map((x) => (x.id === updated.id ? updated : x)));
+        setItems((p) => p.map((x) => (String(x.id) === String(updated.id) ? updated : x)));
+        await success({ title: "Actualizado correctamente", text: `${capitalize(entityName)} guardado.` });
       } else {
         const created = await service.create(data);
         setItems((p) => [...p, created]);
+        await success({ title: "Creado correctamente", text: `${capitalize(entityName)} guardado.` });
       }
       closeModal();
-    } catch (err) {
-      console.error(err);
-      Swal.fire({
-        icon: "error",
-        title: "Error al guardar",
-        text: err.message || "No se pudo guardar el registro.",
-        confirmButtonColor: "#ffc107",
-        background: "#11103a",
-        color: "#E8EAED",
-      });
+    } catch (e) {
+      const msg = e?.message || "No se pudo guardar el registro.";
+      await error({ title: "Error al guardar", text: msg });
+      // no cerramos el modal en error
     }
   };
 
   const requestDelete = async (row) => {
-    const confirm = await Swal.fire({
-      title: `¿Eliminar ${entityName}?`,
+    const confirm = await confirmDelete({
+      title: `¿Eliminar ${capitalize(entityName)}?`,
       text: row?.nombre || "",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#ffc107",
-      cancelButtonColor: "#6c757d",
       confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-      background: "#11103a",
-      color: "#E8EAED",
     });
     if (!confirm.isConfirmed) return;
 
     try {
       await service.remove(row.id);
-      setItems((prev) => prev.filter((x) => x.id !== row.id));
-      Swal.fire({
-        icon: "success",
-        title: "Eliminado correctamente",
-        timer: 1400,
-        showConfirmButton: false,
-      });
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error al eliminar",
-        text: err.message || "No se pudo eliminar el registro.",
-        confirmButtonColor: "#ffc107",
-      });
+      setItems((prev) => prev.filter((x) => String(x.id) !== String(row.id)));
+      await success({ title: "Eliminado correctamente" });
+    } catch (e) {
+      await error({ title: "Error al eliminar", text: e?.message || "No se pudo eliminar el registro." });
     }
   };
 
@@ -264,9 +246,11 @@ export default function EntityTableABMC({
           entityName={entityName}
           schema={formFields}
           entity={editing}
-          onSave={handleSave}
+          onSave={handleSave}   // <- el contenedor maneja las alertas
         />
       )}
     </main>
   );
 }
+
+function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : ""; }

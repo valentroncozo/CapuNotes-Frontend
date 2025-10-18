@@ -1,6 +1,5 @@
-// src/components/abmc/EntityEditForm.jsx
 import { useEffect, useMemo, useState } from "react";
-import Swal from "sweetalert2";
+import Modal from "@/components/common/Modal.jsx";
 import "@/styles/popup.css";
 
 /**
@@ -12,7 +11,7 @@ import "@/styles/popup.css";
  *  - entityName: string
  *  - schema: [{ key, label, type, required, max, options? }]
  *  - entity: object|null
- *  - onSave: fn(payload)
+ *  - onSave: fn(payload) -> Promise  (las alertas se manejan en el padre)
  */
 export default function EntityEditForm({
   isOpen,
@@ -31,10 +30,12 @@ export default function EntityEditForm({
 
   const [form, setForm] = useState(initial);
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setForm(initial);
     setErrors({});
+    setSaving(false);
   }, [initial, isOpen]);
 
   const isEdit = !!entity;
@@ -57,38 +58,13 @@ export default function EntityEditForm({
   };
 
   const handleConfirm = async () => {
-    if (!validate()) return;
-
+    if (!validate() || saving) return;
     try {
-      await onSave?.(form);
-
-      Swal.fire({
-        icon: "success",
-        title: isEdit ? "Actualizado correctamente" : "Creado correctamente",
-        text: `${cap(entityName)} guardado.`,
-        timer: 1500,
-        showConfirmButton: false,
-      });
-
+      setSaving(true);
+      await onSave?.(form);   // ÉXITO/ERROR se avisa en el padre (EntityTableABMC)
       onClose?.();
-    } catch (err) {
-      console.error(err);
-
-      let msg = "Error al guardar los datos.";
-      if (err.name === "DuplicateError") {
-        msg = err.message || "Ya existe un registro con los mismos datos únicos.";
-      } else if (err.message) {
-        msg = err.message;
-      }
-
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: msg,
-        confirmButtonColor: "#ffc107",
-        background: "#11103a",
-        color: "#E8EAED",
-      });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -99,9 +75,7 @@ export default function EntityEditForm({
       <div className="pop-dialog" onMouseDown={(e) => e.stopPropagation()}>
         <div className="pop-header">
           <h3 className="pop-title">{title}</h3>
-          <button className="icon-btn" aria-label="Cerrar" onClick={onClose}>
-            ✕
-          </button>
+          <button className="icon-btn" aria-label="Cerrar" onClick={onClose}>✕</button>
         </div>
 
         <div className="pop-body">
@@ -121,9 +95,7 @@ export default function EntityEditForm({
                   >
                     <option value="">...</option>
                     {(f.options || []).map((opt) => (
-                      <option key={opt} value={opt}>
-                        {opt}
-                      </option>
+                      <option key={opt} value={opt}>{opt}</option>
                     ))}
                   </select>
                 ) : f.type === "textarea" ? (
@@ -155,11 +127,9 @@ export default function EntityEditForm({
         </div>
 
         <div className="pop-footer">
-          <button className="btn btn-secondary" onClick={onClose}>
-            Cancelar
-          </button>
-          <button className="btn btn-primary" onClick={handleConfirm}>
-            Confirmar
+          <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+          <button className={`btn ${saving ? "btn-disabled" : "btn-primary"}`} onClick={handleConfirm} disabled={saving}>
+            {saving ? "Guardando..." : "Confirmar"}
           </button>
         </div>
       </div>

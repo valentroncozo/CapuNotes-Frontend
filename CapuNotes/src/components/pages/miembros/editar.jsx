@@ -1,4 +1,3 @@
-// src/components/pages/miembros/editar.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import BackButton from "@/components/common/BackButton.jsx";
@@ -6,6 +5,7 @@ import { miembrosService } from "@/services/miembrosService.js";
 import { buildMiembroSchema, miembroEntityName } from "@/schemas/miembros.js";
 import "@/styles/abmc.css";
 import "@/styles/forms.css";
+import { success, error } from "@/utils/alerts.js";
 
 export default function MiembrosEditarPage() {
   const navigate = useNavigate();
@@ -15,12 +15,17 @@ export default function MiembrosEditarPage() {
   const schema = useMemo(() => buildMiembroSchema(), []);
   const [form, setForm] = useState(null);
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     (async () => {
-      const list = await miembrosService.list();
-      const current = list.find((m) => String(m.id) === String(id));
-      setForm(current || {});
+      try {
+        const list = await miembrosService.list();
+        const current = list.find((m) => String(m.id) === String(id));
+        setForm(current || {});
+      } catch (e) {
+        await error({ title: "Error al cargar", text: e?.message || "No se pudo cargar el miembro." });
+      }
     })();
   }, [id]);
 
@@ -38,9 +43,17 @@ export default function MiembrosEditarPage() {
   const handleChange = (key, val) => setForm((prev) => ({ ...prev, [key]: val }));
 
   const handleSave = async () => {
-    if (!validate()) return;
-    await miembrosService.update(form);
-    navigate("/miembros");
+    if (!validate() || saving) return;
+    try {
+      setSaving(true);
+      await miembrosService.update(form);
+      await success({ title: "Actualizado correctamente", text: `${capitalize(miembroEntityName)} guardado.` });
+      navigate("/miembros");
+    } catch (e) {
+      await error({ title: "Error al guardar", text: e?.message || "No se pudo guardar." });
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (!form) return null;
@@ -99,7 +112,9 @@ export default function MiembrosEditarPage() {
 
         <div className="abmc-topbar" style={{ justifyContent: "flex-end", marginTop: 16 }}>
           <button className="btn btn-secondary" onClick={() => navigate("/miembros")}>Cancelar</button>
-          <button className="btn btn-primary" onClick={handleSave}>Guardar cambios</button>
+          <button className={`btn ${saving ? "btn-disabled" : "btn-primary"}`} onClick={handleSave} disabled={saving}>
+            {saving ? "Guardando..." : "Guardar cambios"}
+          </button>
         </div>
       </div>
     </main>

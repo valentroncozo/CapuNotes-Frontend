@@ -6,7 +6,6 @@ import "@/styles/table.css";
 import "@/styles/forms.css";
 import { PencilFill } from "react-bootstrap-icons";
 import infoIcon from "/info.png";
-import Swal from "sweetalert2";
 
 import { candidatosService } from "@/services/candidatosService.js";
 import { estadoClass, estadoLabel } from "@/constants/candidatos.js";
@@ -14,6 +13,7 @@ import { horaToMinutes } from "@/components/common/datetime.js";
 
 import ResultadosModal from "./ResultadosModal.jsx";
 import InscripcionView from "@/components/common/InscripcionView.jsx";
+import { success } from "@/utils/alerts.js";
 
 export default function CandidatosPage() {
   const [rows, setRows] = useState([]);
@@ -181,6 +181,7 @@ export default function CandidatosPage() {
             setRows((prev) =>
               prev.map((r) => (r.id === res.id ? { ...r, resultado: res.resultado } : r))
             );
+            await success({ title: "Resultado guardado" });
             setEditRow(null);
           }}
         />
@@ -196,8 +197,8 @@ export default function CandidatosPage() {
             const updated = await candidatosService.updateInscripcionCuerda(viewRow.id, nuevaCuerda);
             if (!updated) return;
             setRows((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
-            setViewRow((prev) => (prev && prev.id === updated.id ? updated : prev));
-            Swal.fire({ icon: "success", title: "Cuerda actualizada", timer: 1100, showConfirmButton: false });
+            // cerrar lo hace el modal tras OK
+            await success({ title: "Cuerda actualizada" });
           }}
         />
       )}

@@ -1,8 +1,12 @@
 // src/services/candidatosService.js
-// Servicio con persistencia en localStorage para candidatos (mock).
+// Runtime toggle: MOCK por defecto; poner VITE_USE_MOCK="false" para usar backend.
+// Contrato público sin cambios: list(), updateResultado(id, payload), updateInscripcionCuerda(id, cuerda)
 
+import { apiClient } from "@/services/apiClient";
 import { buildMockInscripcion } from "./candidatosServiceHelpers.js";
-import { CANDIDATO_STORAGE_KEY } from "@/schemas/candidatos.js";
+
+// ================== MOCK (localStorage) ==================
+const STORAGE_KEY = "capunotes_candidatos";
 
 function safeReadJson(key) {
   try {
@@ -16,7 +20,7 @@ function writeAll(key, arr) {
   localStorage.setItem(key, JSON.stringify(arr));
 }
 
-// Seed inicial (si no hay nada guardado)
+// Seed inicial
 const seedRows = [
   {
     id: 1,
@@ -85,30 +89,28 @@ const seedRows = [
 ];
 
 function ensureSeed() {
-  const current = safeReadJson(CANDIDATO_STORAGE_KEY);
+  const current = safeReadJson(STORAGE_KEY);
   if (!Array.isArray(current) || current.length === 0) {
-    writeAll(CANDIDATO_STORAGE_KEY, seedRows);
+    writeAll(STORAGE_KEY, seedRows);
     return seedRows;
   }
   return current;
 }
 
-export const candidatosService = {
+const mockService = {
   async list() {
-    await new Promise((r) => setTimeout(r, 80)); // pequeña latencia
+    await new Promise((r) => setTimeout(r, 80));
     return ensureSeed();
   },
-
   async updateResultado(id, resultado) {
     const list = ensureSeed();
     const idx = list.findIndex((r) => String(r.id) === String(id));
     if (idx === -1) return null;
     const next = [...list];
     next[idx] = { ...next[idx], resultado: { ...resultado } };
-    writeAll(CANDIDATO_STORAGE_KEY, next);
+    writeAll(STORAGE_KEY, next);
     return next[idx];
   },
-
   async updateInscripcionCuerda(id, cuerda) {
     const list = ensureSeed();
     const idx = list.findIndex((r) => String(r.id) === String(id));
@@ -120,7 +122,65 @@ export const candidatosService = {
     };
     const next = [...list];
     next[idx] = updated;
-    writeAll(CANDIDATO_STORAGE_KEY, next);
+    writeAll(STORAGE_KEY, next);
     return updated;
   },
 };
+
+// ================== REAL API ==================
+// Ajustá paths a tu backend. Se mantiene el mismo shape que consume la UI.
+const apiService = {
+  // GET /candidatos?audicionId=...
+  async list(audicionId) {
+    const data = await apiClient.get("/candidatos", {
+      params: audicionId ? { audicionId } : undefined,
+    });
+    // Aseguramos campos mínimos que espera la UI:
+    return (Array.isArray(data) ? data : []).map((r) => ({
+      id: r.id,
+      hora: r.horaLabel || r.hora || "",        // admite "17.00 hs" o formateás en el back
+      nombre: r.nombre || r.nombreLabel || "",  // "Apellido, Nombre" o similar
+      cancion: r.cancion || "",
+      resultado: r.resultado || { estado: "sin", obs: "" },
+      inscripcion: r.inscripcion || buildMockInscripcion(),
+    }));
+  },
+
+  // PUT /candidatos/:id/resultado  { estado, obs }
+  async updateResultado(id, { estado, obs }) {
+    const updated = await apiClient.put(`/candidatos/${id}/resultado`, {
+      body: { estado, obs },
+    });
+    return {
+      id: updated.id ?? id,
+      hora: updated.horaLabel || updated.hora || "",
+      nombre: updated.nombre || updated.nombreLabel || "",
+      cancion: updated.cancion || "",
+      resultado: updated.resultado || { estado, obs },
+      inscripcion: updated.inscripcion || buildMockInscripcion(),
+    };
+  },
+
+  // PATCH /candidatos/:id/inscripcion/cuerda  { cuerda }
+  async updateInscripcionCuerda(id, cuerda) {
+    const updated = await apiClient.patch(
+      `/candidatos/${id}/inscripcion/cuerda`,
+      { body: { cuerda } }
+    );
+    return {
+      id: updated.id ?? id,
+      hora: updated.horaLabel || updated.hora || "",
+      nombre: updated.nombre || updated.nombreLabel || "",
+      cancion: updated.cancion || "",
+      resultado: updated.resultado || { estado: "sin", obs: "" },
+      inscripcion: {
+        ...buildMockInscripcion(),
+        ...(updated.inscripcion || {}),
+      },
+    };
+  },
+};
+
+// ================== SELECTOR ==================
+const USE_MOCK = String(import.meta.env.VITE_USE_MOCK ?? "true") !== "false";
+export const candidatosService = USE_MOCK ? mockService : apiService;
