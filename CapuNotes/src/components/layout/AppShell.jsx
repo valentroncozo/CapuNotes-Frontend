@@ -31,7 +31,6 @@ const MENU_ITEMS = [
   ["/audiciones", "Audiciones"],
   ["/canciones", "Canciones"],
   ["/eventos", "Eventos"],
-  ["/fraternidades", "Fraternidades"],
   ["/usuarios-roles", "Usuarios y roles"],
 ];
 
