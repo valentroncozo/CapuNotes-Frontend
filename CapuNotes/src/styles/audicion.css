@@ -1,0 +1,20 @@
+
+.audicion-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text-light);
+  padding: 24px;
+  font-family: var(--font-sans);
+}
+
+.audicion-footer {
+  margin-top: 3rem;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 1.5rem;
+}
