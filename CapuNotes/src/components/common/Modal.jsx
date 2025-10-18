@@ -19,11 +19,12 @@ export default function Modal({ isOpen, onClose, title, children, actions }) {
   if (!isOpen) return null;
 
   const onBackdrop = (e) => {
+    // Click (no mousedown) para no interferir con selects nativos
     if (e.target === e.currentTarget) onClose?.();
   };
 
   return (
-    <div className="pop-backdrop" onMouseDown={onBackdrop}>
+    <div className="pop-backdrop" onClick={onBackdrop}>
       <div
         className="pop-dialog"
         role="dialog"

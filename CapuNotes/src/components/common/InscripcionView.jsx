@@ -1,19 +1,51 @@
 // src/components/common/InscripcionView.jsx
+import { useEffect, useMemo, useState } from "react";
 import Modal from "@/components/common/Modal.jsx";
-import { CUERDAS } from "@/constants/candidatos.js";
+import useCuerdas from "@/hooks/useCuerdas.js";
 import "@/styles/popup.css";
 import "@/styles/forms.css";
 
-/**
- * InscripcionView
- * Modal de solo lectura (o semi editable para evaluadores)
- * Muestra todos los campos del formulario de inscripción del candidato.
- */
-export default function InscripcionView({ data = {}, open, onClose, editable = false }) {
+export default function InscripcionView({
+  data = {},
+  open,
+  onClose,
+  editable = false,
+  onSaveCuerda,
+}) {
+  const { items: cuerdas } = useCuerdas();
+
+  const opcionesCuerdas = useMemo(() => {
+    const lista = Array.isArray(cuerdas) ? cuerdas : [];
+    const nombres = lista.map((c) => String(c?.nombre ?? "").trim()).filter(Boolean);
+    const extra = String(data.cuerda ?? "").trim();
+    return Array.from(new Set(extra ? [extra, ...nombres] : nombres));
+  }, [cuerdas, data.cuerda]);
+
+  const [selCuerda, setSelCuerda] = useState(String(data.cuerda ?? ""));
+  const [saving, setSaving] = useState(false);
+
+  // 🔧 Reset controlado: solo cuando se abre el modal o cambia el valor de cuerda proveniente de data
+  useEffect(() => {
+    if (open) setSelCuerda(String(data.cuerda ?? ""));
+    setSaving(false);
+  }, [open, data.cuerda]);
+
+  const dirty = editable && String(selCuerda || "") !== String(data.cuerda || "");
+
+  const handleGuardar = async () => {
+    if (!dirty || saving) return;
+    try {
+      setSaving(true);
+      await onSaveCuerda?.(selCuerda);
+      onClose?.(); // cerrar al guardar OK, como pediste
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
-    <Modal isOpen={open} onClose={onClose}>
+    <Modal isOpen={open} onClose={onClose} title="Formulario de Inscripción">
       <div className="modal-body" style={{ maxHeight: "80vh", overflow: "auto" }}>
-        <h3 className="pop-title" style={{ marginBottom: 8 }}>Formulario de Inscripción</h3>
         <hr className="divisor-amarillo" />
 
         <section style={{ marginBottom: 12 }}>
@@ -65,9 +97,17 @@ export default function InscripcionView({ data = {}, open, onClose, editable = f
           <div className="field" style={{ gridColumn: "1 / span 2" }}>
             <label>Cuerda</label>
             {editable ? (
-              <select className="input" value={data.cuerda || ""}>
+              <select
+                className="input"
+                value={selCuerda}
+                onChange={(e) => setSelCuerda(e.target.value)}
+                aria-label="Seleccionar cuerda"
+                // 🛡️ evita que el click del menú nativo burbujee y dispare el backdrop
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <option value="">...</option>
-                {CUERDAS.map((c) => (
+                {opcionesCuerdas.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
@@ -142,6 +182,16 @@ export default function InscripcionView({ data = {}, open, onClose, editable = f
 
         <div className="pop-footer" style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
           <button className="btn btn-secondary" onClick={onClose}>Cerrar</button>
+          {editable && (
+            <button
+              className={`btn ${dirty && !saving ? "btn-primary" : "btn-disabled"}`}
+              onClick={handleGuardar}
+              disabled={!dirty || saving}
+              aria-disabled={!dirty || saving}
+            >
+              {saving ? "Guardando..." : "Guardar cambios"}
+            </button>
+          )}
         </div>
       </div>
     </Modal>

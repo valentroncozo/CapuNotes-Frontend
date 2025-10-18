@@ -6,6 +6,7 @@ import "@/styles/table.css";
 import "@/styles/forms.css";
 import { PencilFill } from "react-bootstrap-icons";
 import infoIcon from "/info.png";
+import Swal from "sweetalert2";
 
 import { candidatosService } from "@/services/candidatosService.js";
 import { estadoClass, estadoLabel } from "@/constants/candidatos.js";
@@ -35,7 +36,7 @@ export default function CandidatosPage() {
     const ape = (r.apellido || "").trim();
     const nom = (r.nombre || "").trim();
     if (ape && nom) return `${ape}, ${nom}`;
-    return nom || ape || r.nombre || ""; // fallback si solo viene nombre
+    return nom || ape || r.nombre || r.nombreLabel || "";
   };
 
   const filtered = useMemo(() => {
@@ -45,7 +46,8 @@ export default function CandidatosPage() {
       const ape = String(r.apellido || "").toLowerCase();
       const nom = String(r.nombre || "").toLowerCase();
       const apynom = `${ape}, ${nom}`.trim();
-      return ape.includes(t) || nom.includes(t) || apynom.includes(t);
+      const label = String(r.nombreLabel || r.nombre || "").toLowerCase();
+      return ape.includes(t) || nom.includes(t) || apynom.includes(t) || label.includes(t);
     });
   }, [rows, q]);
 
@@ -53,9 +55,7 @@ export default function CandidatosPage() {
     if (!sortBy) return filtered;
     const dir = sortDir === "desc" ? -1 : 1;
     return [...filtered].sort((a, b) => {
-      if (sortBy === "hora") {
-        return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
-      }
+      if (sortBy === "hora") return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
       if (sortBy === "resultado") {
         return (
           estadoLabel(a.resultado?.estado ?? "sin").localeCompare(
@@ -105,24 +105,14 @@ export default function CandidatosPage() {
             <tr className="abmc-row">
               <th className={thClass("hora")}>
                 <span className="th-label">Hora</span>
-                <button
-                  type="button"
-                  className="th-caret-btn"
-                  onClick={() => toggleSort("hora")}
-                  aria-label="Ordenar por Hora"
-                >
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("hora")} aria-label="Ordenar por Hora">
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
 
               <th className={thClass("apynom")}>
                 <span className="th-label">Apellido, Nombre</span>
-                <button
-                  type="button"
-                  className="th-caret-btn"
-                  onClick={() => toggleSort("apynom")}
-                  aria-label="Ordenar por Apellido, Nombre"
-                >
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("apynom")} aria-label="Ordenar por Apellido, Nombre">
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
@@ -131,12 +121,7 @@ export default function CandidatosPage() {
 
               <th className={thClass("resultado")}>
                 <span className="th-label">Resultado</span>
-                <button
-                  type="button"
-                  className="th-caret-btn"
-                  onClick={() => toggleSort("resultado")}
-                  aria-label="Ordenar por Resultado"
-                >
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("resultado")} aria-label="Ordenar por Resultado">
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
@@ -183,7 +168,7 @@ export default function CandidatosPage() {
         </table>
 
         <p style={{ opacity: 0.7, marginTop: 10 }}>
-          Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i>.
+          Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i> y ajustar la <i>Cuerda</i> de la inscripción.
         </p>
       </div>
 
@@ -207,6 +192,13 @@ export default function CandidatosPage() {
           open={true}
           onClose={() => setViewRow(null)}
           editable={true}
+          onSaveCuerda={async (nuevaCuerda) => {
+            const updated = await candidatosService.updateInscripcionCuerda(viewRow.id, nuevaCuerda);
+            if (!updated) return;
+            setRows((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+            setViewRow((prev) => (prev && prev.id === updated.id ? updated : prev));
+            Swal.fire({ icon: "success", title: "Cuerda actualizada", timer: 1100, showConfirmButton: false });
+          }}
         />
       )}
     </main>

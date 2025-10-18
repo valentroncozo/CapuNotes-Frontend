@@ -1,36 +1,29 @@
 /* src/styles/buttons.css */
-/* === Botones globales (forma pill y variantes) ===
-   Este archivo se importa DESPUÉS de tokens/variable en globals.css
-*/
+/* === Botones globales (forma pill y variantes) === */
 
-/* Base pill para todos los .btn */
 .btn,
 button.btn,
 .pop-dialog .btn {
   border: none;
-  border-radius: 999px; /* pill redondito sí o sí */
+  border-radius: 999px; /* pill */
   padding: 10px 18px;
   font-weight: 700;
   font-family: var(--font-sans);
   cursor: pointer;
   transition: all 0.15s ease;
-  background: transparent; /* base neutra */
+  background: transparent;
   color: inherit;
 }
 
-/* Efecto hover base */
 .btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
 
-/* === Primario (amarillo) ===
-   - Fondo sólido var(--accent)
-   - SIN borde visible
-*/
+/* Primario */
 .btn.btn-primary,
 button.btn.btn-primary,
 .pop-dialog .btn.btn-primary {
   background: var(--accent) !important;
   color: var(--text-dark) !important;
-  border: none !important;         /* <- sin borde */
+  border: none !important;
   box-shadow: var(--shadow);
 }
 .btn.btn-primary:hover,
@@ -44,18 +37,15 @@ button.btn.btn-primary:active,
   filter: brightness(0.9);
 }
 
-/* === Secundario (outline blanco) ===
-   - Fondo transparente
-   - Borde blanco del mismo color que la letra
-*/
+/* Secundario (outline blanco) */
 .btn.btn-secondary,
 button.btn.btn-secondary,
 .pop-dialog .btn.btn-secondary {
   background: transparent !important;
   color: #fff !important;
-  border: 1.5px solid #fff !important;  /* borde blanco igual que el texto */
+  border: 1.5px solid #fff !important;
   letter-spacing: 0.3px;
-  padding: 0.45rem 1.4rem; /* pill visualmente más estilizado */
+  padding: 0.45rem 1.4rem;
 }
 .btn.btn-secondary:hover,
 button.btn.btn-secondary:hover,
@@ -72,7 +62,21 @@ button.btn.btn-secondary:active,
   background: rgba(255, 255, 255, 0.2) !important;
 }
 
-/* Asegurar forma pill aunque algún CSS pise .btn */
+/* Disabled (gris) */
+.btn.btn-disabled,
+button.btn.btn-disabled,
+.pop-dialog .btn.btn-disabled,
+.btn:disabled {
+  background: rgba(255,255,255,0.15) !important;
+  color: rgba(232,234,237,0.6) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+/* Fuerza forma pill ante cualquier override */
 .btn,
 button.btn,
 .pop-dialog .btn {

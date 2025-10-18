@@ -1,9 +1,23 @@
 // src/services/candidatosService.js
-// Por ahora mock. Más adelante reemplazás list() por una llamada real.
+// Servicio con persistencia en localStorage para candidatos (mock).
 
 import { buildMockInscripcion } from "./candidatosServiceHelpers.js";
+import { CANDIDATO_STORAGE_KEY } from "@/schemas/candidatos.js";
 
-const mockRows = [
+function safeReadJson(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+function writeAll(key, arr) {
+  localStorage.setItem(key, JSON.stringify(arr));
+}
+
+// Seed inicial (si no hay nada guardado)
+const seedRows = [
   {
     id: 1,
     hora: "17.00 hs",
@@ -70,16 +84,43 @@ const mockRows = [
   },
 ];
 
+function ensureSeed() {
+  const current = safeReadJson(CANDIDATO_STORAGE_KEY);
+  if (!Array.isArray(current) || current.length === 0) {
+    writeAll(CANDIDATO_STORAGE_KEY, seedRows);
+    return seedRows;
+  }
+  return current;
+}
+
 export const candidatosService = {
   async list() {
-    // simula latencia
-    await new Promise((r) => setTimeout(r, 100));
-    return mockRows;
+    await new Promise((r) => setTimeout(r, 80)); // pequeña latencia
+    return ensureSeed();
   },
-  // ganchos para actualizar (futuro persistente)
+
   async updateResultado(id, resultado) {
-    const row = mockRows.find((r) => r.id === id);
-    if (row) row.resultado = resultado;
-    return row;
+    const list = ensureSeed();
+    const idx = list.findIndex((r) => String(r.id) === String(id));
+    if (idx === -1) return null;
+    const next = [...list];
+    next[idx] = { ...next[idx], resultado: { ...resultado } };
+    writeAll(CANDIDATO_STORAGE_KEY, next);
+    return next[idx];
+  },
+
+  async updateInscripcionCuerda(id, cuerda) {
+    const list = ensureSeed();
+    const idx = list.findIndex((r) => String(r.id) === String(id));
+    if (idx === -1) return null;
+    const row = list[idx];
+    const updated = {
+      ...row,
+      inscripcion: { ...row.inscripcion, cuerda: cuerda ?? "" },
+    };
+    const next = [...list];
+    next[idx] = updated;
+    writeAll(CANDIDATO_STORAGE_KEY, next);
+    return updated;
   },
 };
