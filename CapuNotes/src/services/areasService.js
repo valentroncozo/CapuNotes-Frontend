@@ -1,18 +1,55 @@
 // src/services/areasService.js
-// Interfaz estable para consumir Áreas.
-// HOY usa localStorage. Mañana, cambiás a apiClient y listo.
+import axios from "axios";
 
-import { localStorageApi } from "@/services/localStorageApi";
-import { AREA_STORAGE_KEY } from "@/schemas/areas";
-// import { apiClient } from "@/services/apiClient"; // para backend real
+const API_URL = "/api/areas";
 
-// ===== Implementación actual (LocalStorage) =====
-export const areasService = localStorageApi(AREA_STORAGE_KEY);
+export const areasService = {
+  // Obtener todas las áreas
+  list: async () => {
+    const res = await axios.get(API_URL);
+    console.log("📡 Datos recibidos del backend:", res.data);
+    return res.data.map((a) => ({
+      id: a.id,
+      nombre: a.name,
+      descripcion: a.description,
+    }));
+  },
 
-// ===== Implementación futura (Backend) =====
-// export const areasService = {
-//   list: () => apiClient.get('/areas'),
-//   create: (payload) => apiClient.post('/areas', { body: payload }),
-//   update: (payload) => apiClient.put(`/areas/${payload.id}`, { body: payload }),
-//   remove: (id) => apiClient.delete(`/areas/${id}`),
-// };
+  // Crear nueva área
+  create: async (data) => {
+    const payload = {
+      name: data.nombre,
+      description: data.descripcion,
+    };
+    const res = await axios.post(API_URL, payload);
+    return {
+      id: res.data.id,
+      nombre: res.data.name,
+      descripcion: res.data.description,
+    };
+  },
+
+  // Editar área existente
+  update: async (data) => {
+    // data debe incluir id, nombre, descripcion
+    const payload = {
+      name: data.nombre,
+      description: data.descripcion,
+    };
+    const res = await axios.patch(`${API_URL}/${data.id}`, payload);
+    return {
+      id: res.data.id,
+      nombre: res.data.name,
+      descripcion: res.data.description,
+    };
+  },
+
+  // Eliminar área
+  remove: async (id) => {
+    await axios.delete(`${API_URL}/${id}`);
+  },
+};
+
+
+
+
