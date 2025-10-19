@@ -1,4 +1,3 @@
-// src/components/pages/audiciones/candidatosCoord.jsx
 import { useEffect, useMemo, useState } from "react";
 import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
@@ -50,8 +49,8 @@ export default function CandidatosCoordPage() {
       return explicit === "disponible"
         ? "Disponible"
         : explicit === "reservado"
-        ? "Reservado"
-        : "Cancelado";
+          ? "Reservado"
+          : "Cancelado";
     }
     const estRes = String(r?.resultado?.estado || "").toLowerCase();
     if (estRes === "cancelado" || estRes === "cancelada") return "Cancelado";
@@ -86,21 +85,42 @@ export default function CandidatosCoordPage() {
   }, [filtered, sortBy, sortDir]);
 
   const toggleSort = (key) => {
-    if (sortBy !== key) { setSortBy(key); setSortDir("asc"); }
-    else { setSortDir((d) => (d === "asc" ? "desc" : "asc")); }
+    if (sortBy !== key) {
+      setSortBy(key);
+      setSortDir("asc");
+    } else {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    }
   };
   const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
 
   const TurnoIcon = ({ estado }) => {
     const e = String(estado || "").toLowerCase();
-    if (e === "cancelado")  return <span className="icon-estado icon-turno--cancel icon-md" title="Cancelado"><CanceladoIcon /></span>;
-    if (e === "reservado")  return <span className="icon-estado icon-turno--res icon-md" title="Reservado"><ReservadoIcon /></span>;
-    return <span className="icon-estado icon-turno--disp icon-md" title="Disponible"><DisponibleIcon /></span>;
+    if (e === "cancelado")
+      return (
+        <span className="icon-estado icon-turno--cancel icon-md" title="Cancelado">
+          <CanceladoIcon />
+        </span>
+      );
+    if (e === "reservado")
+      return (
+        <span className="icon-estado icon-turno--res icon-md" title="Reservado">
+          <ReservadoIcon />
+        </span>
+      );
+    return (
+      <span className="icon-estado icon-turno--disp icon-md" title="Disponible">
+        <DisponibleIcon />
+      </span>
+    );
   };
 
   const handleOpenInscripcion = async (r) => {
     if (!r?.inscripcion) {
-      await alertInfo({ title: "Sin inscripción", text: "Este turno no tiene inscripción asignada." });
+      await alertInfo({
+        title: "Sin inscripción",
+        text: "Este turno no tiene inscripción asignada.",
+      });
       return;
     }
     setViewRow(r);
@@ -133,34 +153,53 @@ export default function CandidatosCoordPage() {
             <tr className="abmc-row">
               <th className={thClass("hora")}>
                 <span className="th-label">Hora</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("hora")} aria-label="Ordenar por Hora">
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("hora")}
+                  aria-label="Ordenar por Hora"
+                >
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
 
               <th className={thClass("apynom")}>
                 <span className="th-label">Apellido, Nombre</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("apynom")} aria-label="Ordenar por Apellido, Nombre">
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("apynom")}
+                  aria-label="Ordenar por Apellido, Nombre"
+                >
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
 
-              <th><span className="th-label">Canción</span></th>
+              <th>
+                <span className="th-label">Canción</span>
+              </th>
 
               <th className={thClass("estado")}>
                 <span className="th-label">Estado</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("estado")} aria-label="Ordenar por Estado">
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("estado")}
+                  aria-label="Ordenar por Estado"
+                >
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
 
-              <th style={{ textAlign: "center" }}><span className="th-label">Inscripción</span></th>
+              <th style={{ textAlign: "center" }}>
+                <span className="th-label">Inscripción</span>
+              </th>
             </tr>
           </thead>
 
           <tbody>
             {sorted.map((r) => {
-              const est = estadoCoordinador(r); // "Disponible"/"Reservado"/"Cancelado"
+              const est = estadoCoordinador(r);
               const key = est.toLowerCase();
               return (
                 <tr key={r.id} className="abmc-row">
@@ -168,7 +207,6 @@ export default function CandidatosCoordPage() {
                   <td>{nombreApynom(r) || "—"}</td>
                   <td>{r.cancion || "—"}</td>
 
-                  {/* Ícono + botón fijo a la derecha (mismo patrón que evaluadores) */}
                   <td className="cell-right-action">
                     <TurnoIcon estado={key} />
                     <button
@@ -189,7 +227,11 @@ export default function CandidatosCoordPage() {
                       aria-label="Ver inscripción"
                       onClick={() => handleOpenInscripcion(r)}
                     >
-                      <img src={infoIcon} alt="Info" style={{ width: 18, height: 18, opacity: r?.inscripcion ? 1 : .6 }} />
+                      <img
+                        src={infoIcon}
+                        alt="Info"
+                        style={{ width: 18, height: 18, opacity: r?.inscripcion ? 1 : 0.6 }}
+                      />
                     </button>
                   </td>
                 </tr>
@@ -215,7 +257,9 @@ export default function CandidatosCoordPage() {
           onSave={async (estado) => {
             const updated = await candidatosService.updateTurnoEstado(editRow.id, estado);
             if (updated) {
-              setRows((prev) => prev.map((r) => (String(r.id) === String(updated.id) ? { ...r, ...updated } : r)));
+              setRows((prev) =>
+                prev.map((r) => (String(r.id) === String(updated.id) ? { ...r, ...updated } : r))
+              );
               await success({ title: "Estado actualizado" });
             }
             setEditRow(null);

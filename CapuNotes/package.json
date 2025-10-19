@@ -1,13 +1,15 @@
 {
   "name": "capunotes",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
     "preview": "vite preview",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
     "check:css": "node scripts/find-unused-css.mjs"
   },
   "dependencies": {
@@ -23,7 +25,6 @@
     "react-bootstrap-icons": "^1.11.6",
     "react-dom": "^19.2.0",
     "react-router-dom": "^6.14.2",
-    "react-scripts": "^5.0.1",
     "sweetalert2": "^11.26.3"
   },
   "devDependencies": {
@@ -35,6 +36,17 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "prettier": "^3.3.3",
     "vite": "^7.1.9"
+  },
+  "prettier": {
+    "singleQuote": false,
+    "semi": true,
+    "printWidth": 100,
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "useTabs": false,
+    "arrowParens": "always",
+    "bracketSpacing": true
   }
 }

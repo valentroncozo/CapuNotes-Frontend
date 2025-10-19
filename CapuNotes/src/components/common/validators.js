@@ -1,8 +1,8 @@
 // src/components/common/validators.js
 
 // Helpers
-export const isEmpty = (v) => (v ?? '').toString().trim().length === 0;
-export const len = (v) => (v ?? '').toString().trim().length;
+export const isEmpty = (v) => (v ?? "").toString().trim().length === 0;
+export const len = (v) => (v ?? "").toString().trim().length;
 
 // Reglas
 export const required = (fieldLabel) => (v) =>
@@ -25,21 +25,16 @@ export function validateValue(value, rules = []) {
 // ÁREAS: { nombre, descripcion }
 export function validateAreaFields(values) {
   return {
-    nombre: validateValue(values?.nombre, [
-      required('Nombre'),
-      maxLength('Nombre', 80),
-    ]),
-    descripcion: validateValue(values?.descripcion, [
-      maxLength('Descripción', 300),
-    ]),
+    nombre: validateValue(values?.nombre, [required("Nombre"), maxLength("Nombre", 80)]),
+    descripcion: validateValue(values?.descripcion, [maxLength("Descripción", 300)]),
   };
 }
 
 // LOGIN: { username, password }
 export function validateLoginFields(values) {
   return {
-    usuario: validateValue(values?.username, [required('Usuario')]),
-    contraseña: validateValue(values?.password, [required('Contraseña')]),
+    usuario: validateValue(values?.username, [required("Usuario")]),
+    contraseña: validateValue(values?.password, [required("Contraseña")]),
   };
 }
 

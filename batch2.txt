@@ -1,0 +1,2804 @@
+===== src/components/abmc/EntityEditForm.jsx =====
+// src/components/abmc/EntityEditForm.jsx
+import { useEffect, useMemo, useState } from "react";
+import Modal from "@/components/common/Modal.jsx";
+import "@/styles/popup.css";
+
+/**
+ * Popup genérico de Alta/Edición para ABMC
+ */
+export default function EntityEditForm({
+  isOpen,
+  onClose,
+  entityName = "elemento",
+  schema = [],
+  entity = null,
+  onSave,
+}) {
+  const initial = useMemo(() => {
+    const base = {};
+    schema.forEach((f) => (base[f.key] = entity?.[f.key] ?? ""));
+    if (entity?.id) base.id = entity.id;
+    return base;
+  }, [schema, entity]);
+
+  const [form, setForm] = useState(initial);
+  const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setForm(initial);
+    setErrors({});
+    setSaving(false);
+  }, [initial, isOpen]);
+
+  const isEdit = !!entity;
+  const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : "");
+  const title = `${isEdit ? "Editar" : "Agregar"} ${cap(entityName)}`;
+
+  const validate = () => {
+    const next = {};
+    schema.forEach((f) => {
+      const v = (form[f.key] ?? "").toString().trim();
+      if (f.required && !v) next[f.key] = "Obligatorio";
+      if (f.max && v.length > f.max) next[f.key] = `Máx. ${f.max} caracteres`;
+    });
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
+  const handleChange = (key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleConfirm = async (e) => {
+    e?.preventDefault?.();
+    if (!validate() || saving) return;
+    try {
+      setSaving(true);
+      await onSave?.(form);
+      onClose?.();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      showHeaderClose={true} // ✅ cruz visible
+      actions={
+        <>
+          <button className="btn btn-secondary" onClick={onClose} type="button">
+            Cancelar
+          </button>
+          <button
+            className={`btn ${saving ? "btn-disabled" : "btn-primary"}`}
+            onClick={handleConfirm}
+            type="submit"
+            disabled={saving}
+          >
+            {saving ? "Guardando..." : "Confirmar"}
+          </button>
+        </>
+      }
+    >
+      <form onSubmit={handleConfirm}>
+        <div className="form-grid">
+          {schema.map((f) => (
+            <div className="field" key={f.key}>
+              <label htmlFor={`inp-${f.key}`}>
+                {f.label} {f.required ? "*" : ""}
+              </label>
+
+              {f.type === "select" ? (
+                <select
+                  id={`inp-${f.key}`}
+                  className="input"
+                  value={form[f.key] ?? ""}
+                  onChange={(e) => handleChange(f.key, e.target.value)}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <option value="">...</option>
+                  {(f.options || []).map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              ) : f.type === "textarea" ? (
+                <textarea
+                  id={`inp-${f.key}`}
+                  className="input"
+                  rows={3}
+                  value={form[f.key] ?? ""}
+                  onChange={(e) => handleChange(f.key, e.target.value)}
+                  maxLength={f.max || undefined}
+                />
+              ) : (
+                <input
+                  id={`inp-${f.key}`}
+                  className="input"
+                  type={f.type || "text"}
+                  value={form[f.key] ?? ""}
+                  onChange={(e) => handleChange(f.key, e.target.value)}
+                  maxLength={f.max || undefined}
+                />
+              )}
+
+              {errors[f.key] && <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>}
+            </div>
+          ))}
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+===== src/components/abmc/EntityTableABMC.jsx =====
+import { useEffect, useMemo, useState } from "react";
+import BackButton from "../common/BackButton";
+import { PencilFill, Trash3Fill, PlusLg } from "react-bootstrap-icons";
+import EntityEditForm from "./EntityEditForm.jsx";
+import "@/styles/abmc.css";
+
+// ALERTAS unificadas
+import { success, error, confirmDelete } from "@/utils/alerts.js";
+
+export default function EntityTableABMC({
+  title = "Catálogo",
+  service,
+  schema = [],
+  entityName = "elemento",
+  showBackButton = true,
+  usePopupForm = true,
+  sortable = false,
+  onAdd = null,
+  renderActions,
+}) {
+  const [items, setItems] = useState([]);
+  const [q, setQ] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+
+  // Orden
+  const [sortBy, setSortBy] = useState(null);
+  const [sortDir, setSortDir] = useState("asc");
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const list = await service.list();
+        if (mounted) setItems(Array.isArray(list) ? list : []);
+      } catch (e) {
+        if (mounted) {
+          setItems([]);
+          error({ title: "Error al cargar", text: e?.message || "No se pudo obtener la lista." });
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [service]);
+
+  const formFields = useMemo(
+    () => schema.filter((f) => f.type !== "submit" && f.type !== "button"),
+    [schema]
+  );
+  const tableFields = useMemo(() => formFields.filter((f) => f.table !== false), [formFields]);
+
+  const filtered = useMemo(() => {
+    if (!q) return items;
+    const t = q.toLowerCase();
+    return items.filter((row) =>
+      formFields.some((f) =>
+        String(row?.[f.key] ?? "")
+          .toLowerCase()
+          .includes(t)
+      )
+    );
+  }, [items, q, formFields]);
+
+  const sorted = useMemo(() => {
+    if (!sortable || !sortBy) return filtered;
+    const dir = sortDir === "desc" ? -1 : 1;
+    return [...filtered].sort((a, b) => {
+      const av = String(a?.[sortBy] ?? "").toLowerCase();
+      const bv = String(b?.[sortBy] ?? "").toLowerCase();
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+  }, [filtered, sortBy, sortDir, sortable]);
+
+  const toggleSort = (key) => {
+    if (!sortable) return;
+    if (sortBy !== key) {
+      setSortBy(key);
+      setSortDir("asc");
+    } else {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    }
+  };
+
+  const headerClass = (key) => {
+    if (!sortable) return "";
+    if (sortBy !== key) return "th-sortable";
+    return `th-sortable sorted-${sortDir}`;
+  };
+
+  // Abrir alta
+  const openAdd = () => {
+    if (typeof onAdd === "function") return onAdd();
+    if (usePopupForm) {
+      setEditing(null);
+      setIsOpen(true);
+    }
+  };
+  const closeModal = () => {
+    setIsOpen(false);
+    setEditing(null);
+  };
+
+  // Guardar (create/update) — ALERTA ÚNICA DESDE AQUÍ
+  const handleSave = async (data) => {
+    try {
+      if (editing) {
+        const updated = await service.update({ ...editing, ...data });
+        setItems((p) => p.map((x) => (String(x.id) === String(updated.id) ? updated : x)));
+        await success({
+          title: "Actualizado correctamente",
+          text: `${capitalize(entityName)} guardado.`,
+        });
+      } else {
+        const created = await service.create(data);
+        setItems((p) => [...p, created]);
+        await success({
+          title: "Creado correctamente",
+          text: `${capitalize(entityName)} guardado.`,
+        });
+      }
+      closeModal();
+    } catch (e) {
+      const msg = e?.message || "No se pudo guardar el registro.";
+      await error({ title: "Error al guardar", text: msg });
+      // no cerramos el modal en error
+    }
+  };
+
+  const requestDelete = async (row) => {
+    const confirm = await confirmDelete({
+      title: `¿Eliminar ${capitalize(entityName)}?`,
+      text: row?.nombre || "",
+      confirmButtonText: "Sí, eliminar",
+    });
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await service.remove(row.id);
+      setItems((prev) => prev.filter((x) => String(x.id) !== String(row.id)));
+      await success({ title: "Eliminado correctamente" });
+    } catch (e) {
+      await error({
+        title: "Error al eliminar",
+        text: e?.message || "No se pudo eliminar el registro.",
+      });
+    }
+  };
+
+  return (
+    <main className="abmc-page">
+      <div className="abmc-card">
+        <div className="abmc-header">
+          {showBackButton && <BackButton />}
+          <h1 className="abmc-title">{title}</h1>
+          <hr className="divisor-amarillo" />
+        </div>
+
+        <div className="abmc-topbar">
+          <input
+            type="text"
+            className="abmc-input"
+            placeholder={`Buscar ${entityName}...`}
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+          <button
+            type="button"
+            className="abmc-btn abmc-btn-primary"
+            onClick={openAdd}
+            title={`Agregar ${entityName}`}
+          >
+            <PlusLg className="me-1" /> Agregar
+          </button>
+        </div>
+
+        <table className="abmc-table abmc-table-rect">
+          <thead className="abmc-thead">
+            <tr className="abmc-row">
+              {tableFields.map((f) => (
+                <th key={f.key} className={headerClass(f.key)}>
+                  <span className="th-label">{f.label}</span>
+                  {sortable && (
+                    <button
+                      type="button"
+                      className="th-caret-btn"
+                      onClick={() => toggleSort(f.key)}
+                    >
+                      <span className="th-caret" aria-hidden />
+                    </button>
+                  )}
+                </th>
+              ))}
+              <th style={{ textAlign: "center" }}>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {loading ? (
+              <tr className="abmc-row">
+                <td colSpan={tableFields.length + 1}>Cargando...</td>
+              </tr>
+            ) : sorted.length === 0 ? (
+              <tr className="abmc-row">
+                <td colSpan={tableFields.length + 1}>Sin registros</td>
+              </tr>
+            ) : (
+              sorted.map((row) => (
+                <tr className="abmc-row" key={row.id}>
+                  {tableFields.map((f) => (
+                    <td key={f.key}>{String(row?.[f.key] ?? "-")}</td>
+                  ))}
+                  <td className="abmc-actions">
+                    {renderActions ? (
+                      renderActions(row, { requestDelete })
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          className="btn-accion me-2"
+                          title="Editar"
+                          onClick={() => {
+                            setEditing(row);
+                            setIsOpen(true);
+                          }}
+                        >
+                          <PencilFill size={18} />
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-accion eliminar"
+                          title="Eliminar"
+                          onClick={() => requestDelete(row)}
+                        >
+                          <Trash3Fill size={18} />
+                        </button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {usePopupForm && (
+        <EntityEditForm
+          isOpen={isOpen}
+          onClose={closeModal}
+          entityName={entityName}
+          schema={formFields}
+          entity={editing}
+          onSave={handleSave} // <- el contenedor maneja las alertas
+        />
+      )}
+    </main>
+  );
+}
+
+function capitalize(s) {
+  return s ? s[0].toUpperCase() + s.slice(1) : "";
+}
+
+===== src/components/abmc/GenericEditPopup.jsx =====
+// src/components/abmc/GenericEditPopup.jsx
+import { useEffect, useState } from "react";
+import Modal from "../common/Modal";
+import "../../styles/popup.css";
+import Swal from "sweetalert2";
+
+export default function GenericEditPopup({
+  isOpen,
+  onClose,
+  entityName = "registro",
+  schema = [],
+  entity = {},
+  onSave,
+}) {
+  const [form, setForm] = useState({});
+
+  useEffect(() => {
+    setForm(entity || {});
+  }, [entity, isOpen]);
+
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const missingRequiredLabels = () => {
+    const labels = [];
+    for (const f of schema) {
+      if (f.required && !String(form[f.key] ?? "").trim()) labels.push(f.label);
+    }
+    return labels;
+  };
+
+  const handleSave = () => {
+    const missing = missingRequiredLabels();
+    if (missing.length) {
+      const list = missing.map((l) => `<li>${l}</li>`).join("");
+      Swal.fire({
+        icon: "warning",
+        title: "Campos obligatorios",
+        html: `<p>Completá los campos requeridos:</p><ul style="text-align:left;margin:0 auto;max-width:300px">${list}</ul>`,
+        background: "#11103a",
+        color: "#E8EAED",
+        confirmButtonColor: "#7c83ff",
+      });
+      return;
+    }
+    onSave?.(form);
+    onClose?.();
+  };
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Editar ${entityName}`}
+      actions={
+        <>
+          <button className="btn btn-secondary" onClick={onClose}>
+            Cancelar
+          </button>
+          <button className="btn btn-primary" onClick={handleSave}>
+            Guardar cambios
+          </button>
+        </>
+      }
+    >
+      <div className="form-grid">
+        {schema
+          .filter((f) => !["submit", "button", "label"].includes(f.type))
+          .map((f) => (
+            <div className="field" key={f.key}>
+              <label htmlFor={`field-${f.key}`}>{f.label}</label>
+
+              {f.type === "select" ? (
+                <select
+                  id={`field-${f.key}`}
+                  name={f.key}
+                  className="input"
+                  value={form[f.key] || ""}
+                  onChange={onChange}
+                >
+                  <option value="">Seleccionar</option>
+                  {(f.options || []).map((opt) => {
+                    const value = opt.value ?? opt;
+                    const label = opt.label ?? opt;
+                    return (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    );
+                  })}
+                </select>
+              ) : (
+                <input
+                  id={`field-${f.key}`}
+                  type={f.type || "text"}
+                  name={f.key}
+                  className="input"
+                  value={form[f.key] || ""}
+                  onChange={onChange}
+                  maxLength={f.max}
+                  placeholder={f.label}
+                />
+              )}
+            </div>
+          ))}
+      </div>
+    </Modal>
+  );
+}
+
+===== src/components/abmc/MiembrosTableABMC.jsx =====
+// src/components/abmc/MiembrosTableABMC.jsx
+import { useState, useEffect } from "react";
+import BackButton from "../common/BackButton";
+import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { PencilFill, XCircleFill } from "react-bootstrap-icons";
+import Swal from "sweetalert2";
+import { miembrosService } from "@/services/miembrosService.js";
+import { cuerdasService } from "@/services/cuerdasService.js";
+
+import "../../styles/abmc.css";
+import "../../styles/miembros.css";
+
+export default function MiembrosTableABMC({ title = "Miembros del coro", showBackButton = true }) {
+  const navigate = useNavigate();
+  const [listaMiembros, setListaMiembros] = useState([]);
+  const [cuerdas, setCuerdas] = useState([]);
+  const [filtroTexto, setFiltroTexto] = useState("");
+  const [filtroCuerda, setFiltroCuerda] = useState("");
+
+  // 🔹 Cargar miembros y cuerdas desde el backend
+  const load = async () => {
+    try {
+      const [miembrosData, cuerdasData] = await Promise.all([
+        miembrosService.list(),
+        cuerdasService.list(),
+      ]);
+
+      // Ordenar alfabéticamente por apellido y nombre
+      const ordenados = [...miembrosData].sort((a, b) => {
+        const apA = a.apellido?.toLowerCase() || "";
+        const apB = b.apellido?.toLowerCase() || "";
+        if (apA !== apB) return apA.localeCompare(apB, "es", { sensitivity: "base" });
+        return (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" });
+      });
+
+      setListaMiembros(ordenados);
+      setCuerdas(cuerdasData);
+    } catch (_err) {
+      console.error("Error cargando datos:", _err);
+      Swal.fire("Error", "No se pudieron cargar los datos", "error");
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  // 🔎 Filtros combinados
+  const miembrosFiltrados = listaMiembros.filter((m) => {
+    const matchTexto =
+      !filtroTexto ||
+      (m.nombre || "").toLowerCase().includes(filtroTexto.toLowerCase()) ||
+      (m.apellido || "").toLowerCase().includes(filtroTexto.toLowerCase());
+
+    const matchCuerda =
+      !filtroCuerda || (m.cuerda?.name || "").toLowerCase() === filtroCuerda.toLowerCase();
+
+    return matchTexto && matchCuerda;
+  });
+
+  // 🗑️ Eliminar miembro
+  const handleEliminar = async (miembro) => {
+    const res = await Swal.fire({
+      title: `¿Eliminar a ${miembro?.nombre || "miembro"}?`,
+      text: "Esta acción no se puede deshacer.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#ffc107",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      background: "#11103a",
+      color: "#E8EAED",
+    });
+    if (!res.isConfirmed) return;
+
+    try {
+      await miembrosService.remove(miembro.id?.nroDocumento, miembro.id?.tipoDocumento);
+      await load();
+      Swal.fire({
+        title: "Eliminado",
+        icon: "success",
+        timer: 1200,
+        showConfirmButton: false,
+        background: "#11103a",
+        color: "#E8EAED",
+      });
+    } catch (_err) {
+      Swal.fire("Error", "No se pudo eliminar el miembro", "error");
+    }
+  };
+
+  return (
+    <main className="abmc-page">
+      <div className="abmc-card">
+        {/* === Encabezado === */}
+        <div className="abmc-header">
+          {showBackButton && <BackButton />}
+          <h1 className="abmc-title">{title}</h1>
+        </div>
+
+        {/* === Barra superior con buscador y filtro === */}
+        <div className="abmc-topbar">
+          <input
+            type="text"
+            placeholder="Buscar por nombre o apellido..."
+            value={filtroTexto}
+            onChange={(e) => setFiltroTexto(e.target.value)}
+            className="abmc-input"
+          />
+
+          <select
+            className="abmc-select"
+            value={filtroCuerda}
+            onChange={(e) => setFiltroCuerda(e.target.value)}
+          >
+            <option value="">Todas las cuerdas</option>
+            {cuerdas.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+
+          <Button
+            className="abmc-btn abmc-btn-primary"
+            onClick={() => navigate("/miembros/agregar")}
+          >
+            Agregar miembro
+          </Button>
+        </div>
+
+        {/* === Tabla === */}
+        <table className="abmc-table abmc-table-rect">
+          <thead className="abmc-thead">
+            <tr className="abmc-row">
+              <th>Nombre y Apellido</th>
+              <th>Cuerda</th>
+              <th>Área</th>
+              <th>Activo</th>
+              <th style={{ textAlign: "center" }}>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {miembrosFiltrados.length > 0 ? (
+              miembrosFiltrados.map((m) => (
+                <tr key={`${m.id?.nroDocumento}-${m.id?.tipoDocumento}`} className="abmc-row">
+                  <td>{`${m.nombre || "-"} ${m.apellido || ""}`}</td>
+                  <td>{m.cuerda?.name || "-"}</td>
+                  <td>{m.area?.nombre || "-"}</td>
+                  <td>{m.activo ? "Sí" : "No"}</td>
+                  <td className="abmc-actions">
+                    <Button
+                      className="btn-accion"
+                      variant="warning"
+                      onClick={() => navigate("/miembros/editar", { state: { miembro: m } })}
+                      title="Editar"
+                    >
+                      <PencilFill size={18} />
+                    </Button>
+                    <Button
+                      className="btn-accion eliminar"
+                      variant="danger"
+                      onClick={() => handleEliminar(m)}
+                      title="Eliminar"
+                    >
+                      <XCircleFill size={18} />
+                    </Button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center">
+                  No hay miembros registrados
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  );
+}
+
+===== src/components/miembros/MiembroForm.jsx =====
+// src/components/miembros/MiembroForm.jsx
+import "@/styles/forms.css";
+
+/**
+ * Formulario reutilizable para Miembros.
+ *
+ * Props:
+ * - schema: array de campos [{ key, label, type, required, max, options? }]
+ * - value: object con valores actuales
+ * - onChange: (key, value) => void
+ * - errors: object { [key]: "mensaje" }
+ * - readOnly: boolean (deshabilita inputs)
+ * - gridCols: string CSS para columnas del grid (por defecto 1fr 1fr)
+ */
+export default function MiembroForm({
+  schema = [],
+  value = {},
+  onChange,
+  errors = {},
+  readOnly = false,
+  gridCols = "1fr 1fr",
+  gap = 16,
+}) {
+  const handle = (key) => (e) => onChange?.(key, e.target.value);
+
+  return (
+    <div className="form-grid" style={{ gridTemplateColumns: gridCols, gap }}>
+      {schema
+        .filter((f) => f.type !== "button" && f.type !== "submit")
+        .map((f) => (
+          <div className="field" key={f.key} style={{ gridColumn: "span 1" }}>
+            <label htmlFor={`miem-${f.key}`}>
+              {f.label}
+              {f.required ? " *" : ""}
+            </label>
+
+            {f.type === "select" ? (
+              <select
+                id={`miem-${f.key}`}
+                className="input"
+                value={value[f.key] ?? ""}
+                onChange={handle(f.key)}
+                disabled={readOnly}
+              >
+                <option value="">...</option>
+                {(f.options || []).map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            ) : f.type === "textarea" ? (
+              <textarea
+                id={`miem-${f.key}`}
+                rows={3}
+                className="input"
+                value={value[f.key] ?? ""}
+                onChange={handle(f.key)}
+                maxLength={f.max || undefined}
+                readOnly={readOnly}
+                disabled={readOnly}
+              />
+            ) : (
+              <input
+                id={`miem-${f.key}`}
+                className="input"
+                type={f.type || "text"}
+                value={value[f.key] ?? ""}
+                onChange={handle(f.key)}
+                maxLength={f.max || undefined}
+                readOnly={readOnly}
+                disabled={readOnly}
+              />
+            )}
+
+            {errors[f.key] && <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>}
+          </div>
+        ))}
+    </div>
+  );
+}
+
+===== src/components/pages/areas/index.jsx =====
+// src/components/pages/areas/index.jsx
+import EntityTableABMC from "@/components/abmc/EntityTableABMC.jsx";
+import { areasService } from "@/services/areasService.js";
+import { areaSchema, areaUniqueBy, areaEntityName } from "@/schemas/areas.js";
+
+export default function AreasPage() {
+  return (
+    <EntityTableABMC
+      title="Áreas"
+      service={areasService}
+      schema={areaSchema}
+      uniqueBy={areaUniqueBy}
+      entityName={areaEntityName}
+      showBackButton
+    />
+  );
+}
+
+===== src/components/pages/Audicion/index.jsx =====
+// src/components/pages/Audicion/index.jsx
+import "@/styles/audicion.css";
+import "@/styles/abmc.css";
+
+import { useState } from "react";
+
+import TableABMC from "../../common/table.jsx";
+import BackButton from "../../common/BackButton.jsx";
+import { useNavigate } from "react-router-dom";
+
+const Audicion = ({ title = "Audicion" }) => {
+  const headers = ["Día", "Cantidad De Turnos", "Turnos Disponibles", "Acciones"];
+  const URLCRONOGRAMA = "audicion/cronograma";
+
+  const navigate = useNavigate();
+
+  const [data, _setData] = useState([
+    // Datos de ejemplo
+    { id: 1, dia: "Lunes 12", cantidadTurnos: 10, turnosDisponibles: 5 },
+    { id: 2, dia: "Martes 13", cantidadTurnos: 8, turnosDisponibles: 3 },
+    { id: 3, dia: "Lunes 19", cantidadTurnos: 12, turnosDisponibles: 7 },
+  ]);
+
+  const [filteredData, setFilteredData] = useState(data);
+  const [filtroDia, setFiltroDia] = useState("");
+
+  const actions = [
+    {
+      title: "Ver Cronograma",
+      className: "abmc-btn btn-primary",
+      label: "Ver Cronograma",
+      onClick: (d) => {
+        navigate(`audiciones/cronograma/${d.id}?dia=${d.dia}`);
+      },
+    },
+  ];
+
+  const handleFilterChange = (e) => {
+    const value = e.target.value;
+    setFiltroDia(value);
+
+    if (!value) {
+      setFilteredData(data);
+      return;
+    }
+
+    const lower = value.toLowerCase();
+    const filtered = data.filter((item) => (item.dia || "").toLowerCase().includes(lower));
+    setFilteredData(filtered);
+  };
+
+  return (
+    <main className="audicion-page">
+      <div className="abmc-card">
+        <header className="abmc-header">
+          <BackButton />
+          <h1>{title}</h1>
+          <hr className="divisor-amarillo"></hr>
+        </header>
+
+        <div className="abmc-topbar">
+          <input
+            type="text"
+            placeholder="Filtrar por día..."
+            value={filtroDia}
+            onChange={handleFilterChange}
+            className="abmc-input"
+          />
+
+          <button
+            className="abmc-btn btn-primary"
+            onClick={() => {
+              navigate("/audicion/agregar");
+            }}
+          >
+            Agregar Audición
+          </button>
+        </div>
+
+        <div className="abmc-table-container">
+          <TableABMC
+            headers={headers}
+            data={filteredData}
+            actions={actions}
+            columns={["dia", "cantidadTurnos", "turnosDisponibles"]}
+            emptyMenssage={
+              filteredData.length === 0 && data.length > 0
+                ? "No se encuentran días que coincidan con el filtro."
+                : "No hay audiciones disponibles."
+            }
+          />
+        </div>
+
+        <footer className="audicion-footer">
+          <div className="content-footer">
+            <button className="abmc-btn btn-secondary" onClick={() => {}}>
+              Visualizar Cuestionario
+            </button>
+          </div>
+
+          <div className="content-footer">
+            <button className="abmc-btn btn-primary" onClick={() => {}}>
+              Publicar Audición
+            </button>
+            <button className="abmc-btn btn-secondary" onClick={() => {}}>
+              Modificar Audición
+            </button>
+          </div>
+        </footer>
+      </div>
+    </main>
+  );
+};
+
+export default Audicion;
+
+===== src/components/pages/Audicion/agregar.jsx =====
+import "@/styles/abmc.css";
+import "@/styles/audicion.css";
+
+import BackButton from "../../common/BackButton";
+
+const AudicionAgregar = ({ title = "Agregar Audición" }) => {
+  return (
+    <main className="audicion-page">
+      <div className="abmc-card">
+        <header className="abmc-header">
+          <BackButton />
+          <h1>{title}</h1>
+        </header>
+      </div>
+    </main>
+  );
+};
+export default AudicionAgregar;
+
+===== src/components/pages/audiciones/candidatos.jsx =====
+import { useEffect, useMemo, useState } from "react";
+import BackButton from "@/components/common/BackButton.jsx";
+import "@/styles/abmc.css";
+import "@/styles/table.css";
+import "@/styles/forms.css";
+import "@/styles/icons.css";
+import { PencilFill } from "react-bootstrap-icons";
+import infoIcon from "/info.png";
+
+import { candidatosService } from "@/services/candidatosService.js";
+import { estadoLabel } from "@/constants/candidatos.js";
+import { horaToMinutes } from "@/components/common/datetime.js";
+
+import ResultadosModal from "./ResultadosModal.jsx";
+import InscripcionView from "@/components/common/InscripcionView.jsx";
+import { success } from "@/utils/alerts.js";
+
+/* Íconos de resultado */
+import AceptadoIcon from "@/assets/icons/resultado/AceptadoIcon.jsx";
+import RechazadoIcon from "@/assets/icons/resultado/RechazadoIcon.jsx";
+import AusenteIcon from "@/assets/icons/resultado/AusenteIcon.jsx";
+import SinResultadoIcon from "@/assets/icons/resultado/SinResultadoIcon.jsx";
+
+export default function CandidatosPage() {
+  const [rows, setRows] = useState([]);
+  const [q, setQ] = useState("");
+
+  const [sortBy, setSortBy] = useState(null);
+  const [sortDir, setSortDir] = useState("asc");
+
+  const [editRow, setEditRow] = useState(null);
+  const [viewRow, setViewRow] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const data = await candidatosService.list();
+      setRows(data);
+    })();
+  }, []);
+
+  const nombreApynom = (r) => {
+    const ape = (r.apellido || "").trim();
+    const nom = (r.nombre || "").trim();
+    if (ape && nom) return `${ape}, ${nom}`;
+    return nom || ape || r.nombre || r.nombreLabel || "";
+  };
+
+  const filtered = useMemo(() => {
+    if (!q) return rows;
+    const t = q.toLowerCase();
+    return rows.filter((r) => {
+      const ape = String(r.apellido || "").toLowerCase();
+      const nom = String(r.nombre || "").toLowerCase();
+      const apynom = `${ape}, ${nom}`.trim();
+      const label = String(r.nombreLabel || r.nombre || "").toLowerCase();
+      return ape.includes(t) || nom.includes(t) || apynom.includes(t) || label.includes(t);
+    });
+  }, [rows, q]);
+
+  const sorted = useMemo(() => {
+    if (!sortBy) return filtered;
+    const dir = sortDir === "desc" ? -1 : 1;
+    return [...filtered].sort((a, b) => {
+      if (sortBy === "hora") return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
+      if (sortBy === "resultado") {
+        const la = estadoLabel(a.resultado?.estado ?? "sin");
+        const lb = estadoLabel(b.resultado?.estado ?? "sin");
+        return la.localeCompare(lb) * dir;
+      }
+      if (sortBy === "apynom") {
+        const av = nombreApynom(a).toLowerCase();
+        const bv = nombreApynom(b).toLowerCase();
+        return av.localeCompare(bv) * dir;
+      }
+      return 0;
+    });
+  }, [filtered, sortBy, sortDir]);
+
+  const toggleSort = (key) => {
+    if (sortBy !== key) {
+      setSortBy(key);
+      setSortDir("asc");
+    } else {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    }
+  };
+  const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
+
+  const ResultadoIcon = ({ estado }) => {
+    const e = String(estado || "sin").toLowerCase();
+    if (e === "aceptado" || e === "aceptada" || e === "ok")
+      return (
+        <span className="icon-estado icon-estado--ok icon-md" title="Aceptado">
+          <AceptadoIcon />
+        </span>
+      );
+    if (e === "rechazado" || e === "rechazada" || e === "bad")
+      return (
+        <span className="icon-estado icon-estado--bad icon-md" title="Rechazado">
+          <RechazadoIcon />
+        </span>
+      );
+    if (e === "ausente" || e === "pend")
+      return (
+        <span className="icon-estado icon-estado--pend icon-md" title="Ausente">
+          <AusenteIcon />
+        </span>
+      );
+    return (
+      <span className="icon-estado icon-estado--sin icon-md" title="Sin resultado">
+        <SinResultadoIcon />
+      </span>
+    );
+  };
+
+  return (
+    <main className="abmc-page">
+      <div className="abmc-card">
+        <div className="abmc-header">
+          <BackButton />
+          <h1 className="abmc-title">Candidatos</h1>
+        </div>
+
+        <div className="abmc-topbar">
+          <input
+            className="abmc-input"
+            placeholder="Buscar por apellido o nombre"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+          <select className="abmc-input" defaultValue="Viernes 14">
+            <option>Viernes 14</option>
+            <option>Sábado 15</option>
+            <option>Domingo 16</option>
+          </select>
+        </div>
+
+        <table className="abmc-table abmc-table-rect">
+          <thead className="abmc-thead">
+            <tr className="abmc-row">
+              <th className={thClass("hora")}>
+                <span className="th-label">Hora</span>
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("hora")}
+                  aria-label="Ordenar por Hora"
+                >
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+
+              <th className={thClass("apynom")}>
+                <span className="th-label">Apellido, Nombre</span>
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("apynom")}
+                  aria-label="Ordenar por Apellido, Nombre"
+                >
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+
+              <th>
+                <span className="th-label">Canción</span>
+              </th>
+
+              <th className={thClass("resultado")}>
+                <span className="th-label">Resultado</span>
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("resultado")}
+                  aria-label="Ordenar por Resultado"
+                >
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+
+              <th style={{ textAlign: "center" }}>
+                <span className="th-label">Inscripción</span>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {sorted.map((r) => (
+              <tr key={r.id} className="abmc-row">
+                <td>{r.hora}</td>
+                <td>{nombreApynom(r)}</td>
+                <td>{r.cancion}</td>
+
+                {/* Ícono de resultado + botón fijo a la derecha */}
+                <td className="cell-right-action">
+                  <ResultadoIcon estado={r.resultado?.estado} />
+                  <button
+                    type="button"
+                    className="btn-accion btn-accion--icon right-action"
+                    title="Editar resultado"
+                    onClick={() => setEditRow(r)}
+                    aria-label="Editar resultado"
+                  >
+                    <PencilFill size={18} />
+                  </button>
+                </td>
+
+                <td className="abmc-actions">
+                  <button
+                    type="button"
+                    className="btn-accion btn-accion--icon"
+                    title="Ver inscripción"
+                    aria-label="Ver inscripción"
+                    onClick={() => setViewRow(r)}
+                  >
+                    <img src={infoIcon} alt="Info" style={{ width: 18, height: 18 }} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <p style={{ opacity: 0.7, marginTop: 10 }}>
+          Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i> y ajustar la <i>Cuerda</i> de
+          la inscripción.
+        </p>
+      </div>
+
+      {editRow && (
+        <ResultadosModal
+          row={editRow}
+          onClose={() => setEditRow(null)}
+          onSave={async (estado, obs) => {
+            const res = await candidatosService.updateResultado(editRow.id, {
+              estado,
+              obs,
+            });
+            setRows((prev) =>
+              prev.map((x) => (x.id === res.id ? { ...x, resultado: res.resultado } : x))
+            );
+            await success({ title: "Resultado guardado" });
+            setEditRow(null);
+          }}
+        />
+      )}
+
+      {viewRow && (
+        <InscripcionView
+          data={viewRow.inscripcion}
+          open={true}
+          onClose={() => setViewRow(null)}
+          editable={true}
+          onSaveCuerda={async (nuevaCuerda) => {
+            const updated = await candidatosService.updateInscripcionCuerda(
+              viewRow.id,
+              nuevaCuerda
+            );
+            if (!updated) return;
+            setRows((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
+            await success({ title: "Cuerda actualizada" });
+          }}
+        />
+      )}
+    </main>
+  );
+}
+
+===== src/components/pages/audiciones/candidatosCoord.jsx =====
+// src/components/pages/audiciones/candidatosCoord.jsx
+import { useEffect, useMemo, useState } from "react";
+import BackButton from "@/components/common/BackButton.jsx";
+import "@/styles/abmc.css";
+import "@/styles/table.css";
+import "@/styles/forms.css";
+import "@/styles/icons.css";
+import { PencilFill } from "react-bootstrap-icons";
+import infoIcon from "/info.png";
+
+import { candidatosService } from "@/services/candidatosService.js";
+import { horaToMinutes } from "@/components/common/datetime.js";
+import InscripcionView from "@/components/common/InscripcionView.jsx";
+import { info as alertInfo, success } from "@/utils/alerts.js";
+import { TURNO_ESTADOS } from "@/constants/candidatos.js";
+
+import CanceladoIcon from "@/assets/icons/turno/CanceladoIcon.jsx";
+import ReservadoIcon from "@/assets/icons/turno/ReservadoIcon.jsx";
+import DisponibleIcon from "@/assets/icons/turno/DisponibleIcon.jsx";
+
+import TurnoEstadoModal from "./TurnoEstadoModal.jsx";
+
+export default function CandidatosCoordPage() {
+  const [rows, setRows] = useState([]);
+  const [q, setQ] = useState("");
+
+  const [sortBy, setSortBy] = useState(null); // 'hora' | 'estado' | 'apynom'
+  const [sortDir, setSortDir] = useState("asc");
+
+  const [viewRow, setViewRow] = useState(null);
+  const [editRow, setEditRow] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const data = await candidatosService.list();
+      setRows(data);
+    })();
+  }, []);
+
+  const nombreApynom = (r) => {
+    const ape = (r.apellido || "").trim();
+    const nom = (r.nombre || "").trim();
+    if (ape && nom) return `${ape}, ${nom}`;
+    return nom || ape || r.nombre || r.nombreLabel || "";
+  };
+
+  const estadoCoordinador = (r) => {
+    const explicit = String(r?.turnoEstado ?? r?.turno?.estado ?? "").toLowerCase();
+    if (TURNO_ESTADOS.includes(explicit)) {
+      return explicit === "disponible"
+        ? "Disponible"
+        : explicit === "reservado"
+          ? "Reservado"
+          : "Cancelado";
+    }
+    const estRes = String(r?.resultado?.estado || "").toLowerCase();
+    if (estRes === "cancelado" || estRes === "cancelada") return "Cancelado";
+    const tieneCandidato = !!(r?.nombre || r?.apellido || r?.inscripcion);
+    return tieneCandidato ? "Reservado" : "Disponible";
+  };
+
+  const filtered = useMemo(() => {
+    if (!q) return rows;
+    const t = q.toLowerCase();
+    return rows.filter((r) => {
+      const apynom = nombreApynom(r).toLowerCase();
+      const cancion = String(r.cancion || "").toLowerCase();
+      const estado = estadoCoordinador(r).toLowerCase();
+      return apynom.includes(t) || cancion.includes(t) || estado.includes(t);
+    });
+  }, [rows, q]);
+
+  const sorted = useMemo(() => {
+    if (!sortBy) return filtered;
+    const dir = sortDir === "desc" ? -1 : 1;
+    return [...filtered].sort((a, b) => {
+      if (sortBy === "hora") return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
+      if (sortBy === "estado") {
+        return estadoCoordinador(a).localeCompare(estadoCoordinador(b)) * dir;
+      }
+      if (sortBy === "apynom") {
+        return nombreApynom(a).toLowerCase().localeCompare(nombreApynom(b).toLowerCase()) * dir;
+      }
+      return 0;
+    });
+  }, [filtered, sortBy, sortDir]);
+
+  const toggleSort = (key) => {
+    if (sortBy !== key) {
+      setSortBy(key);
+      setSortDir("asc");
+    } else {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    }
+  };
+  const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
+
+  const TurnoIcon = ({ estado }) => {
+    const e = String(estado || "").toLowerCase();
+    if (e === "cancelado")
+      return (
+        <span className="icon-estado icon-turno--cancel icon-md" title="Cancelado">
+          <CanceladoIcon />
+        </span>
+      );
+    if (e === "reservado")
+      return (
+        <span className="icon-estado icon-turno--res icon-md" title="Reservado">
+          <ReservadoIcon />
+        </span>
+      );
+    return (
+      <span className="icon-estado icon-turno--disp icon-md" title="Disponible">
+        <DisponibleIcon />
+      </span>
+    );
+  };
+
+  const handleOpenInscripcion = async (r) => {
+    if (!r?.inscripcion) {
+      await alertInfo({
+        title: "Sin inscripción",
+        text: "Este turno no tiene inscripción asignada.",
+      });
+      return;
+    }
+    setViewRow(r);
+  };
+
+  return (
+    <main className="abmc-page">
+      <div className="abmc-card">
+        <div className="abmc-header">
+          <BackButton />
+          <h1 className="abmc-title">Candidatos (Coordinadores)</h1>
+        </div>
+
+        <div className="abmc-topbar">
+          <input
+            className="abmc-input"
+            placeholder="Buscar por apellido, estado o canción"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+          <select className="abmc-input" defaultValue="Viernes 14">
+            <option>Viernes 14</option>
+            <option>Sábado 15</option>
+            <option>Domingo 16</option>
+          </select>
+        </div>
+
+        <table className="abmc-table abmc-table-rect">
+          <thead className="abmc-thead">
+            <tr className="abmc-row">
+              <th className={thClass("hora")}>
+                <span className="th-label">Hora</span>
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("hora")}
+                  aria-label="Ordenar por Hora"
+                >
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+
+              <th className={thClass("apynom")}>
+                <span className="th-label">Apellido, Nombre</span>
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("apynom")}
+                  aria-label="Ordenar por Apellido, Nombre"
+                >
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+
+              <th>
+                <span className="th-label">Canción</span>
+              </th>
+
+              <th className={thClass("estado")}>
+                <span className="th-label">Estado</span>
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("estado")}
+                  aria-label="Ordenar por Estado"
+                >
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+
+              <th style={{ textAlign: "center" }}>
+                <span className="th-label">Inscripción</span>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {sorted.map((r) => {
+              const est = estadoCoordinador(r); // "Disponible"/"Reservado"/"Cancelado"
+              const key = est.toLowerCase();
+              return (
+                <tr key={r.id} className="abmc-row">
+                  <td>{r.hora}</td>
+                  <td>{nombreApynom(r) || "—"}</td>
+                  <td>{r.cancion || "—"}</td>
+
+                  {/* Ícono + botón fijo a la derecha (mismo patrón que evaluadores) */}
+                  <td className="cell-right-action">
+                    <TurnoIcon estado={key} />
+                    <button
+                      type="button"
+                      className="btn-accion btn-accion--icon right-action"
+                      title="Editar estado"
+                      aria-label="Editar estado"
+                      onClick={() => setEditRow(r)}
+                    >
+                      <PencilFill size={18} />
+                    </button>
+                  </td>
+
+                  <td className="abmc-actions">
+                    <button
+                      className="btn-accion"
+                      title="Ver inscripción"
+                      aria-label="Ver inscripción"
+                      onClick={() => handleOpenInscripcion(r)}
+                    >
+                      <img
+                        src={infoIcon}
+                        alt="Info"
+                        style={{ width: 18, height: 18, opacity: r?.inscripcion ? 1 : 0.6 }}
+                      />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {viewRow && (
+        <InscripcionView
+          data={viewRow.inscripcion}
+          open={true}
+          onClose={() => setViewRow(null)}
+          editable={false}
+        />
+      )}
+
+      {editRow && (
+        <TurnoEstadoModal
+          row={editRow}
+          onClose={() => setEditRow(null)}
+          onSave={async (estado) => {
+            const updated = await candidatosService.updateTurnoEstado(editRow.id, estado);
+            if (updated) {
+              setRows((prev) =>
+                prev.map((r) => (String(r.id) === String(updated.id) ? { ...r, ...updated } : r))
+              );
+              await success({ title: "Estado actualizado" });
+            }
+            setEditRow(null);
+          }}
+        />
+      )}
+    </main>
+  );
+}
+
+===== src/components/pages/audiciones/cuestionario.jsx =====
+// src/components/pages/audiciones/cuestionario.jsx
+import BackButton from "@/components/common/BackButton.jsx";
+import "@/styles/abmc.css";
+
+export default function ConfigurarCuestionario() {
+  return (
+    <main className="abmc-page">
+      <div className="abmc-card">
+        <div className="abmc-header">
+          <BackButton />
+          <h1 className="abmc-title">Configurar cuestionario</h1>
+        </div>
+        <p>Editor de preguntas del cuestionario de audiciones. (Contenido a definir)</p>
+      </div>
+    </main>
+  );
+}
+
+===== src/components/pages/audiciones/historial.jsx =====
+import { useEffect, useMemo, useState } from "react";
+import BackButton from "@/components/common/BackButton.jsx";
+import InscripcionView from "@/components/common/InscripcionView.jsx";
+import { historialService } from "@/services/historialService.js";
+import "@/styles/abmc.css";
+import "@/styles/table.css";
+import "@/styles/forms.css";
+import "@/styles/popup.css";
+import infoIcon from "/info.png";
+
+export default function HistorialAudicionesPage() {
+  const [rows, setRows] = useState([]);
+  const [q, setQ] = useState("");
+  const [viewRow, setViewRow] = useState(null);
+  const [verResultado, setVerResultado] = useState(null); // {estado, obs}
+
+  useEffect(() => {
+    (async () => {
+      const data = await historialService.list();
+      setRows(data);
+    })();
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (!q) return rows;
+    const t = q.toLowerCase();
+    return rows.filter((r) => r.nombre.toLowerCase().includes(t));
+  }, [rows, q]);
+
+  return (
+    <main className="abmc-page">
+      <div className="abmc-card">
+        <div className="abmc-header">
+          <BackButton />
+          <h1 className="abmc-title">Historial de audiciones</h1>
+        </div>
+
+        <div className="abmc-topbar">
+          <input
+            className="abmc-input"
+            placeholder="Buscar por nombre de candidatos"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+        </div>
+
+        <table className="abmc-table abmc-table-rect">
+          <thead className="abmc-thead">
+            <tr className="abmc-row">
+              <th>
+                <span className="th-label">Nombre</span>
+              </th>
+              <th>
+                <span className="th-label">Audición</span>
+              </th>
+              <th>
+                <span className="th-label">Canción</span>
+              </th>
+              <th style={{ textAlign: "center" }}>
+                <span className="th-label">Resultado</span>
+              </th>
+              <th style={{ textAlign: "center" }}>
+                <span className="th-label">Inscripción</span>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filtered.map((r) => (
+              <tr key={r.id} className="abmc-row">
+                <td>{r.nombre}</td>
+                <td>{r.fechaAudicion}</td>
+                <td>{r.cancion}</td>
+                <td style={{ textAlign: "center" }}>
+                  <button
+                    className="btn-accion"
+                    onClick={() => setVerResultado(r.resultado)}
+                    title="Ver resultado"
+                  >
+                    Ver
+                  </button>
+                </td>
+                <td className="abmc-actions">
+                  <button
+                    className="btn-accion btn-accion--icon"
+                    title="Ver inscripción"
+                    onClick={() => setViewRow(r)}
+                    aria-label="Ver inscripción"
+                  >
+                    <img src={infoIcon} alt="Info" style={{ width: 18, height: 18 }} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Popup Resultado con encabezado estándar */}
+      {verResultado && (
+        <div className="pop-backdrop" onMouseDown={() => setVerResultado(null)}>
+          <div
+            className="pop-dialog"
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{ maxWidth: 420 }}
+          >
+            <div className="pop-header">
+              <h3 className="pop-title">Resultado</h3>
+              <button
+                className="icon-btn"
+                aria-label="Cerrar"
+                onClick={() => setVerResultado(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="pop-body">
+              <div className="form-grid">
+                <div className="field">
+                  <label>Estado</label>
+                  <input className="input" value={verResultado.estado || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Observaciones</label>
+                  <textarea
+                    className="input"
+                    rows={4}
+                    value={verResultado.obs || ""}
+                    readOnly
+                    disabled
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="pop-footer" style={{ justifyContent: "flex-end" }}>
+              <button className="btn btn-secondary" onClick={() => setVerResultado(null)}>
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {viewRow && (
+        <InscripcionView
+          data={viewRow.inscripcion}
+          open={true}
+          onClose={() => setViewRow(null)}
+          editable={false}
+        />
+      )}
+    </main>
+  );
+}
+
+===== src/components/pages/audiciones/planificar.jsx =====
+// src/components/pages/audiciones/planificar.jsx
+import BackButton from "@/components/common/BackButton.jsx";
+import "@/styles/abmc.css";
+
+export default function Audiciones() {
+  return (
+    <main className="abmc-page">
+      <div className="abmc-card">
+        <div className="abmc-header">
+          <BackButton />
+          <h1 className="abmc-title">Audiciones</h1>
+        </div>
+        <p>Esta es la página de planificación de audiciones. (Contenido a definir)</p>
+      </div>
+    </main>
+  );
+}
+
+===== src/components/pages/audiciones/ResultadosModal.jsx =====
+// src/components/pages/audiciones/ResultadosModal.jsx
+import ChoiceModal from "@/components/common/ChoiceModal.jsx";
+import "@/styles/popup.css";
+import "@/styles/forms.css";
+import "@/styles/icons.css";
+
+/* Íconos de resultado */
+import AceptadoIcon from "@/assets/icons/resultado/AceptadoIcon.jsx";
+import RechazadoIcon from "@/assets/icons/resultado/RechazadoIcon.jsx";
+import AusenteIcon from "@/assets/icons/resultado/AusenteIcon.jsx";
+import SinResultadoIcon from "@/assets/icons/resultado/SinResultadoIcon.jsx";
+
+const RESULT_OPTS = [
+  { value: "sin", label: "Sin resultado" },
+  { value: "aceptado", label: "Aceptado" },
+  { value: "rechazado", label: "Rechazado" },
+  { value: "ausente", label: "Ausente" },
+];
+
+function previewResultadoIcon(value) {
+  const v = String(value || "sin").toLowerCase();
+  if (v === "aceptado" || v === "aceptada" || v === "ok")
+    return (
+      <span className="icon-estado icon-estado--ok icon-md" title="Aceptado">
+        <AceptadoIcon />
+      </span>
+    );
+  if (v === "rechazado" || v === "rechazada" || v === "bad")
+    return (
+      <span className="icon-estado icon-estado--bad icon-md" title="Rechazado">
+        <RechazadoIcon />
+      </span>
+    );
+  if (v === "ausente" || v === "pend")
+    return (
+      <span className="icon-estado icon-estado--pend icon-md" title="Ausente">
+        <AusenteIcon />
+      </span>
+    );
+  return (
+    <span className="icon-estado icon-estado--sin icon-md" title="Sin resultado">
+      <SinResultadoIcon />
+    </span>
+  );
+}
+
+export default function ResultadosModal({ row, onClose, onSave }) {
+  const initialEstado = String(row?.resultado?.estado || "sin").toLowerCase();
+  const initialObs = row?.resultado?.obs || "";
+
+  return (
+    <ChoiceModal
+      isOpen={true}
+      onClose={onClose}
+      title="Editar resultado"
+      options={RESULT_OPTS}
+      initialValue={initialEstado}
+      withTextarea={true}
+      textareaLabel="Observaciones"
+      textareaPlaceholder="Notas opcionales…"
+      initialNotes={initialObs}
+      renderPreview={previewResultadoIcon}
+      onSave={(estado, obs) => onSave?.(estado, obs)}
+    />
+  );
+}
+
+===== src/components/pages/audiciones/TurnoEstadoModal.jsx =====
+// src/components/pages/audiciones/TurnoEstadoModal.jsx
+import ChoiceModal from "@/components/common/ChoiceModal.jsx";
+import "@/styles/popup.css";
+import "@/styles/forms.css";
+import "@/styles/icons.css";
+
+import CanceladoIcon from "@/assets/icons/turno/CanceladoIcon.jsx";
+import ReservadoIcon from "@/assets/icons/turno/ReservadoIcon.jsx";
+import DisponibleIcon from "@/assets/icons/turno/DisponibleIcon.jsx";
+
+import { TURNO_ESTADOS, estadoLabel } from "@/constants/candidatos.js";
+
+const TURNO_OPTS = [
+  { value: "disponible", label: estadoLabel("disponible") },
+  { value: "reservado", label: estadoLabel("reservado") },
+  { value: "cancelado", label: estadoLabel("cancelado") },
+];
+
+function previewTurnoIcon(value) {
+  const v = String(value || "disponible").toLowerCase();
+  if (v === "cancelado")
+    return (
+      <span className="icon-estado icon-turno--cancel icon-md" title="Cancelado">
+        <CanceladoIcon />
+      </span>
+    );
+  if (v === "reservado")
+    return (
+      <span className="icon-estado icon-turno--res icon-md" title="Reservado">
+        <ReservadoIcon />
+      </span>
+    );
+  return (
+    <span className="icon-estado icon-turno--disp icon-md" title="Disponible">
+      <DisponibleIcon />
+    </span>
+  );
+}
+
+export default function TurnoEstadoModal({ row, onClose, onSave }) {
+  // detectar valor inicial igual que antes
+  const explicit = String(row?.turnoEstado ?? row?.turno?.estado ?? "").toLowerCase();
+  const initialValue = TURNO_ESTADOS.includes(explicit)
+    ? explicit
+    : row?.resultado?.estado === "cancelado" || row?.resultado?.estado === "cancelada"
+      ? "cancelado"
+      : row?.inscripcion || row?.nombre || row?.apellido
+        ? "reservado"
+        : "disponible";
+
+  return (
+    <ChoiceModal
+      isOpen={true}
+      onClose={onClose}
+      title="Editar estado"
+      options={TURNO_OPTS}
+      initialValue={initialValue}
+      withTextarea={false}
+      renderPreview={previewTurnoIcon}
+      onSave={(estado) => onSave?.(estado)}
+    />
+  );
+}
+
+===== src/components/pages/cuerdas/index.jsx =====
+// src/components/pages/cuerdas/index.jsx
+import EntityTableABMC from "@/components/abmc/EntityTableABMC.jsx";
+import { cuerdasService } from "@/services/cuerdasService.js";
+import { cuerdaSchema, cuerdaUniqueBy, cuerdaEntityName } from "@/schemas/cuerdas.js";
+
+export default function CuerdasPage() {
+  return (
+    <EntityTableABMC
+      title="Cuerdas"
+      service={cuerdasService}
+      schema={cuerdaSchema}
+      uniqueBy={cuerdaUniqueBy}
+      entityName={cuerdaEntityName}
+      showBackButton
+    />
+  );
+}
+
+===== src/components/pages/login/index.jsx =====
+// src/components/pages/login/index.jsx
+import { useState } from "react";
+import "@/styles/login.css";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+
+import WavyClipPath from "@/assets/WavyClipPath.jsx";
+import MobileWavyClipPath from "@/assets/MobileWavyClipPath.jsx";
+import AccountUser from "@/assets/AccountUserIcon.jsx";
+import PasswordToggleIcon from "@/assets/PasswordToggleIcon.jsx";
+import { validateLoginFields, hasErrors } from "@/components/common/validators.js";
+
+export default function Login({ onLogin }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({ usuario: null, contraseña: null });
+
+  const runValidation = (nextState) => {
+    const nextErrors = validateLoginFields(nextState);
+    setErrors(nextErrors);
+    return !hasErrors(nextErrors);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const isValid = runValidation({ username, password });
+    if (isValid) onLogin(username);
+  };
+
+  const togglePasswordVisibility = () => setShowPassword((v) => !v);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "Usuario") setUsername(value);
+    if (name === "Contraseña") setPassword(value);
+
+    const draft = {
+      username: name === "Usuario" ? value : username,
+      password: name === "Contraseña" ? value : password,
+    };
+    runValidation(draft);
+  };
+
+  return (
+    <main className="login-container">
+      <WavyClipPath />
+      <div className="login-form-container">
+        <MobileWavyClipPath />
+
+        <Form onSubmit={handleSubmit} noValidate className="formulario-login">
+          <h1 className="logo-text">
+            Iniciar sesión en su cuenta de <strong>CapuNotes </strong>
+            <img src="./logo-coro-sin-fondo.png" alt="Logo" className="logo-coro" />
+          </h1>
+
+          <Form.Group className="custom-input-group">
+            <AccountUser className="account-icon" />
+            <Form.Control
+              type="text"
+              className="custom-input"
+              placeholder="Usuario"
+              value={username}
+              onChange={handleInputChange}
+              name="Usuario"
+              required
+            />
+          </Form.Group>
+          <p className="menssaje-error-login">{errors.usuario}</p>
+
+          <Form.Group className="custom-input-group">
+            <PasswordToggleIcon isVisible={showPassword} onToggle={togglePasswordVisibility} />
+            <Form.Control
+              type={showPassword ? "text" : "password"}
+              className="custom-input"
+              placeholder="Contraseña"
+              value={password}
+              onChange={handleInputChange}
+              name="Contraseña"
+              required
+            />
+          </Form.Group>
+          <p className="menssaje-error-login">{errors.contraseña}</p>
+
+          <Form.Group className="custom-input-group">
+            <Button type="submit" className="button-login">
+              Ingresar
+            </Button>
+          </Form.Group>
+        </Form>
+      </div>
+
+      <img
+        src="/fondo.jpg"
+        alt="Decorative background showing a musical or choir-related scene creating a welcoming atmosphere for the login page"
+        className="img-fondo"
+      />
+    </main>
+  );
+}
+
+===== src/components/pages/miembros/index.jsx =====
+// src/components/pages/miembros/index.jsx
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import EntityTableABMC from "@/components/abmc/EntityTableABMC.jsx";
+import { miembrosService } from "@/services/miembrosService.js";
+import { buildMiembroSchema, miembroUniqueBy, miembroEntityName } from "@/schemas/miembros.js";
+import { PencilFill, Trash3Fill } from "react-bootstrap-icons";
+import infoIcon from "/info.png";
+import Modal from "@/components/common/Modal.jsx";
+
+export default function MiembrosPage() {
+  const navigate = useNavigate();
+  const baseSchema = useMemo(() => buildMiembroSchema(), []);
+
+  // ✅ memoizamos tableKeys y lo incluimos como dependencia donde corresponde
+  const tableKeys = useMemo(() => new Set(["nombre", "apellido", "cuerda", "estado"]), []);
+
+  const [infoRow, setInfoRow] = useState(null);
+
+  const schemaForTable = useMemo(
+    () => baseSchema.map((f) => (tableKeys.has(f.key) ? f : { ...f, table: false })),
+    [baseSchema, tableKeys]
+  );
+
+  return (
+    <div className="pantalla-miembros">
+      <EntityTableABMC
+        title="Miembros"
+        service={miembrosService}
+        schema={schemaForTable}
+        uniqueBy={miembroUniqueBy}
+        entityName={miembroEntityName}
+        showBackButton
+        usePopupForm={false}
+        onAdd={() => navigate("/miembros/agregar")}
+        sortable={true}
+        renderActions={(row, { requestDelete }) => (
+          <>
+            <button
+              type="button"
+              className="btn-accion me-2"
+              title="Más información"
+              onClick={() => setInfoRow(row)}
+            >
+              <img src={infoIcon} alt="Info" style={{ width: 18, height: 18 }} />
+            </button>
+            <button
+              type="button"
+              className="btn-accion me-2"
+              title="Editar"
+              onClick={() => navigate(`/miembros/editar?id=${row.id}`)}
+            >
+              <PencilFill size={18} />
+            </button>
+            <button
+              type="button"
+              className="btn-accion eliminar"
+              title="Eliminar"
+              onClick={() => requestDelete(row)}
+            >
+              <Trash3Fill size={18} />
+            </button>
+          </>
+        )}
+      />
+
+      {infoRow && (
+        <Modal
+          isOpen={true}
+          onClose={() => setInfoRow(null)}
+          title={`${infoRow.nombre} ${infoRow.apellido}`}
+          showHeaderClose={false}
+          actions={
+            <button className="btn btn-secondary" onClick={() => setInfoRow(null)} type="button">
+              Cerrar
+            </button>
+          }
+        >
+          <dl style={{ display: "grid", gridTemplateColumns: "160px 1fr", gap: "8px 16px" }}>
+            {baseSchema
+              .filter((f) => f.type !== "button" && f.type !== "submit")
+              .map((f) => (
+                <FragmentRow key={f.key} label={f.label} value={infoRow[f.key]} />
+              ))}
+          </dl>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+function FragmentRow({ label, value }) {
+  return (
+    <>
+      <dt style={{ opacity: 0.8 }}>{label}</dt>
+      <dd style={{ margin: 0 }}>{String(value ?? "—")}</dd>
+    </>
+  );
+}
+
+===== src/components/pages/miembros/agregar.jsx =====
+// src/components/pages/miembros/agregar.jsx
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import BackButton from "@/components/common/BackButton.jsx";
+import { miembrosService } from "@/services/miembrosService.js";
+import { buildMiembroSchema, miembroEntityName } from "@/schemas/miembros.js";
+import MiembroForm from "@/components/miembros/MiembroForm.jsx";
+import "@/styles/abmc.css";
+import "@/styles/forms.css";
+import { success, error } from "@/utils/alerts.js";
+
+export default function MiembrosAgregarPage() {
+  const navigate = useNavigate();
+  const schema = useMemo(() => buildMiembroSchema(), []);
+  const [form, setForm] = useState(() =>
+    Object.fromEntries(
+      schema.filter((f) => f.type !== "button" && f.type !== "submit").map((f) => [f.key, ""])
+    )
+  );
+  const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+
+  const validate = () => {
+    const e = {};
+    schema.forEach((f) => {
+      const v = String(form?.[f.key] ?? "").trim();
+      if (f.required && !v) e[f.key] = "Obligatorio";
+      if (f.max && v.length > f.max) e[f.key] = `Máx. ${f.max} caracteres`;
+    });
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleChange = (key, val) => setForm((prev) => ({ ...prev, [key]: val }));
+
+  const handleSave = async () => {
+    if (!validate() || saving) return;
+    try {
+      setSaving(true);
+      await miembrosService.create(form);
+      await success({
+        title: "Creado correctamente",
+        text: `${capitalize(miembroEntityName)} guardado.`,
+      });
+      navigate("/miembros");
+    } catch (e) {
+      await error({
+        title: "Error al guardar",
+        text: e?.message || "No se pudo guardar.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <main className="abmc-page">
+      <div className="abmc-card">
+        <div className="abmc-header">
+          <BackButton />
+          <h1 className="abmc-title">Agregar {capitalize(miembroEntityName)}</h1>
+        </div>
+
+        <MiembroForm
+          schema={schema}
+          value={form}
+          onChange={handleChange}
+          errors={errors}
+          readOnly={false}
+          gridCols="1fr 1fr"
+          gap={16}
+        />
+
+        <div className="abmc-topbar" style={{ justifyContent: "flex-end", marginTop: 16 }}>
+          <button className="btn btn-secondary" onClick={() => navigate("/miembros")}>
+            Cancelar
+          </button>
+          <button
+            className={`btn ${saving ? "btn-disabled" : "btn-primary"}`}
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? "Guardando..." : "Confirmar"}
+          </button>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function capitalize(s) {
+  return s ? s[0].toUpperCase() + s.slice(1) : "";
+}
+
+===== src/components/pages/miembros/editar.jsx =====
+// src/components/pages/miembros/editar.jsx
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import BackButton from "@/components/common/BackButton.jsx";
+import { miembrosService } from "@/services/miembrosService.js";
+import { buildMiembroSchema, miembroEntityName } from "@/schemas/miembros.js";
+import MiembroForm from "@/components/miembros/MiembroForm.jsx";
+import "@/styles/abmc.css";
+import "@/styles/forms.css";
+import { success, error } from "@/utils/alerts.js";
+
+export default function MiembrosEditarPage() {
+  const navigate = useNavigate();
+  const [sp] = useSearchParams();
+  const id = sp.get("id");
+
+  const schema = useMemo(() => buildMiembroSchema(), []);
+  const [form, setForm] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const list = await miembrosService.list();
+        const current = list.find((m) => String(m.id) === String(id));
+        setForm(current || {});
+      } catch (e) {
+        await error({
+          title: "Error al cargar",
+          text: e?.message || "No se pudo cargar el miembro.",
+        });
+      }
+    })();
+  }, [id]);
+
+  const validate = () => {
+    const e = {};
+    schema.forEach((f) => {
+      const v = String(form?.[f.key] ?? "").trim();
+      if (f.required && !v) e[f.key] = "Obligatorio";
+      if (f.max && v.length > f.max) e[f.key] = `Máx. ${f.max} caracteres`;
+    });
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleChange = (key, val) => setForm((prev) => ({ ...prev, [key]: val }));
+
+  const handleSave = async () => {
+    if (!validate() || saving) return;
+    try {
+      setSaving(true);
+      await miembrosService.update(form);
+      await success({
+        title: "Actualizado correctamente",
+        text: `${capitalize(miembroEntityName)} guardado.`,
+      });
+      navigate("/miembros");
+    } catch (e) {
+      await error({
+        title: "Error al guardar",
+        text: e?.message || "No se pudo guardar.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (!form) return null;
+
+  return (
+    <main className="abmc-page">
+      <div className="abmc-card">
+        <div className="abmc-header">
+          <BackButton />
+          <h1 className="abmc-title">Editar {capitalize(miembroEntityName)}</h1>
+        </div>
+
+        <MiembroForm
+          schema={schema}
+          value={form}
+          onChange={handleChange}
+          errors={errors}
+          readOnly={false}
+          gridCols="1fr 1fr"
+          gap={16}
+        />
+
+        <div className="abmc-topbar" style={{ justifyContent: "flex-end", marginTop: 16 }}>
+          <button className="btn btn-secondary" onClick={() => navigate("/miembros")}>
+            Cancelar
+          </button>
+          <button
+            className={`btn ${saving ? "btn-disabled" : "btn-primary"}`}
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? "Guardando..." : "Guardar cambios"}
+          </button>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function capitalize(s) {
+  return s ? s[0].toUpperCase() + s.slice(1) : "";
+}
+
+===== src/components/pages/principal/index.jsx =====
+// src/pages/principal/index.jsx
+import WelcomeCard from "./WelcomeCard.jsx";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import ScheduleIcon from "@mui/icons-material/Schedule";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import EventIcon from "@mui/icons-material/Event";
+import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
+import MicIcon from "@mui/icons-material/Mic";
+import "@/styles/principal.css";
+
+export default function Principal({ username }) {
+  return (
+    <div className="principal-container">
+      <div className="home-container">
+        <WelcomeCard title={`Bienvenido, ${username}!`} />
+        <hr className="divisor-amarillo" />
+
+        {/* Próximos eventos */}
+        <section className="eventos-section">
+          <h4 className="section-title">Tus próximos eventos</h4>
+
+          <div className="eventos-scroll">
+            <div className="evento-card">
+              <h5>Peña</h5>
+              <div className="evento-info">
+                <CalendarMonthIcon className="evento-icon" />
+                <p>Viernes 12/09</p>
+              </div>
+              <div className="evento-info">
+                <ScheduleIcon className="evento-icon" />
+                <p>13:00 hs</p>
+              </div>
+              <div className="evento-info">
+                <LocationOnIcon className="evento-icon" />
+                <p>Villa Allende</p>
+              </div>
+            </div>
+
+            <div className="evento-card">
+              <h5>Concierto</h5>
+              <div className="evento-info">
+                <CalendarMonthIcon className="evento-icon" />
+                <p>Sábado 14/09</p>
+              </div>
+              <div className="evento-info">
+                <ScheduleIcon className="evento-icon" />
+                <p>18:00 hs</p>
+              </div>
+              <div className="evento-info">
+                <LocationOnIcon className="evento-icon" />
+                <p>Córdoba</p>
+              </div>
+            </div>
+
+            <div className="evento-card">
+              <h5>Ensayo</h5>
+              <div className="evento-info">
+                <CalendarMonthIcon className="evento-icon" />
+                <p>Domingo 15/09</p>
+              </div>
+              <div className="evento-info">
+                <ScheduleIcon className="evento-icon" />
+                <p>10:00 hs</p>
+              </div>
+              <div className="evento-info">
+                <LocationOnIcon className="evento-icon" />
+                <p>Sede Central</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Tareas principales */}
+        <section className="tareas-section">
+          <h4 className="section-title">Tareas principales</h4>
+          <div className="tareas-grid">
+            <div className="tarea-card">
+              <AssignmentIcon className="tarea-icon" />
+              <span>Asistencia</span>
+            </div>
+
+            <div className="tarea-card tarea-activa">
+              <EventIcon className="tarea-icon" />
+              <span>Eventos</span>
+            </div>
+
+            <div className="tarea-card">
+              <LibraryMusicIcon className="tarea-icon" />
+              <span>Actividades complementarias</span>
+            </div>
+
+            <div className="tarea-card">
+              <MicIcon className="tarea-icon" />
+              <span>Audiciones</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+===== src/components/pages/principal/WelcomeCard.jsx =====
+// src/pages/principal/WelcomeCard.jsx
+import "@/styles/titulo-cards.css";
+
+export default function WelcomeCard({ title }) {
+  return (
+    <div className="welcome-card">
+      <img src="/logo-coro-sin-fondo.png" alt="Logo CapuNotes" className="welcome-card__logo" />
+      <div className="welcome-card__text">
+        <h3 className="welcome-card__title">{title}</h3>
+      </div>
+    </div>
+  );
+}
+
+===== src/components/common/table.jsx =====
+import Button from "react-bootstrap/Button";
+import "@/styles/table.css";
+import "@/styles/forms.css";
+
+const getValueByPath = (obj, path) => {
+  if (!obj || !path) return undefined;
+  return path.split(".").reduce((acc, key) => (acc ? acc[key] : undefined), obj);
+};
+
+const TableABMC = ({
+  headers = [],
+  data = [],
+  actions = [],
+  columns = [],
+  emptyMenssage = "No hay registros",
+}) => {
+  return (
+    <table className="abmc-table abmc-table-rect">
+      <thead className="abmc-thead">
+        <tr className="abmc-row">
+          {headers.map((header, index) => (
+            <th key={index}>{header}</th>
+          ))}
+        </tr>
+      </thead>
+
+      <tbody>
+        {data.length > 0 ? (
+          data.map((d, rowIndex) => (
+            <tr key={d.id ?? rowIndex} className="abmc-row">
+              {columns.length > 0 ? (
+                columns.map((col, i) => <td key={i}>{String(getValueByPath(d, col) ?? "-")}</td>)
+              ) : (
+                // Fallback minimal rendering si no se pasan columns
+                <p>Debe especificar las columnas a mostrar</p>
+              )}
+
+              <td className="abmc-actions">
+                {actions.length > 0 ? (
+                  actions.map((action, index) => (
+                    <Button
+                      key={index}
+                      className={action.className}
+                      onClick={() => action.onClick(d)}
+                      title={action.title}
+                    >
+                      {action.icon} <span>{action.label}</span>
+                    </Button>
+                  ))
+                ) : (
+                  // Si no hay acciones, mostrar un placeholder vacío para mantener la columna
+                  <span className="text-muted">-</span>
+                )}
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan={headers.length} className="text-center">
+              {emptyMenssage}
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  );
+};
+
+export default TableABMC;
+
+===== src/components/common/validators.js =====
+// src/components/common/validators.js
+
+// Helpers
+export const isEmpty = (v) => (v ?? "").toString().trim().length === 0;
+export const len = (v) => (v ?? "").toString().trim().length;
+
+// Reglas
+export const required = (fieldLabel) => (v) =>
+  isEmpty(v) ? `* El campo ${fieldLabel.toLowerCase()} no puede estar vacío.` : null;
+
+export const maxLength = (fieldLabel, max) => (v) =>
+  len(v) > max ? `* ${fieldLabel} no puede superar los ${max} caracteres.` : null;
+
+// Ejecuta reglas para un valor
+export function validateValue(value, rules = []) {
+  for (const rule of rules) {
+    const msg = rule?.(value);
+    if (msg) return msg;
+  }
+  return null;
+}
+
+// ===== Formularios =====
+
+// ÁREAS: { nombre, descripcion }
+export function validateAreaFields(values) {
+  return {
+    nombre: validateValue(values?.nombre, [required("Nombre"), maxLength("Nombre", 80)]),
+    descripcion: validateValue(values?.descripcion, [maxLength("Descripción", 300)]),
+  };
+}
+
+// LOGIN: { username, password }
+export function validateLoginFields(values) {
+  return {
+    usuario: validateValue(values?.username, [required("Usuario")]),
+    contraseña: validateValue(values?.password, [required("Contraseña")]),
+  };
+}
+
+// ¿Hay algún error?
+export function hasErrors(errorsObj = {}) {
+  return Object.values(errorsObj).some(Boolean);
+}
+
+===== src/components/common/Modal.jsx =====
+// src/components/common/Modal.jsx
+import { useEffect, useRef } from "react";
+import "@/styles/popup.css";
+
+/**
+ * Modal base genérico.
+ * - Muestra botón "✕" en el header por defecto (showHeaderClose = true)
+ * - Cierra con Escape y al hacer click en el backdrop.
+ */
+export default function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  actions,
+  showHeaderClose = true, // 👈 ahora por defecto viene la cruz en el header
+  closeLabel = "Cerrar",
+}) {
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e) => e.key === "Escape" && onClose?.();
+    document.addEventListener("keydown", onKey);
+    const t = setTimeout(() => dialogRef.current?.focus(), 0);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      clearTimeout(t);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  const onBackdrop = (e) => {
+    if (e.target === e.currentTarget) onClose?.();
+  };
+
+  return (
+    <div className="pop-backdrop" onClick={onBackdrop} onMouseDown={onBackdrop}>
+      <div
+        className="pop-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title"
+        tabIndex={-1}
+        ref={dialogRef}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <header className="pop-header">
+          <h3 id="modal-title" className="pop-title">
+            {title}
+          </h3>
+
+          {showHeaderClose && (
+            <button
+              className="icon-btn"
+              aria-label={closeLabel}
+              onClick={onClose}
+              type="button"
+              title={closeLabel}
+            >
+              ✕
+            </button>
+          )}
+        </header>
+
+        <div className="pop-body">{children}</div>
+
+        {actions && <footer className="pop-footer">{actions}</footer>}
+      </div>
+    </div>
+  );
+}
+
+===== src/components/common/ChoiceModal.jsx =====
+// src/components/common/ChoiceModal.jsx
+import { useEffect, useMemo, useState } from "react";
+import Modal from "@/components/common/Modal.jsx";
+import "@/styles/forms.css";
+
+/**
+ * ChoiceModal — Modal genérico para elegir una opción y (opcional) escribir notas.
+ *
+ * Props:
+ * - isOpen, onClose
+ * - title
+ * - options: Array<{ value: string, label: string }>
+ * - initialValue: string
+ * - withTextarea?: boolean (default: false)
+ * - textareaLabel?: string
+ * - textareaPlaceholder?: string
+ * - initialNotes?: string
+ * - renderPreview?: (value: string) => ReactNode  // para previsualizar icono/estado
+ * - onSave: (value: string, notes?: string) => Promise|void
+ */
+export default function ChoiceModal({
+  isOpen,
+  onClose,
+  title = "Editar",
+  options = [],
+  initialValue = "",
+  withTextarea = false,
+  textareaLabel = "Observaciones",
+  textareaPlaceholder = "Notas opcionales…",
+  initialNotes = "",
+  renderPreview,
+  onSave,
+}) {
+  const [value, setValue] = useState(initialValue || (options[0]?.value ?? ""));
+  const [notes, setNotes] = useState(initialNotes || "");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setValue(initialValue || (options[0]?.value ?? ""));
+    setNotes(initialNotes || "");
+  }, [initialValue, initialNotes, isOpen, options]);
+
+  const Preview = useMemo(() => {
+    return renderPreview ? () => renderPreview(value) : () => null;
+  }, [renderPreview, value]);
+
+  const handleSubmit = async (e) => {
+    e?.preventDefault?.();
+    if (saving) return;
+    setSaving(true);
+    try {
+      await onSave?.(value, withTextarea ? notes : undefined);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      showHeaderClose={true} // ✅ ahora todas las ventanas tienen cruz
+      actions={
+        <>
+          <button type="button" className="btn btn-secondary" onClick={onClose}>
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className={`btn ${saving ? "btn-disabled" : "btn-primary"}`}
+            disabled={saving}
+            onClick={handleSubmit}
+          >
+            {saving ? "Guardando..." : "Guardar"}
+          </button>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit}>
+        <div className="form-grid">
+          <div className="field">
+            <label htmlFor="choice-select">Seleccionar</label>
+            <select
+              id="choice-select"
+              className="input"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+            >
+              {options.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+
+            {renderPreview && (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
+                <Preview />
+                <small style={{ opacity: 0.8 }}>Seleccionado</small>
+              </div>
+            )}
+          </div>
+
+          {withTextarea && (
+            <div className="field">
+              <label htmlFor="choice-notes">{textareaLabel}</label>
+              <textarea
+                id="choice-notes"
+                className="input"
+                rows={3}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder={textareaPlaceholder}
+              />
+            </div>
+          )}
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+===== src/components/common/InscripcionView.jsx =====
+// src/components/common/InscripcionView.jsx
+import { useEffect, useMemo, useState } from "react";
+import Modal from "@/components/common/Modal.jsx";
+import useCuerdas from "@/hooks/useCuerdas.js";
+import "@/styles/popup.css";
+import "@/styles/forms.css";
+
+export default function InscripcionView({
+  data = {},
+  open,
+  onClose,
+  editable = false,
+  onSaveCuerda,
+}) {
+  const { items: cuerdas } = useCuerdas();
+
+  // Nota: si no se usa en el JSX, lo dejamos con prefijo "_" para evitar warning de eslint
+  const _opcionesCuerdas = useMemo(() => {
+    const lista = Array.isArray(cuerdas) ? cuerdas : [];
+    const nombres = lista.map((c) => String(c?.nombre ?? "").trim()).filter(Boolean);
+    const extra = String(data.cuerda ?? "").trim();
+    return Array.from(new Set(extra ? [extra, ...nombres] : nombres));
+  }, [cuerdas, data.cuerda]);
+
+  const [selCuerda, setSelCuerda] = useState(String(data.cuerda ?? ""));
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (open) setSelCuerda(String(data.cuerda ?? ""));
+    setSaving(false);
+  }, [open, data.cuerda]);
+
+  const dirty = editable && String(selCuerda || "") !== String(data.cuerda || "");
+
+  const handleGuardar = async () => {
+    if (!dirty || saving) return;
+    try {
+      setSaving(true);
+      await onSaveCuerda?.(selCuerda);
+      onClose?.();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Modal
+      isOpen={open}
+      onClose={onClose}
+      title="Formulario de Inscripción"
+      showHeaderClose={true}
+      actions={
+        <>
+          <button className="btn btn-secondary" onClick={onClose}>
+            Cerrar
+          </button>
+          {editable && (
+            <button
+              className={`btn ${dirty && !saving ? "btn-primary" : "btn-disabled"}`}
+              onClick={handleGuardar}
+              disabled={!dirty || saving}
+              aria-disabled={!dirty || saving}
+            >
+              {saving ? "Guardando..." : "Guardar cambios"}
+            </button>
+          )}
+        </>
+      }
+    >
+      <div style={{ maxHeight: "80vh", overflow: "auto" }}>
+        {/* contenido idéntico… */}
+        <hr className="divisor-amarillo" />
+        <h4 style={{ margin: "0 0 12px" }}>Datos personales:</h4>
+        {/* … */}
+      </div>
+    </Modal>
+  );
+}
+
+===== src/components/common/BackButton.jsx =====
+// src/components/common/BackButton.jsx
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import "@/styles/back-button.css";
+import { useNavigate } from "react-router-dom";
+
+export default function BackButton() {
+  const navigate = useNavigate();
+  return (
+    <button
+      type="button"
+      className="back-button"
+      aria-label="Volver"
+      title="Volver"
+      onClick={() => navigate(-1)}
+    >
+      <ArrowBackIcon className="back-icon" />
+    </button>
+  );
+}
+
+===== src/components/common/datetime.js =====
+// src/components/common/datetime.js
+
+/** Convierte "HH.mm hs" o "HH:mm" a minutos desde 00:00 */
+export function horaToMinutes(horaStr = "") {
+  const clean = String(horaStr)
+    .trim()
+    .replace(/\s*hs\s*$/i, "");
+  const [h, m] = clean.includes(".") ? clean.split(".") : clean.split(":");
+  const hh = parseInt(h || "0", 10);
+  const mm = parseInt(m || "0", 10);
+  return hh * 60 + mm;
+}
+

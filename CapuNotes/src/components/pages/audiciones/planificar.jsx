@@ -1,4 +1,3 @@
-// src/components/pages/audiciones/planificar.jsx
 import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
 

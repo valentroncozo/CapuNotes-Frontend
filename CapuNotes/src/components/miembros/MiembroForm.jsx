@@ -43,11 +43,17 @@ export default function MiembroForm({
                 disabled={readOnly}
               >
                 <option value="">...</option>
-                {(f.options || []).map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
+                {(f.options || []).map((opt) => {
+                  const val =
+                    opt && typeof opt === "object" ? opt.value ?? opt.label : opt;
+                  const lab =
+                    opt && typeof opt === "object" ? opt.label ?? opt.value : opt;
+                  return (
+                    <option key={String(val)} value={val}>
+                      {lab}
+                    </option>
+                  );
+                })}
               </select>
             ) : f.type === "textarea" ? (
               <textarea
@@ -73,9 +79,7 @@ export default function MiembroForm({
               />
             )}
 
-            {errors[f.key] && (
-              <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>
-            )}
+            {errors[f.key] && <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>}
           </div>
         ))}
     </div>

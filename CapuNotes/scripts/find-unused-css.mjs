@@ -21,7 +21,11 @@ function walk(dir) {
 }
 
 function read(file) {
-  try { return readFileSync(file, "utf8"); } catch { return ""; }
+  try {
+    return readFileSync(file, "utf8");
+  } catch {
+    return "";
+  }
 }
 
 function normalizePath(p) {
@@ -30,16 +34,18 @@ function normalizePath(p) {
 
 const allFiles = walk(ROOT);
 const styleFiles = allFiles
-  .filter(f => normalizePath(f).includes("/src/styles/"))
-  .filter(f => extname(f) === ".css");
+  .filter((f) => normalizePath(f).includes("/src/styles/"))
+  .filter((f) => extname(f) === ".css");
 
-const codeFiles = allFiles.filter(f => {
+const codeFiles = allFiles.filter((f) => {
   const ext = extname(f);
-  return [".jsx", ".js", ".tsx", ".ts", ".css"].includes(ext) &&
-         !normalizePath(f).includes("/node_modules/");
+  return (
+    [".jsx", ".js", ".tsx", ".ts", ".css"].includes(ext) &&
+    !normalizePath(f).includes("/node_modules/")
+  );
 });
 
-const imports = new Map(styleFiles.map(f => [normalizePath(f), 0]));
+const imports = new Map(styleFiles.map((f) => [normalizePath(f), 0]));
 
 // Busca coincidencias de importaciones a styles
 for (const file of codeFiles) {
@@ -48,14 +54,20 @@ for (const file of codeFiles) {
     const rel = normalizePath(css).split("/src/")[1]; // e.g. styles/table.css
     const short = rel.replace(/^styles\//, "");
     const patterns = [
-      `"/${rel}"`, `'/${rel}'`,
-      `"@/${rel}"`, `'@/${rel}'`,
-      `"./${short}"`, `'./${short}'`,
-      `"../styles/${short}"`, `'../styles/${short}'`,
-      `@import "/${rel}"`, `@import "@/${rel}"`,
-      `@import "./${short}"`, `@import "../styles/${short}"`,
+      `"/${rel}"`,
+      `'/${rel}'`,
+      `"@/${rel}"`,
+      `'@/${rel}'`,
+      `"./${short}"`,
+      `'./${short}'`,
+      `"../styles/${short}"`,
+      `'../styles/${short}'`,
+      `@import "/${rel}"`,
+      `@import "@/${rel}"`,
+      `@import "./${short}"`,
+      `@import "../styles/${short}"`,
     ];
-    if (patterns.some(pt => src.includes(pt))) {
+    if (patterns.some((pt) => src.includes(pt))) {
       imports.set(normalizePath(css), (imports.get(normalizePath(css)) || 0) + 1);
     }
   }
@@ -69,16 +81,20 @@ for (const [css, count] of imports.entries()) {
 }
 
 console.log("== CSS usados ==");
-used.sort((a,b)=>a.css.localeCompare(b.css)).forEach(({css,count})=>{
-  console.log(`✔ ${css}  (importado ${count} vez/veces)`);
-});
+used
+  .sort((a, b) => a.css.localeCompare(b.css))
+  .forEach(({ css, count }) => {
+    console.log(`✔ ${css}  (importado ${count} vez/veces)`);
+  });
 
 console.log("\n== CSS potencialmente NO usados ==");
 if (unused.length === 0) {
   console.log("No se encontraron CSS sin importar. 🎉");
 } else {
-  unused.sort((a,b)=>a.css.localeCompare(b.css)).forEach(({css})=>{
-    console.log(`• ${css}`);
-  });
+  unused
+    .sort((a, b) => a.css.localeCompare(b.css))
+    .forEach(({ css }) => {
+      console.log(`• ${css}`);
+    });
   console.log("\nSugerencia: eliminá con cuidado los listados arriba (verificá en la app).");
 }

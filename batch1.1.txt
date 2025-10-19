@@ -1,0 +1,648 @@
+===== src/services/apiClient.js =====
+// src/services/apiClient.js
+import axios from "axios";
+
+/**
+ * Base URL:
+ * - Si VITE_API_BASE_URL está definido (p.ej. http://localhost:8080), se usa eso.
+ * - Si no, fallback a "/api" para funcionar con el proxy de Vite.
+ */
+const BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "/api").replace(/\/+$/, "");
+
+/**
+ * withCredentials:
+ * - Si usás cookies/sesión de backend, dejalo true (default).
+ * - Para JWT puro (Authorization: Bearer), podés poner false y setear header en interceptor.
+ */
+const WITH_CREDENTIALS = String(import.meta.env.VITE_USE_COOKIES ?? "true") !== "false";
+
+export const http = axios.create({
+  baseURL: BASE_URL,
+  timeout: 15000,
+  withCredentials: WITH_CREDENTIALS,
+  headers: {
+    Accept: "application/json"
+  }
+});
+
+// ====== Interceptores (opcional: token / logging / normalización de errores) ======
+http.interceptors.request.use(
+  (config) => {
+    // Si usás JWT:
+    // const token = localStorage.getItem("capunotes_token");
+    // if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+http.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Normalización básica de errores
+    if (error.code === "ECONNABORTED") {
+      error.message = "Request timeout";
+    } else if (error.response) {
+      // HTTP error (4xx/5xx)
+      const { status, data } = error.response;
+      error.status = status;
+      error.message =
+        (data && (data.message || data.error)) ||
+        `Request failed (${status})`;
+    } else if (error.request) {
+      // Sin respuesta del servidor
+      error.message = "No se recibió respuesta del servidor.";
+    } else {
+      // Error al preparar la request
+      error.message = error.message || "Error desconocido";
+    }
+    return Promise.reject(error);
+  }
+);
+
+===== src/services/index.js =====
+// src/services/index.js
+export * from "./apiClient";
+export * from "./areasService";
+export * from "./cuerdasService";
+export * from "./miembrosService";
+export * from "./localStorageApi";
+export * from "./candidatosService";
+export * from "./audicionesHistorialService";
+
+===== src/services/localStorageApi.js =====
+// src/services/localStorageApi.js
+
+/**
+ * Factory CRUD homogéneo sobre localStorage con:
+ * - Validación de duplicados por uniqueBy (string | string[])
+ * - Comparación case-insensitive y trim
+ * - Errores tipados para manejo consistente en UI
+ */
+
+export class CrudError extends Error {
+  constructor(message, code = "GENERIC") {
+    super(message);
+    this.name = "CrudError";
+    this.code = code;
+  }
+}
+
+export class DuplicateError extends CrudError {
+  constructor(message = "Registro duplicado.") {
+    super(message, "DUPLICATE");
+    this.name = "DuplicateError";
+  }
+}
+
+function safeReadJson(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeAll(storageKey, arr) {
+  localStorage.setItem(storageKey, JSON.stringify(arr));
+}
+
+const norm = (v) => (v ?? "").toString().trim().toLowerCase();
+
+function makeIsDuplicate(uniqueBy) {
+  if (!uniqueBy) return () => false;
+  const fields = Array.isArray(uniqueBy) ? uniqueBy : [uniqueBy];
+
+  return (a, b) => fields.every((k) => norm(a?.[k]) === norm(b?.[k]));
+}
+
+/**
+ * @param {string} storageKey
+ * @param {{ uniqueBy?: string|string[], messages?: Partial<{createDuplicate:string, updateDuplicate:string}>, idFactory?: ()=>string|number }} [opts]
+ * @returns {{list:Function, create:Function, update:Function, remove:Function, clear:Function}}
+ */
+export function localStorageApi(storageKey, opts = {}) {
+  const {
+    uniqueBy = null,
+    idFactory = () => (crypto?.randomUUID?.() ? crypto.randomUUID() : Date.now()),
+    messages = {},
+  } = opts;
+
+  const isDuplicate = makeIsDuplicate(uniqueBy);
+  const msgCreateDup =
+    messages.createDuplicate || "Ya existe un registro con los mismos campos únicos.";
+  const msgUpdateDup =
+    messages.updateDuplicate || "La actualización generaría un duplicado con otro registro.";
+
+  return {
+    /** Devuelve el array completo */
+    async list() {
+      return safeReadJson(storageKey);
+    },
+
+    /** Crea un registro, validando duplicados */
+    async create(obj) {
+      const list = safeReadJson(storageKey);
+      const nuevo = { id: idFactory(), ...obj };
+
+      if (uniqueBy && list.some((x) => isDuplicate(x, nuevo))) {
+        throw new DuplicateError(msgCreateDup);
+      }
+
+      const next = [...list, nuevo];
+      writeAll(storageKey, next);
+      return nuevo;
+    },
+
+    /** Actualiza por id, validando duplicados contra terceros */
+    async update(updated) {
+      if (updated?.id == null) {
+        throw new CrudError("Falta el ID para actualizar.", "MISSING_ID");
+      }
+
+      const list = safeReadJson(storageKey);
+      const exists = list.find((x) => String(x.id) === String(updated.id));
+      if (!exists) {
+        throw new CrudError("No se encontró el registro a actualizar.", "NOT_FOUND");
+      }
+
+      if (
+        uniqueBy &&
+        list.some(
+          (x) => String(x.id) !== String(updated.id) && isDuplicate(x, { ...exists, ...updated })
+        )
+      ) {
+        throw new DuplicateError(msgUpdateDup);
+      }
+
+      const next = list.map((x) =>
+        String(x.id) === String(updated.id) ? { ...x, ...updated } : x
+      );
+      writeAll(storageKey, next);
+      return next.find((x) => String(x.id) === String(updated.id));
+    },
+
+    /** Elimina por id (idempotente) */
+    async remove(id) {
+      const list = safeReadJson(storageKey);
+      const next = list.filter((x) => String(x.id) !== String(id));
+      writeAll(storageKey, next);
+      return { ok: true };
+    },
+
+    /** Limpia todo (útil para tests) */
+    async clear() {
+      writeAll(storageKey, []);
+      return { ok: true };
+    },
+  };
+}
+
+===== src/services/areasService.js =====
+// src/services/areasService.js
+import { localStorageApi } from "./localStorageApi.js";
+import { http } from "./apiClient.js";
+
+// Toggle por entorno (default: mock si VITE_USE_MOCK !== "false")
+const USE_MOCK = String(import.meta.env.VITE_USE_MOCK ?? "true") !== "false";
+
+// Endpoints y claves de storage
+const API_URL = "/areas";
+const AREA_STORAGE_KEY = "areas";
+
+// ===== Implementación API (Axios) =====
+const areasServiceApi = {
+  async list() {
+    const { data } = await http.get(API_URL);
+    return (Array.isArray(data) ? data : []).map((a) => ({
+      id: a.id,
+      nombre: a.nombre ?? a.name ?? "",
+      descripcion: a.descripcion ?? a.description ?? ""
+    }));
+  },
+
+  async create(payload) {
+    const body = {
+      name: payload.nombre,
+      description: payload.descripcion
+    };
+    const { data } = await http.post(API_URL, body);
+    return {
+      id: data.id,
+      nombre: data.nombre ?? data.name ?? body.name,
+      descripcion: data.descripcion ?? data.description ?? body.description
+    };
+  },
+
+  async update(payload) {
+    const body = {
+      name: payload.nombre,
+      description: payload.descripcion
+    };
+    const { data } = await http.patch(`${API_URL}/${payload.id}`, body);
+    return {
+      id: data.id,
+      nombre: data.nombre ?? data.name ?? body.name,
+      descripcion: data.descripcion ?? data.description ?? body.description
+    };
+  },
+
+  async remove(id) {
+    await http.delete(`${API_URL}/${id}`);
+    return { ok: true };
+  }
+};
+
+// ===== Implementación LocalStorage (con validación de duplicados) =====
+const areasServiceLocal = localStorageApi(AREA_STORAGE_KEY, {
+  uniqueBy: "nombre",
+  messages: {
+    createDuplicate: "Ya existe un área con ese nombre.",
+    updateDuplicate: "Ya existe otra área con ese nombre."
+  }
+});
+
+export const areasService = USE_MOCK ? areasServiceLocal : areasServiceApi;
+export { areasServiceApi, areasServiceLocal };
+
+===== src/services/audicionesHistorialService.js =====
+// src/services/audicionesHistorialService.js
+import { localStorageApi } from "@/services/localStorageApi.js";
+import { HISTORIAL_AUDICIONES_STORAGE_KEY } from "@/schemas/audicionesHistorial.js";
+
+// CRUD uniforme sobre LocalStorage
+export const audicionesHistorialService = localStorageApi(HISTORIAL_AUDICIONES_STORAGE_KEY);
+
+===== src/services/candidatosService.js =====
+// src/services/candidatosService.js
+// Runtime toggle: MOCK por defecto; poner VITE_USE_MOCK="false" para usar backend.
+
+import { http } from "@/services/apiClient.js";
+import { buildMockInscripcion } from "./candidatosServiceHelpers.js";
+
+const STORAGE_KEY = "capunotes_candidatos";
+
+function safeReadJson(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+function writeAll(key, arr) {
+  localStorage.setItem(key, JSON.stringify(arr));
+}
+
+const seedRows = [
+  {
+    id: 1,
+    hora: "17.00 hs",
+    nombre: "Begliardo, Francisco",
+    cancion: "Ya me enteré, Reik",
+    resultado: { estado: "sin", obs: "" },
+    turnoEstado: "reservado",
+    inscripcion: buildMockInscripcion({
+      nombreCompleto: "Francisco Begliardo",
+      cuerda: "Tenor",
+      diaAudicion: "Viernes 14",
+      horaAudicion: "17.00 hs",
+      aceptaTerminos: true
+    })
+  },
+  {
+    id: 2,
+    hora: "17.15 hs",
+    nombre: "Alejandro, Peréz",
+    cancion: "Aleluya",
+    resultado: { estado: "rechazado", obs: "Fuera de tono" },
+    turnoEstado: "cancelado",
+    inscripcion: buildMockInscripcion({
+      nombreCompleto: "Alejandro Peréz",
+      cuerda: "Barítono",
+      diaAudicion: "Viernes 14",
+      horaAudicion: "17.15 hs",
+      aceptaTerminos: true
+    })
+  }
+];
+
+function ensureSeed() {
+  const current = safeReadJson(STORAGE_KEY);
+  if (!Array.isArray(current) || current.length === 0) {
+    writeAll(STORAGE_KEY, seedRows);
+    return seedRows;
+  }
+  return current;
+}
+
+const mockService = {
+  async list() {
+    await new Promise((r) => setTimeout(r, 80));
+    return ensureSeed();
+  },
+  async updateResultado(id, resultado) {
+    const list = ensureSeed();
+    const idx = list.findIndex((r) => String(r.id) === String(id));
+    if (idx === -1) return null;
+    const next = [...list];
+    next[idx] = { ...next[idx], resultado: { ...resultado } };
+    writeAll(STORAGE_KEY, next);
+    return next[idx];
+  },
+  async updateInscripcionCuerda(id, cuerda) {
+    const list = ensureSeed();
+    const idx = list.findIndex((r) => String(r.id) === String(id));
+    if (idx === -1) return null;
+    const row = list[idx];
+    const updated = { ...row, inscripcion: { ...row.inscripcion, cuerda: cuerda ?? "" } };
+    const next = [...list];
+    next[idx] = updated;
+    writeAll(STORAGE_KEY, next);
+    return updated;
+  },
+  async updateTurnoEstado(id, estado) {
+    const list = ensureSeed();
+    const idx = list.findIndex((r) => String(r.id) === String(id));
+    if (idx === -1) return null;
+    const next = [...list];
+    next[idx] = { ...next[idx], turnoEstado: String(estado || "").toLowerCase() };
+    writeAll(STORAGE_KEY, next);
+    return next[idx];
+  }
+};
+
+// ========= REAL API (Axios) =========
+const apiService = {
+  async list(audicionId) {
+    const { data } = await http.get("/candidatos", {
+      params: audicionId ? { audicionId } : undefined
+    });
+    return (Array.isArray(data) ? data : []).map((r) => ({
+      id: r.id,
+      hora: r.horaLabel || r.hora || "",
+      nombre: r.nombre || r.nombreLabel || "",
+      cancion: r.cancion || "",
+      resultado: r.resultado || { estado: "sin", obs: "" },
+      turnoEstado:
+        r.turno && r.turno.estado
+          ? String(r.turno.estado).toLowerCase()
+          : (r.turnoEstado || "").toLowerCase(),
+      inscripcion: r.inscripcion || buildMockInscripcion()
+    }));
+  },
+  async updateResultado(id, { estado, obs }) {
+    const { data: updated } = await http.put(`/candidatos/${id}/resultado`, { estado, obs });
+    return {
+      id: updated.id ?? id,
+      hora: updated.horaLabel || updated.hora || "",
+      nombre: updated.nombre || updated.nombreLabel || "",
+      cancion: updated.cancion || "",
+      resultado: updated.resultado || { estado, obs },
+      turnoEstado:
+        updated.turno && updated.turno.estado
+          ? String(updated.turno.estado).toLowerCase()
+          : (updated.turnoEstado || "").toLowerCase(),
+      inscripcion: updated.inscripcion || buildMockInscripcion()
+    };
+  },
+  async updateInscripcionCuerda(id, cuerda) {
+    const { data: updated } = await http.patch(`/candidatos/${id}/inscripcion/cuerda`, { cuerda });
+    return {
+      id: updated.id ?? id,
+      hora: updated.horaLabel || updated.hora || "",
+      nombre: updated.nombre || updated.nombreLabel || "",
+      cancion: updated.cancion || "",
+      resultado: updated.resultado || { estado: "sin", obs: "" },
+      turnoEstado:
+        updated.turno && updated.turno.estado
+          ? String(updated.turno.estado).toLowerCase()
+          : (updated.turnoEstado || "").toLowerCase(),
+      inscripcion: { ...buildMockInscripcion(), ...(updated.inscripcion || {}) }
+    };
+  },
+  async updateTurnoEstado(id, estado) {
+    const { data: updated } = await http.put(`/candidatos/${id}/turno`, { estado });
+    return {
+      id: updated.id ?? id,
+      hora: updated.horaLabel || updated.hora || "",
+      nombre: updated.nombre || updated.nombreLabel || "",
+      cancion: updated.cancion || "",
+      resultado: updated.resultado || { estado: "sin", obs: "" },
+      turnoEstado:
+        updated.turno && updated.turno.estado
+          ? String(updated.turno.estado).toLowerCase()
+          : (updated.turnoEstado || String(estado)).toLowerCase(),
+      inscripcion: updated.inscripcion || buildMockInscripcion()
+    };
+  }
+};
+
+const USE_MOCK = String(import.meta.env.VITE_USE_MOCK ?? "true") !== "false";
+export const candidatosService = USE_MOCK ? mockService : apiService;
+
+===== src/services/candidatosServiceHelpers.js =====
+// src/services/candidatosServiceHelpers.js
+
+export function buildMockInscripcion(partial = {}) {
+  return {
+    nombreCompleto: "",
+    tipoDoc: "",
+    nroDoc: "",
+    fechaNac: "",
+    correo: "",
+    telefono: "",
+    provincia: "",
+    pais: "",
+    profesion: "",
+    cuerda: "",
+    fotoUrl: "",
+    contanosDeVos: "",
+    motivacion: "",
+    cantoAntes: "",
+    conoceMisa: "",
+    participaGrupo: "",
+    instrumentos: "",
+    otrosTalentos: "",
+    comoTeEnteraste: "",
+    queBuscas: "",
+    queCancion: "",
+    diaAudicion: "",
+    horaAudicion: "",
+    aceptaTerminos: false,
+    ...partial,
+  };
+}
+
+===== src/services/cuerdasService.js =====
+// src/services/cuerdasService.js
+import { localStorageApi } from "@/services/localStorageApi.js";
+import { http } from "@/services/apiClient.js";
+import { CUERDA_STORAGE_KEY } from "@/schemas/cuerdas.js";
+
+const USE_MOCK = String(import.meta.env.VITE_USE_MOCK ?? "true") !== "false";
+
+// =========== MOCK localStorage =========== //
+const mock = localStorageApi(CUERDA_STORAGE_KEY, {
+  uniqueBy: "nombre",
+  messages: {
+    createDuplicate: "Ya existe una cuerda con ese nombre.",
+    updateDuplicate: "Ya existe otra cuerda con ese nombre."
+  }
+});
+
+// =========== REAL API (Axios) =========== //
+const api = {
+  async list() {
+    const { data } = await http.get("/cuerdas");
+    return Array.isArray(data) ? data : [];
+  },
+  async create(payload) {
+    const { data } = await http.post("/cuerdas", payload);
+    return data;
+  },
+  async update(payload) {
+    const { data } = await http.put(`/cuerdas/${payload.id}`, payload);
+    return data;
+  },
+  async remove(id) {
+    await http.delete(`/cuerdas/${id}`);
+    return { ok: true };
+  }
+};
+
+export const cuerdasService = USE_MOCK ? mock : api;
+
+===== src/services/historialService.js =====
+// src/services/historialService.js
+// Mock de historial. Más adelante reemplazá list() por la API real.
+
+import { buildMockInscripcion } from "./candidatosServiceHelpers.js";
+
+const historialMock = [
+  {
+    id: "h-1",
+    nombre: "Juan Perez",
+    fechaAudicion: "Marzo 2023",
+    cancion: "Canción – Autor",
+    resultado: { estado: "Aceptado", obs: "Muy buena afinación" },
+    inscripcion: buildMockInscripcion({
+      nombreCompleto: "Juan Perez",
+      tipoDoc: "DNI",
+      nroDoc: "35.555.555",
+      fechaNac: "1993-04-11",
+      correo: "juanp@example.com",
+      telefono: "+54 351 555-1000",
+      provincia: "Córdoba",
+      pais: "Argentina",
+      profesion: "Diseñador",
+      cuerda: "Tenor",
+      contanosDeVos: "Canto desde los 15.",
+      motivacion: "Seguir creciendo en comunidad.",
+      cantoAntes: "Coro escolar.",
+      conoceMisa: "Sí, voy a la de 21hs.",
+      participaGrupo: "Grupo de jóvenes.",
+      instrumentos: "Guitarra.",
+      otrosTalentos: "Fotografía.",
+      comoTeEnteraste: "Instagram.",
+      queBuscas: "Amigos y música.",
+      queCancion: "Canción – Autor",
+      diaAudicion: "Marzo 2023",
+      horaAudicion: "—",
+      aceptaTerminos: true,
+    }),
+  },
+  {
+    id: "h-2",
+    nombre: "Juan Perez",
+    fechaAudicion: "Abril 2024",
+    cancion: "Canción – Autor",
+    resultado: { estado: "Rechazado", obs: "Trabajar respiración" },
+    inscripcion: buildMockInscripcion({
+      nombreCompleto: "Juan Perez",
+      tipoDoc: "DNI",
+      nroDoc: "35.555.555",
+      fechaNac: "1993-04-11",
+      correo: "juanp@example.com",
+      telefono: "+54 351 555-1000",
+      provincia: "Córdoba",
+      pais: "Argentina",
+      profesion: "Diseñador",
+      cuerda: "Tenor",
+      contanosDeVos: "Canto desde los 15.",
+      motivacion: "Seguir creciendo en comunidad.",
+      cantoAntes: "Coro escolar.",
+      conoceMisa: "Sí, voy a la de 21hs.",
+      participaGrupo: "Grupo de jóvenes.",
+      instrumentos: "Guitarra.",
+      otrosTalentos: "Fotografía.",
+      comoTeEnteraste: "Instagram.",
+      queBuscas: "Amigos y música.",
+      queCancion: "Canción – Autor",
+      diaAudicion: "Abril 2024",
+      horaAudicion: "—",
+      aceptaTerminos: true,
+    }),
+  },
+];
+
+export const historialService = {
+  async list() {
+    await new Promise((r) => setTimeout(r, 120));
+    return historialMock;
+  },
+};
+
+===== src/services/miembrosService.js =====
+// src/services/miembrosService.js
+import { localStorageApi } from "./localStorageApi.js";
+import { http } from "./apiClient.js";
+
+// Toggle por entorno (default: mock si VITE_USE_MOCK !== "false")
+const USE_MOCK = String(import.meta.env.VITE_USE_MOCK ?? "true") !== "false";
+
+// Endpoints y claves de storage
+const API_URL = "/miembros";
+const MIEMBRO_STORAGE_KEY = "miembros";
+
+// ===== Implementación LocalStorage con validación =====
+const miembrosServiceLocal = localStorageApi(MIEMBRO_STORAGE_KEY, {
+  uniqueBy: ["nombre", "apellido"],
+  messages: {
+    createDuplicate: "Ya existe un miembro con ese Nombre y Apellido.",
+    updateDuplicate: "Ya existe otro miembro con ese Nombre y Apellido."
+  }
+});
+
+// ===== Implementación API (Axios) =====
+const miembrosServiceApi = {
+  async list() {
+    const { data } = await http.get(API_URL);
+    return Array.isArray(data) ? data : [];
+  },
+
+  async getById(nroDocumento, tipoDocumento) {
+    const { data } = await http.get(`${API_URL}/${tipoDocumento}/${nroDocumento}`);
+    return data;
+  },
+
+  async create(payload) {
+    const { data } = await http.post(API_URL, payload);
+    return data;
+  },
+
+  async update(payload) {
+    const { data } = await http.put(API_URL, payload);
+    return data;
+  },
+
+  async remove(nroDocumento, tipoDocumento) {
+    await http.delete(`${API_URL}/${tipoDocumento}/${nroDocumento}`);
+    return { ok: true };
+  }
+};
+
+export const miembrosService = USE_MOCK ? miembrosServiceLocal : miembrosServiceApi;
+export { miembrosServiceApi, miembrosServiceLocal };
+

@@ -22,12 +22,11 @@ export default function Login({ onLogin }) {
     return !hasErrors(nextErrors);
   };
 
-const handleSubmit = (e) => {
-  e.preventDefault();
-  const isValid = runValidation({ username, password });
-  if (isValid) onLogin(username);
-};
-
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const isValid = runValidation({ username, password });
+    if (isValid) onLogin(username);
+  };
 
   const togglePasswordVisibility = () => setShowPassword((v) => !v);
 
@@ -52,7 +51,8 @@ const handleSubmit = (e) => {
         <Form onSubmit={handleSubmit} noValidate className="formulario-login">
           <h1 className="logo-text">
             Iniciar sesión en su cuenta de <strong>CapuNotes </strong>
-            <img src="./logo-coro-sin-fondo.png" alt="Logo" className="logo-coro" />
+            {/* Vite sirve /public en la raíz => usar /logo... */}
+            <img src="/logo-coro-sin-fondo.png" alt="Logo" className="logo-coro" />
           </h1>
 
           <Form.Group className="custom-input-group">
@@ -91,7 +91,11 @@ const handleSubmit = (e) => {
         </Form>
       </div>
 
-      <img src="/fondo.jpg" alt="Decorative background showing a musical or choir-related scene creating a welcoming atmosphere for the login page" className="img-fondo" />
+      <img
+        src="/fondo.jpg"
+        alt="Decorative background showing a musical or choir-related scene creating a welcoming atmosphere for the login page"
+        className="img-fondo"
+      />
     </main>
   );
 }

@@ -82,10 +82,12 @@ export default function GenericEditPopup({
                 >
                   <option value="">Seleccionar</option>
                   {(f.options || []).map((opt) => {
-                    const value = opt.value ?? opt;
-                    const label = opt.label ?? opt;
+                    const value =
+                      opt && typeof opt === "object" ? opt.value ?? opt.label : opt;
+                    const label =
+                      opt && typeof opt === "object" ? opt.label ?? opt.value : opt;
                     return (
-                      <option key={value} value={value}>
+                      <option key={String(value)} value={value}>
                         {label}
                       </option>
                     );

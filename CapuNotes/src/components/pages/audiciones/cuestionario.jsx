@@ -1,4 +1,3 @@
-// src/components/pages/audiciones/cuestionario.jsx
 import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
 

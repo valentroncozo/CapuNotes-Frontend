@@ -11,10 +11,7 @@ import { cuerdasService } from "@/services/cuerdasService.js";
 import "../../styles/abmc.css";
 import "../../styles/miembros.css";
 
-export default function MiembrosTableABMC({
-  title = "Miembros del coro",
-  showBackButton = true,
-}) {
+export default function MiembrosTableABMC({ title = "Miembros del coro", showBackButton = true }) {
   const navigate = useNavigate();
   const [listaMiembros, setListaMiembros] = useState([]);
   const [cuerdas, setCuerdas] = useState([]);
@@ -39,8 +36,8 @@ export default function MiembrosTableABMC({
 
       setListaMiembros(ordenados);
       setCuerdas(cuerdasData);
-    } catch (err) {
-      console.error("Error cargando datos:", err);
+    } catch (_err) {
+      console.error("Error cargando datos:", _err);
       Swal.fire("Error", "No se pudieron cargar los datos", "error");
     }
   };
@@ -57,8 +54,7 @@ export default function MiembrosTableABMC({
       (m.apellido || "").toLowerCase().includes(filtroTexto.toLowerCase());
 
     const matchCuerda =
-      !filtroCuerda ||
-      (m.cuerda?.name || "").toLowerCase() === filtroCuerda.toLowerCase();
+      !filtroCuerda || (m.cuerda?.name || "").toLowerCase() === filtroCuerda.toLowerCase();
 
     return matchTexto && matchCuerda;
   });
@@ -80,10 +76,8 @@ export default function MiembrosTableABMC({
     if (!res.isConfirmed) return;
 
     try {
-      await miembrosService.remove(
-        miembro.id?.nroDocumento,
-        miembro.id?.tipoDocumento
-      );
+      // Mantengo la firma original del service (IDs compuestos)
+      await miembrosService.remove(miembro.id?.nroDocumento, miembro.id?.tipoDocumento);
       await load();
       Swal.fire({
         title: "Eliminado",
@@ -93,7 +87,7 @@ export default function MiembrosTableABMC({
         background: "#11103a",
         color: "#E8EAED",
       });
-    } catch (err) {
+    } catch (_err) {
       Swal.fire("Error", "No se pudo eliminar el miembro", "error");
     }
   };
@@ -153,10 +147,7 @@ export default function MiembrosTableABMC({
           <tbody>
             {miembrosFiltrados.length > 0 ? (
               miembrosFiltrados.map((m) => (
-                <tr
-                  key={`${m.id?.nroDocumento}-${m.id?.tipoDocumento}`}
-                  className="abmc-row"
-                >
+                <tr key={`${m.id?.nroDocumento}-${m.id?.tipoDocumento}`} className="abmc-row">
                   <td>{`${m.nombre || "-"} ${m.apellido || ""}`}</td>
                   <td>{m.cuerda?.name || "-"}</td>
                   <td>{m.area?.nombre || "-"}</td>
@@ -165,9 +156,7 @@ export default function MiembrosTableABMC({
                     <Button
                       className="btn-accion"
                       variant="warning"
-                      onClick={() =>
-                        navigate("/miembros/editar", { state: { miembro: m } })
-                      }
+                      onClick={() => navigate(`/miembros/editar?id=${m.id}`)}
                       title="Editar"
                     >
                       <PencilFill size={18} />
@@ -196,4 +185,3 @@ export default function MiembrosTableABMC({
     </main>
   );
 }
-

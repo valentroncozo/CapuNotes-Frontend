@@ -14,9 +14,7 @@ export default function MiembrosAgregarPage() {
   const schema = useMemo(() => buildMiembroSchema(), []);
   const [form, setForm] = useState(() =>
     Object.fromEntries(
-      schema
-        .filter((f) => f.type !== "button" && f.type !== "submit")
-        .map((f) => [f.key, ""])
+      schema.filter((f) => f.type !== "button" && f.type !== "submit").map((f) => [f.key, ""])
     )
   );
   const [errors, setErrors] = useState({});
@@ -33,8 +31,7 @@ export default function MiembrosAgregarPage() {
     return Object.keys(e).length === 0;
   };
 
-  const handleChange = (key, val) =>
-    setForm((prev) => ({ ...prev, [key]: val }));
+  const handleChange = (key, val) => setForm((prev) => ({ ...prev, [key]: val }));
 
   const handleSave = async () => {
     if (!validate() || saving) return;
@@ -74,14 +71,8 @@ export default function MiembrosAgregarPage() {
           gap={16}
         />
 
-        <div
-          className="abmc-topbar"
-          style={{ justifyContent: "flex-end", marginTop: 16 }}
-        >
-          <button
-            className="btn btn-secondary"
-            onClick={() => navigate("/miembros")}
-          >
+        <div className="abmc-topbar" style={{ justifyContent: "flex-end", marginTop: 16 }}>
+          <button className="btn btn-secondary" onClick={() => navigate("/miembros")}>
             Cancelar
           </button>
           <button

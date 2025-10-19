@@ -5,6 +5,8 @@
   "javascript.suggest.autoImports": true,
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "javascript.preferences.includePackageJsonAutoImports": "on",
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "vscode.typescript-language-features",
   "files.associations": {
     "*.css": "css",
     "*.scss": "scss",

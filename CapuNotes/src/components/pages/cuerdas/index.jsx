@@ -1,7 +1,7 @@
 // src/components/pages/cuerdas/index.jsx
 import EntityTableABMC from "@/components/abmc/EntityTableABMC.jsx";
 import { cuerdasService } from "@/services/cuerdasService.js";
-import { cuerdaSchema, cuerdaUniqueBy, cuerdaEntityName } from "@/schemas/cuerdas.js";
+import { cuerdaSchema, cuerdaEntityName } from "@/schemas/cuerdas.js";
 
 export default function CuerdasPage() {
   return (
@@ -9,9 +9,9 @@ export default function CuerdasPage() {
       title="Cuerdas"
       service={cuerdasService}
       schema={cuerdaSchema}
-      uniqueBy={cuerdaUniqueBy}
       entityName={cuerdaEntityName}
       showBackButton
+      sortable
     />
   );
 }

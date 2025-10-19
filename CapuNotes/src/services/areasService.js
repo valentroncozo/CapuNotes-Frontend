@@ -1,59 +1,46 @@
 // src/services/areasService.js
-import axios from "axios";
-import { localStorageApi } from "./localStorageApi.js";
-
-// 👉 Flag para elegir backend real o LocalStorage (por defecto: LocalStorage)
-const USE_API = import.meta?.env?.VITE_USE_API === "true";
+import { localStorageApi } from "@/services/localStorageApi.js";
+import { http, USE_MOCK } from "@/services/apiClient.js";
 
 // Endpoints y claves de storage
-const API_URL = "/api/areas";
+const API_URL = "/areas";
 const AREA_STORAGE_KEY = "areas";
 
-// ===== Implementación API (axios) =====
+// ===== Implementación API (Axios) =====
 const areasServiceApi = {
-  // Obtener todas las áreas
-  list: async () => {
-    const res = await axios.get(API_URL);
-    // Normalizamos a tu shape {id, nombre, descripcion}
-    return res.data.map((a) => ({
+  async list() {
+    const { data } = await http.get(API_URL);
+    return (Array.isArray(data) ? data : []).map((a) => ({
       id: a.id,
-      nombre: a.name,
-      descripcion: a.description,
+      nombre: a.nombre ?? a.name ?? "",
+      descripcion: a.descripcion ?? a.description ?? ""
     }));
   },
 
-  // Crear nueva área
-  create: async (data) => {
-    const payload = {
-      name: data.nombre,
-      description: data.descripcion,
-    };
-    const res = await axios.post(API_URL, payload);
+  async create(payload) {
+    const body = { name: payload.nombre, description: payload.descripcion };
+    const { data } = await http.post(API_URL, body);
     return {
-      id: res.data.id,
-      nombre: res.data.name,
-      descripcion: res.data.description,
+      id: data.id,
+      nombre: data.nombre ?? data.name ?? body.name,
+      descripcion: data.descripcion ?? data.description ?? body.description
     };
   },
 
-  // Editar área existente
-  update: async (data) => {
-    const payload = {
-      name: data.nombre,
-      description: data.descripcion,
-    };
-    const res = await axios.patch(`${API_URL}/${data.id}`, payload);
+  async update(payload) {
+    const body = { name: payload.nombre, description: payload.descripcion };
+    const { data } = await http.patch(`${API_URL}/${payload.id}`, body);
     return {
-      id: res.data.id,
-      nombre: res.data.name,
-      descripcion: res.data.description,
+      id: data.id,
+      nombre: data.nombre ?? data.name ?? body.name,
+      descripcion: data.descripcion ?? data.description ?? body.description
     };
   },
 
-  // Eliminar área
-  remove: async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
-  },
+  async remove(id) {
+    await http.delete(`${API_URL}/${id}`);
+    return { ok: true };
+  }
 };
 
 // ===== Implementación LocalStorage (con validación de duplicados) =====
@@ -61,12 +48,9 @@ const areasServiceLocal = localStorageApi(AREA_STORAGE_KEY, {
   uniqueBy: "nombre",
   messages: {
     createDuplicate: "Ya existe un área con ese nombre.",
-    updateDuplicate: "Ya existe otra área con ese nombre.",
-  },
+    updateDuplicate: "Ya existe otra área con ese nombre."
+  }
 });
 
-// ===== Export único =====
-export const areasService = USE_API ? areasServiceApi : areasServiceLocal;
-
-// (Opcional)
+export const areasService = USE_MOCK ? areasServiceLocal : areasServiceApi;
 export { areasServiceApi, areasServiceLocal };

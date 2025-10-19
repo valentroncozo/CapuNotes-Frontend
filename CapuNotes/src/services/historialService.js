@@ -1,7 +1,7 @@
 // src/services/historialService.js
 // Mock de historial. Más adelante reemplazá list() por la API real.
 
-import { buildMockInscripcion } from "./candidatosServiceHelpers.js";
+import { buildMockInscripcion } from "@/services/candidatosServiceHelpers.js";
 
 const historialMock = [
   {
@@ -33,8 +33,8 @@ const historialMock = [
       queCancion: "Canción – Autor",
       diaAudicion: "Marzo 2023",
       horaAudicion: "—",
-      aceptaTerminos: true,
-    }),
+      aceptaTerminos: true
+    })
   },
   {
     id: "h-2",
@@ -65,14 +65,14 @@ const historialMock = [
       queCancion: "Canción – Autor",
       diaAudicion: "Abril 2024",
       horaAudicion: "—",
-      aceptaTerminos: true,
-    }),
-  },
+      aceptaTerminos: true
+    })
+  }
 ];
 
 export const historialService = {
   async list() {
     await new Promise((r) => setTimeout(r, 120));
     return historialMock;
-  },
+  }
 };

@@ -54,12 +54,16 @@ export default function AppShell({ onLogout }) {
   const [audOpen, setAudOpen] = useState(false); // acordeón Audiciones
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    const onKey = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  useEffect(() => { if (!open) setGearOpen(false); }, [open]);
+  useEffect(() => {
+    if (!open) setGearOpen(false);
+  }, [open]);
 
   const handleNavigate = (to) => {
     setOpen(false);
@@ -154,7 +158,10 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
     <div className="appshell-menu">
       <a
         href="/principal"
-        onClick={(e) => { e.preventDefault(); onNavigate("/principal"); }}
+        onClick={(e) => {
+          e.preventDefault();
+          onNavigate("/principal");
+        }}
         className="nav-link"
       >
         Inicio
@@ -190,7 +197,10 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         <a
           key={to}
           href={to}
-          onClick={(e) => { e.preventDefault(); onNavigate(to); }}
+          onClick={(e) => {
+            e.preventDefault();
+            onNavigate(to);
+          }}
           className="nav-link"
         >
           {label}

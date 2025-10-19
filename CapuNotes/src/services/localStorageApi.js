@@ -40,7 +40,6 @@ const norm = (v) => (v ?? "").toString().trim().toLowerCase();
 function makeIsDuplicate(uniqueBy) {
   if (!uniqueBy) return () => false;
   const fields = Array.isArray(uniqueBy) ? uniqueBy : [uniqueBy];
-
   return (a, b) => fields.every((k) => norm(a?.[k]) === norm(b?.[k]));
 }
 
@@ -53,16 +52,14 @@ export function localStorageApi(storageKey, opts = {}) {
   const {
     uniqueBy = null,
     idFactory = () => (crypto?.randomUUID?.() ? crypto.randomUUID() : Date.now()),
-    messages = {},
+    messages = {}
   } = opts;
 
   const isDuplicate = makeIsDuplicate(uniqueBy);
   const msgCreateDup =
-    messages.createDuplicate ||
-    "Ya existe un registro con los mismos campos únicos.";
+    messages.createDuplicate || "Ya existe un registro con los mismos campos únicos.";
   const msgUpdateDup =
-    messages.updateDuplicate ||
-    "La actualización generaría un duplicado con otro registro.";
+    messages.updateDuplicate || "La actualización generaría un duplicado con otro registro.";
 
   return {
     /** Devuelve el array completo */
@@ -99,8 +96,7 @@ export function localStorageApi(storageKey, opts = {}) {
       if (
         uniqueBy &&
         list.some(
-          (x) =>
-            String(x.id) !== String(updated.id) && isDuplicate(x, { ...exists, ...updated })
+          (x) => String(x.id) !== String(updated.id) && isDuplicate(x, { ...exists, ...updated })
         )
       ) {
         throw new DuplicateError(msgUpdateDup);
@@ -125,6 +121,6 @@ export function localStorageApi(storageKey, opts = {}) {
     async clear() {
       writeAll(storageKey, []);
       return { ok: true };
-    },
+    }
   };
 }

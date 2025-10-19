@@ -1,4 +1,3 @@
-// src/components/pages/audiciones/TurnoEstadoModal.jsx
 import ChoiceModal from "@/components/common/ChoiceModal.jsx";
 import "@/styles/popup.css";
 import "@/styles/forms.css";
@@ -12,8 +11,8 @@ import { TURNO_ESTADOS, estadoLabel } from "@/constants/candidatos.js";
 
 const TURNO_OPTS = [
   { value: "disponible", label: estadoLabel("disponible") },
-  { value: "reservado",  label: estadoLabel("reservado") },
-  { value: "cancelado",  label: estadoLabel("cancelado") },
+  { value: "reservado", label: estadoLabel("reservado") },
+  { value: "cancelado", label: estadoLabel("cancelado") },
 ];
 
 function previewTurnoIcon(value) {
@@ -42,9 +41,11 @@ export default function TurnoEstadoModal({ row, onClose, onSave }) {
   const explicit = String(row?.turnoEstado ?? row?.turno?.estado ?? "").toLowerCase();
   const initialValue = TURNO_ESTADOS.includes(explicit)
     ? explicit
-    : (row?.resultado?.estado === "cancelado" || row?.resultado?.estado === "cancelada")
+    : row?.resultado?.estado === "cancelado" || row?.resultado?.estado === "cancelada"
       ? "cancelado"
-      : (row?.inscripcion || row?.nombre || row?.apellido) ? "reservado" : "disponible";
+      : row?.inscripcion || row?.nombre || row?.apellido
+        ? "reservado"
+        : "disponible";
 
   return (
     <ChoiceModal

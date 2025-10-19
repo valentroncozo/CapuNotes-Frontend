@@ -1,37 +1,35 @@
 // src/services/cuerdasService.js
-// Mantiene contrato actual (list/create/update/remove). Toggle por env.
-
-import { localStorageApi } from "@/services/localStorageApi";
-import { apiClient } from "@/services/apiClient";
-import { CUERDA_STORAGE_KEY } from "@/schemas/cuerdas";
-
-const USE_MOCK = String(import.meta.env.VITE_USE_MOCK ?? "true") !== "false";
+import { localStorageApi } from "@/services/localStorageApi.js";
+import { http, USE_MOCK } from "@/services/apiClient.js";
+import { CUERDA_STORAGE_KEY } from "@/schemas/cuerdas.js";
 
 // =========== MOCK localStorage =========== //
 const mock = localStorageApi(CUERDA_STORAGE_KEY, {
   uniqueBy: "nombre",
   messages: {
     createDuplicate: "Ya existe una cuerda con ese nombre.",
-    updateDuplicate: "Ya existe otra cuerda con ese nombre.",
-  },
+    updateDuplicate: "Ya existe otra cuerda con ese nombre."
+  }
 });
 
-// =========== REAL API =========== //
+// =========== REAL API (Axios) =========== //
 const api = {
   async list() {
-    const data = await apiClient.get("/cuerdas");
+    const { data } = await http.get("/cuerdas");
     return Array.isArray(data) ? data : [];
   },
   async create(payload) {
-    return await apiClient.post("/cuerdas", { body: payload });
+    const { data } = await http.post("/cuerdas", payload);
+    return data;
   },
   async update(payload) {
-    return await apiClient.put(`/cuerdas/${payload.id}`, { body: payload });
+    const { data } = await http.put(`/cuerdas/${payload.id}`, payload);
+    return data;
   },
   async remove(id) {
-    await apiClient.delete(`/cuerdas/${id}`);
+    await http.delete(`/cuerdas/${id}`);
     return { ok: true };
-  },
+  }
 };
 
 export const cuerdasService = USE_MOCK ? mock : api;

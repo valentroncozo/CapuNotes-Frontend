@@ -26,6 +26,6 @@ export function buildMockInscripcion(partial = {}) {
     diaAudicion: "",
     horaAudicion: "",
     aceptaTerminos: false,
-    ...partial,
+    ...partial
   };
 }

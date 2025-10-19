@@ -1,3 +1,58 @@
+===== src/hooks/useAuth.js =====
+// src/hooks/useAuth.js
+import { useState, useEffect, useCallback } from "react";
+
+/**
+ * Hook centralizado de autenticación.
+ * En esta primera versión usa localStorage, pero está preparado
+ * para integrarse fácilmente con Keycloak (ver comentarios).
+ */
+
+const AUTH_KEY = "capunotes_auth";
+const USER_KEY = "capunotes_user";
+
+export default function useAuth() {
+  const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem(AUTH_KEY) === "1");
+  const [user, setUser] = useState(localStorage.getItem(USER_KEY) || "");
+
+  // ---- Login local (temporal) ----
+  const login = useCallback((username) => {
+    localStorage.setItem(AUTH_KEY, "1");
+    localStorage.setItem(USER_KEY, username);
+    setUser(username);
+    setIsAuthenticated(true);
+  }, []);
+
+  // ---- Logout ----
+  const logout = useCallback(() => {
+    localStorage.removeItem(AUTH_KEY);
+    localStorage.removeItem(USER_KEY);
+    setIsAuthenticated(false);
+    setUser("");
+  }, []);
+
+  // ---- Keycloak ready section ----
+  // En el futuro, podés reemplazar login/logout por:
+  //   import Keycloak from "keycloak-js";
+  //   const keycloak = new Keycloak({...});
+  //   keycloak.init({ onLoad: "login-required" })
+  //   .then(auth => setIsAuthenticated(auth));
+  //   y leer keycloak.tokenParsed para user info.
+
+  useEffect(() => {
+    // Reactiva sesión persistente al recargar
+    const auth = localStorage.getItem(AUTH_KEY) === "1";
+    const savedUser = localStorage.getItem(USER_KEY);
+    if (auth && savedUser) {
+      setIsAuthenticated(true);
+      setUser(savedUser);
+    }
+  }, []);
+
+  return { isAuthenticated, user, login, logout };
+}
+
+===== src/hooks/useEntityCrud.js =====
 // src/hooks/useEntityCrud.js
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Swal from "sweetalert2";
@@ -31,7 +86,7 @@ export default function useEntityCrud(service, { entityLabel = "registro", autoL
         text: `No se pudieron cargar ${entityLabel}s.`,
         confirmButtonColor: "#ffc107",
         background: "#11103a",
-        color: "#E8EAED"
+        color: "#E8EAED",
       });
     } finally {
       setLoading(false);
@@ -72,22 +127,10 @@ export default function useEntityCrud(service, { entityLabel = "registro", autoL
 
   // === REMOVE ===
   const remove = useCallback(
-    async (...args) => {
+    async (id) => {
       try {
-        // Permite pasar (id) o (nroDocumento, tipoDocumento) o ({nroDocumento,tipoDocumento})
-        await service.remove(...args);
-        if (args.length === 1 && typeof args[0] !== "object") {
-          const id = args[0];
-          setItems((prev) => prev.filter((x) => x.id !== id));
-        } else if (args.length === 1 && typeof args[0] === "object") {
-          const maybeId = args[0]?.id;
-          if (maybeId != null) {
-            setItems((prev) => prev.filter((x) => x.id !== maybeId));
-          } // si no hay id local, no cambiamos el estado (lo recargará list())
-        } else {
-          // Firma (nroDocumento, tipoDocumento): no hay id local seguro -> recarga
-          await list();
-        }
+        await service.remove(id);
+        setItems((prev) => prev.filter((x) => x.id !== id));
         return { ok: true };
       } catch (err) {
         console.error("Error remove()", err);
@@ -95,14 +138,14 @@ export default function useEntityCrud(service, { entityLabel = "registro", autoL
         throw err;
       }
     },
-    [service, entityLabel, list]
+    [service, entityLabel]
   );
 
   // === ERRORES ===
   const handleError = (err, action = "operar") => {
     let msg = `No se pudo ${action}.`;
-    if (err?.name === "DuplicateError") msg = err.message;
-    else if (err?.message) msg = err.message;
+    if (err.name === "DuplicateError") msg = err.message;
+    else if (err.message) msg = err.message;
 
     Swal.fire({
       icon: "error",
@@ -110,7 +153,7 @@ export default function useEntityCrud(service, { entityLabel = "registro", autoL
       text: msg,
       confirmButtonColor: "#ffc107",
       background: "#11103a",
-      color: "#E8EAED"
+      color: "#E8EAED",
     });
   };
 
@@ -126,3 +169,31 @@ export default function useEntityCrud(service, { entityLabel = "registro", autoL
 
   return { ...state, ...actions };
 }
+
+===== src/hooks/useAreas.js =====
+// src/hooks/useAreas.js
+import useEntityCrud from "@/hooks/useEntityCrud.js";
+import { areasService } from "@/services/areasService.js";
+
+export default function useAreas() {
+  return useEntityCrud(areasService, { entityLabel: "área" });
+}
+
+===== src/hooks/useCuerdas.js =====
+// src/hooks/useCuerdas.js
+import useEntityCrud from "@/hooks/useEntityCrud.js";
+import { cuerdasService } from "@/services/cuerdasService.js";
+
+export default function useCuerdas() {
+  return useEntityCrud(cuerdasService, { entityLabel: "cuerda" });
+}
+
+===== src/hooks/useMiembros.js =====
+// src/hooks/useMiembros.js
+import useEntityCrud from "@/hooks/useEntityCrud.js";
+import { miembrosService } from "@/services/miembrosService.js";
+
+export default function useMiembros() {
+  return useEntityCrud(miembrosService, { entityLabel: "miembro" });
+}
+

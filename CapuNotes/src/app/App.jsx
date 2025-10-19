@@ -1,84 +1,77 @@
-// src/app/App.jsx
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import AppShell from "@/components/layout/AppShell.jsx";
-import useAuth from "@/hooks/useAuth.js";
+// src/App.jsx
+import { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-// Pages
+// Páginas
 import Login from "@/components/pages/login/index.jsx";
 import Principal from "@/components/pages/principal/index.jsx";
-import Cuerdas from "@/components/pages/cuerdas/index.jsx";
-import Areas from "@/components/pages/areas/index.jsx";
-import Miembros from "@/components/pages/miembros/index.jsx";
-import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
-import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
-import Audiciones from "@/components/pages/audiciones/planificar.jsx";
-import Candidatos from "@/components/pages/audiciones/candidatos.jsx";
-import CandidatosCoordinadores from "@/components/pages/audiciones/candidatosCoord.jsx";
+
+import AreasPage from "@/components/pages/areas/index.jsx";
+import CuerdasPage from "@/components/pages/cuerdas/index.jsx";
+
+import MiembrosPage from "@/components/pages/miembros/index.jsx";
+import MiembrosAgregarPage from "@/components/pages/miembros/agregar.jsx";
+import MiembrosEditarPage from "@/components/pages/miembros/editar.jsx";
+
+// Audiciones (todas bajo /audiciones)
+import AudicionesLanding from "@/components/pages/audiciones/index.jsx";
+import AgregarAudicionPage from "@/components/pages/audiciones/agregar.jsx";
+import PlanificarAudicionesPage from "@/components/pages/audiciones/planificar.jsx";
+import CandidatosPage from "@/components/pages/audiciones/candidatos.jsx";
+import CandidatosCoordPage from "@/components/pages/audiciones/candidatosCoord.jsx";
+import HistorialAudicionesPage from "@/components/pages/audiciones/historial.jsx";
 import ConfigurarCuestionario from "@/components/pages/audiciones/cuestionario.jsx";
-import HistorialAudiciones from "@/components/pages/audiciones/historial.jsx";
 
-// ➕ Páginas nuevas traídas de Francisco
-import Audicion from "@/components/pages/Audicion/index.jsx";
-import AudicionAgregar from "@/components/pages/Audicion/agregar.jsx";
-
-// 🔴 Import global de estilos (globals importa tokens, variable y buttons)
-import "@/styles/globals.css";
-
-function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
-}
-
-function AppRoutes() {
-  const navigate = useNavigate();
-  const { isAuthenticated, user, login, logout } = useAuth();
-
-  const handleLogin = (username) => {
-    login(username);
-    navigate("/principal", { replace: true });
-  };
-
+function NotFound() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login onLogin={handleLogin} />} />
-
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <AppShell onLogout={logout} />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Navigate to="/principal" replace />} />
-        <Route path="principal" element={<Principal username={user} />} />
-        <Route path="miembros" element={<Miembros />} />
-        <Route path="miembros/agregar" element={<MiembrosAgregar />} />
-        <Route path="miembros/editar" element={<MiembrosEditar />} />
-        <Route path="cuerdas" element={<Cuerdas />} />
-        <Route path="areas" element={<Areas />} />
-
-        {/* Tu flujo actual de Audiciones */}
-        <Route path="audiciones" element={<Audiciones />} />
-        <Route path="candidatos" element={<Candidatos />} />
-        <Route path="candidatos-coordinadores" element={<CandidatosCoordinadores />} />
-        <Route path="configurar-cuestionario" element={<ConfigurarCuestionario />} />
-        <Route path="historial-audiciones" element={<HistorialAudiciones />} />
-
-        {/* ➕ Rutas mínimas para lo de Francisco */}
-        <Route path="audicion" element={<Audicion />} />
-        <Route path="audicion/agregar" element={<AudicionAgregar />} />
-      </Route>
-
-      <Route path="*" element={<Navigate to="/principal" replace />} />
-    </Routes>
+    <main className="abmc-page">
+      <div className="abmc-card">
+        <div className="abmc-header">
+          <h1 className="abmc-title">404</h1>
+        </div>
+        <p>La página que buscás no existe.</p>
+      </div>
+    </main>
   );
 }
 
 export default function App() {
+  // Auth mínima de demo para pasar el username a Principal
+  const [username, setUsername] = useState("Usuario");
+
   return (
     <BrowserRouter>
-      <AppRoutes />
+      <Routes>
+        {/* Redirigí raíz a principal (cambiá a /login si querés) */}
+        <Route path="/" element={<Navigate to="/principal" replace />} />
+
+        {/* Login */}
+        <Route path="/login" element={<Login onLogin={setUsername} />} />
+
+        {/* Home */}
+        <Route path="/principal" element={<Principal username={username} />} />
+
+        {/* Catálogos */}
+        <Route path="/areas" element={<AreasPage />} />
+        <Route path="/cuerdas" element={<CuerdasPage />} />
+
+        {/* Miembros */}
+        <Route path="/miembros" element={<MiembrosPage />} />
+        <Route path="/miembros/agregar" element={<MiembrosAgregarPage />} />
+        <Route path="/miembros/editar" element={<MiembrosEditarPage />} />
+
+        {/* Audiciones */}
+        <Route path="/audiciones" element={<AudicionesLanding />} />
+        <Route path="/audiciones/agregar" element={<AgregarAudicionPage />} />
+        <Route path="/audiciones/planificar" element={<PlanificarAudicionesPage />} />
+        <Route path="/audiciones/candidatos" element={<CandidatosPage />} />
+        <Route path="/audiciones/candidatosCoord" element={<CandidatosCoordPage />} />
+        <Route path="/audiciones/historial" element={<HistorialAudicionesPage />} />
+        <Route path="/audiciones/cuestionario" element={<ConfigurarCuestionario />} />
+
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </BrowserRouter>
   );
 }
