@@ -67,12 +67,10 @@ export default function EntityEditForm({
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      showHeaderClose={true} // ✅ cruz visible
+      showHeaderClose={true}  // ✅ cruz visible
       actions={
         <>
-          <button className="btn btn-secondary" onClick={onClose} type="button">
-            Cancelar
-          </button>
+          <button className="btn btn-secondary" onClick={onClose} type="button">Cancelar</button>
           <button
             className={`btn ${saving ? "btn-disabled" : "btn-primary"}`}
             onClick={handleConfirm}
@@ -102,17 +100,9 @@ export default function EntityEditForm({
                   onClick={(e) => e.stopPropagation()}
                 >
                   <option value="">...</option>
-                  {(f.options || []).map((opt) => {
-                    const value =
-                      opt && typeof opt === "object" ? opt.value ?? opt.label : opt;
-                    const label =
-                      opt && typeof opt === "object" ? opt.label ?? opt.value : opt;
-                    return (
-                      <option key={String(value)} value={value}>
-                        {label}
-                      </option>
-                    );
-                  })}
+                  {(f.options || []).map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
                 </select>
               ) : f.type === "textarea" ? (
                 <textarea
@@ -134,7 +124,9 @@ export default function EntityEditForm({
                 />
               )}
 
-              {errors[f.key] && <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>}
+              {errors[f.key] && (
+                <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>
+              )}
             </div>
           ))}
         </div>

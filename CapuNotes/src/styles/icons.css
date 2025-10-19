@@ -1,39 +1,18 @@
 /* src/styles/icons.css */
 
 /* Colores por semántica, usando currentColor */
-.icon-estado {
-  color: var(--text-light);
-  opacity: 0.95;
-  vertical-align: middle;
-}
+.icon-estado { color: var(--text-light); opacity: .95; vertical-align: middle; }
 
 /* Resultados */
-.icon-estado--ok {
-  color: #2ecc71;
-} /* aceptado */
-.icon-estado--bad {
-  color: #ff6b6b;
-} /* rechazado */
-.icon-estado--pend {
-  color: #f1c40f;
-} /* ausente */
-.icon-estado--sin {
-  color: #aeb4c0;
-} /* sin resultado */
+.icon-estado--ok   { color: #2ecc71; } /* aceptado */
+.icon-estado--bad  { color: #ff6b6b; } /* rechazado */
+.icon-estado--pend { color: #f1c40f; } /* ausente */
+.icon-estado--sin  { color: #aeb4c0; } /* sin resultado */
 
 /* Turnos (coordinadores) */
-.icon-turno--disp {
-  color: #2ecc71;
-} /* disponible */
-.icon-turno--res {
-  color: #f1c40f;
-} /* reservado */
-.icon-turno--cancel {
-  color: #ff6b6b;
-} /* cancelado */
+.icon-turno--disp   { color: #2ecc71; } /* disponible */
+.icon-turno--res    { color: #f1c40f; } /* reservado */
+.icon-turno--cancel { color: #ff6b6b; } /* cancelado */
 
 /* Tamaño en tabla / modal */
-.icon-md svg {
-  width: 22px;
-  height: 22px;
-}
+.icon-md svg { width: 22px; height: 22px; }

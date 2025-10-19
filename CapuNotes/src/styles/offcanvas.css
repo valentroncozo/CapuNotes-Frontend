@@ -1,184 +1,156 @@
 /* src/styles/offcanvas.css */
-.appshell-navbar {
-  background: var(--bg);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: var(--shadow);
-  min-height: 56px;
-  padding-inline: 8px;
-  z-index: 1060; /* por encima de backdrop y contenido */
-  display: flex;
-  align-items: center;
+.appshell-navbar{
+  background:var(--bg);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  box-shadow:var(--shadow);
+  min-height:56px;
+  padding-inline:8px;
+  z-index:1060; /* por encima de backdrop y contenido */
+  display:flex;
+  align-items:center;
 }
 
 /* Botón hamburguesa propio */
-.appshell-toggle {
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  padding: 6px 8px;
-  color: #fff;
-  border-radius: 12px;
+.appshell-toggle{
+  border:none!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  padding:6px 8px;
+  color:#fff;
+  border-radius:12px;
 }
-.appshell-toggle:hover {
-  background: rgba(255, 255, 255, 0.08);
+.appshell-toggle:hover{
+  background: rgba(255,255,255,.08);
 }
 
 /* Drawer custom */
-.drawer {
-  position: fixed;
-  inset: 0 auto 0 0;
-  width: 320px;
-  max-width: 86vw;
-  background: var(--bg);
-  color: var(--text-light);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: var(--shadow);
-  transform: translateX(-100%);
-  transition: transform 0.25s ease;
-  z-index: 1050;
+.drawer{
+  position:fixed;
+  inset:0 auto 0 0;
+  width:320px;
+  max-width:86vw;
+  background:var(--bg);
+  color:var(--text-light);
+  border-right:1px solid rgba(255,255,255,.08);
+  box-shadow:var(--shadow);
+  transform:translateX(-100%);
+  transition:transform .25s ease;
+  z-index:1050;
 }
-.drawer.open {
-  transform: translateX(0);
+.drawer.open{ transform:translateX(0); }
+
+.drawer-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  padding:.75rem 1rem;
+}
+.offcanvas-title{ color:var(--text-light); font-weight:600; }
+
+.drawer-body{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:12px;
 }
 
-.drawer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 0.75rem 1rem;
-}
-.offcanvas-title {
-  color: var(--text-light);
-  font-weight: 600;
-}
-
-.drawer-body {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-}
-
-.appshell-header-controls {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.appshell-header-controls{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
 .appshell-gearbtn,
-.appshell-closebtn {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #fff;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  padding: 0;
+.appshell-closebtn{
+  background:transparent;
+  border:1px solid rgba(255,255,255,.08);
+  color:#fff;
+  width:36px; height:36px;
+  border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  transition:all .2s ease;
+  padding:0;
 }
 .appshell-gearbtn:hover,
-.appshell-closebtn:hover {
-  color: var(--accent);
-  transform: scale(1.1);
-}
+.appshell-closebtn:hover{ color:var(--accent); transform:scale(1.1); }
 
-.appshell-gear-panel {
-  position: absolute;
-  right: 46px;
-  top: 40px;
-  background: #0f1036;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  padding: 6px;
-  min-width: 170px;
-  z-index: 10;
+.appshell-gear-panel{
+  position:absolute;
+  right:46px; top:40px;
+  background:#0f1036;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  box-shadow:var(--shadow);
+  padding:6px;
+  min-width:170px;
+  z-index:10;
 }
-.appshell-gear-item {
-  width: 100%;
-  text-align: left;
-  padding: 0.55rem 0.7rem;
-  border: none;
-  background: transparent;
-  color: var(--text-light);
-  border-radius: 10px;
-  cursor: pointer;
+.appshell-gear-item{
+  width:100%;
+  text-align:left;
+  padding:.55rem .7rem;
+  border:none;
+  background:transparent;
+  color:var(--text-light);
+  border-radius:10px;
+  cursor:pointer;
 }
-.appshell-gear-item:hover {
-  background: rgba(179, 205, 250, 0.12);
-  color: var(--accent);
-}
+.appshell-gear-item:hover{ background: rgba(179,205,250,.12); color:var(--accent); }
 
 /* Links */
-.appshell-menu .nav-link {
-  color: var(--text-light);
-  padding: 0.6rem 0.75rem;
-  border-radius: 12px;
-  transition: 0.15s ease;
-  text-align: center;
-  display: block;
+.appshell-menu .nav-link{
+  color:var(--text-light);
+  padding:.6rem .75rem;
+  border-radius:12px;
+  transition:.15s ease;
+  text-align:center;
+  display:block;
 }
-.appshell-menu .nav-link:hover {
-  background: rgba(179, 205, 250, 0.12);
-  color: var(--accent);
-  text-decoration: none;
+.appshell-menu .nav-link:hover{
+  background: rgba(179,205,250,.12);
+  color:var(--accent);
+  text-decoration:none;
 }
 
 /* Acordeón */
-.appshell-accordion-outer {
-  border: 1px solid #000;
-  border-radius: 12px;
-  overflow: hidden;
+.appshell-accordion-outer{ border:1px solid #000; border-radius:12px; overflow:hidden; }
+.appshell-accordion-trigger{
+  width:100%;
+  background:var(--bg);
+  color:var(--text-light);
+  font-weight:700;
+  padding:.75rem .9rem;
+  border:none;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:.5rem;
 }
-.appshell-accordion-trigger {
-  width: 100%;
-  background: var(--bg);
-  color: var(--text-light);
-  font-weight: 700;
-  padding: 0.75rem 0.9rem;
-  border: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
+.appshell-accordion-trigger:hover{ filter:brightness(1.05); }
+.appshell-accordion-trigger.open{ background:#151246; }
+.appshell-accordion-caret{ opacity:.9; }
+.appshell-accordion-content{
+  background:#0f1036;
+  border-top:1px solid rgba(255,255,255,.08);
+  padding:.6rem;
 }
-.appshell-accordion-trigger:hover {
-  filter: brightness(1.05);
+.appshell-accordion-content .nav-link{
+  display:block;
+  padding:.55rem .6rem;
+  border-radius:10px;
+  color:var(--text-light);
+  font-weight:500;
+  text-align:center;
 }
-.appshell-accordion-trigger.open {
-  background: #151246;
-}
-.appshell-accordion-caret {
-  opacity: 0.9;
-}
-.appshell-accordion-content {
-  background: #0f1036;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 0.6rem;
-}
-.appshell-accordion-content .nav-link {
-  display: block;
-  padding: 0.55rem 0.6rem;
-  border-radius: 10px;
-  color: var(--text-light);
-  font-weight: 500;
-  text-align: center;
-}
-.appshell-accordion-content .nav-link:hover {
-  background: rgba(179, 205, 250, 0.12);
-  color: var(--accent);
-}
+.appshell-accordion-content .nav-link:hover{ background: rgba(179,205,250,.12); color:var(--accent); }
 
 /* Backdrop para cerrar al click fuera */
-.drawer-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+.drawer-backdrop{
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.45);
   backdrop-filter: blur(1px);
-  z-index: 1040; /* debajo del drawer (1050) y navbar (1060) */
+  z-index:1040; /* debajo del drawer (1050) y navbar (1060) */
 }

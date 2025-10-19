@@ -3,23 +3,19 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EntityTableABMC from "@/components/abmc/EntityTableABMC.jsx";
 import { miembrosService } from "@/services/miembrosService.js";
-import { buildMiembroSchema, miembroEntityName } from "@/schemas/miembros.js";
+import { buildMiembroSchema, miembroUniqueBy, miembroEntityName } from "@/schemas/miembros.js";
 import { PencilFill, Trash3Fill } from "react-bootstrap-icons";
 import infoIcon from "/info.png";
-import Modal from "@/components/common/Modal.jsx";
+import Modal from "@/components/common/Modal.jsx"; // ← NUEVO
 
 export default function MiembrosPage() {
   const navigate = useNavigate();
   const baseSchema = useMemo(() => buildMiembroSchema(), []);
-
-  // columnas visibles en la tabla
-  const tableKeys = useMemo(() => new Set(["nombre", "apellido", "cuerda", "estado"]), []);
-
   const [infoRow, setInfoRow] = useState(null);
-
+  const tableKeys = new Set(["nombre", "apellido", "cuerda", "estado"]);
   const schemaForTable = useMemo(
     () => baseSchema.map((f) => (tableKeys.has(f.key) ? f : { ...f, table: false })),
-    [baseSchema, tableKeys]
+    [baseSchema]
   );
 
   return (
@@ -28,11 +24,12 @@ export default function MiembrosPage() {
         title="Miembros"
         service={miembrosService}
         schema={schemaForTable}
+        uniqueBy={miembroUniqueBy}
         entityName={miembroEntityName}
         showBackButton
         usePopupForm={false}
         onAdd={() => navigate("/miembros/agregar")}
-        sortable
+        sortable={true}
         renderActions={(row, { requestDelete }) => (
           <>
             <button
@@ -47,7 +44,7 @@ export default function MiembrosPage() {
               type="button"
               className="btn-accion me-2"
               title="Editar"
-              onClick={() => navigate(`/miembros/editar?id=${encodeURIComponent(row.id)}`)}
+              onClick={() => navigate(`/miembros/editar?id=${row.id}`)}
             >
               <PencilFill size={18} />
             </button>
@@ -68,7 +65,7 @@ export default function MiembrosPage() {
           isOpen={true}
           onClose={() => setInfoRow(null)}
           title={`${infoRow.nombre} ${infoRow.apellido}`}
-          showHeaderClose={true}
+          showHeaderClose={false}
           actions={
             <button className="btn btn-secondary" onClick={() => setInfoRow(null)} type="button">
               Cerrar

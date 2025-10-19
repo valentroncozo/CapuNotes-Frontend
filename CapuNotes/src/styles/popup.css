@@ -29,15 +29,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 18px;
-  border-bottom: 1px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
 }
 
 .pop-title {
   margin: 0;
   font-weight: 700;
   font-size: 1.1rem;
-  position: relative;
-  top: 1px; /* levanta visualmente el texto */
 }
 
 .icon-btn {
@@ -50,14 +48,9 @@
   border-radius: 10px;
   transition: all 0.15s;
 }
-.icon-btn:hover {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.08);
-}
+.icon-btn:hover { opacity: 1; background: rgba(255, 255, 255, 0.08); }
 
-.pop-body {
-  padding: 18px;
-}
+.pop-body { padding: 18px; }
 
 .pop-footer {
   display: flex;

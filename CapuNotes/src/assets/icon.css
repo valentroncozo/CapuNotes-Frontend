@@ -4,9 +4,9 @@
   display: flex;
   padding: 0;
   margin: 0;
-  right: 0.6rem;
+  right: .6rem;
   position: absolute;
-  top: 50%; /* ⬅️ ancla vertical */
+  top: 50%;                    /* ⬅️ ancla vertical */
   transform: translateY(-50%); /* ⬅️ centra vertical */
   justify-content: center;
   align-items: center;

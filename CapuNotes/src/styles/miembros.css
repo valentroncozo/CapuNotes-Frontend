@@ -44,5 +44,5 @@ input[type="date"].input-date {
 
 /* Placeholder del date (fallback) */
 input[type="date"].input-date::placeholder {
-  color: rgba(232, 234, 237, 0.5);
+  color: rgba(232,234,237,0.5);
 }

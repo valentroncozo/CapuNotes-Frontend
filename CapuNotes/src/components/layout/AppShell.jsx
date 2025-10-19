@@ -54,16 +54,12 @@ export default function AppShell({ onLogout }) {
   const [audOpen, setAudOpen] = useState(false); // acordeón Audiciones
 
   useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "Escape") setOpen(false);
-    };
+    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  useEffect(() => {
-    if (!open) setGearOpen(false);
-  }, [open]);
+  useEffect(() => { if (!open) setGearOpen(false); }, [open]);
 
   const handleNavigate = (to) => {
     setOpen(false);
@@ -138,6 +134,7 @@ export default function AppShell({ onLogout }) {
         </div>
       </div>
 
+      {/* Overlay para cerrar al click fuera del drawer */}
       {open && (
         <div
           className="drawer-backdrop"
@@ -147,6 +144,7 @@ export default function AppShell({ onLogout }) {
         />
       )}
 
+      {/* separador para que el contenido no quede debajo del navbar fijo */}
       <div style={{ height: "56px" }} />
       <Outlet />
     </>
@@ -158,15 +156,13 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
     <div className="appshell-menu">
       <a
         href="/principal"
-        onClick={(e) => {
-          e.preventDefault();
-          onNavigate("/principal");
-        }}
+        onClick={(e) => { e.preventDefault(); onNavigate("/principal"); }}
         className="nav-link"
       >
         Inicio
       </a>
 
+      {/* Acordeón reutilizable: Organización del Coro */}
       <AccordionMenu
         title="Organización del Coro"
         open={orgOpen}
@@ -186,21 +182,19 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         setOpen={setAudOpen}
         onNavigate={onNavigate}
         items={[
-          { label: "Audiciones", path: "/audicion" },
+          { label: "Audiciones", path: "/audiciones" },
           { label: "Candidatos", path: "/candidatos" },
           { label: "Configurar Cuestionario", path: "/configurar-cuestionario" },
           { label: "Historial de Audiciones", path: "/historial-audiciones" },
         ]}
       />
 
+      {/* Otros accesos directos existentes */}
       {MENU_ITEMS.map(([to, label]) => (
         <a
           key={to}
           href={to}
-          onClick={(e) => {
-            e.preventDefault();
-            onNavigate(to);
-          }}
+          onClick={(e) => { e.preventDefault(); onNavigate(to); }}
           className="nav-link"
         >
           {label}

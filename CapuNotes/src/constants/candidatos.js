@@ -27,9 +27,7 @@ export function fmtHora(hora) {
 
 /** Normaliza el estado a uno conocido para badge + label */
 export function normalizeEstado(raw) {
-  const v = String(raw ?? "")
-    .trim()
-    .toLowerCase();
+  const v = String(raw ?? "").trim().toLowerCase();
 
   // Estados de turno (coordinadores)
   if (["disponible", "reservado", "cancelado"].includes(v)) return v;
@@ -96,7 +94,7 @@ export function estadoLabel(estado) {
       return "Sin resultado";
 
     default:
-      return v ? v[0].toUpperCase() + v.slice(1) : "—";
+      return v ? (v[0].toUpperCase() + v.slice(1)) : "—";
   }
 }
 

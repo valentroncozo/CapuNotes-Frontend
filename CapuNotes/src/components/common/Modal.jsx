@@ -13,7 +13,7 @@ export default function Modal({
   title,
   children,
   actions,
-  showHeaderClose = true, // 👈 ahora por defecto viene la cruz en el header
+  showHeaderClose = true,   // 👈 ahora por defecto viene la cruz en el header
   closeLabel = "Cerrar",
 }) {
   const dialogRef = useRef(null);
@@ -47,9 +47,7 @@ export default function Modal({
         onMouseDown={(e) => e.stopPropagation()}
       >
         <header className="pop-header">
-          <h3 id="modal-title" className="pop-title">
-            {title}
-          </h3>
+          <h3 id="modal-title" className="pop-title">{title}</h3>
 
           {showHeaderClose && (
             <button

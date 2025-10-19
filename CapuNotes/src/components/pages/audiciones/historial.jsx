@@ -47,15 +47,9 @@ export default function HistorialAudicionesPage() {
         <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
             <tr className="abmc-row">
-              <th>
-                <span className="th-label">Nombre</span>
-              </th>
-              <th>
-                <span className="th-label">Audición</span>
-              </th>
-              <th>
-                <span className="th-label">Canción</span>
-              </th>
+              <th><span className="th-label">Nombre</span></th>
+              <th><span className="th-label">Audición</span></th>
+              <th><span className="th-label">Canción</span></th>
               <th style={{ textAlign: "center" }}>
                 <span className="th-label">Resultado</span>
               </th>
@@ -87,7 +81,11 @@ export default function HistorialAudicionesPage() {
                     onClick={() => setViewRow(r)}
                     aria-label="Ver inscripción"
                   >
-                    <img src={infoIcon} alt="Info" style={{ width: 18, height: 18 }} />
+                    <img
+                      src={infoIcon}
+                      alt="Info"
+                      style={{ width: 18, height: 18 }}
+                    />
                   </button>
                 </td>
               </tr>
@@ -119,7 +117,12 @@ export default function HistorialAudicionesPage() {
               <div className="form-grid">
                 <div className="field">
                   <label>Estado</label>
-                  <input className="input" value={verResultado.estado || ""} readOnly disabled />
+                  <input
+                    className="input"
+                    value={verResultado.estado || ""}
+                    readOnly
+                    disabled
+                  />
                 </div>
                 <div className="field">
                   <label>Observaciones</label>
@@ -135,7 +138,10 @@ export default function HistorialAudicionesPage() {
             </div>
 
             <div className="pop-footer" style={{ justifyContent: "flex-end" }}>
-              <button className="btn btn-secondary" onClick={() => setVerResultado(null)}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setVerResultado(null)}
+              >
                 Cerrar
               </button>
             </div>

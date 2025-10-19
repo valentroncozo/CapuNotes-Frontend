@@ -84,7 +84,8 @@ export default function CandidatosPage() {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     }
   };
-  const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
+  const thClass = (key) =>
+    sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable";
 
   const ResultadoIcon = ({ estado }) => {
     const e = String(estado || "sin").toLowerCase();
@@ -191,6 +192,7 @@ export default function CandidatosPage() {
                 <td>{nombreApynom(r)}</td>
                 <td>{r.cancion}</td>
 
+                {/* Ícono de resultado + botón fijo a la derecha */}
                 <td className="cell-right-action">
                   <ResultadoIcon estado={r.resultado?.estado} />
                   <button
@@ -198,6 +200,7 @@ export default function CandidatosPage() {
                     className="btn-accion btn-accion--icon right-action"
                     title="Editar resultado"
                     onClick={() => setEditRow(r)}
+                    aria-label="Editar resultado"
                   >
                     <PencilFill size={18} />
                   </button>
@@ -208,9 +211,14 @@ export default function CandidatosPage() {
                     type="button"
                     className="btn-accion btn-accion--icon"
                     title="Ver inscripción"
+                    aria-label="Ver inscripción"
                     onClick={() => setViewRow(r)}
                   >
-                    <img src={infoIcon} alt="Info" style={{ width: 18, height: 18 }} />
+                    <img
+                      src={infoIcon}
+                      alt="Info"
+                      style={{ width: 18, height: 18 }}
+                    />
                   </button>
                 </td>
               </tr>
@@ -219,8 +227,8 @@ export default function CandidatosPage() {
         </table>
 
         <p style={{ opacity: 0.7, marginTop: 10 }}>
-          Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i> y ajustar la <i>Cuerda</i> de
-          la inscripción.
+          Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i> y ajustar la{" "}
+          <i>Cuerda</i> de la inscripción.
         </p>
       </div>
 
@@ -229,9 +237,14 @@ export default function CandidatosPage() {
           row={editRow}
           onClose={() => setEditRow(null)}
           onSave={async (estado, obs) => {
-            const res = await candidatosService.updateResultado(editRow.id, { estado, obs });
+            const res = await candidatosService.updateResultado(editRow.id, {
+              estado,
+              obs,
+            });
             setRows((prev) =>
-              prev.map((x) => (x.id === res.id ? { ...x, resultado: res.resultado } : x))
+              prev.map((x) =>
+                x.id === res.id ? { ...x, resultado: res.resultado } : x
+              )
             );
             await success({ title: "Resultado guardado" });
             setEditRow(null);
@@ -251,7 +264,9 @@ export default function CandidatosPage() {
               nuevaCuerda
             );
             if (!updated) return;
-            setRows((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
+            setRows((prev) =>
+              prev.map((x) => (x.id === updated.id ? updated : x))
+            );
             await success({ title: "Cuerda actualizada" });
           }}
         />

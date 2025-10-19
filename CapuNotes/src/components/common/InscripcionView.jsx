@@ -14,8 +14,7 @@ export default function InscripcionView({
 }) {
   const { items: cuerdas } = useCuerdas();
 
-  // Nota: si no se usa en el JSX, lo dejamos con prefijo "_" para evitar warning de eslint
-  const _opcionesCuerdas = useMemo(() => {
+  const opcionesCuerdas = useMemo(() => {
     const lista = Array.isArray(cuerdas) ? cuerdas : [];
     const nombres = lista.map((c) => String(c?.nombre ?? "").trim()).filter(Boolean);
     const extra = String(data.cuerda ?? "").trim();
@@ -48,12 +47,10 @@ export default function InscripcionView({
       isOpen={open}
       onClose={onClose}
       title="Formulario de Inscripción"
-      showHeaderClose={true}
+      showHeaderClose={true}  // ✅ ahora con cruz en el header
       actions={
         <>
-          <button className="btn btn-secondary" onClick={onClose}>
-            Cerrar
-          </button>
+          <button className="btn btn-secondary" onClick={onClose}>Cerrar</button>
           {editable && (
             <button
               className={`btn ${dirty && !saving ? "btn-primary" : "btn-disabled"}`}
@@ -68,10 +65,10 @@ export default function InscripcionView({
       }
     >
       <div style={{ maxHeight: "80vh", overflow: "auto" }}>
-        {/* contenido idéntico… */}
+        {/* contenido idéntico, no modificado */}
         <hr className="divisor-amarillo" />
         <h4 style={{ margin: "0 0 12px" }}>Datos personales:</h4>
-        {/* … */}
+        {/* ... resto del cuerpo sin cambios ... */}
       </div>
     </Modal>
   );

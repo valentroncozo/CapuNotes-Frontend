@@ -31,7 +31,7 @@ export default function useEntityCrud(service, { entityLabel = "registro", autoL
         text: `No se pudieron cargar ${entityLabel}s.`,
         confirmButtonColor: "#ffc107",
         background: "#11103a",
-        color: "#E8EAED"
+        color: "#E8EAED",
       });
     } finally {
       setLoading(false);
@@ -72,22 +72,10 @@ export default function useEntityCrud(service, { entityLabel = "registro", autoL
 
   // === REMOVE ===
   const remove = useCallback(
-    async (...args) => {
+    async (id) => {
       try {
-        // Permite pasar (id) o (nroDocumento, tipoDocumento) o ({nroDocumento,tipoDocumento})
-        await service.remove(...args);
-        if (args.length === 1 && typeof args[0] !== "object") {
-          const id = args[0];
-          setItems((prev) => prev.filter((x) => x.id !== id));
-        } else if (args.length === 1 && typeof args[0] === "object") {
-          const maybeId = args[0]?.id;
-          if (maybeId != null) {
-            setItems((prev) => prev.filter((x) => x.id !== maybeId));
-          } // si no hay id local, no cambiamos el estado (lo recargará list())
-        } else {
-          // Firma (nroDocumento, tipoDocumento): no hay id local seguro -> recarga
-          await list();
-        }
+        await service.remove(id);
+        setItems((prev) => prev.filter((x) => x.id !== id));
         return { ok: true };
       } catch (err) {
         console.error("Error remove()", err);
@@ -95,14 +83,14 @@ export default function useEntityCrud(service, { entityLabel = "registro", autoL
         throw err;
       }
     },
-    [service, entityLabel, list]
+    [service, entityLabel]
   );
 
   // === ERRORES ===
   const handleError = (err, action = "operar") => {
     let msg = `No se pudo ${action}.`;
-    if (err?.name === "DuplicateError") msg = err.message;
-    else if (err?.message) msg = err.message;
+    if (err.name === "DuplicateError") msg = err.message;
+    else if (err.message) msg = err.message;
 
     Swal.fire({
       icon: "error",
@@ -110,7 +98,7 @@ export default function useEntityCrud(service, { entityLabel = "registro", autoL
       text: msg,
       confirmButtonColor: "#ffc107",
       background: "#11103a",
-      color: "#E8EAED"
+      color: "#E8EAED",
     });
   };
 
@@ -122,7 +110,10 @@ export default function useEntityCrud(service, { entityLabel = "registro", autoL
     () => ({ items, loading, error, count: items.length }),
     [items, loading, error]
   );
-  const actions = useMemo(() => ({ list, create, update, remove }), [list, create, update, remove]);
+  const actions = useMemo(
+    () => ({ list, create, update, remove }),
+    [list, create, update, remove]
+  );
 
   return { ...state, ...actions };
 }

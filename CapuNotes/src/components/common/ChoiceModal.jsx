@@ -60,7 +60,7 @@ export default function ChoiceModal({
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      showHeaderClose={true} // ✅ ahora todas las ventanas tienen cruz
+      showHeaderClose={true}  // ✅ ahora todas las ventanas tienen cruz
       actions={
         <>
           <button type="button" className="btn btn-secondary" onClick={onClose}>
@@ -88,16 +88,14 @@ export default function ChoiceModal({
               onChange={(e) => setValue(e.target.value)}
             >
               {options.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
+                <option key={o.value} value={o.value}>{o.label}</option>
               ))}
             </select>
 
             {renderPreview && (
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
                 <Preview />
-                <small style={{ opacity: 0.8 }}>Seleccionado</small>
+                <small style={{ opacity: .8 }}>Seleccionado</small>
               </div>
             )}
           </div>

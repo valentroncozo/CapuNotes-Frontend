@@ -1,12 +1,12 @@
 // src/pages/principal/index.jsx
 import WelcomeCard from "./WelcomeCard.jsx";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import ScheduleIcon from "@mui/icons-material/Schedule";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import AssignmentIcon from "@mui/icons-material/Assignment";
-import EventIcon from "@mui/icons-material/Event";
-import LibraryMusicIcon from "@mui/icons-material/LibraryMusic";
-import MicIcon from "@mui/icons-material/Mic";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import EventIcon from '@mui/icons-material/Event';
+import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
+import MicIcon from '@mui/icons-material/Mic';
 import "@/styles/principal.css";
 
 export default function Principal({ username }) {

@@ -1,8 +1,9 @@
 /* src/styles/back-button.css */
 .back-button {
+
   top: -6px; /* levanta la flecha para que no quede baja */
   background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255,255,255,.25);
   border-radius: 999px;
   width: 36px;
   height: 36px;
@@ -12,6 +13,7 @@
   padding: 0;
   margin-right: 0.75rem;
   box-shadow: none !important;
+  
 }
 
 .back-button:hover {
@@ -22,7 +24,7 @@
   color: var(--text-light);
   width: 22px !important;
   height: 22px !important;
-  transition: color 0.2s ease;
+  transition: color .2s ease;
 }
 
 .back-button:hover .back-icon {

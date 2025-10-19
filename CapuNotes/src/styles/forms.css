@@ -4,24 +4,22 @@
 .abmc-input,
 .abmc-select {
   flex: 1 1 200px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255,.08);
   color: var(--text-light);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255,255,255,.15);
   border-radius: 12px;
   padding: 10px 12px;
   outline: none;
   font-family: var(--font-sans);
 }
 
-.abmc-input::placeholder {
-  color: rgba(232, 234, 237, 0.75);
-}
+.abmc-input::placeholder { color: rgba(232,234,237,.75); }
 .abmc-input:focus,
 .abmc-select:focus {
   color: var(--text-light);
   border-color: var(--card);
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25);
+  background: rgba(255,255,255,.08);
+  box-shadow: 0 0 0 3px rgba(179,205,250,.25);
 }
 
 /* Date picker (Chromium/WebKit) */
@@ -41,20 +39,15 @@
   border-radius: 12px;
   padding: 6px 10px;
   box-shadow: var(--shadow);
-  transition: filter 0.15s ease; /* solo brillo, sin movimiento */
+  transition: filter .15s ease;    /* solo brillo, sin movimiento */
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
-.btn-accion:hover {
-  filter: brightness(0.95);
-}
+.btn-accion:hover { filter: brightness(0.95); }
 
 /* === Grid y etiquetas de form === */
-.form-grid {
-  display: grid;
-  gap: 16px;
-}
+.form-grid { display: grid; gap: 16px; }
 
 .field label {
   display: block;
@@ -68,7 +61,7 @@
 .input,
 textarea.input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255,255,255,.05);
   color: var(--text-light);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--radius);
@@ -83,9 +76,7 @@ textarea.input:focus {
   box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25);
 }
 .input::placeholder,
-textarea.input::placeholder {
-  color: rgba(232, 234, 237, 0.6);
-}
+textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
 
 /* === Grupo específico de Miembro (local) === */
 .form-group-miembro {

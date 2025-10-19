@@ -45,26 +45,23 @@ export default function EntityTableABMC({
         if (mounted) setLoading(false);
       }
     })();
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, [service]);
 
   const formFields = useMemo(
     () => schema.filter((f) => f.type !== "submit" && f.type !== "button"),
     [schema]
   );
-  const tableFields = useMemo(() => formFields.filter((f) => f.table !== false), [formFields]);
+  const tableFields = useMemo(
+    () => formFields.filter((f) => f.table !== false),
+    [formFields]
+  );
 
   const filtered = useMemo(() => {
     if (!q) return items;
     const t = q.toLowerCase();
     return items.filter((row) =>
-      formFields.some((f) =>
-        String(row?.[f.key] ?? "")
-          .toLowerCase()
-          .includes(t)
-      )
+      formFields.some((f) => String(row?.[f.key] ?? "").toLowerCase().includes(t))
     );
   }, [items, q, formFields]);
 
@@ -115,17 +112,11 @@ export default function EntityTableABMC({
       if (editing) {
         const updated = await service.update({ ...editing, ...data });
         setItems((p) => p.map((x) => (String(x.id) === String(updated.id) ? updated : x)));
-        await success({
-          title: "Actualizado correctamente",
-          text: `${capitalize(entityName)} guardado.`,
-        });
+        await success({ title: "Actualizado correctamente", text: `${capitalize(entityName)} guardado.` });
       } else {
         const created = await service.create(data);
         setItems((p) => [...p, created]);
-        await success({
-          title: "Creado correctamente",
-          text: `${capitalize(entityName)} guardado.`,
-        });
+        await success({ title: "Creado correctamente", text: `${capitalize(entityName)} guardado.` });
       }
       closeModal();
     } catch (e) {
@@ -148,10 +139,7 @@ export default function EntityTableABMC({
       setItems((prev) => prev.filter((x) => String(x.id) !== String(row.id)));
       await success({ title: "Eliminado correctamente" });
     } catch (e) {
-      await error({
-        title: "Error al eliminar",
-        text: e?.message || "No se pudo eliminar el registro.",
-      });
+      await error({ title: "Error al eliminar", text: e?.message || "No se pudo eliminar el registro." });
     }
   };
 
@@ -161,7 +149,6 @@ export default function EntityTableABMC({
         <div className="abmc-header">
           {showBackButton && <BackButton />}
           <h1 className="abmc-title">{title}</h1>
-          <hr className="divisor-amarillo" />
         </div>
 
         <div className="abmc-topbar">
@@ -259,13 +246,11 @@ export default function EntityTableABMC({
           entityName={entityName}
           schema={formFields}
           entity={editing}
-          onSave={handleSave} // <- el contenedor maneja las alertas
+          onSave={handleSave}   // <- el contenedor maneja las alertas
         />
       )}
     </main>
   );
 }
 
-function capitalize(s) {
-  return s ? s[0].toUpperCase() + s.slice(1) : "";
-}
+function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : ""; }
