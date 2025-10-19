@@ -1,6 +1,6 @@
 // src/services/areasService.js
 import axios from "axios";
-import localStorageApi from "./localStorageApi.js";
+import { localStorageApi } from "./localStorageApi.js";
 
 // 👉 Flag para elegir backend real o LocalStorage (por defecto: LocalStorage)
 const USE_API = import.meta?.env?.VITE_USE_API === "true";
@@ -68,5 +68,5 @@ const areasServiceLocal = localStorageApi(AREA_STORAGE_KEY, {
 // ===== Export único =====
 export const areasService = USE_API ? areasServiceApi : areasServiceLocal;
 
-// (Opcional, por si querés referenciarlos explícitamente en algún refactor futuro)
+// (Opcional)
 export { areasServiceApi, areasServiceLocal };

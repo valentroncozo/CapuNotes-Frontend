@@ -1,6 +1,6 @@
 // src/services/miembrosService.js
 import axios from "axios";
-import localStorageApi from "./localStorageApi.js";
+import { localStorageApi } from "./localStorageApi.js";
 
 // 👉 Flag para elegir backend real o LocalStorage (por defecto: LocalStorage)
 const USE_API = import.meta?.env?.VITE_USE_API === "true";
@@ -53,5 +53,5 @@ const miembrosServiceApi = {
 // ===== Export único =====
 export const miembrosService = USE_API ? miembrosServiceApi : miembrosServiceLocal;
 
-// (Opcional, por si querés referenciarlos explícitamente en algún refactor futuro)
+// (Opcional)
 export { miembrosServiceApi, miembrosServiceLocal };
