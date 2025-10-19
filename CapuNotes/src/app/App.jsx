@@ -17,6 +17,10 @@ import CandidatosCoordinadores from "@/components/pages/audiciones/candidatosCoo
 import ConfigurarCuestionario from "@/components/pages/audiciones/cuestionario.jsx";
 import HistorialAudiciones from "@/components/pages/audiciones/historial.jsx";
 
+// ➕ Páginas nuevas traídas de Francisco
+import Audicion from "@/components/pages/Audicion/index.jsx";
+import AudicionAgregar from "@/components/pages/Audicion/agregar.jsx";
+
 // 🔴 Import global de estilos (globals importa tokens, variable y buttons)
 import "@/styles/globals.css";
 
@@ -53,11 +57,17 @@ function AppRoutes() {
         <Route path="miembros/editar" element={<MiembrosEditar />} />
         <Route path="cuerdas" element={<Cuerdas />} />
         <Route path="areas" element={<Areas />} />
+
+        {/* Tu flujo actual de Audiciones */}
         <Route path="audiciones" element={<Audiciones />} />
         <Route path="candidatos" element={<Candidatos />} />
         <Route path="candidatos-coordinadores" element={<CandidatosCoordinadores />} />
         <Route path="configurar-cuestionario" element={<ConfigurarCuestionario />} />
         <Route path="historial-audiciones" element={<HistorialAudiciones />} />
+
+        {/* ➕ Rutas mínimas para lo de Francisco */}
+        <Route path="audicion" element={<Audicion />} />
+        <Route path="audicion/agregar" element={<AudicionAgregar />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/principal" replace />} />
