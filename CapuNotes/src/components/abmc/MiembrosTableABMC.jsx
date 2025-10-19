@@ -1,9 +1,8 @@
-// src/components/abmc/MiembrosTableABMC.jsx
 import { useState, useEffect } from "react";
 import BackButton from "../common/BackButton";
-import { Button } from "react-bootstrap";
+import { Button, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { PencilFill, XCircleFill } from "react-bootstrap-icons";
+import { PencilFill, XCircleFill, CheckCircleFill } from "react-bootstrap-icons";
 import Swal from "sweetalert2";
 import { miembrosService } from "@/services/miembrosService.js";
 import { cuerdasService } from "@/services/cuerdasService.js";
@@ -29,13 +28,25 @@ export default function MiembrosTableABMC({
         cuerdasService.list(),
       ]);
 
-      // Ordenar alfabéticamente por apellido y nombre
+
+      //verificar porque se ordena por apellido y esta el nombre primero RARI
+      // 🧩 Ordenar primero por activo (true arriba), luego alfabéticamente
       const ordenados = [...miembrosData].sort((a, b) => {
+        // Activos primero
+        if (a.activo && !b.activo) return -1;
+        if (!a.activo && b.activo) return 1;
+
+        // Dentro del mismo grupo (ambos activos o ambos inactivos), ordenar por apellido y nombre
         const apA = a.apellido?.toLowerCase() || "";
         const apB = b.apellido?.toLowerCase() || "";
-        if (apA !== apB) return apA.localeCompare(apB, "es", { sensitivity: "base" });
-        return (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" });
+        if (apA !== apB)
+          return apA.localeCompare(apB, "es", { sensitivity: "base" });
+
+        return (a.nombre || "").localeCompare(b.nombre || "", "es", {
+          sensitivity: "base",
+        });
       });
+
 
       setListaMiembros(ordenados);
       setCuerdas(cuerdasData);
@@ -63,38 +74,65 @@ export default function MiembrosTableABMC({
     return matchTexto && matchCuerda;
   });
 
-  // 🗑️ Eliminar miembro
-  const handleEliminar = async (miembro) => {
+  // 🟡 Cambiar estado (dar de baja / reactivar)
+  const handleCambiarEstado = async (miembro) => {
+    const activo = miembro.activo;
+    const accion = activo ? "dar de baja" : "reactivar";
+
     const res = await Swal.fire({
-      title: `¿Eliminar a ${miembro?.nombre || "miembro"}?`,
-      text: "Esta acción no se puede deshacer.",
+      title: `¿Desea ${accion} a ${miembro?.nombre || "miembro"}?`,
+      text: activo
+        ? "El miembro pasará a estado inactivo."
+        : "El miembro volverá a estar activo.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#ffc107",
       cancelButtonColor: "#6c757d",
-      confirmButtonText: "Sí, eliminar",
+      confirmButtonText: `Sí, ${accion}`,
       cancelButtonText: "Cancelar",
+      reverseButtons: true,
       background: "#11103a",
       color: "#E8EAED",
     });
+
     if (!res.isConfirmed) return;
 
     try {
-      await miembrosService.remove(
-        miembro.id?.nroDocumento,
-        miembro.id?.tipoDocumento
-      );
+      if (activo) {
+        await miembrosService.darDeBaja(
+          miembro.id?.nroDocumento,
+          miembro.id?.tipoDocumento
+        );
+      } else {
+        await miembrosService.reactivar(
+          miembro.id?.nroDocumento,
+          miembro.id?.tipoDocumento
+        );
+      }
+
       await load();
+
       Swal.fire({
-        title: "Eliminado",
         icon: "success",
-        timer: 1200,
-        showConfirmButton: false,
+        title: activo ? "Miembro dado de baja" : "Miembro reactivado",
+        text: `${miembro.nombre} ${miembro.apellido} ahora está ${activo ? "inactivo" : "activo"
+          }.`,
         background: "#11103a",
         color: "#E8EAED",
+        confirmButtonColor: "#ffc107",
+        timer: 1500,
+        showConfirmButton: false,
       });
     } catch (err) {
-      Swal.fire("Error", "No se pudo eliminar el miembro", "error");
+      console.error("❌ Error al cambiar estado:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "No se pudo cambiar el estado del miembro.",
+        background: "#11103a",
+        color: "#E8EAED",
+        confirmButtonColor: "#7c83ff",
+      });
     }
   };
 
@@ -145,7 +183,7 @@ export default function MiembrosTableABMC({
               <th>Nombre y Apellido</th>
               <th>Cuerda</th>
               <th>Área</th>
-              <th>Activo</th>
+              <th>Estado</th>
               <th style={{ textAlign: "center" }}>Acciones</th>
             </tr>
           </thead>
@@ -160,7 +198,14 @@ export default function MiembrosTableABMC({
                   <td>{`${m.nombre || "-"} ${m.apellido || ""}`}</td>
                   <td>{m.cuerda?.name || "-"}</td>
                   <td>{m.area?.nombre || "-"}</td>
-                  <td>{m.activo ? "Sí" : "No"}</td>
+                  <td>
+                    <Badge
+                      bg={m.activo ? "success" : "secondary"}
+                      style={{ fontSize: "0.9rem" }}
+                    >
+                      {m.activo ? "Activo" : "Inactivo"}
+                    </Badge>
+                  </td>
                   <td className="abmc-actions">
                     <Button
                       className="btn-accion"
@@ -173,12 +218,16 @@ export default function MiembrosTableABMC({
                       <PencilFill size={18} />
                     </Button>
                     <Button
-                      className="btn-accion eliminar"
-                      variant="danger"
-                      onClick={() => handleEliminar(m)}
-                      title="Eliminar"
+                      className="btn-accion"
+                      variant={m.activo ? "danger" : "success"}
+                      onClick={() => handleCambiarEstado(m)}
+                      title={m.activo ? "Dar de baja" : "Reactivar"}
                     >
-                      <XCircleFill size={18} />
+                      {m.activo ? (
+                        <XCircleFill size={18} />
+                      ) : (
+                        <CheckCircleFill size={18} />
+                      )}
                     </Button>
                   </td>
                 </tr>
@@ -196,4 +245,3 @@ export default function MiembrosTableABMC({
     </main>
   );
 }
-
