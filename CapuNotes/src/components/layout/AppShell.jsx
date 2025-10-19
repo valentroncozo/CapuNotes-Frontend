@@ -134,7 +134,6 @@ export default function AppShell({ onLogout }) {
         </div>
       </div>
 
-      {/* Overlay para cerrar al click fuera del drawer */}
       {open && (
         <div
           className="drawer-backdrop"
@@ -144,7 +143,6 @@ export default function AppShell({ onLogout }) {
         />
       )}
 
-      {/* separador para que el contenido no quede debajo del navbar fijo */}
       <div style={{ height: "56px" }} />
       <Outlet />
     </>
@@ -162,7 +160,6 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         Inicio
       </a>
 
-      {/* Acordeón reutilizable: Organización del Coro */}
       <AccordionMenu
         title="Organización del Coro"
         open={orgOpen}
@@ -182,14 +179,13 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         setOpen={setAudOpen}
         onNavigate={onNavigate}
         items={[
-          { label: "Audiciones", path: "/audiciones" },
+          { label: "Audiciones", path: "/audicion" },
           { label: "Candidatos", path: "/candidatos" },
           { label: "Configurar Cuestionario", path: "/configurar-cuestionario" },
           { label: "Historial de Audiciones", path: "/historial-audiciones" },
         ]}
       />
 
-      {/* Otros accesos directos existentes */}
       {MENU_ITEMS.map(([to, label]) => (
         <a
           key={to}
