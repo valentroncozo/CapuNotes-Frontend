@@ -1,5 +1,6 @@
 // src/components/pages/audiciones/candidatosCoord.jsx
 import { useEffect, useMemo, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
 import "@/styles/table.css";
@@ -21,8 +22,12 @@ import DisponibleIcon from "@/assets/icons/turno/DisponibleIcon.jsx";
 import TurnoEstadoModal from "./TurnoEstadoModal.jsx";
 
 export default function CandidatosCoordPage() {
+  const { audicionId } = useParams(); // <- /audiciones/:audicionId/coordinadores
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [rows, setRows] = useState([]);
   const [q, setQ] = useState("");
+  const [selectedDia, setSelectedDia] = useState(searchParams.get("dia") || "Viernes 14");
 
   const [sortBy, setSortBy] = useState(null); // 'hora' | 'estado' | 'apynom'
   const [sortDir, setSortDir] = useState("asc");
@@ -32,10 +37,18 @@ export default function CandidatosCoordPage() {
 
   useEffect(() => {
     (async () => {
+      // const data = await candidatosService.list({ audicionId, dia: selectedDia });
       const data = await candidatosService.list();
       setRows(data);
     })();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audicionId, selectedDia]);
+
+  useEffect(() => {
+    const dia = searchParams.get("dia");
+    if (dia && dia !== selectedDia) setSelectedDia(dia);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const nombreApynom = (r) => {
     const ape = (r.apellido || "").trim();
@@ -60,9 +73,10 @@ export default function CandidatosCoordPage() {
   };
 
   const filtered = useMemo(() => {
-    if (!q) return rows;
+    const base = rows; // si filtrás por backend, ya vendría filtrado por día
+    if (!q) return base;
     const t = q.toLowerCase();
-    return rows.filter((r) => {
+    return base.filter((r) => {
       const apynom = nombreApynom(r).toLowerCase();
       const cancion = String(r.cancion || "").toLowerCase();
       const estado = estadoCoordinador(r).toLowerCase();
@@ -75,9 +89,7 @@ export default function CandidatosCoordPage() {
     const dir = sortDir === "desc" ? -1 : 1;
     return [...filtered].sort((a, b) => {
       if (sortBy === "hora") return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
-      if (sortBy === "estado") {
-        return estadoCoordinador(a).localeCompare(estadoCoordinador(b)) * dir;
-      }
+      if (sortBy === "estado") return estadoCoordinador(a).localeCompare(estadoCoordinador(b)) * dir;
       if (sortBy === "apynom") {
         return nombreApynom(a).toLowerCase().localeCompare(nombreApynom(b).toLowerCase()) * dir;
       }
@@ -85,10 +97,7 @@ export default function CandidatosCoordPage() {
     });
   }, [filtered, sortBy, sortDir]);
 
-  const toggleSort = (key) => {
-    if (sortBy !== key) { setSortBy(key); setSortDir("asc"); }
-    else { setSortDir((d) => (d === "asc" ? "desc" : "asc")); }
-  };
+  const toggleSort = (key) => { if (sortBy !== key) { setSortBy(key); setSortDir("asc"); } else { setSortDir((d) => (d === "asc" ? "desc" : "asc")); } };
   const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
 
   const TurnoIcon = ({ estado }) => {
@@ -106,12 +115,22 @@ export default function CandidatosCoordPage() {
     setViewRow(r);
   };
 
+  const handleChangeDia = (e) => {
+    const nuevo = e.target.value;
+    setSelectedDia(nuevo);
+    const next = new URLSearchParams(searchParams);
+    if (nuevo) next.set("dia", nuevo);
+    else next.delete("dia");
+    setSearchParams(next);
+  };
+
   return (
     <main className="abmc-page">
       <div className="abmc-card">
         <div className="abmc-header">
           <BackButton />
           <h1 className="abmc-title">Candidatos (Coordinadores)</h1>
+          <p style={{margin: 0, opacity: .8}}>Audición ID: <code>{audicionId || '—'}</code></p>
         </div>
 
         <div className="abmc-topbar">
@@ -121,7 +140,7 @@ export default function CandidatosCoordPage() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-          <select className="abmc-input" defaultValue="Viernes 14">
+          <select className="abmc-input" value={selectedDia} onChange={handleChangeDia} aria-label="Día">
             <option>Viernes 14</option>
             <option>Sábado 15</option>
             <option>Domingo 16</option>
@@ -168,7 +187,6 @@ export default function CandidatosCoordPage() {
                   <td>{nombreApynom(r) || "—"}</td>
                   <td>{r.cancion || "—"}</td>
 
-                  {/* Ícono + botón fijo a la derecha (mismo patrón que evaluadores) */}
                   <td className="cell-right-action">
                     <TurnoIcon estado={key} />
                     <button
@@ -197,6 +215,10 @@ export default function CandidatosCoordPage() {
             })}
           </tbody>
         </table>
+
+        <p style={{ opacity: 0.7, marginTop: 10 }}>
+          Vista de <b>coordinadores</b> • Día: <b>{selectedDia}</b>
+        </p>
       </div>
 
       {viewRow && (

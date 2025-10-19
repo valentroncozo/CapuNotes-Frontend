@@ -37,11 +37,21 @@ button,
   color: inherit;
   font-family: var(--font-sans);
 }
-.btn-primary, .btn-warning, .btn {
+
+/* ⚠️ Importante: .btn base no pinta color por defecto */
+.btn {
+  background: transparent;
+  color: inherit;
+}
+
+/* Variantes con color (no tocar .btn "pelado") */
+.btn-primary,
+.btn-warning {
   background-color: var(--accent) !important;
   color: var(--text-dark) !important;
   box-shadow: var(--shadow);
 }
+
 .btn:hover { filter: brightness(1.05); } /* sin transform */
 
 /* FORMULARIOS base */

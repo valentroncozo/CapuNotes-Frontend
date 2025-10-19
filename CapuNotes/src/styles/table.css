@@ -7,9 +7,9 @@
   border-spacing: 0 12px;
 }
 
-/* Cabecera: #b3cdfa */
+/* Cabecera: usa token --card (antes #b3cdfa) */
 .abmc-thead th {
-  background: #b3cdfa;
+  background: var(--card);
   color: var(--text-dark);
   font-weight: 700;
   padding: 12px 14px;
@@ -21,7 +21,7 @@
 .abmc-thead th:focus,
 .abmc-thead th:focus-within,
 .abmc-thead th:active {
-  background: #b3cdfa !important;
+  background: var(--card) !important;
   color: var(--text-dark) !important;
 }
 

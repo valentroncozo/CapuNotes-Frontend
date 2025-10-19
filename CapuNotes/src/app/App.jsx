@@ -11,13 +11,17 @@ import Areas from "@/components/pages/areas/index.jsx";
 import Miembros from "@/components/pages/miembros/index.jsx";
 import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
-import Audiciones from "@/components/pages/audiciones/planificar.jsx";
+
+// Audiciones
+import AudicionesIndex from "@/components/pages/audiciones/index.jsx";
+import AudicionAgregar from "@/components/pages/audiciones/agregar.jsx";
+import AudicionesPlanificar from "@/components/pages/audiciones/planificar.jsx";
 import Candidatos from "@/components/pages/audiciones/candidatos.jsx";
 import CandidatosCoordinadores from "@/components/pages/audiciones/candidatosCoord.jsx";
 import ConfigurarCuestionario from "@/components/pages/audiciones/cuestionario.jsx";
 import HistorialAudiciones from "@/components/pages/audiciones/historial.jsx";
 
-// 🔴 Import global de estilos (globals importa tokens, variable y buttons)
+// Estilos globales
 import "@/styles/globals.css";
 
 function ProtectedRoute({ children }) {
@@ -27,7 +31,7 @@ function ProtectedRoute({ children }) {
 
 function AppRoutes() {
   const navigate = useNavigate();
-  const { isAuthenticated, user, login, logout } = useAuth();
+  const { user, login, logout } = useAuth();
 
   const handleLogin = (username) => {
     login(username);
@@ -53,9 +57,19 @@ function AppRoutes() {
         <Route path="miembros/editar" element={<MiembrosEditar />} />
         <Route path="cuerdas" element={<Cuerdas />} />
         <Route path="areas" element={<Areas />} />
-        <Route path="audiciones" element={<Audiciones />} />
-        <Route path="candidatos" element={<Candidatos />} />
-        <Route path="candidatos-coordinadores" element={<CandidatosCoordinadores />} />
+
+        {/* Audiciones */}
+        <Route path="audiciones" element={<AudicionesIndex />} />
+        <Route path="audiciones/agregar" element={<AudicionAgregar />} />
+        <Route path="audiciones/planificar" element={<AudicionesPlanificar />} />
+
+        {/* Cronogramas (antes “/audiciones/cronograma/:id”) */}
+        <Route path="audiciones/:audicionId/candidatos" element={<Candidatos />} />
+        <Route path="audiciones/:audicionId/coordinadores" element={<CandidatosCoordinadores />} />
+
+        <Route path="candidatos" element={<Candidatos />} /> {/* compat legacy */}
+        <Route path="candidatos-coordinadores" element={<CandidatosCoordinadores />} /> {/* compat legacy */}
+
         <Route path="configurar-cuestionario" element={<ConfigurarCuestionario />} />
         <Route path="historial-audiciones" element={<HistorialAudiciones />} />
       </Route>

@@ -48,7 +48,9 @@
   flex-wrap: wrap;
 }
 
-/* Botón Agregar */
+/* Helper de botón local (forma/padding). 
+   ✅ Recomendación: usar variantes globales .btn .btn-primary/.btn-secondary.
+   Mantengo .abmc-btn para compatibilidad en pantallas actuales. */
 .abmc-btn {
   border: none;
   border-radius: 12px;
@@ -58,6 +60,9 @@
   transition: .15s ease;
   font-family: var(--font-sans);
 }
+
+/* Alias compat: algunas vistas viejas usan .abmc-btn-primary.
+   Lo dejamos como equivalente visual a un primario. */
 .abmc-btn-primary {
   background: var(--accent);
   color: var(--text-dark);
