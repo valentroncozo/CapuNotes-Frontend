@@ -125,6 +125,7 @@ textarea.input:focus {
 textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
 
 .form-group-miembro {
+  width: 100%;
   padding: 2.5rem 0rem;
   display: flex;
   flex-direction: column;

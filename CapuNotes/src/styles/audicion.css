@@ -2,7 +2,7 @@
 .audicion-page {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   align-content: center;
   min-height: 100vh;
@@ -12,6 +12,7 @@
   font-family: var(--font-sans);
   gap: 1rem ;
 }
+
 
 
 .abmc-table-container {
@@ -51,10 +52,15 @@
 
   .content-footer .abmc-btn {
     min-width: inherit;
-    margin: .5rem 3rem;
+    margin: .5rem 2rem;
   }
   .content-footer {
     flex-direction: column;
+    gap: 0;
+  }
+  .audicion-footer {
+    align-items: center;
+    gap: 0rem;
   }
 
   .abmc-table-container {

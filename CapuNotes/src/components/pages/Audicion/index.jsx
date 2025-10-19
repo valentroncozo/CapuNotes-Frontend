@@ -7,7 +7,7 @@ import TableABMC from '../../common/table.jsx';
 import BackButton from '../../common/BackButton.jsx';
 import { useNavigate } from 'react-router-dom';
 
-const Audicion = ({ title ='Audicion'}) => {
+const Audicion = ({ title ='Audición'}) => {
 
   const headers = ['Día','Cantidad De Turnos','Turnos Disponibles','Acciones'];
   const URLCRONOGRAMA = 'audicion/cronograma';

@@ -1,0 +1,18 @@
+.horarios-inputs {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 4.5rem;
+    gap: 1rem;
+}
+
+.container-eliminar-turno {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+
+
+
