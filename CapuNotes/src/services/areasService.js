@@ -1,13 +1,20 @@
 // src/services/areasService.js
 import axios from "axios";
+import localStorageApi from "./localStorageApi.js";
 
+// 👉 Flag para elegir backend real o LocalStorage (por defecto: LocalStorage)
+const USE_API = import.meta?.env?.VITE_USE_API === "true";
+
+// Endpoints y claves de storage
 const API_URL = "/api/areas";
+const AREA_STORAGE_KEY = "areas";
 
-export const areasService = {
+// ===== Implementación API (axios) =====
+const areasServiceApi = {
   // Obtener todas las áreas
   list: async () => {
     const res = await axios.get(API_URL);
-    console.log("📡 Datos recibidos del backend:", res.data);
+    // Normalizamos a tu shape {id, nombre, descripcion}
     return res.data.map((a) => ({
       id: a.id,
       nombre: a.name,
@@ -31,7 +38,6 @@ export const areasService = {
 
   // Editar área existente
   update: async (data) => {
-    // data debe incluir id, nombre, descripcion
     const payload = {
       name: data.nombre,
       description: data.descripcion,
@@ -50,10 +56,8 @@ export const areasService = {
   },
 };
 
-
-
-// ===== Implementación actual (LocalStorage) con validación de duplicados =====
-export const areasService = localStorageApi(AREA_STORAGE_KEY, {
+// ===== Implementación LocalStorage (con validación de duplicados) =====
+const areasServiceLocal = localStorageApi(AREA_STORAGE_KEY, {
   uniqueBy: "nombre",
   messages: {
     createDuplicate: "Ya existe un área con ese nombre.",
@@ -61,3 +65,8 @@ export const areasService = localStorageApi(AREA_STORAGE_KEY, {
   },
 });
 
+// ===== Export único =====
+export const areasService = USE_API ? areasServiceApi : areasServiceLocal;
+
+// (Opcional, por si querés referenciarlos explícitamente en algún refactor futuro)
+export { areasServiceApi, areasServiceLocal };
