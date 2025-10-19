@@ -9,31 +9,30 @@ import { cuerdasService } from "@/services/cuerdasService.js";
 import { areasService } from "@/services/areasService.js";
 import { miembrosService } from "@/services/miembrosService.js";
 
-
 export default function MiembrosAgregar({ title = "Registro de miembro" }) {
+  const navigate = useNavigate();
+
   const empty = {
     nombre: "",
     apellido: "",
     tipoDocumento: "",
     numeroDocumento: "",
     fechaNacimiento: "",
-    correo: "",
     telefono: "",
-    provincia: "",
+    correo: "",
     carreraProfesion: "",
     lugarOrigen: "",
     instrumentoMusical: "",
     cuerda: "",
     area: "",
-    estado: "Activo",
   };
 
   const [miembro, setMiembro] = useState(empty);
+  const [errores, setErrores] = useState({});
   const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
   const [areasDisponibles, setAreasDisponibles] = useState([]);
-  const navigate = useNavigate();
 
-  // 🔹 Cargar cuerdas y áreas desde el backend
+  // 🔹 Cargar cuerdas y áreas
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -57,29 +56,48 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
     fetchData();
   }, []);
 
-  // 🔹 Actualizar estado del formulario
+  // 🔹 Manejar cambios
   const handleChange = (e) => {
     const { name, value } = e.target;
     setMiembro((prev) => ({ ...prev, [name]: value }));
+    setErrores((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  // 🔹 Validación antes de enviar
+  const validarCampos = () => {
+    const camposRequeridos = [
+      "nombre",
+      "apellido",
+      "tipoDocumento",
+      "numeroDocumento",
+      "cuerda",
+    ];
+    const nuevosErrores = {};
+    camposRequeridos.forEach((campo) => {
+      if (!miembro[campo] || String(miembro[campo]).trim() === "") {
+        nuevosErrores[campo] = "Campo obligatorio";
+      }
+    });
+    setErrores(nuevosErrores);
+    return Object.keys(nuevosErrores).length === 0;
   };
 
   // 🔹 Enviar datos al backend
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!miembro.nombre || !miembro.cuerda) {
-      await Swal.fire({
+    if (!validarCampos()) {
+      Swal.fire({
         icon: "warning",
-        title: "Campos obligatorios",
-        text: "Por favor completá al menos Nombre y Cuerda.",
+        title: "Campos incompletos",
+        text: "Por favor completá todos los campos obligatorios marcados en amarillo.",
         background: "#11103a",
         color: "#E8EAED",
+        confirmButtonColor: "#7c83ff",
       });
       return;
     }
 
     try {
-      // Construimos el JSON que tu backend espera:
       const payload = {
         id: {
           nroDocumento: miembro.numeroDocumento,
@@ -89,25 +107,21 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
         apellido: miembro.apellido,
         fechaNacimiento: miembro.fechaNacimiento || null,
         nroTelefono: miembro.telefono || null,
-        correo: miembro.correo,
+        correo: miembro.correo || null,
         carreraProfesion: miembro.carreraProfesion || null,
-        lugarOrigen: miembro.lugarOrigen || miembro.provincia || null,
+        lugarOrigen: miembro.lugarOrigen || null,
         instrumentoMusical: miembro.instrumentoMusical || null,
-        activo: miembro.estado === "Activo",
-        cuerda: {
-          id: parseInt(miembro.cuerda),
-        },
-        area: {
-          id: parseInt(miembro.area),
-        },
+        activo: true,
+        cuerda: { id: parseInt(miembro.cuerda) },
+        area: miembro.area ? { id: parseInt(miembro.area) } : null,
       };
 
       await miembrosService.create(payload);
 
-      await Swal.fire({
+      Swal.fire({
         icon: "success",
         title: "Miembro registrado",
-        text: `Se registró ${miembro.nombre} exitosamente.`,
+        text: `Se registró ${miembro.nombre} correctamente.`,
         timer: 1600,
         showConfirmButton: false,
         background: "#11103a",
@@ -134,138 +148,237 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
         <div className="abmc-header">
           <BackButton />
           <h1 className="abmc-title">{title}</h1>
+          <p className="aviso-obligatorios">Los campos marcados con <span className="required">*</span> son obligatorios.</p>
         </div>
 
         <Form onSubmit={handleSubmit} className="abmc-topbar">
           {/* Nombre */}
           <Form.Group className="form-group-miembro">
-            <label>Nombre</label>
+            <label>
+              Nombre <span className="required">*</span>
+            </label>
             <Form.Control
               type="text"
               name="nombre"
               placeholder="Ej: Juan"
               value={miembro.nombre}
               onChange={handleChange}
-              className="abmc-input"
+              className={`abmc-input ${errores.nombre ? "error" : ""}`}
             />
           </Form.Group>
 
           {/* Apellido */}
           <Form.Group className="form-group-miembro">
-            <label>Apellido</label>
+            <label>
+              Apellido <span className="required">*</span>
+            </label>
             <Form.Control
               type="text"
               name="apellido"
               placeholder="Ej: Pérez"
               value={miembro.apellido}
               onChange={handleChange}
-              className="abmc-input"
+              className={`abmc-input ${errores.apellido ? "error" : ""}`}
             />
           </Form.Group>
 
-          {/* Tipo de documento */}
-          <Form.Group className="form-group-miembro">
-            <label>Tipo de Documento</label>
-            <Form.Select
-              name="tipoDocumento"
-              value={miembro.tipoDocumento}
-              onChange={handleChange}
-              className="abmc-select"
-            >
-              <option value="">Tipo de documento</option>
-              <option value="DNI">DNI</option>
-              <option value="Pasaporte">Pasaporte</option>
-              <option value="Libreta Cívica">Libreta Cívica</option>
-            </Form.Select>
-          </Form.Group>
+          {/* Tipo y número documento */}
+          <div className="form-row-miembros">
+            <div className="mitad">
+              <label>
+                Tipo de Documento <span className="required">*</span>
+              </label>
+              <Form.Select
+                name="tipoDocumento"
+                value={miembro.tipoDocumento}
+                onChange={handleChange}
+                className={`abmc-select visible-dropdown ${errores.tipoDocumento ? "error" : ""}`}>
 
-          {/* Nro documento */}
-          <Form.Group className="form-group-miembro">
-            <label>Número de Documento</label>
-            <Form.Control
-              type="text"
-              name="numeroDocumento"
-              placeholder="Ej: 40123456"
-              value={miembro.numeroDocumento}
-              onChange={handleChange}
-              className="abmc-input"
-            />
-          </Form.Group>
+                <option value="">Seleccionar tipo</option>
+                <option value="DNI">DNI</option>
+                <option value="Pasaporte">Pasaporte</option>
+                <option value="Libreta Cívica">Libreta Cívica</option>
+              </Form.Select>
+            </div>
 
-          {/* Cuerda */}
-          <Form.Group className="form-group-agregar">
-            <label>Cuerda</label>
-            <select
-              className="abmc-select"
-              name="cuerda"
-              value={miembro.cuerda}
-              onChange={handleChange}
-            >
-              <option value="">Seleccionar cuerda</option>
-              {cuerdasDisponibles.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nombre}
-                </option>
-              ))}
-            </select>
+            <div className="mitad">
+              <label>
+                Número de Documento <span className="required">*</span>
+              </label>
+              <Form.Control
+                type="text"
+                name="numeroDocumento"
+                placeholder="Ej: 40123456"
+                value={miembro.numeroDocumento}
+                onChange={handleChange}
+                className={`abmc-input ${errores.numeroDocumento ? "error" : ""}`}
+              />
+            </div>
+          </div>
 
-            <Button
-              variant="warning"
-              className="abmc-btn"
-              onClick={() => navigate("/cuerdas")}
-              title="Gestionar cuerdas"
-              type="button"
-            >
-              +
-            </Button>
-          </Form.Group>
+          {/* Fecha de nacimiento y lugar de origen */}
+          <div className="form-row-miembros">
+            <div className="mitad">
+              <label>Fecha de Nacimiento</label>
+              <Form.Control
+                type="date"
+                name="fechaNacimiento"
+                value={miembro.fechaNacimiento}
+                onChange={handleChange}
+                className="abmc-input"
+              />
+            </div>
 
-          {/* Área */}
-          <Form.Group className="form-group-agregar">
-            <label>Área</label>
-            <select
-              name="area"
-              className="abmc-select"
-              value={miembro.area}
-              onChange={handleChange}
-            >
-              <option value="">Seleccionar área</option>
-              {areasDisponibles.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.nombre}
-                </option>
-              ))}
-            </select>
+            <div className="mitad">
+              <label>Lugar de Origen</label>
+              <Form.Control
+                type="text"
+                name="lugarOrigen"
+                placeholder="Ej: Córdoba"
+                value={miembro.lugarOrigen}
+                onChange={handleChange}
+                className="abmc-input"
+              />
+            </div>
+          </div>
 
-            <Button
-              variant="warning"
-              className="abmc-btn"
-              onClick={() => navigate("/areas")}
-              title="Gestionar áreas"
-              type="button"
-            >
-              +
-            </Button>
-          </Form.Group>
+          {/* Teléfono y correo */}
+          <div className="form-row-miembros">
+            <div className="mitad">
+              <label>Teléfono</label>
+              <Form.Control
+                type="text"
+                name="telefono"
+                placeholder="Ej: 3512345678"
+                value={miembro.telefono}
+                onChange={handleChange}
+                className="abmc-input"
+              />
+            </div>
+
+            <div className="mitad">
+              <label>Correo</label>
+              <Form.Control
+                type="email"
+                name="correo"
+                placeholder="Ej: nombre@mail.com"
+                value={miembro.correo}
+                onChange={handleChange}
+                className="abmc-input"
+              />
+            </div>
+          </div>
+
+          {/* Profesión e instrumento */}
+          <div className="form-row-miembros">
+            <div className="mitad">
+              <label>Carrera / Profesión</label>
+              <Form.Control
+                type="text"
+                name="carreraProfesion"
+                placeholder="Ej: Estudiante de música"
+                value={miembro.carreraProfesion}
+                onChange={handleChange}
+                className="abmc-input"
+              />
+            </div>
+
+            <div className="mitad">
+              <label>Instrumento Musical</label>
+              <Form.Control
+                type="text"
+                name="instrumentoMusical"
+                placeholder="Ej: Guitarra"
+                value={miembro.instrumentoMusical}
+                onChange={handleChange}
+                className="abmc-input"
+              />
+            </div>
+          </div>
+
+
+          {/* Cuerda y Área */}
+          <div className="form-row-miembros">
+            <div className="mitad">
+              <label>
+                Cuerda <span className="required">*</span>
+              </label>
+              <div className="input-with-button">
+                <select
+                  name="cuerda"
+                  value={miembro.cuerda}
+                  onChange={handleChange}
+                  className={`abmc-select ${errores.cuerda ? "error" : ""}`}
+                >
+                  <option value="">Seleccionar cuerda</option>
+                  {cuerdasDisponibles.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.nombre || c.name || c.descripcion || "—"}
+                    </option>
+                  ))}
+                </select>
+
+                <Button
+                  variant="warning"
+                  className="abmc-btn"
+                  onClick={() => navigate("/cuerdas")}
+                  title="Gestionar cuerdas"
+                  type="button"
+                >
+                  +
+                </Button>
+              </div>
+            </div>
+
+
+            <div className="mitad">
+              <label>Área</label>
+              <div className="input-with-button">
+                <Form.Select
+                  name="area"
+                  value={miembro.area}
+                  onChange={handleChange}
+                  className="abmc-select"
+                >
+                  <option value="">Seleccionar área</option>
+                  {areasDisponibles.map((a) => (
+                    <option key={a.id} value={a.id}>
+                      {a.nombre}
+                    </option>
+                  ))}
+                </Form.Select>
+
+                <Button
+                  variant="warning"
+                  className="abmc-btn"
+                  onClick={() => navigate("/areas")}
+                  title="Gestionar áreas"
+                  type="button"
+                >
+                  +
+                </Button>
+              </div>
+            </div>
+          </div>
 
           {/* Acciones */}
-          <Form.Group className="form-group-agregar-acciones">
+          <div className="acciones-form-miembro derecha">
             <button
               type="button"
-              className="abmc-btn abmc-btn-secondary btn btn-secondary"
+              className="abmc-btn abmc-btn-secondary"
               onClick={() => navigate("/miembros")}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="abmc-btn abmc-btn-primary btn btn-primary"
+              className="abmc-btn abmc-btn-primary"
             >
-              Agregar
+              Agregar miembro
             </button>
-          </Form.Group>
+          </div>
         </Form>
-      </div>
-    </main>
+      </div >
+    </main >
   );
 }

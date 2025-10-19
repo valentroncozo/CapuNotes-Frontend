@@ -7,11 +7,7 @@ export const cuerdasService = {
   list: async () => {
     const res = await axios.get(API_URL);
     console.log("📡 Datos recibidos de CUERDAS:", res.data);
-    return res.data.map((c) => ({
-      id: c.id,
-      nombre: c.name || c.nombre || "(Sin nombre)",
-      descripcion: c.description || c.descripcion || "",
-    }));
+    return res.data;
   },
 
   getById: async (id) => {
