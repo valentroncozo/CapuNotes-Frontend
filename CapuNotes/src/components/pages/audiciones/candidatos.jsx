@@ -1,13 +1,11 @@
 // src/components/pages/audiciones/candidatos.jsx
 import { useEffect, useMemo, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
 import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
 import "@/styles/table.css";
 import "@/styles/forms.css";
 import "@/styles/icons.css";
 import { PencilFill } from "react-bootstrap-icons";
-import infoIcon from "/info.png";
 
 import { candidatosService } from "@/services/candidatosService.js";
 import { estadoLabel } from "@/constants/candidatos.js";
@@ -23,13 +21,12 @@ import RechazadoIcon from "@/assets/icons/resultado/RechazadoIcon.jsx";
 import AusenteIcon from "@/assets/icons/resultado/AusenteIcon.jsx";
 import SinResultadoIcon from "@/assets/icons/resultado/SinResultadoIcon.jsx";
 
-export default function CandidatosPage() {
-  const { audicionId } = useParams(); // <- /audiciones/:audicionId/candidatos
-  const [searchParams, setSearchParams] = useSearchParams();
+/* ⬇️ Ícono local (reemplaza /info.png) */
+import InfoIcon from "@/assets/InfoIcon.jsx";
 
+export default function CandidatosPage() {
   const [rows, setRows] = useState([]);
   const [q, setQ] = useState("");
-  const [selectedDia, setSelectedDia] = useState(searchParams.get("dia") || "Viernes 14");
 
   const [sortBy, setSortBy] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
@@ -39,34 +36,22 @@ export default function CandidatosPage() {
 
   useEffect(() => {
     (async () => {
-      // Si el service soporta filtros, pasalos:
-      // const data = await candidatosService.list({ audicionId, dia: selectedDia });
       const data = await candidatosService.list();
       setRows(data);
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [audicionId, selectedDia]);
-
-  // Sincronizar estado local si viene un cambio externo en la URL
-  useEffect(() => {
-    const dia = searchParams.get("dia");
-    if (dia && dia !== selectedDia) setSelectedDia(dia);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, []);
 
   const nombreApynom = (r) => {
     const ape = (r.apellido || "").trim();
     const nom = (r.nombre || "").trim();
     if (ape && nom) return `${ape}, ${nom}`;
     return nom || ape || r.nombre || r.nombreLabel || "";
-    };
+  };
 
   const filtered = useMemo(() => {
-    // si tu backend filtra por día, esto quedaría innecesario
-    const base = rows;
-    if (!q) return base;
+    if (!q) return rows;
     const t = q.toLowerCase();
-    return base.filter((r) => {
+    return rows.filter((r) => {
       const ape = String(r.apellido || "").toLowerCase();
       const nom = String(r.nombre || "").toLowerCase();
       const apynom = `${ape}, ${nom}`.trim();
@@ -132,22 +117,12 @@ export default function CandidatosPage() {
     );
   };
 
-  const handleChangeDia = (e) => {
-    const nuevo = e.target.value;
-    setSelectedDia(nuevo);
-    const next = new URLSearchParams(searchParams);
-    if (nuevo) next.set("dia", nuevo);
-    else next.delete("dia");
-    setSearchParams(next);
-  };
-
   return (
     <main className="abmc-page">
       <div className="abmc-card">
         <div className="abmc-header">
           <BackButton />
           <h1 className="abmc-title">Candidatos</h1>
-          <p style={{margin: 0, opacity: .8}}>Audición ID: <code>{audicionId || '—'}</code></p>
         </div>
 
         <div className="abmc-topbar">
@@ -157,7 +132,7 @@ export default function CandidatosPage() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-          <select className="abmc-input" value={selectedDia} onChange={handleChangeDia} aria-label="Día">
+          <select className="abmc-input" defaultValue="Viernes 14">
             <option>Viernes 14</option>
             <option>Sábado 15</option>
             <option>Domingo 16</option>
@@ -191,7 +166,9 @@ export default function CandidatosPage() {
                 </button>
               </th>
 
-              <th><span className="th-label">Canción</span></th>
+              <th>
+                <span className="th-label">Canción</span>
+              </th>
 
               <th className={thClass("resultado")}>
                 <span className="th-label">Resultado</span>
@@ -218,6 +195,7 @@ export default function CandidatosPage() {
                 <td>{nombreApynom(r)}</td>
                 <td>{r.cancion}</td>
 
+                {/* Ícono de resultado + botón fijo a la derecha */}
                 <td className="cell-right-action">
                   <ResultadoIcon estado={r.resultado?.estado} />
                   <button
@@ -239,7 +217,7 @@ export default function CandidatosPage() {
                     aria-label="Ver inscripción"
                     onClick={() => setViewRow(r)}
                   >
-                    <img src={infoIcon} alt="Info" style={{ width: 18, height: 18 }} />
+                    <InfoIcon size={18} />
                   </button>
                 </td>
               </tr>
@@ -248,7 +226,8 @@ export default function CandidatosPage() {
         </table>
 
         <p style={{ opacity: 0.7, marginTop: 10 }}>
-          Vista de <b>evaluadores</b> • Día: <b>{selectedDia}</b>
+          Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i> y ajustar la{" "}
+          <i>Cuerda</i> de la inscripción.
         </p>
       </div>
 
