@@ -32,7 +32,7 @@
 .abmc-row:hover { background: var(--table-row-hover); }
 
 .abmc-row td:first-child,
-.abmc-row td:last-child { border-radius: 0 !important; }
+.abmc-row td:last-child { border-radius: 0 !important;}
 
 /* Acciones agrupadas */
 .abmc-actions { display: flex; gap: 8px; justify-content: center; }

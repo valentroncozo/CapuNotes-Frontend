@@ -29,13 +29,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 18px;
-  border-bottom: 2px solid var(--accent);
+  border-bottom: 1px solid var(--accent) ;
 }
 
 .pop-title {
   margin: 0;
   font-weight: 700;
   font-size: 1.1rem;
+  position: relative;
+  top: 1px; /* levanta visualmente el texto */
 }
 
 .icon-btn {

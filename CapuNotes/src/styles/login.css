@@ -147,7 +147,7 @@ input[type="password"]::-webkit-password-toggle-button { display: none !importan
 .menssaje-error-login{ color: var(--accent); font-size: .9rem; padding-left: clamp(0px, 1.5vw, 1rem); font-weight: 500; margin: 0; align-self: start; }
 
 /* Botón */
-.custom-input-group .button-login{
+.custom-input-group .button-login {
   width: 30%;
   padding: clamp(0px, .5rem, .5rem);
   margin: 0; min-width: 120px;

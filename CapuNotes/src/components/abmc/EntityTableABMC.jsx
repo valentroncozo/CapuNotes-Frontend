@@ -149,6 +149,7 @@ export default function EntityTableABMC({
         <div className="abmc-header">
           {showBackButton && <BackButton />}
           <h1 className="abmc-title">{title}</h1>
+          <hr className="divisor-amarillo" />
         </div>
 
         <div className="abmc-topbar">
@@ -249,6 +250,7 @@ export default function EntityTableABMC({
           onSave={handleSave}   // <- el contenedor maneja las alertas
         />
       )}
+
     </main>
   );
 }

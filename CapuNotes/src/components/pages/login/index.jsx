@@ -91,7 +91,7 @@ const handleSubmit = (e) => {
         </Form>
       </div>
 
-      <img src="/fondo.jpg" alt="fondo" className="img-fondo" />
+      <img src="/fondo.jpg" alt="Decorative background showing a musical or choir-related scene creating a welcoming atmosphere for the login page" className="img-fondo" />
     </main>
   );
 }
