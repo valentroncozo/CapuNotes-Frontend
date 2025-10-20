@@ -13,8 +13,6 @@ import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
 
 // Audiciones
-import AudicionesIndex from "@/components/pages/audiciones/index.jsx";
-import AudicionAgregar from "@/components/pages/audiciones/agregar.jsx";
 import AudicionesPlanificar from "@/components/pages/audiciones/planificar.jsx";
 import Candidatos from "@/components/pages/audiciones/candidatos.jsx";
 import CandidatosCoordinadores from "@/components/pages/audiciones/candidatosCoord.jsx";
@@ -59,8 +57,6 @@ function AppRoutes() {
         <Route path="areas" element={<Areas />} />
 
         {/* Audiciones */}
-        <Route path="audiciones" element={<AudicionesIndex />} />
-        <Route path="audiciones/agregar" element={<AudicionAgregar />} />
         <Route path="audiciones/planificar" element={<AudicionesPlanificar />} />
 
         {/* Cronogramas (antes “/audiciones/cronograma/:id”) */}
