@@ -4,11 +4,14 @@ import getDateRangeDates, { formatDDMMYYYY } from './components/utils/obtenerDia
 import BackButton from '../../common/BackButton';
 import TurnoSection from './components/TurnoSection';
 import { useState, useEffect } from 'react';
+import Swal from "sweetalert2";
+
 
 const AudicionAgregar = ({title="Agregar Audición"}) => {
     const [diaDesde,setDiaDesde]= useState ('');
     const [diaHasta,setDiaHasta]= useState ('');
     const [descripcion,setDescripcion]= useState ('');
+
     const [nombre,setNombre]= useState ('');
     const [ubicacion,setUbicacion]= useState ('');
     const [dias, setDias]= useState ([]);
@@ -120,6 +123,35 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
     };
 
     const handleGuardarBorrador = () => {
+        // validar que no haya franjas incompletas en data.dias
+        const validateFranjas = (dataObj) => {
+            if (!dataObj || !dataObj.dias) return { ok: true };
+            const diasObj = dataObj.dias;
+            for (const key of Object.keys(diasObj)) {
+                const lista = diasObj[key] || [];
+                for (let i = 0; i < lista.length; i++) {
+                    const f = lista[i] || {};
+                    if (!f.horaDesde || !f.horaHasta || !f.duracion) {
+                        return { ok: false, day: key, index: i, franja: f };
+                    }
+                }
+            }
+            return { ok: true };
+        };
+
+        const res = validateFranjas(data);
+        if (!res.ok) {
+            Swal.fire({
+            icon: "error",
+            title: "Error al cargar datos",
+            text:`Hay una franja incompleta en el día ${res.day} (franja #${res.index + 1}). Completá Hora Desde, Hora Hasta y Duración.`,
+            background: "#11103a",
+            color: "#E8EAED",
+            });
+            console.warn('Franjas incompletas detectadas:', res);
+            return;
+        }
+
         console.log('Datos guardados en estado data:', data);
         alert('Datos guardados en el estado');
     };
@@ -153,19 +185,6 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
                 </div>
                 <div className='content-inputs-date-audicion'>
                     <div className="form-group-miembro">
-                        <label htmlFor="nombre">Nombre</label>
-                        <input type="text" 
-                        id="nombre" 
-                        name="nombre" 
-                        className='abmc-input' 
-                        value={nombre}
-                        onChange={(e) => { 
-                            setNombre(e.target.value);
-                            setData(prev => ({ ...prev, nombre: e.target.value })); 
-                        }}
-                        required />
-                    </div>
-                    <div className="form-group-miembro">
                         <label htmlFor="descripcion">Descripción</label>
                         <input 
                             type="text"
@@ -177,7 +196,6 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
                                 setDescripcion(e.target.value);
                                 setData(prev => ({ ...prev, descripcion: e.target.value }));
                             }}
-                            required
                         />
                     </div>
 

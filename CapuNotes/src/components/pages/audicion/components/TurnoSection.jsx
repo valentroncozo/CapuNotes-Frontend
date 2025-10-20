@@ -40,6 +40,19 @@ const TurnoSection = ({ index, day, dias, setDias, data = { dias: {} }, setData 
     }, [franjas, key, setData]);
 
     const agregarFranja = () => {
+        // validar que no haya franjas incompletas antes de agregar
+        const incomplete = (franjas || []).some(f => !f || !f.horaDesde || !f.horaHasta || !f.duracion);
+        if (incomplete) {
+             Swal.fire({
+                      icon: "error",
+                      title: "Error al cargar datos",
+                      text: "Completá todos los campos de la franja actual antes de agregar otra.",
+                      background: "#11103a",
+                      color: "#E8EAED",
+                    });
+            return;
+        }
+
         setFranjas(prev => [...prev, { horaDesde: '', horaHasta: '', duracion: '' }]);
     };
 
@@ -63,7 +76,7 @@ const TurnoSection = ({ index, day, dias, setDias, data = { dias: {} }, setData 
                 <DayTitle title={day} />
             </div>
 
-            <div className="content-horarios">
+            <form className="content-horarios">
                 {franjas.map((f, i) => (
                     <HorarioInputs key={i} index={i} value={f} onChange={actualizarFranja} onRemove={eliminarFranja} />
                 ))}
@@ -71,7 +84,7 @@ const TurnoSection = ({ index, day, dias, setDias, data = { dias: {} }, setData 
                 <button type="button" className="abmc-btn btn-primary" onClick={agregarFranja}>
                     Agregar franja Horaria
                 </button>
-            </div>
+            </form>
         </div>
     );
 };
