@@ -91,7 +91,7 @@ body.abmc-btn-primary:hover { filter: brightness(.95); }
   color: var(--card) !important;
   border: 2px solid var(--card) !important;
 }
-.btn-secondary:hover { background: rgba(179, 205, 250, 0.1); }
+.btn-secondary:hover { background-color: var(--accent) ;  border:none; color: var(--text-dark); }
 
 /* Form grid */
 .form-grid { display: grid; gap: 16px; }
