@@ -8,6 +8,8 @@ import { useState } from 'react';
 const AudicionAgregar = ({title="Agregar Audición"}) => {
     const [diaDesde,setDiaDesde]= useState ('');
     const [diaHasta,setDiaHasta]= useState ('');
+    const [descripcion,setDescripcion]= useState ('');
+    const [nombre,setNombre]= useState ('');
     const [ubicacion,setUbicacion]= useState ('');
     const [dias, setDias]= useState ([]);
 
@@ -131,6 +133,42 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
                     }}
                     required />
                 </div>
+                <div className='content-inputs-date-audicion'>
+                    <div className="form-group-miembro">
+                        <label htmlFor="nombre">Nombre</label>
+                        <input type="text" 
+                        id="nombre" 
+                        name="nombre" 
+                        className='abmc-input' 
+                        value={nombre}
+                        onChange={(e) => { 
+                            setNombre(e.target.value);
+                            setData(prev => ({ ...prev, nombre: e.target.value })); 
+                        }}
+                        required />
+                    </div>
+                    <div className="form-group-miembro">
+                        <label htmlFor="descripcion">Descripción</label>
+                        <input 
+                            type="text"
+                            id="descripcion"
+                            name="descripcion"
+                            className='abmc-input'
+                            value={descripcion}
+                            onChange={(e) => {
+                                setDescripcion(e.target.value);
+                                setData(prev => ({ ...prev, descripcion: e.target.value }));
+                            }}
+                            required
+                        />
+                    </div>
+
+
+
+
+                </div>
+
+
 
                 <div className="content-inputs-date-audicion">
                     <div className='inputs-date-audicion'> 
@@ -151,6 +189,7 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
                             required 
                         />
                     </div>
+                    
                     <div className='inputs-date-audicion'>
                         <label htmlFor="fechaHasta">Fecha Hasta</label>
                         <input 

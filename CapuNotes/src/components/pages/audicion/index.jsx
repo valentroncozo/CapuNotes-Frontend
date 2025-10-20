@@ -28,7 +28,7 @@ const Audicion = ({ title ='Audición'}) => {
     title: 'Ver Cronograma',
     className: 'abmc-btn btn-primary',
     label: 'Ver Cronograma',
-    onClick:(d) => { navigate(`audiciones/cronograma/${d.id}?dia=${d.dia}`); }
+    onClick:(d) => { navigate(`${URLCRONOGRAMA}/${d.id}?dia=${d.dia}`); }
   }];
 
   const handleFilterChange = (e) => {
