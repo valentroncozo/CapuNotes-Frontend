@@ -1,9 +1,11 @@
 // src/components/pages/audiciones/index.jsx
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import TableABMC from '@/components/common/table.jsx';
 import BackButton from '@/components/common/BackButton.jsx';
+
+import { audicionesService } from '@/services/audicionesService.js';
 
 import '@/styles/abmc.css';
 import '@/styles/table.css';
@@ -14,15 +16,21 @@ export default function AudicionesIndex({ title = 'Audiciones' }) {
 
   const headers = ['Día', 'Cantidad de turnos', 'Turnos disponibles', 'Acciones'];
 
-  // Datos mock para el primer armado visual
-  const [data] = useState([
-    { id: 1, dia: 'Viernes 14', cantidadTurnos: 10, turnosDisponibles: 5 },
-    { id: 2, dia: 'Sábado 15',  cantidadTurnos:  8, turnosDisponibles: 3 },
-    { id: 3, dia: 'Domingo 16', cantidadTurnos: 12, turnosDisponibles: 7 },
-  ]);
-
-  const [filteredData, setFilteredData] = useState(data);
+  const [data, setData] = useState([]);
   const [filtroDia, setFiltroDia] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      const a = await audicionesService.listAudiciones();
+      setData(a);
+    })();
+  }, []);
+
+  const filteredData = useMemo(() => {
+    if (!filtroDia) return data;
+    const lower = filtroDia.toLowerCase();
+    return data.filter((item) => (item.dia || '').toLowerCase().includes(lower));
+  }, [data, filtroDia]);
 
   const actions = [
     {
@@ -43,19 +51,6 @@ export default function AudicionesIndex({ title = 'Audiciones' }) {
     },
   ];
 
-  const handleFilterChange = (e) => {
-    const value = e.target.value;
-    setFiltroDia(value);
-
-    if (!value) {
-      setFilteredData(data);
-      return;
-    }
-    const lower = value.toLowerCase();
-    const filtered = data.filter((item) => (item.dia || '').toLowerCase().includes(lower));
-    setFilteredData(filtered);
-  };
-
   return (
     <main className="abmc-page">
       <div className="abmc-card">
@@ -70,7 +65,7 @@ export default function AudicionesIndex({ title = 'Audiciones' }) {
             type="text"
             placeholder="Filtrar por día…"
             value={filtroDia}
-            onChange={handleFilterChange}
+            onChange={(e) => setFiltroDia(e.target.value)}
             className="abmc-input"
             aria-label="Filtrar por día"
           />

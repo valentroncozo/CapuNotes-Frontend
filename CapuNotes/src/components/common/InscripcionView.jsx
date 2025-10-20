@@ -176,11 +176,7 @@ export default function InscripcionView({
           </label>
         </div>
 
-        <div style={{ textAlign: "center", marginTop: "1rem" }}>
-          <button className="btn btn-primary" style={{ width: "100%" }}>
-            Inscribirme
-          </button>
-        </div>
+        {/* Sin botón "Inscribirme" en esta vista */}
       </div>
     </Modal>
   );

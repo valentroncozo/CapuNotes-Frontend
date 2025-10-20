@@ -1,5 +1,6 @@
 // src/components/pages/audiciones/candidatos.jsx
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
 import "@/styles/table.css";
@@ -8,6 +9,7 @@ import "@/styles/icons.css";
 import { PencilFill } from "react-bootstrap-icons";
 
 import { candidatosService } from "@/services/candidatosService.js";
+import { audicionesService } from "@/services/audicionesService.js";
 import { estadoLabel } from "@/constants/candidatos.js";
 import { horaToMinutes } from "@/components/common/datetime.js";
 
@@ -21,12 +23,14 @@ import RechazadoIcon from "@/assets/icons/resultado/RechazadoIcon.jsx";
 import AusenteIcon from "@/assets/icons/resultado/AusenteIcon.jsx";
 import SinResultadoIcon from "@/assets/icons/resultado/SinResultadoIcon.jsx";
 
-/* ⬇️ Ícono local (reemplaza /info.png) */
+/* Ícono local */
 import InfoIcon from "@/assets/InfoIcon.jsx";
 
 export default function CandidatosPage() {
   const [rows, setRows] = useState([]);
   const [q, setQ] = useState("");
+  const [dias, setDias] = useState([]);
+  const [diaSel, setDiaSel] = useState("-");
 
   const [sortBy, setSortBy] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
@@ -34,12 +38,21 @@ export default function CandidatosPage() {
   const [editRow, setEditRow] = useState(null);
   const [viewRow, setViewRow] = useState(null);
 
+  const [sp] = useSearchParams();
+
   useEffect(() => {
     (async () => {
-      const data = await candidatosService.list();
-      setRows(data);
+      const [cd, ds] = await Promise.all([
+        candidatosService.list(),
+        audicionesService.listDias(),
+      ]);
+      setRows(cd);
+      setDias(ds);
+      const qp = sp.get("dia");
+      if (qp && ds.includes(qp)) setDiaSel(qp);
+      else setDiaSel("-");
     })();
-  }, []);
+  }, [sp]);
 
   const nombreApynom = (r) => {
     const ape = (r.apellido || "").trim();
@@ -48,7 +61,7 @@ export default function CandidatosPage() {
     return nom || ape || r.nombre || r.nombreLabel || "";
   };
 
-  const filtered = useMemo(() => {
+  const filteredByText = useMemo(() => {
     if (!q) return rows;
     const t = q.toLowerCase();
     return rows.filter((r) => {
@@ -59,6 +72,13 @@ export default function CandidatosPage() {
       return ape.includes(t) || nom.includes(t) || apynom.includes(t) || label.includes(t);
     });
   }, [rows, q]);
+
+  const filtered = useMemo(() => {
+    if (diaSel === "-") return filteredByText;
+    const getDia = (r) =>
+      String(r?.inscripcion?.diaAudicion || r?.dia || r?.fechaAudicion || "").trim();
+    return filteredByText.filter((r) => getDia(r) === diaSel);
+  }, [filteredByText, diaSel]);
 
   const sorted = useMemo(() => {
     if (!sortBy) return filtered;
@@ -80,41 +100,20 @@ export default function CandidatosPage() {
   }, [filtered, sortBy, sortDir]);
 
   const toggleSort = (key) => {
-    if (sortBy !== key) {
-      setSortBy(key);
-      setSortDir("asc");
-    } else {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    }
+    if (sortBy !== key) { setSortBy(key); setSortDir("asc"); }
+    else { setSortDir((d) => (d === "asc" ? "desc" : "asc")); }
   };
-  const thClass = (key) =>
-    sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable";
+  const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
 
   const ResultadoIcon = ({ estado }) => {
     const e = String(estado || "sin").toLowerCase();
     if (e === "aceptado" || e === "aceptada" || e === "ok")
-      return (
-        <span className="icon-estado icon-estado--ok icon-md" title="Aceptado">
-          <AceptadoIcon />
-        </span>
-      );
+      return <span className="icon-estado icon-estado--ok icon-md" title="Aceptado"><AceptadoIcon /></span>;
     if (e === "rechazado" || e === "rechazada" || e === "bad")
-      return (
-        <span className="icon-estado icon-estado--bad icon-md" title="Rechazado">
-          <RechazadoIcon />
-        </span>
-      );
+      return <span className="icon-estado icon-estado--bad icon-md" title="Rechazado"><RechazadoIcon /></span>;
     if (e === "ausente" || e === "pend")
-      return (
-        <span className="icon-estado icon-estado--pend icon-md" title="Ausente">
-          <AusenteIcon />
-        </span>
-      );
-    return (
-      <span className="icon-estado icon-estado--sin icon-md" title="Sin resultado">
-        <SinResultadoIcon />
-      </span>
-    );
+      return <span className="icon-estado icon-estado--pend icon-md" title="Ausente"><AusenteIcon /></span>;
+    return <span className="icon-estado icon-estado--sin icon-md" title="Sin resultado"><SinResultadoIcon /></span>;
   };
 
   return (
@@ -132,10 +131,15 @@ export default function CandidatosPage() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-          <select className="abmc-input" defaultValue="Viernes 14">
-            <option>Viernes 14</option>
-            <option>Sábado 15</option>
-            <option>Domingo 16</option>
+
+          <select
+            className="abmc-input"
+            value={diaSel}
+            onChange={(e) => setDiaSel(e.target.value)}
+            aria-label="Filtrar por día de audición"
+          >
+            <option value="-">-</option>
+            {dias.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
         </div>
 
@@ -144,47 +148,28 @@ export default function CandidatosPage() {
             <tr className="abmc-row">
               <th className={thClass("hora")}>
                 <span className="th-label">Hora</span>
-                <button
-                  type="button"
-                  className="th-caret-btn"
-                  onClick={() => toggleSort("hora")}
-                  aria-label="Ordenar por Hora"
-                >
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("hora")} aria-label="Ordenar por Hora">
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
 
               <th className={thClass("apynom")}>
                 <span className="th-label">Apellido, Nombre</span>
-                <button
-                  type="button"
-                  className="th-caret-btn"
-                  onClick={() => toggleSort("apynom")}
-                  aria-label="Ordenar por Apellido, Nombre"
-                >
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("apynom")} aria-label="Ordenar por Apellido, Nombre">
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
 
-              <th>
-                <span className="th-label">Canción</span>
-              </th>
+              <th><span className="th-label">Canción</span></th>
 
               <th className={thClass("resultado")}>
                 <span className="th-label">Resultado</span>
-                <button
-                  type="button"
-                  className="th-caret-btn"
-                  onClick={() => toggleSort("resultado")}
-                  aria-label="Ordenar por Resultado"
-                >
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("resultado")} aria-label="Ordenar por Resultado">
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
 
-              <th style={{ textAlign: "center" }}>
-                <span className="th-label">Inscripción</span>
-              </th>
+              <th style={{ textAlign: "center" }}><span className="th-label">Inscripción</span></th>
             </tr>
           </thead>
 
@@ -195,7 +180,6 @@ export default function CandidatosPage() {
                 <td>{nombreApynom(r)}</td>
                 <td>{r.cancion}</td>
 
-                {/* Ícono de resultado + botón fijo a la derecha */}
                 <td className="cell-right-action">
                   <ResultadoIcon estado={r.resultado?.estado} />
                   <button
@@ -226,8 +210,7 @@ export default function CandidatosPage() {
         </table>
 
         <p style={{ opacity: 0.7, marginTop: 10 }}>
-          Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i> y ajustar la{" "}
-          <i>Cuerda</i> de la inscripción.
+          Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i> y ajustar la <i>Cuerda</i>.
         </p>
       </div>
 
