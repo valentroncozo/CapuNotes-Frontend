@@ -1,0 +1,95 @@
+/* src/styles/buttons.css */
+/* === Botones globales (forma pill y variantes) === */
+
+.btn,
+button.btn,
+.pop-dialog .btn {
+  border: none;
+  border-radius: 999px; /* pill */
+  padding: 10px 18px;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  background: transparent;
+  color: inherit;
+  transition: filter .15s ease, background-color .15s ease, color .15s ease;
+}
+
+/* Hover/active estándar (sin movimiento) */
+.btn:hover,
+button.btn:hover,
+.pop-dialog .btn:hover { filter: brightness(1.03); }
+.btn:active,
+button.btn:active,
+.pop-dialog .btn:active { filter: brightness(0.95); }
+
+/* Primario */
+.btn.btn-primary,
+button.btn.btn-primary,
+.pop-dialog .btn.btn-primary {
+  background: var(--accent) !important;
+  color: var(--text-dark) !important;
+  border: none !important;
+  box-shadow: var(--shadow);
+}
+
+/* Secundario (outline blanco) */
+.btn.btn-secondary,
+button.btn.btn-secondary,
+.pop-dialog .btn.btn-secondary {
+  background: transparent !important;
+  color: #fff !important;
+  border: 1.5px solid #fff !important;
+  letter-spacing: 0.3px;
+  padding: 0.45rem 1.4rem;
+}
+.btn.btn-secondary:hover,
+button.btn.btn-secondary:hover,
+.pop-dialog .btn.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: #fff !important;
+  color: #fff !important;
+}
+
+/* Disabled */
+.btn.btn-disabled,
+button.btn.btn-disabled,
+.pop-dialog .btn.btn-disabled,
+.btn:disabled {
+  background: rgba(255,255,255,0.15) !important;
+  color: rgba(232,234,237,0.6) !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  filter: none !important;
+}
+
+/* === Botones de acción (tablitas, icon-only, etc.) === */
+.btn-accion {
+  background: var(--accent);
+  color: var(--text-dark);
+  border: 0;
+  box-shadow: var(--shadow);
+}
+
+/* Icon-only cuadrado (lapicito, info, etc.) */
+.btn-accion--icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hover/active con el mismo brillo que el resto */
+.btn-accion:hover,
+.btn-accion--icon:hover,
+.btn-accion:active,
+.btn-accion--icon:active {
+  filter: brightness(0.95);
+}
+
+/* Evita “salto” por baseline del SVG */
+.btn-accion--icon svg { display: block; }
