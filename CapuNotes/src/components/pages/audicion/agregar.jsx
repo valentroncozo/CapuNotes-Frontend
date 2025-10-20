@@ -3,7 +3,7 @@ import '@/styles/audicion-agregar.css';
 import getDateRangeDates, { formatDDMMYYYY } from './components/utils/obtenerDias.js';
 import BackButton from '../../common/BackButton';
 import TurnoSection from './components/TurnoSection';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const AudicionAgregar = ({title="Agregar Audición"}) => {
     const [diaDesde,setDiaDesde]= useState ('');
@@ -15,6 +15,24 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
 
     // Estado 'data' con estructura: { ubicacion, fechaDesde, fechaHasta, dias: { "DD/MM/YYYY": [ { horaDesde, horaHasta, duracion } ] } }
     const [data, setData]= useState ({ ubicacion: '', fechaDesde: '', fechaHasta: '', dias: {} });
+
+    // Mantener data.dias sincronizado con el array `dias` (elimina claves huérfanas)
+    useEffect(() => {
+        setData(prev => {
+            const prevObj = prev || { ubicacion: '', fechaDesde: '', fechaHasta: '', dias: {} };
+            const newDiasObj = {};
+            (dias || []).forEach(d => {
+                const key = formatDDMMYYYY(d);
+                if (prevObj.dias && prevObj.dias[key]) {
+                    newDiasObj[key] = prevObj.dias[key];
+                } else {
+                    // mantener al menos array vacío para clave nueva
+                    newDiasObj[key] = prevObj.dias && prevObj.dias[key] ? prevObj.dias[key] : [];
+                }
+            });
+            return { ...prevObj, dias: newDiasObj };
+        });
+    }, [dias]);
 
     
     const handlerCancelar = () => {

@@ -22,12 +22,18 @@ const TurnoSection = ({ index, day, dias, setDias, data = { dias: {} }, setData 
         if (typeof setData === 'function') {
             setData(prev => {
                 const prevObj = prev || { ubicacion: '', fechaDesde: '', fechaHasta: '', dias: {} };
+                const prevDias = { ...(prevObj.dias || {}) };
+
+                if (!franjas || franjas.length === 0) {
+                    // eliminar la clave del día si no quedan franjas
+                    if (prevDias.hasOwnProperty(key)) delete prevDias[key];
+                } else {
+                    prevDias[key] = franjas;
+                }
+
                 return {
                     ...prevObj,
-                    dias: {
-                        ...(prevObj.dias || {}),
-                        [key]: franjas
-                    }
+                    dias: prevDias
                 };
             });
         }
