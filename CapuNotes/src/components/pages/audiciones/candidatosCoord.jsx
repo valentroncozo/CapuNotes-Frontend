@@ -19,8 +19,6 @@ import ReservadoIcon from "@/assets/icons/turno/ReservadoIcon.jsx";
 import DisponibleIcon from "@/assets/icons/turno/DisponibleIcon.jsx";
 
 import TurnoEstadoModal from "./TurnoEstadoModal.jsx";
-
-/* Ícono local */
 import InfoIcon from "@/assets/InfoIcon.jsx";
 
 export default function CandidatosCoordPage() {
@@ -46,12 +44,10 @@ export default function CandidatosCoordPage() {
       const inicial = (qp && ds.includes(qp)) ? qp : "-";
       setDiaSel(inicial);
 
-      // Si viene día específico, precargamos turnos de ese día; si no, unificamos todos
       if (inicial !== "-") {
         const t = await audicionesService.listTurnos(inicial);
         setRows(t);
       } else {
-        // todos los días → concatenamos turnos de cada día
         const all = (await Promise.all(ds.map(d => audicionesService.listTurnos(d)))).flat();
         setRows(all);
       }
@@ -59,10 +55,16 @@ export default function CandidatosCoordPage() {
   }, [sp]);
 
   const nombreApynom = (r) => {
-    const ape = (r.apellido || "").trim();
-    const nom = (r.nombre || "").trim();
-    if (ape && nom) return `${ape}, ${nom}`;
-    return nom || ape || r.nombre || r.nombreLabel || "-";
+    const rawApe = (r.apellido ?? "").trim();
+    const rawNom = (r.nombre ?? "").trim();
+    const ape = rawApe || "";
+    const nom = rawNom || "";
+    const isDashApe = ape === "-";
+    const isDashNom = nom === "-";
+    if ((ape && !isDashApe) && (nom && !isDashNom)) return `${ape}, ${nom}`;
+    if ((ape && !isDashApe) && (!nom || isDashNom)) return ape;
+    if ((nom && !isDashNom) && (!ape || isDashApe)) return nom;
+    return "–"; // ambos son "-" o vacíos
   };
 
   const estadoCoordinador = (r) => {
@@ -74,7 +76,6 @@ export default function CandidatosCoordPage() {
     return tieneCandidato ? "Reservado" : "Disponible";
   };
 
-  // Refiltra por día cuando cambia selección
   useEffect(() => {
     (async () => {
       if (diaSel === "-") {
@@ -103,20 +104,13 @@ export default function CandidatosCoordPage() {
     const dir = sortDir === "desc" ? -1 : 1;
     return [...filtered].sort((a, b) => {
       if (sortBy === "hora") return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
-      if (sortBy === "estado") {
-        return estadoCoordinador(a).localeCompare(estadoCoordinador(b)) * dir;
-      }
-      if (sortBy === "apynom") {
-        return nombreApynom(a).toLowerCase().localeCompare(nombreApynom(b).toLowerCase()) * dir;
-      }
+      if (sortBy === "estado") return estadoCoordinador(a).localeCompare(estadoCoordinador(b)) * dir;
+      if (sortBy === "apynom") return nombreApynom(a).toLowerCase().localeCompare(nombreApynom(b).toLowerCase()) * dir;
       return 0;
     });
   }, [filtered, sortBy, sortDir]);
 
-  const toggleSort = (key) => {
-    if (sortBy !== key) { setSortBy(key); setSortDir("asc"); }
-    else { setSortDir((d) => (d === "asc" ? "desc" : "asc")); }
-  };
+  const toggleSort = (key) => { if (sortBy !== key) { setSortBy(key); setSortDir("asc"); } else { setSortDir((d) => d === "asc" ? "desc" : "asc"); } };
   const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
 
   const TurnoIcon = ({ estado }) => {
@@ -192,13 +186,13 @@ export default function CandidatosCoordPage() {
 
           <tbody>
             {sorted.map((r) => {
-              const est = estadoCoordinador(r); // "Disponible"/"Reservado"/"Cancelado"
+              const est = estadoCoordinador(r);
               const key = est.toLowerCase();
               const hasInscripcion = !!r.inscripcion;
               return (
                 <tr key={r.id} className="abmc-row">
                   <td>{r.hora}</td>
-                  <td>{nombreApynom(r) || "—"}</td>
+                  <td>{nombreApynom(r)}</td>
                   <td>{r.cancion || "—"}</td>
 
                   <td className="cell-right-action">
@@ -246,8 +240,7 @@ export default function CandidatosCoordPage() {
           row={editRow}
           onClose={() => setEditRow(null)}
           onSave={async (estado) => {
-            // acá normalmente haría POST al back; mock:
-            const updated = { ...editRow, turnoEstado: estado.toLowerCase() };
+            const updated = { ...editRow, turnoEstado: estado.toLowerCase() }; // mock
             setRows((prev) => prev.map((x) => (String(x.id) === String(updated.id) ? updated : x)));
             await success({ title: "Estado actualizado" });
             setEditRow(null);

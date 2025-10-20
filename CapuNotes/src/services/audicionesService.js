@@ -1,5 +1,5 @@
 // src/services/audicionesService.js
-// Servicio mock para la "audición vigente" (una por año)
+// Servicio mock para la audición vigente (una por año)
 
 const _audicionActual = [
   { id: 1, dia: "Viernes 14",  cantidadTurnos: 10, turnosDisponibles: 5 },
@@ -30,7 +30,7 @@ export const audicionesService = {
     return a.map(x => x.dia);
   },
 
-  // Turnos por día: por ahora solo “disponible”, sin inscripción; el back pondrá la hora real
+  // Turnos por día: por ahora “disponible”, sin inscripción; el back pondrá la hora real
   async listTurnos(dia) {
     await new Promise((r) => setTimeout(r, 80));
     const aud = _audicionActual.find(x => x.dia === dia);

@@ -1,4 +1,3 @@
-// src/components/pages/audiciones/historial.jsx
 import { useEffect, useMemo, useState } from "react";
 import BackButton from "@/components/common/BackButton.jsx";
 import InscripcionView from "@/components/common/InscripcionView.jsx";
@@ -17,7 +16,8 @@ export default function HistorialAudicionesPage() {
   const [viewRow, setViewRow] = useState(null);
   const [verResultado, setVerResultado] = useState(null); // {estado, obs}
 
-  const [sortBy, setSortBy] = useState(null); // 'nombre' | 'fechaAudicion'
+  // 'nombre' | 'fechaAudicion' | 'anio'
+  const [sortBy, setSortBy] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
 
   useEffect(() => {
@@ -26,6 +26,11 @@ export default function HistorialAudicionesPage() {
       setRows(data);
     })();
   }, []);
+
+  const getAnio = (label) => {
+    const m = String(label || "").match(/\b(20\d{2}|19\d{2})\b/);
+    return m ? m[1] : "";
+  };
 
   const filtered = useMemo(() => {
     if (!q) return rows;
@@ -38,10 +43,15 @@ export default function HistorialAudicionesPage() {
     const dir = sortDir === "desc" ? -1 : 1;
     return [...filtered].sort((a, b) => {
       if (sortBy === "nombre") {
-        return String(a.nombre || "").toLowerCase().localeCompare(String(b.nombre || "").toLowerCase()) * dir;
+        return String(a.nombre || "").toLowerCase()
+          .localeCompare(String(b.nombre || "").toLowerCase()) * dir;
       }
       if (sortBy === "fechaAudicion") {
-        return String(a.fechaAudicion || "").toLowerCase().localeCompare(String(b.fechaAudicion || "").toLowerCase()) * dir;
+        return String(a.fechaAudicion || "").toLowerCase()
+          .localeCompare(String(b.fechaAudicion || "").toLowerCase()) * dir;
+      }
+      if (sortBy === "anio") {
+        return getAnio(a.fechaAudicion).localeCompare(getAnio(b.fechaAudicion)) * dir;
       }
       return 0;
     });
@@ -79,12 +89,21 @@ export default function HistorialAudicionesPage() {
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
+
               <th className={thClass("fechaAudicion")}>
                 <span className="th-label">Audición</span>
                 <button type="button" className="th-caret-btn" onClick={() => toggleSort("fechaAudicion")} aria-label="Ordenar por Audición">
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
+
+              <th className={thClass("anio")}>
+                <span className="th-label">Año</span>
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("anio")} aria-label="Ordenar por Año">
+                  <span className="th-caret" aria-hidden />
+                </button>
+              </th>
+
               <th><span className="th-label">Canción</span></th>
               <th style={{ textAlign: "center" }}><span className="th-label">Resultado</span></th>
               <th style={{ textAlign: "center" }}><span className="th-label">Inscripción</span></th>
@@ -96,7 +115,9 @@ export default function HistorialAudicionesPage() {
               <tr key={r.id} className="abmc-row">
                 <td>{r.nombre}</td>
                 <td>{r.fechaAudicion}</td>
+                <td>{getAnio(r.fechaAudicion) || "—"}</td>
                 <td>{r.cancion}</td>
+
                 <td style={{ textAlign: "center" }}>
                   <button
                     className="btn-accion btn-accion--icon"
@@ -107,6 +128,7 @@ export default function HistorialAudicionesPage() {
                     <VerResultadoIcon />
                   </button>
                 </td>
+
                 <td className="abmc-actions">
                   <button
                     className="btn-accion btn-accion--icon"

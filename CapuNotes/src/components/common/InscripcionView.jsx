@@ -66,7 +66,8 @@ export default function InscripcionView({
         </>
       }
     >
-      <div style={{ maxHeight: "80vh", overflow: "auto" }}>
+      {/* quitamos el maxHeight/overflow para que el título no quede oculto */}
+      <div>
         <hr className="divisor-amarillo" />
         <h4 style={{ margin: "0 0 12px" }}>Datos personales:</h4>
 
