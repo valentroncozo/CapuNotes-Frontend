@@ -12,12 +12,14 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
     const [diaHasta,setDiaHasta]= useState ('');
     const [descripcion,setDescripcion]= useState ('');
 
-    const [nombre,setNombre]= useState ('');
+    const now = new Date().toISOString().split('T')[0];
+    const nombre = `Audiciones ${now}`;
+
     const [ubicacion,setUbicacion]= useState ('');
     const [dias, setDias]= useState ([]);
 
     // Estado 'data' con estructura: { ubicacion, fechaDesde, fechaHasta, dias: { "DD/MM/YYYY": [ { horaDesde, horaHasta, duracion } ] } }
-    const [data, setData]= useState ({ ubicacion: '', fechaDesde: '', fechaHasta: '', dias: {} });
+    const [data, setData]= useState ({ nombre: nombre, ubicacion: '', fechaDesde: '', fechaHasta: '', dias: {} });
 
     // Mantener data.dias sincronizado con el array `dias` (elimina claves huérfanas)
     useEffect(() => {

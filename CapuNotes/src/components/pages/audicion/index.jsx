@@ -2,10 +2,15 @@ import '@/styles/audicion.css';
 import '@/styles/abmc.css';
 
 import { useState } from 'react'; 
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 import TableABMC from '../../common/table.jsx';
 import BackButton from '../../common/BackButton.jsx';
-import { useNavigate } from 'react-router-dom';
+
+import TurnoService from '@/services/turnoServices.js';
+import AudicionService from '@/services/audicionService.js';
+import aggregateTurnosByDaySimple from '@/services/ParsingTurnos.js';
 
 const Audicion = ({ title ='Audición'}) => {
 
@@ -14,16 +19,36 @@ const Audicion = ({ title ='Audición'}) => {
 
   const navigate = useNavigate();
 
-  const [data, setData] = useState([
-    // Datos de ejemplo
-    { id: 1, dia: 'Lunes 12', cantidadTurnos: 10, turnosDisponibles: 5 },
-    { id: 2, dia: 'Martes 13', cantidadTurnos: 8, turnosDisponibles: 3 },
-    { id: 3, dia: 'Lunes 19', cantidadTurnos: 12, turnosDisponibles: 7 },
-  ]);
+  const [audicion, setAudicion] = useState({});
+  const [data, setData] = useState([]);
 
   const [filteredData, setFilteredData] = useState(data);
   const [filtroDia, setFiltroDia] = useState('');
 
+  //Carga de datos de audiciones - pendiente integracion con el servicio
+
+  const  load = async () => {
+    const audicion = await AudicionService.getActual();
+
+    setAudicion(audicion);
+
+    if (!audicion) {
+      setData([]);
+      return;
+    } else {
+      const turnos = await TurnoService.listarPorAudicion(audicion.id);
+      const aggregated = aggregateTurnosByDaySimple(turnos);
+
+      console.log('Aggregated turnos by day:', aggregated);
+
+      setData(aggregated);
+      setFilteredData(aggregated);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  // Botones que peuden figurar en la tabla
   const actions = [{
     title: 'Ver Cronograma',
     className: 'abmc-btn btn-primary',
