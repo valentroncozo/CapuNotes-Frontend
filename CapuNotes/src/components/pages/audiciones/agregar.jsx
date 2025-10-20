@@ -1,44 +1,137 @@
 // src/components/pages/audiciones/agregar.jsx
-import BackButton from '@/components/common/BackButton.jsx';
-import '@/styles/abmc.css';
-import '@/styles/forms.css';
+import '@/styles/audicion.css';
+import '@/styles/audicion-agregar.css';
 
-export default function AudicionAgregar({ title = 'Agregar audición' }) {
+import getDateRangeDates, { formatDDMMYYYY } from './components/utils/obtenerDias.js';
+import BackButton from '@/components/common/BackButton.jsx';
+import TurnoSection from './components/TurnoSection.jsx';
+import { useState } from 'react';
+
+export default function AudicionAgregar({ title = "Agregar Audición" }) {
+  const [diaDesde, setDiaDesde] = useState('');
+  const [diaHasta, setDiaHasta] = useState('');
+  const [dias, setDias] = useState([]);
+
+  const handlerObtenerDias = (e) => {
+    e.preventDefault();
+    setDias([]);
+    const diasObtenidos = getDateRangeDates(diaDesde, diaHasta);
+    setDias(diasObtenidos);
+  };
+
+  const handleAgregarDia = () => {
+    if (!dias || dias.length === 0) {
+      if (!diaDesde) {
+        alert('No hay días en la lista. Generá fechas o completá "Fecha Desde" primero.');
+        return;
+      }
+      const [y, m, d] = diaDesde.split('-');
+      const first = new Date(Number(y), Number(m) - 1, Number(d));
+      setDias([first]);
+      if (!diaHasta) {
+        const yy = first.getFullYear();
+        const mm = String(first.getMonth() + 1).padStart(2, '0');
+        const dd = String(first.getDate()).padStart(2, '0');
+        setDiaHasta(`${yy}-${mm}-${dd}`);
+      }
+      return;
+    }
+
+    const ultimo = dias[dias.length - 1];
+    const siguiente = new Date(ultimo.getTime());
+    siguiente.setDate(siguiente.getDate() + 1);
+
+    if (diaHasta) {
+      const [y2, m2, d2] = diaHasta.split('-');
+      const limite = new Date(Number(y2), Number(m2) - 1, Number(d2));
+      if (siguiente.getTime() > limite.getTime()) {
+        const yy = siguiente.getFullYear();
+        const mm = String(siguiente.getMonth() + 1).padStart(2, '0');
+        const dd = String(siguiente.getDate()).padStart(2, '0');
+        setDiaHasta(`${yy}-${mm}-${dd}`);
+      }
+    } else {
+      const yy = siguiente.getFullYear();
+      const mm = String(siguiente.getMonth() + 1).padStart(2, '0');
+      const dd = String(siguiente.getDate()).padStart(2, '0');
+      setDiaHasta(`${yy}-${mm}-${dd}`);
+    }
+
+    const existe = dias.some((dt) => dt.getTime() === siguiente.getTime());
+    if (existe) { alert('La fecha ya existe en la lista.'); return; }
+    setDias((prev) => [...prev, siguiente]);
+  };
+
   return (
-    <main className="abmc-page">
+    <main className='audicion-page'>
       <div className="abmc-card">
         <header className="abmc-header">
           <BackButton />
-          <h1 className="abmc-title">{title}</h1>
-          <hr className="divisor-amarillo" />
+          <h1 className='abmc-title'>{title}</h1>
         </header>
 
-        {/* TODO: formulario de alta de audición */}
-        <div className="form-grid">
-          <div className="field">
-            <label>Fecha</label>
-            <input className="input" type="date" />
-          </div>
+        <hr className='divider' />
 
-          <div className="field">
-            <label>Cantidad de turnos</label>
-            <input className="input" type="number" min="0" placeholder="0" />
-          </div>
+        <section className="content-form-audicion">
+          <form className="form-audicion" onSubmit={handlerObtenerDias}>
+            <div className="form-group-miembro">
+              <label htmlFor="lugar">Lugar</label>
+              <input type="text" id="lugar" name="lugar" className='abmc-input' required />
+            </div>
 
-          <div className="field">
-            <label>Observaciones</label>
-            <textarea className="input" rows={4} placeholder="Notas opcionales…" />
-          </div>
-        </div>
+            <div className="content-inputs-date-audicion">
+              <div className='inputs-date-audicion'>
+                <label htmlFor="fechaDesde">Fecha Desde</label>
+                <input
+                  value={diaDesde}
+                  onChange={(e) => setDiaDesde(e.target.value)}
+                  type="date"
+                  id="fechaDesde"
+                  name="fechaDesde"
+                  className='abmc-input'
+                  required
+                />
+              </div>
+              <div className='inputs-date-audicion'>
+                <label htmlFor="fechaHasta">Fecha Hasta</label>
+                <input
+                  value={diaHasta}
+                  onChange={(e) => setDiaHasta(e.target.value)}
+                  type="date"
+                  id="fechaHasta"
+                  name="fechaHasta"
+                  className='abmc-input'
+                  required
+                />
+              </div>
 
-        <div style={{ marginTop: 16, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button className="btn btn-secondary" onClick={() => window.history.back()}>
-            Cancelar
-          </button>
-          <button className="btn btn-primary" onClick={() => { /* TODO: guardar */ }}>
-            Guardar
-          </button>
-        </div>
+              <div className="button-date-audicion">
+                <button type="submit" className="abmc-btn btn-primary">Agregar Fechas</button>
+              </div>
+            </div>
+          </form>
+
+          <hr className='divider'/>
+
+          <section className="content-turno-input">
+            {dias.length > 0 ? (
+              dias.map((dia, index) => (
+                <TurnoSection
+                  key={index}
+                  day={formatDDMMYYYY(dia)}
+                  dias={dias}
+                  setDias={setDias}
+                />
+              ))
+            ) : (
+              <p>No hay días seleccionados.</p>
+            )}
+
+            <button type="button" className="abmc-btn btn-primary btn-dias" onClick={handleAgregarDia}>
+              Agregar día
+            </button>
+          </section>
+        </section>
       </div>
     </main>
   );
