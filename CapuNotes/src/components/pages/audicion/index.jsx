@@ -11,9 +11,8 @@ import TurnoService from '@/services/turnoServices.js';
 import AudicionService from '@/services/audicionService.js';
 import aggregateTurnosByDaySimple from '@/services/parsingTurnos.js';
 
-const Audicion = ({ title ='Audición'}) => {
-
-  const headers = ['Día','Cantidad De Turnos','Turnos Disponibles','Acciones'];
+const Audicion = ({ title = 'Audición' }) => {
+  const headers = ['Día', 'Cantidad De Turnos', 'Turnos Disponibles']; // Eliminada la columna "Acciones"
 
   const navigate = useNavigate();
 
@@ -39,7 +38,9 @@ const Audicion = ({ title ='Audición'}) => {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   // 🎯 Acciones por fila: Candidatos y Turnos (coordinadores)
   const actions = [
@@ -53,7 +54,8 @@ const Audicion = ({ title ='Audición'}) => {
       title: 'Turnos (Coordinadores)',
       className: 'abmc-btn btn-secondary',
       label: 'Turnos',
-      onClick: (d) => navigate(`/candidatos-coord?dia=${encodeURIComponent(d.dia)}`),
+      onClick: (d) =>
+        navigate(`/candidatos-coord?dia=${encodeURIComponent(d.dia)}`),
     },
   ];
 
@@ -61,13 +63,15 @@ const Audicion = ({ title ='Audición'}) => {
     const value = e.target.value;
     setFiltroDia(value);
 
-    if(!value){
+    if (!value) {
       setFilteredData(data);
       return;
     }
 
     const lower = value.toLowerCase();
-    const filtered = data.filter(item => (item.dia || '').toLowerCase().includes(lower));
+    const filtered = data.filter((item) =>
+      (item.dia || '').toLowerCase().includes(lower)
+    );
     setFilteredData(filtered);
   };
 
@@ -77,7 +81,7 @@ const Audicion = ({ title ='Audición'}) => {
         <header className="abmc-header">
           <BackButton />
           <h1>{title}</h1>
-          <hr className='divisor-amarillo'></hr>
+          <hr className="divisor-amarillo"></hr>
         </header>
 
         <div className="abmc-topbar">
@@ -89,9 +93,11 @@ const Audicion = ({ title ='Audición'}) => {
             className="abmc-input"
           />
 
-          <button 
+          <button
             className="abmc-btn btn-primary"
-            onClick={() => { navigate('/audicion/agregar'); }}
+            onClick={() => {
+              navigate('/audicion/agregar');
+            }}
           >
             Agregar Audición
           </button>
@@ -101,23 +107,24 @@ const Audicion = ({ title ='Audición'}) => {
           <TableABMC
             headers={headers}
             data={filteredData}
-            actions={actions}
-            columns={['dia', 'cantidadTurnos', 'turnosDisponibles']}  
-            emptyMenssage={ filteredData.length === 0 && data.length > 0 
-              ? 'No se encuentran días que coincidan con el filtro.' 
-              : 'No se encuentran audiciones actuales.' 
+            actions={actions} // Mantener las acciones pero no mostrar la columna "Acciones"
+            columns={['dia', 'cantidadTurnos', 'turnosDisponibles']}
+            emptyMenssage={
+              filteredData.length === 0 && data.length > 0
+                ? 'No se encuentran días que coincidan con el filtro.'
+                : 'No se encuentran audiciones actuales.'
             }
           />
         </div>
 
         <footer className="audicion-footer">
-          <div className='content-footer'>
+          <div className="content-footer">
             <button className="abmc-btn btn-secondary" onClick={() => {}}>
               Visualizar Cuestionario
             </button>
           </div>
 
-          <div className='content-footer'>
+          <div className="content-footer">
             <button className="abmc-btn btn-primary" onClick={() => {}}>
               Publicar Audición
             </button>
@@ -128,7 +135,7 @@ const Audicion = ({ title ='Audición'}) => {
         </footer>
       </div>
     </main>
-  )
+  );
 };
 
 export default Audicion;
