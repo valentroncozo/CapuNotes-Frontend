@@ -14,7 +14,6 @@ import aggregateTurnosByDaySimple from '@/services/parsingTurnos.js';
 const Audicion = ({ title ='Audición'}) => {
 
   const headers = ['Día','Cantidad De Turnos','Turnos Disponibles','Acciones'];
-  const URLCRONOGRAMA = 'audicion/cronograma';
 
   const navigate = useNavigate();
 
@@ -35,8 +34,6 @@ const Audicion = ({ title ='Audición'}) => {
       const turnos = await TurnoService.listarPorAudicion(audicion.id);
       const aggregated = aggregateTurnosByDaySimple(turnos);
 
-      console.log('Aggregated turnos by day:', aggregated);
-
       setData(aggregated);
       setFilteredData(aggregated);
     }
@@ -44,13 +41,21 @@ const Audicion = ({ title ='Audición'}) => {
 
   useEffect(() => { load(); }, []);
 
-  // Botones que peuden figurar en la tabla
-  const actions = [{
-    title: 'Ver Cronograma',
-    className: 'abmc-btn btn-primary',
-    label: 'Ver Cronograma',
-    onClick:(d) => { navigate(`${URLCRONOGRAMA}/${d.id}?dia=${d.dia}`); }
-  }];
+  // 🎯 Acciones por fila: Candidatos y Turnos (coordinadores)
+  const actions = [
+    {
+      title: 'Candidatos',
+      className: 'abmc-btn btn-primary',
+      label: 'Candidatos',
+      onClick: (d) => navigate(`/candidatos?dia=${encodeURIComponent(d.dia)}`),
+    },
+    {
+      title: 'Turnos (Coordinadores)',
+      className: 'abmc-btn btn-secondary',
+      label: 'Turnos',
+      onClick: (d) => navigate(`/candidatos-coord?dia=${encodeURIComponent(d.dia)}`),
+    },
+  ];
 
   const handleFilterChange = (e) => {
     const value = e.target.value;
@@ -106,7 +111,6 @@ const Audicion = ({ title ='Audición'}) => {
         </div>
 
         <footer className="audicion-footer">
-
           <div className='content-footer'>
             <button className="abmc-btn btn-secondary" onClick={() => {}}>
               Visualizar Cuestionario
@@ -121,7 +125,6 @@ const Audicion = ({ title ='Audición'}) => {
               Modificar Audición
             </button>
           </div>
-
         </footer>
       </div>
     </main>

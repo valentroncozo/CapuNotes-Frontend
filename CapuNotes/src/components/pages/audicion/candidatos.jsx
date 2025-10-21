@@ -1,4 +1,4 @@
-// src/components/pages/audiciones/candidatos.jsx
+// src/components/pages/audicion/candidatos.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import BackButton from "@/components/common/BackButton.jsx";
@@ -17,13 +17,10 @@ import ResultadosModal from "./ResultadosModal.jsx";
 import InscripcionView from "@/components/common/InscripcionView.jsx";
 import { success } from "@/utils/alerts.js";
 
-/* Íconos de resultado */
 import AceptadoIcon from "@/assets/icons/resultado/AceptadoIcon.jsx";
 import RechazadoIcon from "@/assets/icons/resultado/RechazadoIcon.jsx";
 import AusenteIcon from "@/assets/icons/resultado/AusenteIcon.jsx";
 import SinResultadoIcon from "@/assets/icons/resultado/SinResultadoIcon.jsx";
-
-/* Ícono local */
 import InfoIcon from "@/assets/InfoIcon.jsx";
 
 export default function CandidatosPage() {
@@ -31,26 +28,22 @@ export default function CandidatosPage() {
   const [q, setQ] = useState("");
   const [dias, setDias] = useState([]);
   const [diaSel, setDiaSel] = useState("-");
-
   const [sortBy, setSortBy] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
-
   const [editRow, setEditRow] = useState(null);
   const [viewRow, setViewRow] = useState(null);
-
   const [sp] = useSearchParams();
 
   useEffect(() => {
     (async () => {
       const [cd, ds] = await Promise.all([
         candidatosService.list(),
-        audicionesService.listDias(),
+        audicionesService.listDias?.() ?? [],
       ]);
       setRows(cd);
       setDias(ds);
       const qp = sp.get("dia");
       if (qp && ds.includes(qp)) setDiaSel(qp);
-      else setDiaSel("-");
     })();
   }, [sp]);
 
@@ -58,33 +51,32 @@ export default function CandidatosPage() {
     const ape = (r.apellido || "").trim();
     const nom = (r.nombre || "").trim();
     if (ape && nom) return `${ape}, ${nom}`;
-    return nom || ape || r.nombre || r.nombreLabel || "";
+    return nom || ape || "";
   };
 
   const filteredByText = useMemo(() => {
     if (!q) return rows;
     const t = q.toLowerCase();
-    return rows.filter((r) => {
-      const ape = String(r.apellido || "").toLowerCase();
-      const nom = String(r.nombre || "").toLowerCase();
-      const apynom = `${ape}, ${nom}`.trim();
-      const label = String(r.nombreLabel || r.nombre || "").toLowerCase();
-      return ape.includes(t) || nom.includes(t) || apynom.includes(t) || label.includes(t);
-    });
+    return rows.filter((r) =>
+      `${r.apellido} ${r.nombre} ${r.cancion}`.toLowerCase().includes(t)
+    );
   }, [rows, q]);
 
   const filtered = useMemo(() => {
     if (diaSel === "-") return filteredByText;
-    const getDia = (r) =>
-      String(r?.inscripcion?.diaAudicion || r?.dia || r?.fechaAudicion || "").trim();
-    return filteredByText.filter((r) => getDia(r) === diaSel);
+    return filteredByText.filter(
+      (r) =>
+        String(r?.inscripcion?.diaAudicion || "").trim() ===
+        String(diaSel).trim()
+    );
   }, [filteredByText, diaSel]);
 
   const sorted = useMemo(() => {
     if (!sortBy) return filtered;
     const dir = sortDir === "desc" ? -1 : 1;
     return [...filtered].sort((a, b) => {
-      if (sortBy === "hora") return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
+      if (sortBy === "hora")
+        return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
       if (sortBy === "resultado") {
         const la = estadoLabel(a.resultado?.estado ?? "sin");
         const lb = estadoLabel(b.resultado?.estado ?? "sin");
@@ -100,20 +92,37 @@ export default function CandidatosPage() {
   }, [filtered, sortBy, sortDir]);
 
   const toggleSort = (key) => {
-    if (sortBy !== key) { setSortBy(key); setSortDir("asc"); }
-    else { setSortDir((d) => (d === "asc" ? "desc" : "asc")); }
+    if (sortBy !== key) setSortBy(key), setSortDir("asc");
+    else setSortDir((d) => (d === "asc" ? "desc" : "asc"));
   };
-  const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
+  const thClass = (key) =>
+    sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable";
 
   const ResultadoIcon = ({ estado }) => {
     const e = String(estado || "sin").toLowerCase();
-    if (e === "aceptado" || e === "aceptada" || e === "ok")
-      return <span className="icon-estado icon-estado--ok icon-md" title="Aceptado"><AceptadoIcon /></span>;
-    if (e === "rechazado" || e === "rechazada" || e === "bad")
-      return <span className="icon-estado icon-estado--bad icon-md" title="Rechazado"><RechazadoIcon /></span>;
-    if (e === "ausente" || e === "pend")
-      return <span className="icon-estado icon-estado--pend icon-md" title="Ausente"><AusenteIcon /></span>;
-    return <span className="icon-estado icon-estado--sin icon-md" title="Sin resultado"><SinResultadoIcon /></span>;
+    if (["aceptado", "aceptada", "ok"].includes(e))
+      return (
+        <span className="icon-estado icon-estado--ok icon-md" title="Aceptado">
+          <AceptadoIcon />
+        </span>
+      );
+    if (["rechazado", "rechazada", "bad"].includes(e))
+      return (
+        <span className="icon-estado icon-estado--bad icon-md" title="Rechazado">
+          <RechazadoIcon />
+        </span>
+      );
+    if (["ausente", "pend"].includes(e))
+      return (
+        <span className="icon-estado icon-estado--pend icon-md" title="Ausente">
+          <AusenteIcon />
+        </span>
+      );
+    return (
+      <span className="icon-estado icon-estado--sin icon-md" title="Sin resultado">
+        <SinResultadoIcon />
+      </span>
+    );
   };
 
   return (
@@ -133,75 +142,66 @@ export default function CandidatosPage() {
           />
 
           <select
-            className="abmc-input"
+            className="abmc-select"
             value={diaSel}
             onChange={(e) => setDiaSel(e.target.value)}
-            aria-label="Filtrar por día de audición"
+            aria-label="Filtrar por día"
           >
-            <option value="-">-</option>
-            {dias.map(d => <option key={d} value={d}>{d}</option>)}
+            <option value="-">Todos los días</option>
+            {dias.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
           </select>
         </div>
 
         <table className="abmc-table abmc-table-rect">
-          <thead className="abmc-thead">
-            <tr className="abmc-row">
-              <th className={thClass("hora")}>
-                <span className="th-label">Hora</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("hora")} aria-label="Ordenar por Hora">
-                  <span className="th-caret" aria-hidden />
-                </button>
+          <thead>
+            <tr>
+              <th className={thClass("hora")} onClick={() => toggleSort("hora")}>
+                Hora
               </th>
-
-              <th className={thClass("apynom")}>
-                <span className="th-label">Apellido, Nombre</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("apynom")} aria-label="Ordenar por Apellido, Nombre">
-                  <span className="th-caret" aria-hidden />
-                </button>
+              <th
+                className={thClass("apynom")}
+                onClick={() => toggleSort("apynom")}
+              >
+                Apellido, Nombre
               </th>
-
-              <th><span className="th-label">Canción</span></th>
-
-              <th className={thClass("resultado")}>
-                <span className="th-label">Resultado</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("resultado")} aria-label="Ordenar por Resultado">
-                  <span className="th-caret" aria-hidden />
-                </button>
+              <th>Canción</th>
+              <th
+                className={thClass("resultado")}
+                onClick={() => toggleSort("resultado")}
+              >
+                Resultado
               </th>
-
-              <th style={{ textAlign: "center" }}><span className="th-label">Inscripción</span></th>
+              <th style={{ textAlign: "center" }}>Acciones</th>
             </tr>
           </thead>
 
           <tbody>
             {sorted.map((r) => (
-              <tr key={r.id} className="abmc-row">
+              <tr key={r.id}>
                 <td>{r.hora}</td>
                 <td>{nombreApynom(r)}</td>
                 <td>{r.cancion}</td>
-
-                <td className="cell-right-action">
+                <td>
                   <ResultadoIcon estado={r.resultado?.estado} />
-                  <button
-                    type="button"
-                    className="btn-accion btn-accion--icon right-action"
-                    title="Editar resultado"
-                    onClick={() => setEditRow(r)}
-                    aria-label="Editar resultado"
-                  >
-                    <PencilFill size={18} />
-                  </button>
                 </td>
-
                 <td className="abmc-actions">
                   <button
-                    type="button"
-                    className="btn-accion btn-accion--icon"
+                    className="abmc-btn abmc-btn-icon"
+                    title="Editar resultado"
+                    onClick={() => setEditRow(r)}
+                  >
+                    <PencilFill />
+                  </button>
+                  <button
+                    className="abmc-btn abmc-btn-icon"
                     title="Ver inscripción"
-                    aria-label="Ver inscripción"
                     onClick={() => setViewRow(r)}
                   >
-                    <InfoIcon size={18} />
+                    <InfoIcon />
                   </button>
                 </td>
               </tr>
@@ -210,7 +210,8 @@ export default function CandidatosPage() {
         </table>
 
         <p style={{ opacity: 0.7, marginTop: 10 }}>
-          Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i> y ajustar la <i>Cuerda</i>.
+          Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i> y ajustar
+          la <i>Cuerda</i>.
         </p>
       </div>
 
@@ -219,9 +220,14 @@ export default function CandidatosPage() {
           row={editRow}
           onClose={() => setEditRow(null)}
           onSave={async (estado, obs) => {
-            const res = await candidatosService.updateResultado(editRow.id, { estado, obs });
+            const res = await candidatosService.updateResultado(editRow.id, {
+              estado,
+              obs,
+            });
             setRows((prev) =>
-              prev.map((x) => (x.id === res.id ? { ...x, resultado: res.resultado } : x))
+              prev.map((x) =>
+                x.id === res.id ? { ...x, resultado: res.resultado } : x
+              )
             );
             await success({ title: "Resultado guardado" });
             setEditRow(null);
@@ -236,9 +242,14 @@ export default function CandidatosPage() {
           onClose={() => setViewRow(null)}
           editable={true}
           onSaveCuerda={async (nuevaCuerda) => {
-            const updated = await candidatosService.updateInscripcionCuerda(viewRow.id, nuevaCuerda);
+            const updated = await candidatosService.updateInscripcionCuerda(
+              viewRow.id,
+              nuevaCuerda
+            );
             if (!updated) return;
-            setRows((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
+            setRows((prev) =>
+              prev.map((x) => (x.id === updated.id ? updated : x))
+            );
             await success({ title: "Cuerda actualizada" });
           }}
         />

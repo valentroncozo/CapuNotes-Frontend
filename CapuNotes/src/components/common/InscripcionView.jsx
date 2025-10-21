@@ -52,7 +52,9 @@ export default function InscripcionView({
       showHeaderClose={true}
       actions={
         <>
-          <button className="btn btn-secondary" onClick={onClose}>Cerrar</button>
+          <button className="btn btn-secondary" onClick={onClose}>
+            Cerrar
+          </button>
           {editable && (
             <button
               className={`btn ${dirty && !saving ? "btn-primary" : "btn-disabled"}`}
@@ -66,8 +68,13 @@ export default function InscripcionView({
         </>
       }
     >
-      {/* quitamos el maxHeight/overflow para que el título no quede oculto */}
-      <div>
+      <div
+        style={{
+          maxHeight: "70vh",
+          overflowY: "auto",
+          paddingRight: "8px",
+        }}
+      >
         <hr className="divisor-amarillo" />
         <h4 style={{ margin: "0 0 12px" }}>Datos personales:</h4>
 
@@ -128,7 +135,9 @@ export default function InscripcionView({
               >
                 <option value="">— Seleccionar —</option>
                 {opcionesCuerdas.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
               </select>
             ) : (
@@ -176,8 +185,6 @@ export default function InscripcionView({
             ¿Estás de acuerdo con todo lo anterior?
           </label>
         </div>
-
-        {/* Sin botón "Inscribirme" en esta vista */}
       </div>
     </Modal>
   );

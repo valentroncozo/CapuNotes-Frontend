@@ -1,4 +1,4 @@
-// src/components/pages/audiciones/candidatosCoord.jsx
+// src/components/pages/audicion/candidatosCoord.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import BackButton from "@/components/common/BackButton.jsx";
@@ -17,23 +17,18 @@ import { TURNO_ESTADOS } from "@/constants/candidatos.js";
 import CanceladoIcon from "@/assets/icons/turno/CanceladoIcon.jsx";
 import ReservadoIcon from "@/assets/icons/turno/ReservadoIcon.jsx";
 import DisponibleIcon from "@/assets/icons/turno/DisponibleIcon.jsx";
-
-import TurnoEstadoModal from "./TurnoEstadoModal.jsx";
 import InfoIcon from "@/assets/InfoIcon.jsx";
+import TurnoEstadoModal from "./TurnoEstadoModal.jsx";
 
 export default function CandidatosCoordPage() {
   const [rows, setRows] = useState([]);
   const [q, setQ] = useState("");
-
   const [dias, setDias] = useState([]);
   const [diaSel, setDiaSel] = useState("-");
-
-  const [sortBy, setSortBy] = useState(null); // 'hora' | 'estado' | 'apynom'
+  const [sortBy, setSortBy] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
-
   const [viewRow, setViewRow] = useState(null);
   const [editRow, setEditRow] = useState(null);
-
   const [sp] = useSearchParams();
 
   useEffect(() => {
@@ -41,45 +36,41 @@ export default function CandidatosCoordPage() {
       const ds = await audicionesService.listDias();
       setDias(ds);
       const qp = sp.get("dia");
-      const inicial = (qp && ds.includes(qp)) ? qp : "-";
+      const inicial = qp && ds.includes(qp) ? qp : "-";
       setDiaSel(inicial);
 
       if (inicial !== "-") {
         const t = await audicionesService.listTurnos(inicial);
         setRows(t);
       } else {
-        const all = (await Promise.all(ds.map(d => audicionesService.listTurnos(d)))).flat();
+        const all = (await Promise.all(ds.map((d) => audicionesService.listTurnos(d)))).flat();
         setRows(all);
       }
     })();
   }, [sp]);
 
   const nombreApynom = (r) => {
-    const rawApe = (r.apellido ?? "").trim();
-    const rawNom = (r.nombre ?? "").trim();
-    const ape = rawApe || "";
-    const nom = rawNom || "";
-    const isDashApe = ape === "-";
-    const isDashNom = nom === "-";
-    if ((ape && !isDashApe) && (nom && !isDashNom)) return `${ape}, ${nom}`;
-    if ((ape && !isDashApe) && (!nom || isDashNom)) return ape;
-    if ((nom && !isDashNom) && (!ape || isDashApe)) return nom;
-    return "–"; // ambos son "-" o vacíos
+    const ape = (r.apellido || "").trim();
+    const nom = (r.nombre || "").trim();
+    if (ape && nom) return `${ape}, ${nom}`;
+    return nom || ape || "–";
   };
 
   const estadoCoordinador = (r) => {
-    const explicit = String(r?.turnoEstado ?? r?.turno?.estado ?? "").toLowerCase();
+    const explicit = String(r?.turnoEstado || r?.turno?.estado || "").toLowerCase();
     if (TURNO_ESTADOS.includes(explicit)) {
-      return explicit === "disponible" ? "Disponible" : explicit === "reservado" ? "Reservado" : "Cancelado";
+      if (explicit === "disponible") return "Disponible";
+      if (explicit === "reservado") return "Reservado";
+      return "Cancelado";
     }
-    const tieneCandidato = !!(r?.nombre && r?.nombre !== "-" || r?.apellido && r?.apellido !== "-" || r?.inscripcion);
+    const tieneCandidato = !!(r?.nombre && r?.nombre !== "-" || r?.apellido && r?.apellido !== "-");
     return tieneCandidato ? "Reservado" : "Disponible";
   };
 
   useEffect(() => {
     (async () => {
       if (diaSel === "-") {
-        const all = (await Promise.all(dias.map(d => audicionesService.listTurnos(d)))).flat();
+        const all = (await Promise.all(dias.map((d) => audicionesService.listTurnos(d)))).flat();
         setRows(all);
       } else {
         const t = await audicionesService.listTurnos(diaSel);
@@ -91,12 +82,9 @@ export default function CandidatosCoordPage() {
   const filtered = useMemo(() => {
     if (!q) return rows;
     const t = q.toLowerCase();
-    return rows.filter((r) => {
-      const apynom = nombreApynom(r).toLowerCase();
-      const cancion = String(r.cancion || "").toLowerCase();
-      const estado = estadoCoordinador(r).toLowerCase();
-      return apynom.includes(t) || cancion.includes(t) || estado.includes(t);
-    });
+    return rows.filter((r) =>
+      `${nombreApynom(r)} ${estadoCoordinador(r)}`.toLowerCase().includes(t)
+    );
   }, [rows, q]);
 
   const sorted = useMemo(() => {
@@ -105,24 +93,45 @@ export default function CandidatosCoordPage() {
     return [...filtered].sort((a, b) => {
       if (sortBy === "hora") return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
       if (sortBy === "estado") return estadoCoordinador(a).localeCompare(estadoCoordinador(b)) * dir;
-      if (sortBy === "apynom") return nombreApynom(a).toLowerCase().localeCompare(nombreApynom(b).toLowerCase()) * dir;
+      if (sortBy === "apynom") return nombreApynom(a).localeCompare(nombreApynom(b)) * dir;
       return 0;
     });
   }, [filtered, sortBy, sortDir]);
 
-  const toggleSort = (key) => { if (sortBy !== key) { setSortBy(key); setSortDir("asc"); } else { setSortDir((d) => d === "asc" ? "desc" : "asc"); } };
-  const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
+  const toggleSort = (key) => {
+    if (sortBy !== key) setSortBy(key), setSortDir("asc");
+    else setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+  };
+  const thClass = (key) =>
+    sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable";
 
   const TurnoIcon = ({ estado }) => {
     const e = String(estado || "").toLowerCase();
-    if (e === "cancelado")  return <span className="icon-estado icon-turno--cancel icon-md" title="Cancelado"><CanceladoIcon /></span>;
-    if (e === "reservado")  return <span className="icon-estado icon-turno--res icon-md" title="Reservado"><ReservadoIcon /></span>;
-    return <span className="icon-estado icon-turno--disp icon-md" title="Disponible"><DisponibleIcon /></span>;
+    if (e === "cancelado")
+      return (
+        <span className="icon-estado icon-turno--cancel icon-md" title="Cancelado">
+          <CanceladoIcon />
+        </span>
+      );
+    if (e === "reservado")
+      return (
+        <span className="icon-estado icon-turno--res icon-md" title="Reservado">
+          <ReservadoIcon />
+        </span>
+      );
+    return (
+      <span className="icon-estado icon-turno--disp icon-md" title="Disponible">
+        <DisponibleIcon />
+      </span>
+    );
   };
 
   const handleOpenInscripcion = async (r) => {
     if (!r?.inscripcion) {
-      await alertInfo({ title: "Sin inscripción", text: "Este turno no tiene inscripción asignada." });
+      await alertInfo({
+        title: "Sin inscripción",
+        text: "Este turno no tiene inscripción asignada.",
+      });
       return;
     }
     setViewRow(r);
@@ -139,84 +148,73 @@ export default function CandidatosCoordPage() {
         <div className="abmc-topbar">
           <input
             className="abmc-input"
-            placeholder="Buscar por apellido, estado o canción"
+            placeholder="Buscar por apellido o estado"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
+
           <select
-            className="abmc-input"
+            className="abmc-select"
             value={diaSel}
             onChange={(e) => setDiaSel(e.target.value)}
             aria-label="Filtrar por día"
           >
-            <option value="-">-</option>
-            {dias.map(d => <option key={d} value={d}>{d}</option>)}
+            <option value="-">Todos los días</option>
+            {dias.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
           </select>
         </div>
 
         <table className="abmc-table abmc-table-rect">
-          <thead className="abmc-thead">
-            <tr className="abmc-row">
-              <th className={thClass("hora")}>
-                <span className="th-label">Hora</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("hora")} aria-label="Ordenar por Hora">
-                  <span className="th-caret" aria-hidden />
-                </button>
+          <thead>
+            <tr>
+              <th className={thClass("hora")} onClick={() => toggleSort("hora")}>
+                Hora
               </th>
-
-              <th className={thClass("apynom")}>
-                <span className="th-label">Apellido, Nombre</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("apynom")} aria-label="Ordenar por Apellido, Nombre">
-                  <span className="th-caret" aria-hidden />
-                </button>
+              <th
+                className={thClass("apynom")}
+                onClick={() => toggleSort("apynom")}
+              >
+                Apellido, Nombre
               </th>
-
-              <th><span className="th-label">Canción</span></th>
-
-              <th className={thClass("estado")}>
-                <span className="th-label">Estado</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("estado")} aria-label="Ordenar por Estado">
-                  <span className="th-caret" aria-hidden />
-                </button>
+              <th
+                className={thClass("estado")}
+                onClick={() => toggleSort("estado")}
+              >
+                Estado
               </th>
-
-              <th style={{ textAlign: "center" }}><span className="th-label">Inscripción</span></th>
+              <th style={{ textAlign: "center" }}>Acciones</th>
             </tr>
           </thead>
 
           <tbody>
             {sorted.map((r) => {
               const est = estadoCoordinador(r);
-              const key = est.toLowerCase();
-              const hasInscripcion = !!r.inscripcion;
               return (
-                <tr key={r.id} className="abmc-row">
+                <tr key={r.id}>
                   <td>{r.hora}</td>
                   <td>{nombreApynom(r)}</td>
-                  <td>{r.cancion || "—"}</td>
-
-                  <td className="cell-right-action">
-                    <TurnoIcon estado={key} />
-                    <button
-                      type="button"
-                      className="btn-accion btn-accion--icon right-action"
-                      title="Editar estado"
-                      aria-label="Editar estado"
-                      onClick={() => setEditRow(r)}
-                    >
-                      <PencilFill size={18} />
-                    </button>
+                  <td>
+                    <TurnoIcon estado={est.toLowerCase()} /> {est}
                   </td>
-
                   <td className="abmc-actions">
                     <button
-                      className="btn-accion btn-accion--icon"
-                      title="Ver inscripción"
-                      aria-label="Ver inscripción"
-                      onClick={() => handleOpenInscripcion(r)}
-                      disabled={!hasInscripcion}
+                      className="abmc-btn abmc-btn-icon"
+                      title="Editar estado"
+                      onClick={() => setEditRow(r)}
                     >
-                      <InfoIcon size={18} />
+                      <PencilFill />
+                    </button>
+                    <button
+                      className="abmc-btn abmc-btn-icon"
+                      title="Ver inscripción"
+                      onClick={() => handleOpenInscripcion(r)}
+                      disabled={!r.inscripcion}
+                    >
+                      <InfoIcon />
                     </button>
                   </td>
                 </tr>
@@ -240,8 +238,10 @@ export default function CandidatosCoordPage() {
           row={editRow}
           onClose={() => setEditRow(null)}
           onSave={async (estado) => {
-            const updated = { ...editRow, turnoEstado: estado.toLowerCase() }; // mock
-            setRows((prev) => prev.map((x) => (String(x.id) === String(updated.id) ? updated : x)));
+            const updated = { ...editRow, turnoEstado: estado.toLowerCase() };
+            setRows((prev) =>
+              prev.map((x) => (String(x.id) === String(updated.id) ? updated : x))
+            );
             await success({ title: "Estado actualizado" });
             setEditRow(null);
           }}
