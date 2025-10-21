@@ -12,11 +12,9 @@ import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
 
 // Audiciones (importamos las nuevas páginas)
-import AudicionesPlanificar from "@/components/pages/audiciones/planificar.jsx";
-import Candidatos from "@/components/pages/audiciones/candidatos.jsx";
-import CandidatosCoordinadores from "@/components/pages/audiciones/candidatosCoord.jsx";
-import ConfigurarCuestionario from "@/components/pages/audiciones/cuestionario.jsx";
-import HistorialAudiciones from "@/components/pages/audiciones/historial.jsx";
+import Candidatos from "@/components/pages/audicion/candidatos.jsx";
+import CandidatosCoordinadores from "@/components/pages/audicion/candidatosCoord.jsx";
+import HistorialAudiciones from "@/components/pages/audicion/historial.jsx";
 
 // Estilos globales
 import "@/styles/globals.css";
