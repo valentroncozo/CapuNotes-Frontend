@@ -1,16 +1,15 @@
 import '@/styles/audicion.css';
 import '@/styles/abmc.css';
 
-import { useState } from 'react'; 
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 
 import TableABMC from '../../common/table.jsx';
 import BackButton from '../../common/BackButton.jsx';
 
 import TurnoService from '@/services/turnoServices.js';
 import AudicionService from '@/services/audicionService.js';
-import aggregateTurnosByDaySimple from '@/services/ParsingTurnos.js';
+import aggregateTurnosByDaySimple from '@/services/parsingTurnos.js';
 
 const Audicion = ({ title ='Audición'}) => {
 
@@ -25,8 +24,7 @@ const Audicion = ({ title ='Audición'}) => {
   const [filteredData, setFilteredData] = useState(data);
   const [filtroDia, setFiltroDia] = useState('');
 
-
-  const  load = async () => {
+  const load = async () => {
     const audicion = await AudicionService.getActual();
 
     setAudicion(audicion);
@@ -69,68 +67,65 @@ const Audicion = ({ title ='Audición'}) => {
   };
 
   return (
-      <main className="audicion-page">
-        <div className="abmc-card">
-          <header className="abmc-header">
-            <BackButton />
-            <h1>{title}</h1>
-            <hr className='divisor-amarillo'></hr>
-          </header>
-    
-          <div className="abmc-topbar">
-              <input
-                type="text"
-                placeholder="Filtrar por día..."
-                value={filtroDia}
-                onChange={handleFilterChange}
-                className="abmc-input"
-              />
+    <main className="audicion-page">
+      <div className="abmc-card">
+        <header className="abmc-header">
+          <BackButton />
+          <h1>{title}</h1>
+          <hr className='divisor-amarillo'></hr>
+        </header>
 
-              <button 
-              className="abmc-btn btn-primary"
-              onClick={() => { navigate('/audicion/agregar'); }}
-              >
-                Agregar Audición
-              </button>
-          </div>
+        <div className="abmc-topbar">
+          <input
+            type="text"
+            placeholder="Filtrar por día..."
+            value={filtroDia}
+            onChange={handleFilterChange}
+            className="abmc-input"
+          />
 
-          <div className="abmc-table-container">
-            <TableABMC
-              headers={headers}
-              data={filteredData}
-              actions={actions}
-              columns={['dia', 'cantidadTurnos', 'turnosDisponibles']}  
-              emptyMenssage={ filteredData.length === 0 && data.length > 0 
-                ? 'No se encuentran días que coincidan con el filtro.' 
-                : 'No se encuentran audiciones actuales.' 
-              }
-            />
-          </div>
-
-          <footer className="audicion-footer">
-
-            <div className='content-footer'>
-              <button className="abmc-btn btn-secondary" onClick={() => {}}>
-                Visualizar Cuestionario
-              </button>
-            </div>
-
-            <div className='content-footer'>
-              <button className="abmc-btn btn-primary" onClick={() => {}}>
-                Publicar Audición
-              </button>
-              <button className="abmc-btn btn-secondary" onClick={() => {}}>
-                Modificar Audición
-              </button>
-            </div>
-
-          </footer>
+          <button 
+            className="abmc-btn btn-primary"
+            onClick={() => { navigate('/audicion/agregar'); }}
+          >
+            Agregar Audición
+          </button>
         </div>
 
+        <div className="abmc-table-container">
+          <TableABMC
+            headers={headers}
+            data={filteredData}
+            actions={actions}
+            columns={['dia', 'cantidadTurnos', 'turnosDisponibles']}  
+            emptyMenssage={ filteredData.length === 0 && data.length > 0 
+              ? 'No se encuentran días que coincidan con el filtro.' 
+              : 'No se encuentran audiciones actuales.' 
+            }
+          />
+        </div>
 
-      </main>
+        <footer className="audicion-footer">
+
+          <div className='content-footer'>
+            <button className="abmc-btn btn-secondary" onClick={() => {}}>
+              Visualizar Cuestionario
+            </button>
+          </div>
+
+          <div className='content-footer'>
+            <button className="abmc-btn btn-primary" onClick={() => {}}>
+              Publicar Audición
+            </button>
+            <button className="abmc-btn btn-secondary" onClick={() => {}}>
+              Modificar Audición
+            </button>
+          </div>
+
+        </footer>
+      </div>
+    </main>
   )
 };
 
 export default Audicion;
-

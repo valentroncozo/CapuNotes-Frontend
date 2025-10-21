@@ -160,7 +160,7 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         Inicio
       </a>
 
-      {/* Acordeón reutilizable: Organización del Coro */}
+      {/* Organización del Coro */}
       <AccordionMenu
         title="Organización del Coro"
         open={orgOpen}
@@ -173,14 +173,16 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         ]}
       />
 
-      {/* Acordeón reutilizable: Audiciones */}
+      {/* Audiciones */}
       <AccordionMenu
         title="Audiciones"
         open={audOpen}
         setOpen={setAudOpen}
         onNavigate={onNavigate}
         items={[
-          { label: "Planificar Audición", path: "/audiciones/planificar" },
+          // 🔁 Antes: { label: "Planificar Audición", path: "/audiciones/planificar" },
+          // ✅ Ahora:
+          { label: "Audiciones", path: "/audicion" },
           { label: "Candidatos", path: "/candidatos" },
           { label: "Configurar Cuestionario", path: "/configurar-cuestionario" },
           { label: "Historial de Audiciones", path: "/historial-audiciones" },

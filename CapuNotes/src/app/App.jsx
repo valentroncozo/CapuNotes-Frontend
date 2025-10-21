@@ -1,82 +1,68 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import AppShell from "@/components/layout/AppShell.jsx";
-import useAuth from "@/hooks/useAuth.js";
 
-// Pages
-import Login from "@/components/pages/login/index.jsx";
 import Principal from "@/components/pages/principal/index.jsx";
-import Cuerdas from "@/components/pages/cuerdas/index.jsx";
+import Audicion from "@/components/pages/audicion/index.jsx";
+import AudicionAgregar from "@/components/pages/audicion/agregar.jsx";
 import Areas from "@/components/pages/areas/index.jsx";
+import Cuerdas from "@/components/pages/cuerdas/index.jsx";
 import Miembros from "@/components/pages/miembros/index.jsx";
-import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
-import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
 
-// Audiciones (importamos las nuevas páginas)
-import Candidatos from "@/components/pages/audicion/candidatos.jsx";
-import CandidatosCoordinadores from "@/components/pages/audicion/candidatosCoord.jsx";
-import HistorialAudiciones from "@/components/pages/audicion/historial.jsx";
-
-// Estilos globales
-import "@/styles/globals.css";
-
-function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
-}
-
-function AppRoutes() {
-  const navigate = useNavigate();
-  const { user, login, logout } = useAuth();
-
-  const handleLogin = (username) => {
-    login(username);
-    navigate("/principal", { replace: true });
-  };
-
+// Placeholder simple para rutas del menú que todavía no tienen página
+function Placeholder({ title }) {
   return (
-    <Routes>
-      <Route path="/login" element={<Login onLogin={handleLogin} />} />
-
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <AppShell onLogout={logout} />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Navigate to="/principal" replace />} />
-        <Route path="principal" element={<Principal username={user} />} />
-        <Route path="miembros" element={<Miembros />} />
-        <Route path="miembros/agregar" element={<MiembrosAgregar />} />
-        <Route path="miembros/editar" element={<MiembrosEditar />} />
-        <Route path="cuerdas" element={<Cuerdas />} />
-        <Route path="areas" element={<Areas />} />
-
-        {/* --- Rutas de Audiciones Integradas --- */}
-        <Route path="audiciones/planificar" element={<AudicionesPlanificar />} />
-
-        {/* Cronogramas (antes “/audiciones/cronograma/:id”) */}
-        <Route path="audiciones/:audicionId/candidatos" element={<Candidatos />} />
-        <Route path="audiciones/:audicionId/coordinadores" element={<CandidatosCoordinadores />} />
-
-        {/* Rutas de compatibilidad para enlaces antiguos */}
-        <Route path="candidatos" element={<Candidatos />} /> 
-        <Route path="candidatos-coordinadores" element={<CandidatosCoordinadores />} /> 
-
-        <Route path="configurar-cuestionario" element={<ConfigurarCuestionario />} />
-        <Route path="historial-audiciones" element={<HistorialAudiciones />} />
-      </Route>
-
-      <Route path="*" element={<Navigate to="/principal" replace />} />
-    </Routes>
+    <div style={{ padding: 24 }}>
+      <h2 style={{ margin: 0 }}>{title}</h2>
+      <p style={{ opacity: 0.8 }}>Contenido en construcción.</p>
+    </div>
   );
 }
 
+/**
+ * Cambios mínimos:
+ * - Usamos rutas anidadas con <AppShell /> como layout padre.
+ * - <AppShell /> renderiza <Outlet />, por eso las páginas deben ir como children del Route padre.
+ * - Redirigimos / (root) -> /principal.
+ * - Mapeamos /audiciones/planificar -> /audicion (para que el ítem del menú no rompa).
+ * - Añadimos /candidatos como placeholder para evitar pantalla vacía.
+ */
 export default function App() {
   return (
     <BrowserRouter>
-      <AppRoutes />
+      <Routes>
+        {/* Ruta padre con layout */}
+        <Route path="/" element={<AppShell />}>
+          {/* Redirect desde root */}
+          <Route index element={<Navigate to="/principal" replace />} />
+
+          {/* Páginas principales */}
+          <Route path="principal" element={<Principal />} />
+
+          {/* Audiciones */}
+          <Route path="audicion" element={<Audicion />} />
+          <Route path="audicion/agregar" element={<AudicionAgregar />} />
+          <Route path="audicion/cronograma/:id" element={<Placeholder title="Cronograma" />} />
+
+          {/* Alias para el menú actual ("Planificar Audición") */}
+          <Route path="audiciones/planificar" element={<Navigate to="/audicion" replace />} />
+
+          {/* Organización del Coro */}
+          <Route path="areas" element={<Areas />} />
+          <Route path="cuerdas" element={<Cuerdas />} />
+          <Route path="miembros" element={<Miembros />} />
+
+          {/* Otras entradas del menú para que no queden en blanco */}
+          <Route path="candidatos" element={<Placeholder title="Candidatos" />} />
+          <Route path="configurar-cuestionario" element={<Placeholder title="Configurar Cuestionario" />} />
+          <Route path="historial-audiciones" element={<Placeholder title="Historial de Audiciones" />} />
+
+          {/* 404 dentro del layout */}
+          <Route path="*" element={<Navigate to="/principal" replace />} />
+        </Route>
+
+        {/* 404 global */}
+        <Route path="*" element={<Navigate to="/principal" replace />} />
+      </Routes>
     </BrowserRouter>
   );
 }

@@ -65,16 +65,19 @@ const AudicionService = {
     }
   },
 
-  getActual: async () => {
-    try {
-      const r = await api.get('/audiciones/actual');
-      return r.data;
-    } catch (e) {
-      // devolver null si 404 u otro mensaje del backend
-      if (e.response?.status === 404) return null;
-      throw e.response?.data || e.message;
-    }
-  },
+getActual: async () => {
+  try {
+    const r = await api.get('/audiciones/actual');
+    // Si el backend devuelve 204, axios lanza error por "empty body"? mejor chequear
+    return r?.data ?? null;
+  } catch (e) {
+    // 204 o 404 → no hay audición actual
+    const s = e?.response?.status;
+    if (s === 204 || s === 404) return null;
+    throw e.response?.data || e.message;
+  }
+},
+
 
   // cronograma: si page/size son undefined usa sin paginar (backend admite Pageable.unpaged())
   getCronograma: async (audicionId, { dia = null, page = undefined, size = undefined } = {}) => {
