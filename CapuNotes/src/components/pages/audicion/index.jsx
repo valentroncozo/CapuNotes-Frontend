@@ -25,7 +25,6 @@ const Audicion = ({ title ='Audición'}) => {
   const [filteredData, setFilteredData] = useState(data);
   const [filtroDia, setFiltroDia] = useState('');
 
-  //Carga de datos de audiciones - pendiente integracion con el servicio
 
   const  load = async () => {
     const audicion = await AudicionService.getActual();
@@ -34,7 +33,6 @@ const Audicion = ({ title ='Audición'}) => {
 
     if (!audicion) {
       setData([]);
-      return;
     } else {
       const turnos = await TurnoService.listarPorAudicion(audicion.id);
       const aggregated = aggregateTurnosByDaySimple(turnos);
@@ -104,7 +102,7 @@ const Audicion = ({ title ='Audición'}) => {
               columns={['dia', 'cantidadTurnos', 'turnosDisponibles']}  
               emptyMenssage={ filteredData.length === 0 && data.length > 0 
                 ? 'No se encuentran días que coincidan con el filtro.' 
-                : 'No hay audiciones disponibles.' 
+                : 'No se encuentran audiciones actuales.' 
               }
             />
           </div>

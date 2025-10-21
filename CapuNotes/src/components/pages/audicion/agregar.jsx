@@ -6,11 +6,14 @@ import TurnoSection from './components/TurnoSection';
 import { useState, useEffect } from 'react';
 import Swal from "sweetalert2";
 
+import sendToService from './components/utils/sendToServices.js';
+
 
 const AudicionAgregar = ({title="Agregar Audición"}) => {
     const [diaDesde,setDiaDesde]= useState ('');
     const [diaHasta,setDiaHasta]= useState ('');
     const [descripcion,setDescripcion]= useState ('');
+    const [isSaving, setIsSaving] = useState(false);
 
     const now = new Date().toISOString().split('T')[0];
     const nombre = `Audiciones ${now}`;
@@ -124,7 +127,7 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
         setDias((prev) => [...prev, siguiente]);
     };
 
-    const handleGuardarBorrador = () => {
+    const handleGuardarBorrador = async () => {
         // validar que no haya franjas incompletas en data.dias
         const validateFranjas = (dataObj) => {
             if (!dataObj || !dataObj.dias) return { ok: true };
@@ -156,6 +159,17 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
 
         console.log('Datos guardados en estado data:', data);
         alert('Datos guardados en el estado');
+
+       setIsSaving(true);
+        try {
+            await sendToService(data);
+        } catch (error) {
+            console.error('Error al guardar:', error);
+        } finally {
+            setIsSaving(false);
+        }
+
+
     };
 
   return (
@@ -284,8 +298,13 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
                 <button type="button" className="abmc-btn btn-secondary btn-dias" onClick={handlerCancelar}>
                     Cancelar
                 </button>
-                <button type="button" className="abmc-btn btn-primary btn-dias" onClick={handleGuardarBorrador}>
-                    Guardar Borrador
+                <button 
+                    type="button" 
+                    className="abmc-btn btn-primary btn-dias" 
+                    onClick={handleGuardarBorrador}
+                    disabled={isSaving}
+                >
+                {isSaving ? 'Guardando...' : 'Guardar Borrador'}
                 </button>
 
             </section>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import DayTitle from './DayTittle';
+import Swal from 'sweetalert2';
 import HorarioInputs from './HorarioInputs';
 import '@/styles/turnos.css';
 
