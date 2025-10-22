@@ -22,6 +22,19 @@ body .abmc-select:focus {
   box-shadow: 0 0 0 3px rgba(179,205,250,.25) !important;
 }
 
+body .abmc-input[type="date"]::-webkit-calendar-picker-indicator {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  cursor: pointer;
+  opacity: 0.95;
+  /* Ajusta el filtro para el color deseado */
+  filter: invert(92%) sepia(6%) saturate(8%) hue-rotate(180deg) brightness(99%) contrast(95%);
+}
+
+
+
 body .abmc-select option {
   background: var(--bg);
   color: var(--text-light);
@@ -39,7 +52,7 @@ body .abmc-select:focus {
 body .abmc-btn {
 
   border: none;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 10px 16px;
   font-weight: 700 !important;
   cursor: pointer;
@@ -78,7 +91,7 @@ body.abmc-btn-primary:hover { filter: brightness(.95); }
   color: var(--card) !important;
   border: 2px solid var(--card) !important;
 }
-.btn-secondary:hover { background: rgba(179, 205, 250, 0.1); }
+.btn-secondary:hover { background-color: var(--accent) ;  border:none; color: var(--text-dark); }
 
 /* Form grid */
 .form-grid { display: grid; gap: 16px; }
@@ -112,6 +125,7 @@ textarea.input:focus {
 textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
 
 .form-group-miembro {
+  width: 100%;
   padding: 2.5rem 0rem;
   display: flex;
   flex-direction: column;

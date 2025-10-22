@@ -1,0 +1,57 @@
+.input-horario {
+    max-width: 9rem;
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-height: 2rem;
+    min-width: 1.5rem;
+}
+
+.input-horario label {
+    width: 100%;
+}
+
+.input-with-icon {
+    width: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-with-icon .abmc-input[type="text"] {
+    width: 100%;
+    padding-left: 4rem; /* espacio para el icono */
+    box-sizing: border-box;
+}
+
+.input-with-icon .abmc-input[type="time"] {
+    width: 30%;
+    padding-left: 4rem; /* espacio para el icono */
+    box-sizing: border-box;
+}
+
+
+
+/* Chromium / WebKit: ocultar pseudo-elementos posibles */
+.abmc-input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none !important;
+  -webkit-appearance: none !important;
+
+}
+
+
+.clock-icon {
+    left: .5rem;
+    position: absolute;
+    pointer-events: none;
+    fill: var(--text-light);
+}
+
+
+
+
+
+
