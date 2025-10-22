@@ -22,6 +22,19 @@ function TrashIcon(props) {
   );
 }
 
+// Alerta genérica para registros duplicados
+function showDuplicateAlert(uniqueBy) {
+  Swal.fire({
+    icon: "warning",
+    title: "Duplicado",
+    text: `Ya existe un registro con ese ${uniqueBy}.`,
+    background: "#11103a",
+    color: "#E8EAED",
+    confirmButtonColor: "#7c83ff",
+  });
+}
+
+
 export default function EntityTableABMC({
   title = "Entidad",
   service,
@@ -88,14 +101,22 @@ export default function EntityTableABMC({
   const handleAgregar = async (e) => {
     e.preventDefault();
 
+    // Validación de campos obligatorios del schema
     const missing = missingRequiredLabels(nuevo);
     if (missing.length) return showMissingAlert(missing);
 
+    // 🔔 Validar duplicado (ya lo tenés)
     if (isDuplicate(nuevo)) {
+      showDuplicateAlert(uniqueBy);
+      return;
+    }
+
+    // ⚠️ Validación extra solo para ÁREA (si falta descripción)
+    if (entityName.toLowerCase() === "área" && !nuevo.descripcion?.trim()) {
       Swal.fire({
         icon: "warning",
-        title: "Duplicado",
-        text: `Ya existe un registro con ese ${uniqueBy}.`,
+        title: "Falta completar",
+        text: "Debés ingresar una descripción para el área.",
         background: "#11103a",
         color: "#E8EAED",
         confirmButtonColor: "#7c83ff",
@@ -103,14 +124,44 @@ export default function EntityTableABMC({
       return;
     }
 
-    await service.create(nuevo);
-    setNuevo({});
-    load();
+    try {
+      await service.create(nuevo);
+      await load();
+      setNuevo({});
+
+      // ✅ Aviso de éxito
+      Swal.fire({
+        icon: "success",
+        title: "Creado correctamente",
+        text: `${entityName} se creó con éxito.`,
+        background: "#11103a",
+        color: "#E8EAED",
+        confirmButtonColor: "#7c83ff",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error("❌ Error al crear:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.response?.data || "No se pudo crear el registro.",
+        background: "#11103a",
+        color: "#E8EAED",
+        confirmButtonColor: "#7c83ff",
+      });
+    }
   };
 
+
   const handleEliminar = async (id, displayName) => {
+    // 🔠 Detectar género de la entidad
+    const femenino = ["cuerda", "área", "audición", "especialidad"]; // podés agregar más si querés
+    const articulo = femenino.includes(entityName.toLowerCase()) ? "la" : "el";
+
+    // 🔔 Confirmación antes de borrar
     const res = await Swal.fire({
-      title: `¿Eliminar ${displayName}?`,
+      title: `¿Eliminar ${articulo} ${displayName}?`,
       text: "Esta acción no se puede deshacer.",
       icon: "warning",
       showCancelButton: true,
@@ -118,18 +169,93 @@ export default function EntityTableABMC({
       cancelButtonColor: "#6c757d",
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
+      reverseButtons: true, // 👉 mantiene Cancelar a la izquierda
       background: "#11103a",
       color: "#E8EAED",
     });
+
     if (!res.isConfirmed) return;
-    await service.remove(id);
-    load();
+
+    try {
+      await service.remove(id);
+      await load();
+
+      // ✅ Aviso de éxito al eliminar
+      Swal.fire({
+        icon: "success",
+        title: `${entityName.charAt(0).toUpperCase() + entityName.slice(1)
+          } eliminad${femenino.includes(entityName.toLowerCase()) ? "a" : "o"}`,
+        text: `${entityName} "${displayName}" se eliminó correctamente.`,
+        timer: 1500,
+        showConfirmButton: false,
+        background: "#11103a",
+        color: "#E8EAED",
+      });
+    } catch (err) {
+      console.error("❌ Error al eliminar:", err);
+
+      Swal.fire({
+        icon: "error",
+        title: `No se puede eliminar ${articulo} ${entityName}`,
+        text: "Tiene elementos asociados o un error impide eliminarlo.",
+        background: "#11103a",
+        color: "#E8EAED",
+        confirmButtonColor: "#7c83ff",
+        reverseButtons: true,
+      });
+    }
   };
 
   const handleEditSave = async (updated) => {
-    await service.update(updated);
-    load();
+    // 🔹 Validar duplicado (si aplica)
+    if (uniqueBy && Array.isArray(items)) {
+      const baseValue = updated?.[uniqueBy];
+
+      if (baseValue) {
+        const base = String(baseValue).trim().toLowerCase();
+
+        const duplicado = items.some(
+          (it) =>
+            String(it?.[uniqueBy] ?? "").trim().toLowerCase() === base &&
+            it.id !== updated.id
+        );
+
+        if (duplicado) {
+          showDuplicateAlert(uniqueBy);
+          return;
+        }
+      }
+    }
+
+    try {
+      await service.update(updated);
+      await load();
+
+      // ✅ Aviso de éxito
+      Swal.fire({
+        icon: "success",
+        title: "Actualizado correctamente",
+        text: `${entityName} se actualizó con éxito.`,
+        background: "#11103a",
+        color: "#E8EAED",
+        confirmButtonColor: "#7c83ff",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error("❌ Error al actualizar:", err);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.response?.data || "No se pudo actualizar el registro.",
+        background: "#11103a",
+        color: "#E8EAED",
+        confirmButtonColor: "#7c83ff",
+      });
+    }
   };
+
 
   // Campos visibles en la tabla (excluir controles: button, submit, label)
   const visibleFields = schema.filter(

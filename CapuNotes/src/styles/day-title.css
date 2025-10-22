@@ -1,0 +1,31 @@
+.title-day {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: .2rem;
+    min-height: 2rem;  
+}
+
+@media (width < 540px) {
+    .title-day {
+        align-content: center;
+        align-items: center;
+    }
+
+    .calendar-icon {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+
+@media (width < 490px) {
+    .title-day {
+        flex-direction: column;
+    }
+    
+    .calendar-icon {
+        width: 20px;
+        height: 20px;
+    }
+}

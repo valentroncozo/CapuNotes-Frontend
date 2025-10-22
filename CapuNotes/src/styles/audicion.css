@@ -1,0 +1,75 @@
+
+.audicion-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  align-content: center;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text-light);
+  padding: 24px;
+  font-family: var(--font-sans);
+  gap: 1rem ;
+}
+
+
+
+.abmc-table-container {
+  display: flex;
+  width: 100%;
+  padding: 0 2rem;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  border-collapse: collapse;
+  
+}
+
+.audicion-footer {
+  margin-top: 3rem;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.content-footer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  gap:1rem;
+}
+
+
+.audicion-footer:last-child .abmc-btn {
+  min-width: 207px;
+}
+
+
+@media (width < 477px) {
+
+  .content-footer .abmc-btn {
+    min-width: inherit;
+    margin: .5rem 2rem;
+  }
+  .content-footer {
+    flex-direction: column;
+    gap: 0;
+  }
+  .audicion-footer {
+    align-items: center;
+    gap: 0rem;
+  }
+
+  .abmc-table-container {
+    padding: 0;
+  }
+
+  .abmc-card {
+    margin: 0;
+  }
+
+
+}

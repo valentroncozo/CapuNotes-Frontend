@@ -12,7 +12,7 @@ export const miembrosService = {
 
   // 🔹 Obtener miembro por ID compuesto (nroDocumento + tipoDocumento)
   getById: async (nroDocumento, tipoDocumento) => {
-    const res = await axios.get(`${API_URL}/${tipoDocumento}/${nroDocumento}`);
+    const res = await axios.get(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
     return res.data;
   },
 
@@ -25,14 +25,19 @@ export const miembrosService = {
 
   // 🔹 Actualizar miembro existente
   update: async (data) => {
-    const res = await axios.put(API_URL, data);
+    const res = await axios.patch(API_URL, data); // 👈 tu backend usa PATCH, no PUT
     console.log("✏️ Miembro actualizado:", res.data);
     return res.data;
   },
 
-  // 🔹 Eliminar miembro
-  remove: async (nroDocumento, tipoDocumento) => {
-    await axios.delete(`${API_URL}/${tipoDocumento}/${nroDocumento}`);
-    console.log(`🗑️ Miembro eliminado: ${tipoDocumento} ${nroDocumento}`);
+  // 🔹 Dar de baja (baja lógica → activo = false)
+  darDeBaja: async (nroDocumento, tipoDocumento) => {
+    await axios.delete(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
+    console.log(`⚠️ Miembro dado de baja: ${tipoDocumento} ${nroDocumento}`);
+  },
+  // 🟢 Reactivar
+  reactivar: async (nroDocumento, tipoDocumento) => {
+    await axios.patch(`${API_URL}/${nroDocumento}/${tipoDocumento}/reactivar`);
   },
 };
+
