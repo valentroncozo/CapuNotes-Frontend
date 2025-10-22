@@ -9,7 +9,7 @@ import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import MicIcon from '@mui/icons-material/Mic';
 import "@/styles/principal.css";
 
-export default function Principal({ username }) {
+export default function Principal({ username='Admin' }) {
   return (
     <div className="principal-container">
       <div className="home-container">

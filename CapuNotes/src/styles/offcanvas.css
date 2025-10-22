@@ -135,7 +135,7 @@
 
 /* Acordeón */
 .appshell-accordion-outer {
-  border: 1px solid #000;
+  border: 1px solid transparent;
   border-radius: 12px;
   overflow: hidden;
 }
