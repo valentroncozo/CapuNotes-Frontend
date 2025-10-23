@@ -9,6 +9,7 @@ import Login from "@/components/pages/login/index.jsx";
 import Principal from "@/components/pages/principal/index.jsx";
 import Cuerdas from "@/components/pages/cuerdas/index.jsx";
 import Areas from "@/components/pages/areas/index.jsx";
+import Fraternidades from "@/components/pages/fraternidades/index.jsx";
 import Miembros from "@/components/pages/miembros/index.jsx";
 import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
@@ -59,6 +60,7 @@ function AppRoutes() {
         <Route path="miembros/editar" element={<MiembrosEditar />} />
         <Route path="cuerdas" element={<Cuerdas />} />
         <Route path="areas" element={<Areas />} />
+        <Route path="fraternidades" element={<Fraternidades />} />
         <Route path="audicion" element={<Audicion />} />
         <Route path="audicion/agregar" element={<AudicionAgregar />} />
 
