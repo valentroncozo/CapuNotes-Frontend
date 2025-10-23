@@ -1,20 +1,26 @@
 /* src/styles/tokens.css */
 :root {
-  /* Colores */
+  /* Paleta base */
   --bg: #11103a;
+  --surface-1: #0f1036;             /* para cards oscuras (antes hardcodeado) */
   --accent: #ffc107;
   --card: #b3cdfa;
+
   --text-light: #E8EAED;
   --text-dark: #202124;
+
+  /* Estados */
+  --danger: #dc3545;
+  --danger-600: #bb2d3b;
 
   /* Layout */
   --radius: 16px;
   --shadow: 0 4px 14px rgba(0,0,0,.35);
 
-  /* Tipografía (global del sistema) */
+  /* Tipografía */
   --font-sans: 'Manjari', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
 
-  /* Escala (por si la necesitás en adelante) */
+  /* Espaciado */
   --space-1: .25rem;
   --space-2: .5rem;
   --space-3: .75rem;
@@ -22,10 +28,16 @@
   --space-5: 1.25rem;
   --space-6: 1.5rem;
 
+  /* Tamaños de fuente */
   --fs-1: .875rem;
   --fs-2: 1rem;
   --fs-3: 1.125rem;
   --fs-4: 1.25rem;
   --fs-5: 1.5rem;
   --fs-6: 1.75rem;
+
+  /* Breakpoints */
+  --bp-sm: 480px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
 }

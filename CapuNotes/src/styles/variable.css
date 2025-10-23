@@ -1,10 +1,3 @@
-:root {
-  --bg: #11103a;             /* primario/fondo */
-  --accent: #ffc107;         /* secundario / botones primarios */
-  --card: #b3cdfa;           /* terciario / cards */
-  --text-light: #E8EAED;     /* texto principal sobre fondo oscuro */
-  --text-dark: #202124;      /* texto en fondos claros */
-  --shadow: 0 4px 14px rgba(0,0,0,.35);
-  --radius: 16px;
-  --font: "Manjari", "Segoe UI", sans-serif;
-}
+/* src/styles/variable.css - DEPRECADO */
+/* Mantener por compatibilidad: todos los tokens viven en tokens.css */
+@import "./tokens.css";

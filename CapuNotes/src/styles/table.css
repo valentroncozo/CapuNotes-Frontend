@@ -1,3 +1,12 @@
+/* src/styles/table.css */
+
+/* Tokens locales de tabla (si querés moverlos a tokens.css, avisa y los subimos) */
+:root {
+  --table-row: #1f1e46;
+  --table-row-alt: #24224f;
+  --table-row-hover: #2a285e;
+}
+
 /* Tabla rectangular con filas separadas como cards */
 .abmc-table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
 
@@ -13,19 +22,18 @@
 }
 
 /* Filas alternadas */
-.abmc-row { color: var(--text-light); background: #1f1e46; }
-.abmc-row:nth-child(even) { background: #24224f; }
+.abmc-row { color: var(--text-light); background: var(--table-row); }
+.abmc-row:nth-child(even) { background: var(--table-row-alt); }
 .abmc-row td { padding: 14px; vertical-align: middle; }
-.abmc-row:hover { background: #2a285e; }
+.abmc-row:hover { background: var(--table-row-hover); }
 
 /* Sin redondeo en extremos */
 .abmc-row td:first-child,
 .abmc-row td:last-child { border-radius: 0 !important;}
 
-
 .abmc-row td,th {
   text-align: center;
-  min-width: 0;                 /* permite que el item se reduzca dentro del flex */
+  min-width: 0;
   overflow-wrap: break-word;
 }
 
@@ -33,26 +41,20 @@
 .abmc-actions { display: flex; gap: 8px; justify-content: center; }
 
 /* Responsive */
-@media (width < 460px) { 
+@media (width < 460px) {
   .abmc-actions { flex-wrap: wrap !important; }
 
-.abmc-row td,th {
-  text-align: center;
-  min-width: 0;                 /* permite que el item se reduzca dentro del flex */
-  overflow-wrap: break-word;
-}
+  .abmc-row td,th {
+    text-align: center;
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
 
   .abmc-row td:nth-child(4) { display: none; }
-
   .abmc-row th:nth-child(4) { display: none; }
+}
 
- }
-
-
- @media (width < 408px) { 
+@media (width < 408px) {
   .abmc-row td:nth-child(3) { display: none; }
-
   .abmc-row th:nth-child(3) { display: none; }
-
- }
-
+}

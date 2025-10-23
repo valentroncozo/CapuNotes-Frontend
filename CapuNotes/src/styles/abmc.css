@@ -2,8 +2,6 @@
 @import url('./forms.css');
 @import url('./table.css');
 
-
-
 .abmc-page {
   min-height: 100vh;
   background: var(--bg);
@@ -15,7 +13,7 @@
 .abmc-card {
   margin: 0 auto;
   width: min(980px, 96vw);
-  background: #0f1036;
+  background: var(--surface-1);
   border: 1px solid rgba(255,255,255,.08);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -52,7 +50,6 @@
   flex-wrap: wrap;
 }
 
-
 .form-group-agregar {
   width: 90%;
   height: auto;
@@ -60,7 +57,6 @@
   gap: 0.8rem;
   flex: row;
   flex-wrap: wrap;
-  
 }
 
 .form-group-agregar label {
@@ -80,13 +76,11 @@
   flex-wrap: wrap;
 }
 
-
 .form-group-miembro {
   width: 90%;
   display: flex;
   gap: 0.8rem;
   flex: row;
-
 }
 
 /* --- Mejorar alineación y espaciado de la columna de Acciones --- */
@@ -100,9 +94,9 @@
 /* Centra y da más aire a los íconos */
 .abmc-actions {
   display: flex;
-  justify-content: center;  /* centra horizontalmente los botones */
-  gap: 12px;                /* espacio entre los iconos */
-  padding-right: 12px;      /* 👈 corrimiento visual hacia adentro */
+  justify-content: center;
+  gap: 12px;
+  padding-right: 12px;
 }
 
 /* === Prioridad total para botones de acciones === */
@@ -159,11 +153,12 @@
   outline: none !important;
   box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.4); /* un halo suave dorado */
 }
+
 /* === Igualar altura visual del select con el input === */
 .abmc-select {
   height: 44px !important;
   padding: 0 12px;
-  line-height: 1.4; /* un poco más alto para centrar el texto */
+  line-height: 1.4;
   border: 1px solid rgba(255,255,255,.2);
   border-radius: var(--radius);
   background-color: rgba(255,255,255,.05);
@@ -173,7 +168,7 @@
 /* === Hover y focus coherentes con el diseño === */
 .abmc-select:hover {
   background-color: rgba(255, 255, 255, 0.08);
-  border-color: var(--accent); /* mismo amarillo institucional */
+  border-color: var(--accent);
   transition: all 0.2s ease-in-out;
 }
 
@@ -183,5 +178,3 @@
   outline: none;
   background-color: rgba(255, 255, 255, 0.1);
 }
-
-

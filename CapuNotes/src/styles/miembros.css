@@ -1,17 +1,7 @@
+/* src/styles/miembros.css */
+
 /* === FUENTE GLOBAL === */
 @import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
-
-/* === VARIABLES === */
-:root {
-  --bg: #11103a;
-  --accent: #ffc107;
-  --card: #b3cdfa;
-  --text-light: #E8EAED;
-  --text-dark: #202124;
-  --shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  --radius: 16px;
-  --font: "Manjari", "Segoe UI", sans-serif;
-}
 
 /* === REGLAS BASE === */
 * {
@@ -94,7 +84,7 @@ textarea {
 button.abmc-btn[variant="warning"],
 button.abmc-btn.agregar-btn {
   background-color: var(--accent) !important;
-  color: #11103a !important;
+  color: var(--text-dark) !important;
   border: none !important;
   border-radius: 8px;
   font-weight: 600;
@@ -183,7 +173,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 /* === CAMPOS OBLIGATORIOS === */
 .required {
-  color: #ffc107;
+  color: var(--accent);
   margin-left: 4px;
   font-weight: bold;
 }
@@ -200,7 +190,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 input.error,
 select.error,
 .form-select.error {
-  border: 2px solid #ffc107 !important;
+  border: 2px solid var(--accent) !important;
   background-color: var(--bg) !important;
 }
 
@@ -210,11 +200,12 @@ select.error:focus,
   border-color: #ffca2c !important;
   box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.25);
 }
+
 /* Forzar dropdown más visible (mayor alto) */
 select.abmc-select {
   background-color: var(--bg);
   color: var(--text-light);
-  border: 1px solid #b3cdfa;
+  border: 1px solid var(--card);
   border-radius: 8px;
   padding: 6px 10px;
   transition: border-color 0.2s ease;
@@ -234,55 +225,24 @@ select.abmc-select option {
 
 /* Evita que los selects se abran hacia arriba */
 .abmc-card {
-  overflow: visible !important; /* permite que el menú salga del contenedor */
+  overflow: visible !important;
   position: relative;
   z-index: 1;
 }
+
 /* Forzar que los select se abran hacia abajo */
 select.abmc-select,
 .form-select {
   background-color: var(--bg);
   color: var(--text-light);
-  border: 1px solid #b3cdfa;
+  border: 1px solid var(--card);
   border-radius: 8px;
   padding: 6px 10px;
-  appearance: auto !important; /* asegura que use el menú nativo */
-  -webkit-appearance: menulist !important;
-  overflow: visible !important;
-}
-
-select.abmc-select option,
-.form-select option {
-  background-color: var(--bg);
-  color: var(--text-light);
-}
-/* === FORZAR SELECTS A DESPLEGARSE HACIA ABAJO === */
-
-/* Asegura que el menú no se recorte ni se abra hacia arriba */
-.abmc-card,
-.pantalla-miembros,
-.abmc-topbar {
-  overflow: visible !important;
-  position: relative !important;
-  z-index: 1;
-}
-
-/* Asegura que los selects muestren la flecha y no hereden restricciones */
-select.abmc-select,
-.form-select {
   appearance: auto !important;
   -webkit-appearance: menulist !important;
   overflow: visible !important;
-  position: relative !important;
-  z-index: 2;
-  background-color: var(--bg);
-  color: var(--text-light);
-  border: 1px solid #b3cdfa;
-  border-radius: 8px;
-  padding: 6px 10px;
 }
 
-/* Fondo del menú desplegable */
 select.abmc-select option,
 .form-select option {
   background-color: var(--bg);
@@ -300,12 +260,13 @@ select.abmc-select:focus,
 .pantalla-miembros .abmc-card {
   padding-bottom: 60px; /* espacio adicional debajo del último campo */
 }
+
 /* separa el último grupo (Área / Cuerda) de los botones */
 .form-row-miembros:last-of-type {
   margin-bottom: 30px; /* antes 10px o 16px */
 }
+
 .acciones-form-miembro {
   margin-top: 40px !important; /* antes 20px */
   padding-top: 8px;
- 
 }
