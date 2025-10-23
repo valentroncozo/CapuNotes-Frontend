@@ -19,7 +19,7 @@ const Audicion = ({ title ='Audición'}) => {
 
   const navigate = useNavigate();
 
-  const [audicion, setAudicion] = useState({});
+  const [setAudicion] = useState({});
   const [data, setData] = useState([]);
 
   const [filteredData, setFilteredData] = useState(data);
