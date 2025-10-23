@@ -87,8 +87,8 @@ const Audicion = ({ title ='Audición'}) => {
               />
 
               <button 
-              className="abmc-btn btn-primary"
-              onClick={() => { navigate('/audicion/agregar'); }}
+                className="abmc-btn btn-primary"
+                onClick={() => { navigate('/audicion/agregar'); }}
               >
                 Agregar Audición
               </button>

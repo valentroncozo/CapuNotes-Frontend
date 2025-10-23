@@ -28,7 +28,6 @@ function GearIcon(props) {
 
 const MENU_ITEMS = [
   ["/asistencias", "Asistencias"],
-  ["/audicion", "Audiciones"],
   ["/canciones", "Canciones"],
   ["/eventos", "Eventos"],
   ["/usuarios-roles", "Usuarios y roles"],
@@ -38,6 +37,7 @@ export default function AppShell({ onLogout }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [orgOpen, setOrgOpen] = useState(false);
+  const [audicionOpen, setAudicionOpen] = useState(false);
   const [gearOpen, setGearOpen] = useState(false);
 
   useEffect(() => {
@@ -113,6 +113,8 @@ export default function AppShell({ onLogout }) {
           <Menu
             orgOpen={orgOpen}
             setOrgOpen={setOrgOpen}
+            audicionOpen={audicionOpen}
+            setAudicionOpen={setAudicionOpen}
             onNavigate={handleNavigate}
           />
         </div>
@@ -134,7 +136,7 @@ export default function AppShell({ onLogout }) {
   );
 }
 
-function Menu({ orgOpen, setOrgOpen, onNavigate }) {
+function Menu({ orgOpen, setOrgOpen, audicionOpen, setAudicionOpen, onNavigate }) {
   return (
     <div className="appshell-menu">
       <a
@@ -177,6 +179,50 @@ function Menu({ orgOpen, setOrgOpen, onNavigate }) {
               onClick={(e) => { e.preventDefault(); onNavigate("/miembros"); }}
             >
               Miembros
+            </a>
+          </div>
+        )}
+      </div>
+
+      <div className="appshell-accordion-outer">
+        <button
+          className={`appshell-accordion-trigger ${audicionOpen ? "open" : ""}`}
+          onClick={() => setAudicionOpen((v) => !v)}
+          aria-expanded={audicionOpen}
+        >
+          Audiciones
+          <span className="appshell-accordion-caret">{audicionOpen ? "▴" : "▾"}</span>
+        </button>
+
+        {audicionOpen && (
+          <div className="appshell-accordion-content">
+            <a
+              href="/audicion"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/audicion"); }}
+            >
+              Audiciones
+            </a>
+            <a
+              href="/audicion/historial"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/historial"); }}
+            >
+              Historial de Audiciones
+            </a>
+            <a
+              href="/audicion/candidatos"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/candidatos"); }}
+            >
+              Candidatos
+            </a>
+            <a
+              href="/audicion/cuestionario"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/cuestionario"); }}
+            >
+              Configuración del Cuestionario
             </a>
           </div>
         )}

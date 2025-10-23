@@ -14,6 +14,7 @@ import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
 import Audicion from "@/components/pages/audicion/index.jsx";
 import AudicionAgregar from "@/components/pages/audicion/agregar.jsx";
+import HistorialAudiciones from "@/components/pages/audicion/historial.jsx";
 
 // Estilos base (usar globals como fuente de verdad)
 import "@/styles/globals.css";
@@ -61,6 +62,7 @@ function AppRoutes() {
         <Route path="areas" element={<Areas />} />
         <Route path="audicion" element={<Audicion />} />
         <Route path="audicion/agregar" element={<AudicionAgregar />} />
+        <Route path="audicion/historial" element={<HistorialAudiciones />} />
 
       </Route>
 
