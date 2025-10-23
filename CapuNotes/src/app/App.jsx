@@ -15,6 +15,12 @@ import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
 import Audicion from "@/components/pages/audicion/index.jsx";
 import AudicionAgregar from "@/components/pages/audicion/agregar.jsx";
+import AudicionEditar from "@/components/pages/audicion/editar.jsx";
+import CuestionarioConfig from "@/components/pages/cuestionario/configuracion.jsx";
+import CuestionarioPreview from "@/components/pages/cuestionario/preview.jsx";
+import Candidatos from "@/components/pages/candidatos/index.jsx";
+import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx";
+import HistorialCandidatos from "@/components/pages/candidatos/historial.jsx";
 
 // Estilos base (usar globals como fuente de verdad)
 import "@/styles/globals.css";
@@ -63,6 +69,13 @@ function AppRoutes() {
         <Route path="fraternidades" element={<Fraternidades />} />
         <Route path="audicion" element={<Audicion />} />
         <Route path="audicion/agregar" element={<AudicionAgregar />} />
+        <Route path="audicion/editar" element={<AudicionEditar />} />
+        <Route path="audicion/cronograma/:id" element={<Navigate to="/candidatos-coordinadores" replace />} />
+        <Route path="cuestionario/configuracion" element={<CuestionarioConfig />} />
+        <Route path="cuestionario/preview" element={<CuestionarioPreview />} />
+        <Route path="candidatos" element={<Candidatos />} />
+        <Route path="candidatos-coordinadores" element={<CandidatosCoordinadores />} />
+        <Route path="candidatos/historial" element={<HistorialCandidatos />} />
 
       </Route>
 

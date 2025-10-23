@@ -50,16 +50,29 @@ export default function EntityTableABMC({
   const [selected, setSelected] = useState(null);
 
   const load = async () => {
-    const data = await service.list();
+    try {
+      const data = await service.list();
 
-    // Ordenar alfabéticamente por el campo "nombre"
-    const sorted = Array.isArray(data)
-      ? [...data].sort((a, b) =>
-        (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" })
-      )
-      : [];
+      // Ordenar alfabéticamente por el campo "nombre"
+      const sorted = Array.isArray(data)
+        ? [...data].sort((a, b) =>
+          (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" })
+        )
+        : [];
 
-    setItems(sorted);
+      setItems(sorted);
+    } catch (err) {
+      console.error("❌ Error al cargar la lista:", err);
+      setItems([]);
+      Swal.fire({
+        icon: "error",
+        title: "Error al cargar",
+        text: err?.response?.data || "No se pudieron cargar los datos.",
+        background: "#11103a",
+        color: "#E8EAED",
+        confirmButtonColor: "#7c83ff",
+      });
+    }
   };
 
 
@@ -334,7 +347,7 @@ export default function EntityTableABMC({
                 {f.label}
               </button>
             ) : f.type === "submit" ? (
-              <button type="submit" className="abmc-btn abmc-btn-primary">
+              <button key={f.key} type="submit" className="abmc-btn abmc-btn-primary">
                 {f.label}
               </button>
             ) : f.type === "label" ? (

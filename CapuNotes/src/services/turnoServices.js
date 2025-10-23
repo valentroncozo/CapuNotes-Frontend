@@ -28,6 +28,15 @@ const TurnoService = {
     }
   },
 
+  listarResumenPorDia: async (audicionId) => {
+    try {
+      const r = await api.get(`/turnos/audicion/${encodeURIComponent(audicionId)}/resumen-diario`);
+      return r.data;
+    } catch (e) {
+      throw e.response?.data || e.message;
+    }
+  },
+
   generarTurnos: async (audicionId, generarTurnosRequest) => {
     try {
       const r = await api.post(`/turnos/audicion/${encodeURIComponent(audicionId)}`, generarTurnosRequest);
