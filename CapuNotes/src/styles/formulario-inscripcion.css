@@ -1,0 +1,171 @@
+import back-button.css import tokens.css body {
+  background-color: #0b0b3a;
+  color: #fff;
+  font-family: 'Manjari', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+h2 {
+  margin-top: 2rem;
+  font-size: 1.3rem;
+  color: #ffc107;
+  text-align: center;
+}
+
+/* === FORMULARIO === */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 2rem 1rem;
+}
+
+/* Cada bloque de campos */
+.form-grid {
+  display: flex;
+  flex-direction: column; /* 🔥 Todos los campos en una sola columna */
+  gap: 1.2rem;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* === CAMPOS === */
+.field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.field label {
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+/* Inputs, selects y textarea */
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  background: #23233a;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: 'Manjari', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  resize: vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: #ffc107;
+  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2);
+}
+
+/* === BOTÓN === */
+button[type='submit'] {
+  background-color: #ffc107;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 25px;
+  padding: 0.8rem 2rem;
+  margin-top: 2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button[type='submit']:hover {
+  background-color: #e0a800;
+}
+
+/* === LISTA DE INSTRUCCIONES === */
+.field ul {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  list-style-type: disc;
+}
+
+.field li {
+  margin-bottom: 0.5rem;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  .form-grid {
+    padding: 1rem;
+    max-width: 100%;
+  }
+
+  button[type='submit'] {
+    width: 100%;
+  }
+}
+
+.abmc-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 14px;
+}
+
+.abmc-header button {
+  position: absolute;
+  left: 0;
+}
+
+.abmc-title {
+  flex: 2;
+  margin: 0;
+  font-weight: 700;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.divisor-amarillo {
+  border: none;
+  border-top: 1px solid var(--accent);
+  border-radius: 1px;
+  margin: 0.75rem 0 1.25rem;
+}
+
+.bloque {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.datos-personales {
+  position: sticky;
+  top: 80px;
+  padding: 0.5rem 0;
+  z-index: 10;
+}
+
+.datos-personales h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  text-align: center;
+}
