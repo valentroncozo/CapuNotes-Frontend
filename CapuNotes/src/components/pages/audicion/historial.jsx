@@ -14,6 +14,7 @@ export default function HistorialAudicionesPage() {
   const [rows, setRows] = useState([]);
   const [q, setQ] = useState("");
   const [verResultado, setVerResultado] = useState(null); // {estado, obs}
+  const [verInscripcion, setVerInscripcion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -29,16 +30,46 @@ export default function HistorialAudicionesPage() {
         setLoading(true);
         setError(null);
         const data = await historialService.list();
-        setRows(data || []);
+        
+        // Transformar la estructura del backend:
+        // De: [{ candidato: {...}, inscripcion: [...] }]
+        // A: filas planas para la tabla
+        const flatRows = (data || []).flatMap((historialItem) => {
+          const { candidato, inscripcion } = historialItem;
+          
+          // Si no hay inscripciones, crear una fila con datos del candidato
+          if (!inscripcion || inscripcion.length === 0) {
+            return [{
+              id: candidato?.id || Math.random(),
+              nombre: candidato?.nombre || '',
+              apellido: candidato?.apellido || '',
+              fechaAudicion: '',
+              cancion: '',
+              resultado: null,
+              inscripcion: candidato // Guardar datos completos del candidato
+            }];
+          }
+          
+          // Crear una fila por cada inscripción
+          return inscripcion.map((insc, idx) => ({
+            id: `${candidato?.id || 'temp'}-${idx}`,
+            nombre: candidato?.nombre || '',
+            apellido: candidato?.apellido || '',
+            fechaAudicion: insc.fechaAudicion || insc.diaAudicion || '',
+            cancion: insc.cancion || '',
+            resultado: insc.resultado || null,
+            inscripcion: insc // Datos completos de la inscripción
+          }));
+        });
+        
+        setRows(flatRows);
       } catch (err) {
         console.error('Error cargando historial:', err);
         
         // Verificar si es un error de conexión (endpoint no implementado)
         if (err.message?.includes('Network Error') || err.message?.includes('404')) {
           setError('El servicio de historial aún no está disponible. Por favor, implemente el endpoint del backend.');
-        } else {
-          setError('No se pudo cargar el historial de audiciones. Verifique la conexión con el servidor.');
-        }
+        } 
       } finally {
         setLoading(false);
       }
@@ -142,7 +173,7 @@ export default function HistorialAudicionesPage() {
           <thead className="abmc-thead">
             <tr className="abmc-row">
               <th className={thClass("nombre")}>
-                <span className="th-label">Apellido, Nombre</span>
+                <span className="th-label">Nombre</span>
                 <button type="button" className="th-caret-btn" onClick={() => toggleSort("nombre")} aria-label="Ordenar por Nombre">
                   <span className="th-caret" aria-hidden />
                 </button>
@@ -155,13 +186,6 @@ export default function HistorialAudicionesPage() {
                 </button>
               </th>
 
-              <th className={thClass("anio")}>
-                <span className="th-label">Año</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("anio")} aria-label="Ordenar por Año">
-                  <span className="th-caret" aria-hidden />
-                </button>
-              </th>
-
               <th><span className="th-label">Canción</span></th>
               
               <th className={thClass("resultado")}>
@@ -170,16 +194,15 @@ export default function HistorialAudicionesPage() {
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
-              
-              <th style={{ textAlign: "center" }}><span className="th-label">Detalles</span></th>
-              <th style={{ textAlign: "center" }}><span className="th-label">Inscripción</span></th>
+
+              <th style={{ width: 60 }} aria-hidden="true" />
             </tr>
           </thead>
 
           <tbody>
             {sorted.length === 0 ? (
               <tr>
-                <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
                   {q
                     ? 'No se encontraron resultados con el filtro de búsqueda.' 
                     : 'No hay registros en el historial de audiciones.'}
@@ -209,14 +232,14 @@ export default function HistorialAudicionesPage() {
                       </button>
                     </td>
 
-                    <td className="abmc-actions">
+                    <td style={{ textAlign: "center" }}>
                       <button
-                        className="btn-accion btn-accion--icon"
-                        title="Ver inscripción"
-                        onClick={() => alert(JSON.stringify(r.inscripcion || {}, null, 2))}
-                        aria-label="Ver inscripción"
+                        className="btn-accion"
+                        title="Abrir cuestionario de inscripción"
+                        onClick={() => setVerInscripcion(r.inscripcion || r)}
+                        aria-label="Abrir cuestionario de inscripción"
                       >
-                        <InfoIcon size={18} />
+                        +
                       </button>
                     </td>
                   </tr>
@@ -226,6 +249,66 @@ export default function HistorialAudicionesPage() {
           </tbody>
         </table>
       </div>
+
+      {verInscripcion && (
+        <div className="pop-backdrop" onMouseDown={() => setVerInscripcion(null)}>
+          <div className="pop-dialog" onMouseDown={(e) => e.stopPropagation()} style={{ maxWidth: 600 }}>
+            <div className="pop-header">
+              <h3 className="pop-title">Cuestionario de inscripción</h3>
+              <button className="icon-btn" aria-label="Cerrar" onClick={() => setVerInscripcion(null)}>✕</button>
+            </div>
+            <div className="pop-body">
+              <div className="form-grid" style={{ gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div className="field">
+                  <label>Nombre</label>
+                  <input className="input" value={verInscripcion.nombre || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Apellido</label>
+                  <input className="input" value={verInscripcion.apellido || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Documento</label>
+                  <input className="input" value={`${verInscripcion.tipoDocumento || ""} ${verInscripcion.nroDocumento || ""}`.trim()} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Email</label>
+                  <input className="input" value={verInscripcion.email || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Teléfono</label>
+                  <input className="input" value={verInscripcion.telefono || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Fecha de Nacimiento</label>
+                  <input className="input" value={verInscripcion.fechaNacimiento || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Género</label>
+                  <input className="input" value={verInscripcion.genero || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Cuerda</label>
+                  <input className="input" value={verInscripcion.cuerda || ""} readOnly disabled />
+                </div>
+                <div className="field" style={{ gridColumn: "1 / -1" }}>
+                  <label>Dirección</label>
+                  <input className="input" value={verInscripcion.direccion || ""} readOnly disabled />
+                </div>
+                {verInscripcion.observaciones && (
+                  <div className="field" style={{ gridColumn: "1 / -1" }}>
+                    <label>Observaciones</label>
+                    <textarea className="input" rows={3} value={verInscripcion.observaciones || ""} readOnly disabled />
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="pop-footer" style={{ justifyContent: "flex-end" }}>
+              <button className="btn btn-secondary" onClick={() => setVerInscripcion(null)}>Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {verResultado && (
         <div className="pop-backdrop" onMouseDown={() => setVerResultado(null)}>

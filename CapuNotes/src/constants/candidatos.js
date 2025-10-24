@@ -48,3 +48,8 @@ export function estadoClass(estado) {
   }
   return 'estado-sin';
 }
+
+/**
+ * Estados válidos de turno para la vista de coordinador
+ */
+export const TURNO_ESTADOS = ["disponible", "reservado", "cancelado"];

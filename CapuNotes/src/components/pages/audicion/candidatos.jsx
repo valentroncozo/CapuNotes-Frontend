@@ -5,25 +5,9 @@ import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
 import "@/styles/table.css";
 import "@/styles/forms.css";
-import "@/styles/icons.css";
-import { PencilFill } from "react-bootstrap-icons";
+import "@/styles/popup.css";
 
 import { candidatosService } from "@/services/candidatosService.js";
-import { audicionesService } from "@/services/audicionesService.js";
-import { estadoLabel } from "@/constants/candidatos.js";
-import { horaToMinutes } from "@/components/common/datetime.js";
-
-import ResultadosModal from "./ResultadosModal.jsx";
-import InscripcionView from "@/components/common/InscripcionView.jsx";
-import { success } from "@/utils/alerts.js";
-
-/* Íconos de resultado */
-import AceptadoIcon from "@/assets/icons/resultado/AceptadoIcon.jsx";
-import RechazadoIcon from "@/assets/icons/resultado/RechazadoIcon.jsx";
-import AusenteIcon from "@/assets/icons/resultado/AusenteIcon.jsx";
-import SinResultadoIcon from "@/assets/icons/resultado/SinResultadoIcon.jsx";
-
-/* Ícono local */
 import InfoIcon from "@/assets/InfoIcon.jsx";
 
 export default function CandidatosPage() {
@@ -35,24 +19,42 @@ export default function CandidatosPage() {
   const [sortBy, setSortBy] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
 
-  const [editRow, setEditRow] = useState(null);
-  const [viewRow, setViewRow] = useState(null);
+  const [verInscripcion, setVerInscripcion] = useState(null);
+  const [verResultado, setVerResultado] = useState(null);
+  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [sp] = useSearchParams();
 
   useEffect(() => {
-    (async () => {
-      const [cd, ds] = await Promise.all([
-        candidatosService.list(),
-        audicionesService.listDias(),
-      ]);
-      setRows(cd);
-      setDias(ds);
-      const qp = sp.get("dia");
-      if (qp && ds.includes(qp)) setDiaSel(qp);
-      else setDiaSel("-");
-    })();
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sp]);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const cd = await candidatosService.list();
+      setRows(cd || []);
+      
+      // Extraer días únicos de los candidatos
+      const uniqueDias = [...new Set(cd.map(c => c.dia || c.inscripcion?.diaAudicion).filter(Boolean))];
+      setDias(uniqueDias);
+      
+      const qp = sp.get("dia");
+      if (qp && uniqueDias.includes(qp)) setDiaSel(qp);
+      else setDiaSel("-");
+    } catch (err) {
+      console.error('Error cargando candidatos:', err);
+      if (err.message?.includes('Network Error') || err.message?.includes('404')) {
+        setError('El servicio de candidatos aún no está disponible.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const nombreApynom = (r) => {
     const ape = (r.apellido || "").trim();
@@ -80,6 +82,20 @@ export default function CandidatosPage() {
     return filteredByText.filter((r) => getDia(r) === diaSel);
   }, [filteredByText, diaSel]);
 
+  const horaToMinutes = (hora) => {
+    if (!hora) return 0;
+    const [h, m] = String(hora).split(':').map(Number);
+    return (h || 0) * 60 + (m || 0);
+  };
+
+  const estadoLabel = (estado) => {
+    const e = String(estado || "sin").toLowerCase();
+    if (e === "aceptado" || e === "aceptada" || e === "ok") return "Aceptado";
+    if (e === "rechazado" || e === "rechazada" || e === "bad") return "Rechazado";
+    if (e === "ausente" || e === "pend") return "Ausente";
+    return "Sin resultado";
+  };
+
   const sorted = useMemo(() => {
     if (!sortBy) return filtered;
     const dir = sortDir === "desc" ? -1 : 1;
@@ -103,18 +119,36 @@ export default function CandidatosPage() {
     if (sortBy !== key) { setSortBy(key); setSortDir("asc"); }
     else { setSortDir((d) => (d === "asc" ? "desc" : "asc")); }
   };
+  
   const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
 
-  const ResultadoIcon = ({ estado }) => {
-    const e = String(estado || "sin").toLowerCase();
-    if (e === "aceptado" || e === "aceptada" || e === "ok")
-      return <span className="icon-estado icon-estado--ok icon-md" title="Aceptado"><AceptadoIcon /></span>;
-    if (e === "rechazado" || e === "rechazada" || e === "bad")
-      return <span className="icon-estado icon-estado--bad icon-md" title="Rechazado"><RechazadoIcon /></span>;
-    if (e === "ausente" || e === "pend")
-      return <span className="icon-estado icon-estado--pend icon-md" title="Ausente"><AusenteIcon /></span>;
-    return <span className="icon-estado icon-estado--sin icon-md" title="Sin resultado"><SinResultadoIcon /></span>;
-  };
+  if (loading) {
+    return (
+      <main className="abmc-page">
+        <div className="abmc-card">
+          <div className="abmc-header">
+            <BackButton />
+            <h1 className="abmc-title">Candidatos</h1>
+          </div>
+          <p style={{ textAlign: 'center', padding: '2rem' }}>Cargando candidatos...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="abmc-page">
+        <div className="abmc-card">
+          <div className="abmc-header">
+            <BackButton />
+            <h1 className="abmc-title">Candidatos</h1>
+          </div>
+          <p style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>{error}</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="abmc-page">
@@ -138,7 +172,7 @@ export default function CandidatosPage() {
             onChange={(e) => setDiaSel(e.target.value)}
             aria-label="Filtrar por día de audición"
           >
-            <option value="-">-</option>
+            <option value="-">Todos los días</option>
             {dias.map(d => <option key={d} value={d}>{d}</option>)}
           </select>
         </div>
@@ -154,8 +188,8 @@ export default function CandidatosPage() {
               </th>
 
               <th className={thClass("apynom")}>
-                <span className="th-label">Apellido, Nombre</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("apynom")} aria-label="Ordenar por Apellido, Nombre">
+                <span className="th-label">Nombre</span>
+                <button type="button" className="th-caret-btn" onClick={() => toggleSort("apynom")} aria-label="Ordenar por Nombre">
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
@@ -169,79 +203,139 @@ export default function CandidatosPage() {
                 </button>
               </th>
 
-              <th style={{ textAlign: "center" }}><span className="th-label">Inscripción</span></th>
+              <th style={{ textAlign: "center" }}><span className="th-label"></span></th>
             </tr>
           </thead>
 
           <tbody>
-            {sorted.map((r) => (
-              <tr key={r.id} className="abmc-row">
-                <td>{r.hora}</td>
-                <td>{nombreApynom(r)}</td>
-                <td>{r.cancion}</td>
-
-                <td className="cell-right-action">
-                  <ResultadoIcon estado={r.resultado?.estado} />
-                  <button
-                    type="button"
-                    className="btn-accion btn-accion--icon right-action"
-                    title="Editar resultado"
-                    onClick={() => setEditRow(r)}
-                    aria-label="Editar resultado"
-                  >
-                    <PencilFill size={18} />
-                  </button>
-                </td>
-
-                <td className="abmc-actions">
-                  <button
-                    type="button"
-                    className="btn-accion btn-accion--icon"
-                    title="Ver inscripción"
-                    aria-label="Ver inscripción"
-                    onClick={() => setViewRow(r)}
-                  >
-                    <InfoIcon size={18} />
-                  </button>
+            {sorted.length === 0 ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                  {q || diaSel !== "-"
+                    ? 'No se encontraron resultados con los filtros aplicados.' 
+                    : 'No hay candidatos registrados.'}
                 </td>
               </tr>
-            ))}
+            ) : (
+              sorted.map((r) => (
+                <tr key={r.id} className="abmc-row">
+                  <td>{r.hora || "—"}</td>
+                  <td>{nombreApynom(r)}</td>
+                  <td>{r.cancion || "—"}</td>
+                  <td style={{ textAlign: 'center' }}>
+                    <button
+                      className="btn-accion"
+                      onClick={() => setVerResultado(r.resultado || { estado: "", obs: "" })}
+                      title="Ver detalles del resultado"
+                      aria-label="Ver detalles del resultado"
+                    >
+                      {estadoLabel(r.resultado?.estado)}
+                    </button>
+                  </td>
+
+                  <td className="abmc-actions" style={{ textAlign: 'center' }}>
+                    <button
+                      className="btn-accion btn-accion--icon"
+                      title="Ver inscripción"
+                      aria-label="Ver inscripción"
+                      onClick={() => setVerInscripcion(r.inscripcion || r)}
+                    >
+                      <InfoIcon size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
-
-        <p style={{ opacity: 0.7, marginTop: 10 }}>
-          Vista de <b>evaluadores</b>: pueden asignar <i>Resultado</i> y ajustar la <i>Cuerda</i>.
-        </p>
       </div>
 
-      {editRow && (
-        <ResultadosModal
-          row={editRow}
-          onClose={() => setEditRow(null)}
-          onSave={async (estado, obs) => {
-            const res = await candidatosService.updateResultado(editRow.id, { estado, obs });
-            setRows((prev) =>
-              prev.map((x) => (x.id === res.id ? { ...x, resultado: res.resultado } : x))
-            );
-            await success({ title: "Resultado guardado" });
-            setEditRow(null);
-          }}
-        />
+      {/* Popup de Resultado */}
+      {verResultado && (
+        <div className="pop-backdrop" onMouseDown={() => setVerResultado(null)}>
+          <div className="pop-dialog" onMouseDown={(e) => e.stopPropagation()} style={{ maxWidth: 420 }}>
+            <div className="pop-header">
+              <h3 className="pop-title">Resultado</h3>
+              <button className="icon-btn" aria-label="Cerrar" onClick={() => setVerResultado(null)}>✕</button>
+            </div>
+            <div className="pop-body">
+              <div className="form-grid">
+                <div className="field">
+                  <label>Estado</label>
+                  <input className="input" value={verResultado.estado || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Observaciones</label>
+                  <textarea className="input" rows={4} value={verResultado.obs || ""} readOnly disabled />
+                </div>
+              </div>
+            </div>
+            <div className="pop-footer" style={{ justifyContent: "flex-end" }}>
+              <button className="btn btn-secondary" onClick={() => setVerResultado(null)}>Cerrar</button>
+            </div>
+          </div>
+        </div>
       )}
 
-      {viewRow && (
-        <InscripcionView
-          data={viewRow.inscripcion}
-          open={true}
-          onClose={() => setViewRow(null)}
-          editable={true}
-          onSaveCuerda={async (nuevaCuerda) => {
-            const updated = await candidatosService.updateInscripcionCuerda(viewRow.id, nuevaCuerda);
-            if (!updated) return;
-            setRows((prev) => prev.map((x) => (x.id === updated.id ? updated : x)));
-            await success({ title: "Cuerda actualizada" });
-          }}
-        />
+      {/* Popup de Inscripción */}
+      {verInscripcion && (
+        <div className="pop-backdrop" onMouseDown={() => setVerInscripcion(null)}>
+          <div className="pop-dialog" onMouseDown={(e) => e.stopPropagation()} style={{ maxWidth: 600 }}>
+            <div className="pop-header">
+              <h3 className="pop-title">Datos de Inscripción</h3>
+              <button className="icon-btn" aria-label="Cerrar" onClick={() => setVerInscripcion(null)}>✕</button>
+            </div>
+            <div className="pop-body">
+              <div className="form-grid" style={{ gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+                <div className="field">
+                  <label>Nombre</label>
+                  <input className="input" value={verInscripcion.nombre || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Apellido</label>
+                  <input className="input" value={verInscripcion.apellido || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Documento</label>
+                  <input className="input" value={`${verInscripcion.tipoDocumento || ""} ${verInscripcion.nroDocumento || ""}`.trim()} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Email</label>
+                  <input className="input" value={verInscripcion.email || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Teléfono</label>
+                  <input className="input" value={verInscripcion.telefono || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Fecha de Nacimiento</label>
+                  <input className="input" value={verInscripcion.fechaNacimiento || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Género</label>
+                  <input className="input" value={verInscripcion.genero || ""} readOnly disabled />
+                </div>
+                <div className="field">
+                  <label>Cuerda</label>
+                  <input className="input" value={verInscripcion.cuerda || ""} readOnly disabled />
+                </div>
+                <div className="field" style={{ gridColumn: "1 / -1" }}>
+                  <label>Dirección</label>
+                  <input className="input" value={verInscripcion.direccion || ""} readOnly disabled />
+                </div>
+                {verInscripcion.observaciones && (
+                  <div className="field" style={{ gridColumn: "1 / -1" }}>
+                    <label>Observaciones</label>
+                    <textarea className="input" rows={3} value={verInscripcion.observaciones || ""} readOnly disabled />
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="pop-footer" style={{ justifyContent: "flex-end" }}>
+              <button className="btn btn-secondary" onClick={() => setVerInscripcion(null)}>Cerrar</button>
+            </div>
+          </div>
+        </div>
       )}
     </main>
   );

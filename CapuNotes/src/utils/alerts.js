@@ -50,6 +50,20 @@ export async function warning({ title, message }) {
 }
 
 /**
+ * Muestra una alerta informativa
+ * @param {Object} options
+ * @param {string} options.title
+ * @param {string} options.message
+ */
+export async function info({ title, message }) {
+  if (message) {
+    alert(`${title}\n${message}`);
+  } else {
+    alert(title);
+  }
+}
+
+/**
  * Muestra un diálogo de confirmación
  * @param {Object} options - Opciones del diálogo
  * @param {string} options.title - Título del diálogo

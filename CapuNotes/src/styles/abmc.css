@@ -15,10 +15,13 @@
 .abmc-card {
   margin: 0 auto;
   width: min(980px, 96vw);
-  background: #0f1036;
-  border: 1px solid rgba(255,255,255,.08);
+  /* Usar el mismo color de fondo que la página para un fondo uniforme */
+  background: var(--bg);
+  /* mantener una ligera separación visual con un borde muy sutil */
+  border: 1px solid rgba(255,255,255,0.02);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  /* sombra opcional pero sutil para leer mejor el contenido */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
   padding: 20px;
 }
 
@@ -39,6 +42,17 @@
   font-weight: 700;
   text-align: center;
   font-size: 1.8rem;
+}
+
+/* Línea amarilla decorativa debajo de los títulos */
+.abmc-title::after {
+  content: "";
+  display: block;
+  width: 64px;
+  height: 4px;
+  margin: 8px auto 0 auto;
+  background: var(--accent);
+  border-radius: 2px;
 }
 
 /* Topbar: alta + buscar */

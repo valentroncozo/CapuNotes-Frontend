@@ -17,6 +17,7 @@ export const historialService = {
   // Versión mínima: un solo método para listar
   list: async () => {
     try {
+      // Si tu backend expone /api/historial, cambia '/historial' por '/api/historial'
       const response = await api.get('/historial');
       return response.data;
     } catch (error) {
