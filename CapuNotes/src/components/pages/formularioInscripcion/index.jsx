@@ -1,21 +1,86 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useDropzone } from 'react-dropzone';
 import '@/styles/formulario-inscripcion.css';
 import BackButton from '../../common/BackButton.jsx';
+import { IMaskInput } from 'react-imask';
 
 const FormularioBasico = () => {
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
     email: '',
+    tipoDocumento: '',
+    numeroDocumento: '',
+    fechaNacimiento: '',
+    telefono: '',
+    lugarOrigen: '',
+    profesion: '',
+    cuerda: '',
+    foto: null,
+    sobreMi: '',
+    crecerFe: '',
+    experienciaCanto: '',
+    misaCapuchinos: '',
+    otrosGrupos: '',
+    instrumentoMusical: '',
+    otroTalento: '',
+    enterasteConvocatoria: '',
+    motivacionCoro: '',
+    cancionElegida: '',
+    dia: '',
+    horario: '',
+    aceptoCondiciones: false,
   });
 
+  const [preview, setPreview] = useState(null);
+
+  // Maneja cualquier cambio en inputs normales
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: type === 'checkbox' ? checked : value,
     });
   };
+
+  // Maneja archivos arrastrados o seleccionados
+  const onDrop = useCallback(
+    (acceptedFiles) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
+
+      // Si ya hay una imagen cargada, no permite otra
+      if (formData.foto) {
+        alert('Solo podés subir una imagen. Eliminá la actual para cambiarla.');
+        return;
+      }
+
+      setFormData((prev) => ({ ...prev, foto: file }));
+      setPreview(URL.createObjectURL(file));
+    },
+    [formData.foto]
+  );
+
+  const handleRemoveImage = () => {
+    setFormData((prev) => ({ ...prev, foto: null }));
+    if (preview) {
+      URL.revokeObjectURL(preview);
+      setPreview(null);
+    }
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { 'image/*': [] },
+    multiple: false,
+  });
+
+  // Limpieza del objeto URL al desmontar
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,9 +91,11 @@ const FormularioBasico = () => {
     <div className="formulario-container">
       <header className="abmc-header">
         <BackButton />
-        <h1>Formulario de Audición</h1>
+        <div className="abmdc-title">
+          <h1>Formulario inscripción audición</h1>
+        </div>
       </header>
-      <hr className="divisor-amarillo"></hr>
+      <hr className="divisor-amarillo" />
 
       <form onSubmit={handleSubmit} className="form-group">
         <section className="form-grid">
@@ -59,31 +126,39 @@ const FormularioBasico = () => {
               />
             </div>
 
-            <div className="field">
-              <label>Tipo Documento</label>
-              <select name="tipoDocumento" required>
-                <option value="">Seleccione</option>
-                <option value="DNI">DNI</option>
-                <option value="Pasaporte">Pasaporte</option>
-                <option value="Cédula">Cédula</option>
-              </select>
+            <div className="documento-row">
+              <div className="field">
+                <label>Tipo Documento</label>
+                <select name="tipoDocumento" required>
+                  <option value="">Seleccione</option>
+                  <option value="DNI">DNI</option>
+                  <option value="Pasaporte">Pasaporte</option>
+                  <option value="Cédula">Cédula</option>
+                </select>
+              </div>
+
+              <div className="field">
+                <label>Número Documento</label>
+                <input type="number" name="numeroDocumento" required />
+              </div>
             </div>
 
-            <div className="field">
-              <label>Número Documento</label>
-              <input type="number" name="numeroDocumento" required />
-            </div>
-
+            {/* 🔽 Campo modificado con InputMask para la fecha 🔽 */}
             <div className="field">
               <label>Fecha de Nacimiento</label>
-              <input
-                type="text"
+              <IMaskInput
+                mask="00/00/0000"
                 name="fechaNacimiento"
+                value={formData.fechaNacimiento}
+                onAccept={(value) =>
+                  setFormData({ ...formData, fechaNacimiento: value })
+                }
                 placeholder="DD/MM/AAAA"
-                onChange={handleChange}
                 required
               />
             </div>
+
+            {/* 🔼 Fin del campo modificado 🔼 */}
 
             <div className="field">
               <label>Correo</label>
@@ -113,7 +188,7 @@ const FormularioBasico = () => {
 
             <div className="field">
               <label>Cuerda</label>
-              <select name="cuerda" required>
+              <select name="cuerda">
                 <option value="">Seleccione</option>
                 <option value="primera">Primera</option>
                 <option value="segunda">Segunda</option>
@@ -121,10 +196,35 @@ const FormularioBasico = () => {
               </select>
             </div>
 
+            {/* 🔽 Campo modificado con Dropzone y botón de eliminar 🔽 */}
             <div className="field">
               <label>Subí una foto tuya para que podamos reconocerte</label>
-              <input type="file" name="foto" accept="image/*" required />
+              {!preview ? (
+                <div
+                  {...getRootProps()}
+                  className={`dropzone ${isDragActive ? 'active' : ''}`}
+                >
+                  <input {...getInputProps()} name="foto" required />
+                  <p>Arrastrá una imagen o hacé clic para seleccionar</p>
+                </div>
+              ) : (
+                <div className="preview-container">
+                  <img
+                    src={preview}
+                    alt="Vista previa"
+                    className="preview-img"
+                  />
+                  <button
+                    type="button"
+                    className="btn-submit"
+                    onClick={handleRemoveImage}
+                  >
+                    Quitar imagen
+                  </button>
+                </div>
+              )}
             </div>
+            {/* 🔼 Fin campo modificado 🔼 */}
           </section>
 
           <section className="bloque">
@@ -191,14 +291,18 @@ const FormularioBasico = () => {
               <textarea name="cancionElegida" rows="2" required></textarea>
             </div>
 
-            <div className="field">
-              <label>Elegí el horario para tu audición</label>
-              <div className="row">
+            <div className="horario-row">
+              <div className="field">
+                <label>Día</label>
                 <select name="dia" required>
-                  <option value="">Día</option>
+                  <option value=""></option>
                 </select>
+              </div>
+
+              <div className="field">
+                <label>Horario</label>
                 <select name="horario" required>
-                  <option value="">Horario</option>
+                  <option value=""></option>
                 </select>
               </div>
             </div>
