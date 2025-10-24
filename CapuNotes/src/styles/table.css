@@ -1,5 +1,5 @@
-/* Tabla rectangular con filas separadas como cards */
-.abmc-table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
+/* Tabla rectangular — usar colapso para evitar separación tipo "card" entre filas */
+.abmc-table { width: 100%; border-collapse: collapse; border-spacing: 0; }
 
 .abmc-thead th {
   text-align: center;
@@ -16,10 +16,9 @@
 }
 
 /* Filas alternadas */
-.abmc-row { color: var(--text-light); background: #1f1e46; }
-.abmc-row:nth-child(even) { background: #24224f; }
-.abmc-row td { padding: 14px; vertical-align: middle; }
-.abmc-row:hover { background: #2a285e; }
+.abmc-row { color: var(--text-light); background: transparent; }
+.abmc-row td { padding: 14px; vertical-align: middle; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.abmc-row:hover { background: rgba(255,255,255,0.02); }
 
 /* Sin redondeo en extremos */
 .abmc-row td:first-child,
@@ -30,6 +29,7 @@
   text-align: center;
   min-width: 0;                 /* permite que el item se reduzca dentro del flex */
   overflow-wrap: break-word;
+  background: transparent; /* asegurar filas transparentes para fondo uniforme */
 }
 
 /* Acciones */

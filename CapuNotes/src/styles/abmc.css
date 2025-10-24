@@ -17,11 +17,10 @@
   width: min(980px, 96vw);
   /* Usar el mismo color de fondo que la página para un fondo uniforme */
   background: var(--bg);
-  /* mantener una ligera separación visual con un borde muy sutil */
-  border: 1px solid rgba(255,255,255,0.02);
-  border-radius: var(--radius);
-  /* sombra opcional pero sutil para leer mejor el contenido */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  /* Quitar el marco y la sombra para obtener un solo fondo homogéneo */
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   padding: 20px;
 }
 
@@ -32,7 +31,10 @@
   gap: 8px;
   justify-content: space-between;
   position: relative;
-  margin-bottom: 14px;
+  /* Espacio interno bajo el header para separar el título de la línea amarilla */
+  padding-bottom: 18px;
+  /* Separación entre la línea y el contenido que viene debajo */
+  margin-bottom: 36px;
 }
 
 /* Título */
@@ -44,16 +46,22 @@
   font-size: 1.8rem;
 }
 
-/* Línea amarilla decorativa debajo de los títulos */
-.abmc-title::after {
+/* Línea amarilla que cruza todo el renglón del header */
+.abmc-header::after {
   content: "";
-  display: block;
-  width: 64px;
+  position: absolute;
+  left: 0;
+  right: 0;
   height: 4px;
-  margin: 8px auto 0 auto;
   background: var(--accent);
-  border-radius: 2px;
+  /* Colocar la barra en la base interior del header: el padding-bottom
+     crea espacio entre el título y esta barra. */
+  bottom: 0;
+  opacity: 0.95;
 }
+
+/* remover línea amarilla localizada en el título para evitar duplicados */
+.abmc-title::after { display: none; }
 
 /* Topbar: alta + buscar */
 .abmc-topbar {

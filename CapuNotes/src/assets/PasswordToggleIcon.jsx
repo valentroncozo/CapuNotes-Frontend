@@ -1,6 +1,6 @@
 import EyeOnIcon from './VisibilityOnIcon'
 import EyeOffIcon from './VisibilityOffIcon'
-import './icon.css'
+import '@/styles/icon.css'
 export default function PasswordToggleIcon({ isVisible, onToggle }) {
     return (
         <a className="container-toggle" onClick={onToggle}>
