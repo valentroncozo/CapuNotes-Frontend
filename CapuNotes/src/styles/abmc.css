@@ -2,8 +2,6 @@
 @import url('./forms.css');
 @import url('./table.css');
 
-
-
 .abmc-page {
   min-height: 100vh;
   background: var(--bg);
@@ -15,29 +13,23 @@
 .abmc-card {
   margin: 0 auto;
   width: min(980px, 96vw);
-  /* Usar el mismo color de fondo que la página para un fondo uniforme */
-  background: var(--bg);
-  /* Quitar el marco y la sombra para obtener un solo fondo homogéneo */
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
   padding: 20px;
 }
 
-/* Header con flecha + título centrado */
+/* Header */
 .abmc-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  justify-content: space-between;
+  justify-content: flex-end;
   position: relative;
-  /* Espacio interno bajo el header para separar el título de la línea amarilla */
-  padding-bottom: 18px;
-  /* Separación entre la línea y el contenido que viene debajo */
-  margin-bottom: 36px;
+  margin-bottom: 14px;
 }
 
-/* Título */
 .abmc-title {
   flex: 2;
   margin: 0;
@@ -46,164 +38,62 @@
   font-size: 1.8rem;
 }
 
-/* Línea amarilla que cruza todo el renglón del header */
-.abmc-header::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--accent);
-  /* Colocar la barra en la base interior del header: el padding-bottom
-     crea espacio entre el título y esta barra. */
-  bottom: 0;
-  opacity: 0.95;
-}
-
-/* remover línea amarilla localizada en el título para evitar duplicados */
-.abmc-title::after { display: none; }
-
-/* Topbar: alta + buscar */
+/* Topbar */
 .abmc-topbar {
   display: flex;
   align-items: center;
   justify-content: center;
-  align-content: center;
   gap: 8px;
   margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
+/* Helper de botón local (forma/padding). 
+   ✅ Recomendación: usar variantes globales .btn .btn-primary/.btn-secondary.
+   Mantengo .abmc-btn para compatibilidad en pantallas actuales. */
+.abmc-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .15s ease;
+  font-family: var(--font-sans);
+}
 
+/* Alias compat: algunas vistas viejas usan .abmc-btn-primary.
+   Lo dejamos como equivalente visual a un primario. */
+.abmc-btn-primary {
+  background: var(--accent);
+  color: var(--text-dark);
+  box-shadow: var(--shadow);
+}
+.abmc-btn-primary:hover { filter: brightness(0.95); }
+.abmc-btn-primary:active { filter: brightness(0.9); }
+
+/* Grupos */
 .form-group-agregar {
   width: 90%;
-  height: auto;
   display: flex;
   gap: 0.8rem;
-  flex: row;
+  flex-direction: row;       /* fix */
   flex-wrap: wrap;
-  
 }
-
-.form-group-agregar label {
-  width: 100%;
-}
-
-.form-group-agregar .abmc-select {
-  flex:3;
-}
+.form-group-agregar label { width: 100%; }
+.form-group-agregar .abmc-select { flex:3; }
 
 .form-group-agregar-acciones {
   width: 90%;
   padding-top: calc(24px + 0.8rem);
   display: flex;
   gap: 0.8rem;
-  flex: row;
+  flex-direction: row;       /* fix */
   flex-wrap: wrap;
 }
-
 
 .form-group-miembro {
   width: 90%;
   display: flex;
   gap: 0.8rem;
-  flex: row;
-
+  flex-direction: row;       /* fix */
 }
-
-/* --- Mejorar alineación y espaciado de la columna de Acciones --- */
-
-/* Mueve un poco el título "Acciones" hacia el centro */
-.abmc-table th:last-child {
-  text-align: center;
-  padding-right: 20px; /* 👈 separa del borde derecho */
-}
-
-/* Centra y da más aire a los íconos */
-.abmc-actions {
-  display: flex;
-  justify-content: center;  /* centra horizontalmente los botones */
-  gap: 12px;                /* espacio entre los iconos */
-  padding-right: 12px;      /* 👈 corrimiento visual hacia adentro */
-}
-
-/* === Prioridad total para botones de acciones === */
-.abmc-actions .abmc-btn-icon,
-.abmc-actions .abmc-btn-icon:hover,
-.abmc-actions .abmc-btn-icon svg,
-.abmc-actions .abmc-btn-icon svg path {
-  opacity: 1 !important;
-  background-color: #ffc107 !important;
-  color: #202124 !important;
-  fill: #202124 !important;
-  stroke: none !important;
-  border: none !important;
-}
-
-/* === Hover refinado + sin borde celeste === */
-.abmc-actions .abmc-btn-icon {
-  outline: none !important;
-  border: none !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  background-color: #ffc107; /* amarillo institucional */
-  color: #202124;
-  transition: all 0.2s ease-in-out;
-}
-
-/* Hover: aclara el fondo e ícono, sin borde */
-.abmc-actions .abmc-btn-icon:hover {
-  background-color: #ffd54f; /* más claro */
-  color: #3a3a3a; /* ícono un poco más claro */
-  filter: brightness(1.05);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
-  outline: none !important;
-  border: none !important;
-}
-
-/* Click o "active": efecto de hundimiento */
-.abmc-actions .abmc-btn-icon:active {
-  transform: translateY(1px) scale(0.98);
-  background-color: #e6ad00; /* tono más oscuro al presionar */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  outline: none !important;
-  border: none !important;
-}
-
-/* Asegura que los iconos sigan el color del botón */
-.abmc-actions .abmc-btn-icon svg path {
-  fill: currentColor !important;
-  stroke: none !important;
-}
-
-/* Quita cualquier borde/halo al enfocar con tab */
-.abmc-actions .abmc-btn-icon:focus-visible {
-  outline: none !important;
-  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.4); /* un halo suave dorado */
-}
-/* === Igualar altura visual del select con el input === */
-.abmc-select {
-  height: 44px !important;
-  padding: 0 12px;
-  line-height: 1.4; /* un poco más alto para centrar el texto */
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: var(--radius);
-  background-color: rgba(255,255,255,.05);
-  color: var(--text-light);
-}
-
-/* === Hover y focus coherentes con el diseño === */
-.abmc-select:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-color: var(--accent); /* mismo amarillo institucional */
-  transition: all 0.2s ease-in-out;
-}
-
-.abmc-select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.35);
-  outline: none;
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-

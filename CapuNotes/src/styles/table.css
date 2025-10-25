@@ -1,61 +1,119 @@
-/* Tabla rectangular — usar colapso para evitar separación tipo "card" entre filas */
-.abmc-table { width: 100%; border-collapse: collapse; border-spacing: 0; }
+/* src/styles/table.css */
 
+/* ================== BASE ================== */
+.abmc-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
+
+/* Cabecera: usa token --card (antes #b3cdfa) */
 .abmc-thead th {
-  text-align: center;
-  /* Cabeceras: fondo transparente para integrarse con el fondo oscuro
-     y texto claro para contraste. Se mantiene tamaño y padding. */
-  background: transparent;
-  color: var(--text-light);
+  background: var(--card);
+  color: var(--text-dark);
   font-weight: 700;
   padding: 12px 14px;
   text-align: left;
   border-radius: 0 !important;
-  font-size: 1.10rem;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background-color 0.2s ease;
+}
+.abmc-thead th:hover,
+.abmc-thead th:focus,
+.abmc-thead th:focus-within,
+.abmc-thead th:active {
+  background: var(--card) !important;
+  color: var(--text-dark) !important;
 }
 
-/* Filas alternadas */
-.abmc-row { color: var(--text-light); background: transparent; }
-.abmc-row td { padding: 14px; vertical-align: middle; border-bottom: 1px solid rgba(255,255,255,0.03); }
-.abmc-row:hover { background: rgba(255,255,255,0.02); }
+/* Filas */
+.abmc-row { color: var(--text-light); background: var(--table-row); }
+.abmc-row:nth-child(even) { background: var(--table-row-alt); }
+.abmc-row td { padding: 14px; vertical-align: middle; }
+.abmc-row:hover { background: var(--table-row-hover); }
 
-/* Sin redondeo en extremos */
 .abmc-row td:first-child,
-.abmc-row td:last-child { border-radius: 0 !important;}
+.abmc-row td:last-child { border-radius: 0 !important; }
 
-
-.abmc-row td,th {
-  text-align: center;
-  min-width: 0;                 /* permite que el item se reduzca dentro del flex */
-  overflow-wrap: break-word;
-  background: transparent; /* asegurar filas transparentes para fondo uniforme */
-}
-
-/* Acciones */
+/* Acciones agrupadas */
 .abmc-actions { display: flex; gap: 8px; justify-content: center; }
 
-/* Responsive */
-@media (width < 460px) { 
+/* ================== RESPONSIVE ================== */
+@media (width < 460px) {
   .abmc-actions { flex-wrap: wrap !important; }
-
-.abmc-row td,th {
-  text-align: center;
-  min-width: 0;                 /* permite que el item se reduzca dentro del flex */
-  overflow-wrap: break-word;
+  .abmc-row td, th { text-align: center; min-width: 0; overflow-wrap: break-word; }
+  .abmc-row td:nth-child(4), .abmc-row th:nth-child(4) { display: none; }
+}
+@media (width < 408px) {
+  .abmc-row td:nth-child(3), .abmc-row th:nth-child(3) { display: none; }
 }
 
-  .abmc-row td:nth-child(4) { display: none; }
+/* ==========================================================
+   ORDENABLE — SOLO la flecha es interactiva/hover
+   ========================================================== */
+.th-sortable { position: relative; user-select: none; padding-right: 28px; pointer-events: none; }
+.th-sortable .th-label { pointer-events: none; }
+.th-caret-btn {
+  all: unset; position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  padding: 6px; border-radius: 8px; cursor: pointer; pointer-events: auto;
+  transition: background-color .15s ease, transform .15s ease;
+}
+.th-caret-btn:hover { background: rgba(0, 0, 0, 0.1); transform: translateY(-50%) scale(1.04); }
 
-  .abmc-row th:nth-child(4) { display: none; }
+/* Estado neutro ↕ */
+.th-caret { position: relative; display: inline-block; width: 16px; height: 16px; }
+.th-sortable:not(.sorted-asc):not(.sorted-desc) .th-caret::before {
+  content: "↕";
+  font-size: 16px;
+  line-height: 16px;
+  color: rgba(0,0,0,.6);
+  display: block;
+  text-align: center;
+  opacity: .85;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.th-caret-btn:hover .th-caret::before { opacity: 1; transform: translateY(-1px) scale(1.05); }
 
- }
+/* Ordenado: triángulos */
+.th-sortable.sorted-asc .th-caret::before,
+.th-sortable.sorted-desc .th-caret::before { content: ""; }
+.th-sortable.sorted-asc .th-caret {
+  width: 0; height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--text-dark);
+}
+.th-sortable.sorted-desc .th-caret {
+  width: 0; height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid var(--text-dark);
+}
 
+/* ==========================================================
+   ACCIÓN FIJA A LA DERECHA EN LA CELDA (LÁPIZ)
+   ========================================================== */
+.cell-right-action {
+  position: relative;
+  padding-right: 46px; /* espacio para el botón a la derecha */
+}
 
- @media (width < 408px) { 
-  .abmc-row td:nth-child(3) { display: none; }
+/* Centrado vertical absoluto, sin movimiento en hover */
+.right-action {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%); /* se mantiene igual en :hover */
+  will-change: filter;
+}
 
-  .abmc-row th:nth-child(3) { display: none; }
-
- }
-
+/* Garantiza el mismo hover que el resto dentro de tablas */
+.abmc-table .btn-accion,
+.abmc-table .btn-accion--icon {
+  transition: filter .15s ease !important;
+}
+.abmc-table .btn-accion:hover,
+.abmc-table .btn-accion--icon:hover,
+.abmc-table .btn-accion:active,
+.abmc-table .btn-accion--icon:active {
+  filter: brightness(0.95);
+}
