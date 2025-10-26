@@ -1,127 +1,197 @@
-// src/components/pages/audiciones/candidatos.jsx
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
 import "@/styles/table.css";
 import "@/styles/forms.css";
 import "@/styles/popup.css";
-
 import { candidatosService } from "@/services/candidatosService.js";
 import InfoIcon from "@/assets/InfoIcon.jsx";
 
 export default function CandidatosPage() {
   const [rows, setRows] = useState([]);
+  const [audicionActual, setAudicionActual] = useState(null);
   const [q, setQ] = useState("");
-  const [dias, setDias] = useState([]);
   const [diaSel, setDiaSel] = useState("-");
-
+  const [dias, setDias] = useState([]);
+  const [verInscripcion, setVerInscripcion] = useState(null);
+  const [editResultado, setEditResultado] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [sortBy, setSortBy] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
 
-  const [verInscripcion, setVerInscripcion] = useState(null);
-  const [verResultado, setVerResultado] = useState(null);
-  
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const [sp] = useSearchParams();
-
   useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sp]);
+    loadAudicionActual();
+  }, []);
 
-  const loadData = async () => {
+  // 🔹 Cargar audición actual y generar los días del rango
+  const loadAudicionActual = async () => {
     try {
       setLoading(true);
       setError(null);
-      const cd = await candidatosService.list();
-      setRows(cd || []);
-      
-      // Extraer días únicos de los candidatos
-      const uniqueDias = [...new Set(cd.map(c => c.dia || c.inscripcion?.diaAudicion).filter(Boolean))];
-      setDias(uniqueDias);
-      
-      const qp = sp.get("dia");
-      if (qp && uniqueDias.includes(qp)) setDiaSel(qp);
-      else setDiaSel("-");
-    } catch (err) {
-      console.error('Error cargando candidatos:', err);
-      if (err.message?.includes('Network Error') || err.message?.includes('404')) {
-        setError('El servicio de candidatos aún no está disponible.');
+
+      const res = await fetch("http://localhost:8080/audiciones/actual");
+      if (res.status === 204) {
+        setError("No hay audiciones activas actualmente.");
+        setLoading(false);
+        return;
       }
+
+      if (!res.ok) throw new Error("Error al obtener audición actual");
+      const audicion = await res.json();
+      setAudicionActual(audicion);
+
+      // Generar días entre fechaInicio y fechaFin
+      const startDate = new Date(audicion.fechaInicio + "T00:00:00");
+      const endDate = new Date(audicion.fechaFin + "T00:00:00");
+      const diasArray = [];
+
+      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        diasArray.push(`${yyyy}-${mm}-${dd}`);
+      }
+
+      setDias(diasArray);
+      await loadCandidatos(audicion.id);
+    } catch (err) {
+      console.error("Error al obtener audición actual:", err);
+      setError("Error al obtener la audición actual.");
     } finally {
       setLoading(false);
     }
   };
 
-  const nombreApynom = (r) => {
-    const ape = (r.apellido || "").trim();
-    const nom = (r.nombre || "").trim();
-    if (ape && nom) return `${ape}, ${nom}`;
-    return nom || ape || r.nombre || r.nombreLabel || "";
+  // 🔹 Cargar candidatos
+  const loadCandidatos = async (audicionId) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`http://localhost:8080/audiciones/${audicionId}/candidatos`);
+      if (!res.ok) throw new Error("Error al obtener candidatos");
+      const cd = await res.json();
+
+      setRows(cd || []);
+      setDiaSel("-");
+    } catch (err) {
+      console.error("Error al cargar candidatos:", err);
+      setError("No se pudieron cargar los candidatos de la audición actual.");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // 🔹 Normalización texto
+  const normalizeText = (text) =>
+    text?.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() || "";
+
+  // 🔹 Filtrado por texto
   const filteredByText = useMemo(() => {
     if (!q) return rows;
-    const t = q.toLowerCase();
+    const t = normalizeText(q);
     return rows.filter((r) => {
-      const ape = String(r.apellido || "").toLowerCase();
-      const nom = String(r.nombre || "").toLowerCase();
-      const apynom = `${ape}, ${nom}`.trim();
-      const label = String(r.nombreLabel || r.nombre || "").toLowerCase();
-      return ape.includes(t) || nom.includes(t) || apynom.includes(t) || label.includes(t);
+      const ape = normalizeText(r.apellido);
+      const nom = normalizeText(r.nombre);
+      const apynom = `${ape}, ${nom}`;
+      return ape.includes(t) || nom.includes(t) || apynom.includes(t);
     });
   }, [rows, q]);
 
+  // 🔹 Filtrado por día
   const filtered = useMemo(() => {
     if (diaSel === "-") return filteredByText;
-    const getDia = (r) =>
-      String(r?.inscripcion?.diaAudicion || r?.dia || r?.fechaAudicion || "").trim();
-    return filteredByText.filter((r) => getDia(r) === diaSel);
+    return filteredByText.filter((r) => {
+      const fechaTurno =
+        r?.inscripcion?.turno?.fechaHoraInicio ||
+        r?.fechaAudicion ||
+        r?.dia ||
+        "";
+      if (!fechaTurno) return false;
+      const fechaStr = fechaTurno.split("T")[0];
+      return fechaStr === diaSel;
+    });
   }, [filteredByText, diaSel]);
 
-  const horaToMinutes = (hora) => {
-    if (!hora) return 0;
-    const [h, m] = String(hora).split(':').map(Number);
-    return (h || 0) * 60 + (m || 0);
-  };
-
-  const estadoLabel = (estado) => {
-    const e = String(estado || "sin").toLowerCase();
-    if (e === "aceptado" || e === "aceptada" || e === "ok") return "Aceptado";
-    if (e === "rechazado" || e === "rechazada" || e === "bad") return "Rechazado";
-    if (e === "ausente" || e === "pend") return "Ausente";
-    return "Sin resultado";
-  };
-
+  // 🔹 Ordenamiento
   const sorted = useMemo(() => {
     if (!sortBy) return filtered;
     const dir = sortDir === "desc" ? -1 : 1;
     return [...filtered].sort((a, b) => {
-      if (sortBy === "hora") return (horaToMinutes(a.hora) - horaToMinutes(b.hora)) * dir;
-      if (sortBy === "resultado") {
-        const la = estadoLabel(a.resultado?.estado ?? "sin");
-        const lb = estadoLabel(b.resultado?.estado ?? "sin");
-        return la.localeCompare(lb) * dir;
-      }
       if (sortBy === "apynom") {
-        const av = nombreApynom(a).toLowerCase();
-        const bv = nombreApynom(b).toLowerCase();
+        const av = normalizeText(`${a.apellido || ""} ${a.nombre || ""}`);
+        const bv = normalizeText(`${b.apellido || ""} ${b.nombre || ""}`);
         return av.localeCompare(bv) * dir;
+      }
+      if (sortBy === "hora") {
+        const toMinutes = (h) => {
+          if (!h) return 0;
+          const [hh, mm] = String(h).split(":").map(Number);
+          return (hh || 0) * 60 + (mm || 0);
+        };
+        return (toMinutes(a.hora) - toMinutes(b.hora)) * dir;
       }
       return 0;
     });
   }, [filtered, sortBy, sortDir]);
 
+  // 🔹 Utils UI
   const toggleSort = (key) => {
-    if (sortBy !== key) { setSortBy(key); setSortDir("asc"); }
-    else { setSortDir((d) => (d === "asc" ? "desc" : "asc")); }
+    if (sortBy !== key) {
+      setSortBy(key);
+      setSortDir("asc");
+    } else {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    }
   };
-  
   const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
 
+  // 🔹 Botón de resultado (añadir / aprobado / rechazado)
+  const getResultadoButton = (r) => {
+    const estado = r.resultado;
+    const idInscripcion = r.idInscripcion;
+
+    const color =
+      !estado || estado === "PENDIENTE"
+        ? "#444"
+        : estado === "APROBADO"
+        ? "green"
+        : estado === "RECHAZADO"
+        ? "red"
+        : "#444";
+
+    const label =
+      !estado || estado === "PENDIENTE"
+        ? "Añadir"
+        : estado === "APROBADO"
+        ? "✅"
+        : estado === "RECHAZADO"
+        ? "❌"
+        : "Añadir";
+
+    return (
+      <button
+        className="btn-accion"
+        style={{ fontSize: "1.1rem", color }}
+        onClick={() => {
+          if (!idInscripcion) {
+            console.warn("⚠️ No se encontró id de inscripción para el candidato:", r);
+            alert("No se encontró la inscripción asociada a este candidato.");
+            return;
+          }
+
+          setEditResultado({
+            idInscripcion,
+            estado: estado || "",
+            obs: r.observaciones || "",
+          });
+        }}
+      >
+        {label}
+      </button>
+    );
+  };
+
+  // 🔹 Renderizado principal
   if (loading) {
     return (
       <main className="abmc-page">
@@ -130,7 +200,7 @@ export default function CandidatosPage() {
             <BackButton />
             <h1 className="abmc-title">Candidatos</h1>
           </div>
-          <p style={{ textAlign: 'center', padding: '2rem' }}>Cargando candidatos...</p>
+          <p style={{ textAlign: "center", padding: "2rem" }}>Cargando...</p>
         </div>
       </main>
     );
@@ -144,7 +214,7 @@ export default function CandidatosPage() {
             <BackButton />
             <h1 className="abmc-title">Candidatos</h1>
           </div>
-          <p style={{ textAlign: 'center', padding: '2rem', color: 'red' }}>{error}</p>
+          <p style={{ textAlign: "center", padding: "2rem", color: "red" }}>{error}</p>
         </div>
       </main>
     );
@@ -155,7 +225,9 @@ export default function CandidatosPage() {
       <div className="abmc-card">
         <div className="abmc-header">
           <BackButton />
-          <h1 className="abmc-title">Candidatos</h1>
+          <h1 className="abmc-title">
+            Candidatos — {audicionActual?.nombre || "Audición actual"}
+          </h1>
         </div>
 
         <div className="abmc-topbar">
@@ -170,10 +242,17 @@ export default function CandidatosPage() {
             className="abmc-input"
             value={diaSel}
             onChange={(e) => setDiaSel(e.target.value)}
-            aria-label="Filtrar por día de audición"
           >
             <option value="-">Todos los días</option>
-            {dias.map(d => <option key={d} value={d}>{d}</option>)}
+            {dias.map((d) => (
+              <option key={d} value={d}>
+                {new Date(d + "T00:00:00").toLocaleDateString("es-AR", {
+                  weekday: "long",
+                  day: "2-digit",
+                  month: "2-digit",
+                })}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -182,63 +261,53 @@ export default function CandidatosPage() {
             <tr className="abmc-row">
               <th className={thClass("hora")}>
                 <span className="th-label">Hora</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("hora")} aria-label="Ordenar por Hora">
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("hora")}
+                  aria-label="Ordenar por hora"
+                >
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
 
               <th className={thClass("apynom")}>
                 <span className="th-label">Nombre</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("apynom")} aria-label="Ordenar por Nombre">
+                <button
+                  type="button"
+                  className="th-caret-btn"
+                  onClick={() => toggleSort("apynom")}
+                  aria-label="Ordenar por nombre"
+                >
                   <span className="th-caret" aria-hidden />
                 </button>
               </th>
 
               <th><span className="th-label">Canción</span></th>
-
-              <th className={thClass("resultado")}>
-                <span className="th-label">Resultado</span>
-                <button type="button" className="th-caret-btn" onClick={() => toggleSort("resultado")} aria-label="Ordenar por Resultado">
-                  <span className="th-caret" aria-hidden />
-                </button>
-              </th>
-
-              <th style={{ textAlign: "center" }}><span className="th-label"></span></th>
+              <th><span className="th-label">Resultado</span></th>
+              <th style={{ textAlign: "center" }}></th>
             </tr>
           </thead>
 
           <tbody>
             {sorted.length === 0 ? (
               <tr>
-                <td colSpan="5" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
-                  {q || diaSel !== "-"
-                    ? 'No se encontraron resultados con los filtros aplicados.' 
-                    : 'No hay candidatos registrados.'}
+                <td colSpan="5" style={{ textAlign: "center", padding: "2rem" }}>
+                  No hay candidatos en esta audición.
                 </td>
               </tr>
             ) : (
               sorted.map((r) => (
-                <tr key={r.id} className="abmc-row">
+                <tr key={r.idInscripcion || r.id} className="abmc-row">
                   <td>{r.hora || "—"}</td>
-                  <td>{nombreApynom(r)}</td>
+                  <td>{r.nombre || "—"}</td>
                   <td>{r.cancion || "—"}</td>
-                  <td style={{ textAlign: 'center' }}>
-                    <button
-                      className="btn-accion"
-                      onClick={() => setVerResultado(r.resultado || { estado: "", obs: "" })}
-                      title="Ver detalles del resultado"
-                      aria-label="Ver detalles del resultado"
-                    >
-                      {estadoLabel(r.resultado?.estado)}
-                    </button>
-                  </td>
-
-                  <td className="abmc-actions" style={{ textAlign: 'center' }}>
+                  <td style={{ textAlign: "center" }}>{getResultadoButton(r)}</td>
+                  <td style={{ textAlign: "center" }}>
                     <button
                       className="btn-accion btn-accion--icon"
+                      onClick={() => setVerInscripcion(r)}
                       title="Ver inscripción"
-                      aria-label="Ver inscripción"
-                      onClick={() => setVerInscripcion(r.inscripcion || r)}
                     >
                       <InfoIcon size={18} />
                     </button>
@@ -250,89 +319,81 @@ export default function CandidatosPage() {
         </table>
       </div>
 
-      {/* Popup de Resultado */}
-      {verResultado && (
-        <div className="pop-backdrop" onMouseDown={() => setVerResultado(null)}>
-          <div className="pop-dialog" onMouseDown={(e) => e.stopPropagation()} style={{ maxWidth: 420 }}>
+      {/* Popup de edición de resultado */}
+      {editResultado && (
+        <div className="pop-backdrop" onMouseDown={() => setEditResultado(null)}>
+          <div
+            className="pop-dialog"
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{ maxWidth: 420 }}
+          >
             <div className="pop-header">
               <h3 className="pop-title">Resultado</h3>
-              <button className="icon-btn" aria-label="Cerrar" onClick={() => setVerResultado(null)}>✕</button>
+              <button className="icon-btn" aria-label="Cerrar" onClick={() => setEditResultado(null)}>
+                ✕
+              </button>
             </div>
+
             <div className="pop-body">
               <div className="form-grid">
                 <div className="field">
                   <label>Estado</label>
-                  <input className="input" value={verResultado.estado || ""} readOnly disabled />
+                  <select
+                    className="input"
+                    value={editResultado.estado || ""}
+                    onChange={(e) =>
+                      setEditResultado((prev) => ({
+                        ...prev,
+                        estado: e.target.value,
+                      }))
+                    }
+                  >
+                    <option value="">Seleccionar...</option>
+                    <option value="APROBADO">Aprobado</option>
+                    <option value="RECHAZADO">Rechazado</option>
+                  </select>
                 </div>
+
                 <div className="field">
                   <label>Observaciones</label>
-                  <textarea className="input" rows={4} value={verResultado.obs || ""} readOnly disabled />
+                  <textarea
+                    className="input"
+                    rows={4}
+                    value={editResultado.obs || ""}
+                    onChange={(e) =>
+                      setEditResultado((prev) => ({
+                        ...prev,
+                        obs: e.target.value,
+                      }))
+                    }
+                  />
                 </div>
               </div>
             </div>
-            <div className="pop-footer" style={{ justifyContent: "flex-end" }}>
-              <button className="btn btn-secondary" onClick={() => setVerResultado(null)}>Cerrar</button>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Popup de Inscripción */}
-      {verInscripcion && (
-        <div className="pop-backdrop" onMouseDown={() => setVerInscripcion(null)}>
-          <div className="pop-dialog" onMouseDown={(e) => e.stopPropagation()} style={{ maxWidth: 600 }}>
-            <div className="pop-header">
-              <h3 className="pop-title">Datos de Inscripción</h3>
-              <button className="icon-btn" aria-label="Cerrar" onClick={() => setVerInscripcion(null)}>✕</button>
-            </div>
-            <div className="pop-body">
-              <div className="form-grid" style={{ gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div className="field">
-                  <label>Nombre</label>
-                  <input className="input" value={verInscripcion.nombre || ""} readOnly disabled />
-                </div>
-                <div className="field">
-                  <label>Apellido</label>
-                  <input className="input" value={verInscripcion.apellido || ""} readOnly disabled />
-                </div>
-                <div className="field">
-                  <label>Documento</label>
-                  <input className="input" value={`${verInscripcion.tipoDocumento || ""} ${verInscripcion.nroDocumento || ""}`.trim()} readOnly disabled />
-                </div>
-                <div className="field">
-                  <label>Email</label>
-                  <input className="input" value={verInscripcion.email || ""} readOnly disabled />
-                </div>
-                <div className="field">
-                  <label>Teléfono</label>
-                  <input className="input" value={verInscripcion.telefono || ""} readOnly disabled />
-                </div>
-                <div className="field">
-                  <label>Fecha de Nacimiento</label>
-                  <input className="input" value={verInscripcion.fechaNacimiento || ""} readOnly disabled />
-                </div>
-                <div className="field">
-                  <label>Género</label>
-                  <input className="input" value={verInscripcion.genero || ""} readOnly disabled />
-                </div>
-                <div className="field">
-                  <label>Cuerda</label>
-                  <input className="input" value={verInscripcion.cuerda || ""} readOnly disabled />
-                </div>
-                <div className="field" style={{ gridColumn: "1 / -1" }}>
-                  <label>Dirección</label>
-                  <input className="input" value={verInscripcion.direccion || ""} readOnly disabled />
-                </div>
-                {verInscripcion.observaciones && (
-                  <div className="field" style={{ gridColumn: "1 / -1" }}>
-                    <label>Observaciones</label>
-                    <textarea className="input" rows={3} value={verInscripcion.observaciones || ""} readOnly disabled />
-                  </div>
-                )}
-              </div>
-            </div>
             <div className="pop-footer" style={{ justifyContent: "flex-end" }}>
-              <button className="btn btn-secondary" onClick={() => setVerInscripcion(null)}>Cerrar</button>
+              <button
+                className="btn btn-primary"
+                onClick={async () => {
+                  try {
+                    await candidatosService.updateResultado(
+                      editResultado.idInscripcion,
+                      editResultado
+                    );
+                    setEditResultado(null);
+                    await loadCandidatos(audicionActual.id);
+                  } catch (err) {
+                    console.error("Error al guardar resultado:", err);
+                    alert("No se pudo guardar el resultado.");
+                  }
+                }}
+              >
+                Guardar
+              </button>
+
+              <button className="btn btn-secondary" onClick={() => setEditResultado(null)}>
+                Cancelar
+              </button>
             </div>
           </div>
         </div>

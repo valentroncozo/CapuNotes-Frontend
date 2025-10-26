@@ -1,13 +1,14 @@
-import axios from 'axios';
+// src/services/candidatosService.js
+import axios from "axios";
 
-const DEV_PROXY_BASE = '/api';
-const resolvedBaseURL = import.meta.env.DEV 
-  ? DEV_PROXY_BASE 
-  : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
+const DEV_PROXY_BASE = "/api";
+const resolvedBaseURL = import.meta.env.DEV
+  ? DEV_PROXY_BASE
+  : import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const api = axios.create({
   baseURL: resolvedBaseURL,
-  headers: { 'Content-Type': 'application/json' }
+  headers: { "Content-Type": "application/json" },
 });
 
 export const candidatosService = {
@@ -17,10 +18,10 @@ export const candidatosService = {
    */
   list: async () => {
     try {
-      const response = await api.get('/candidatos');
+      const response = await api.get("/candidatos");
       return response.data;
     } catch (error) {
-      console.error('Error al listar candidatos:', error);
+      console.error("❌ Error al listar candidatos:", error);
       throw error.response?.data || error.message;
     }
   },
@@ -35,23 +36,29 @@ export const candidatosService = {
       const response = await api.get(`/candidatos/${id}`);
       return response.data;
     } catch (error) {
-      console.error('Error al obtener candidato:', error);
+      console.error("❌ Error al obtener candidato:", error);
       throw error.response?.data || error.message;
     }
   },
 
   /**
-   * Actualiza el resultado de un candidato
-   * @param {number} id - ID del candidato
-   * @param {Object} resultado - { estado, obs }
-   * @returns {Promise<Object>} Candidato actualizado
+   * 🔄 Crea o actualiza el resultado de una inscripción
+   * @param {number} idInscripcion - ID de la inscripción
+   * @param {{estado: string, obs: string}} data - Datos a guardar
+   * @returns {Promise<Object>} Inscripción actualizada
    */
-  updateResultado: async (id, resultado) => {
+  updateResultado: async (idInscripcion, data) => {
     try {
-      const response = await api.patch(`/candidatos/${id}/resultado`, resultado);
+      // ✅ Enviamos el formato EXACTO que el backend espera
+      const payload = {
+        resultado: data.estado || null,
+        observaciones: data.obs || null,
+      };
+
+      const response = await api.patch(`/inscripciones/${idInscripcion}`, payload);
       return response.data;
     } catch (error) {
-      console.error('Error al actualizar resultado:', error);
+      console.error("❌ Error al actualizar resultado:", error);
       throw error.response?.data || error.message;
     }
   },
@@ -67,7 +74,7 @@ export const candidatosService = {
       const response = await api.patch(`/candidatos/${id}/cuerda`, { cuerda });
       return response.data;
     } catch (error) {
-      console.error('Error al actualizar cuerda:', error);
+      console.error("❌ Error al actualizar cuerda:", error);
       throw error.response?.data || error.message;
     }
   },
@@ -79,16 +86,16 @@ export const candidatosService = {
    */
   create: async (candidato) => {
     try {
-      const response = await api.post('/candidatos', candidato);
+      const response = await api.post("/candidatos", candidato);
       return response.data;
     } catch (error) {
-      console.error('Error al crear candidato:', error);
+      console.error("❌ Error al crear candidato:", error);
       throw error.response?.data || error.message;
     }
   },
 
   /**
-   * Actualiza un candidato
+   * Actualiza un candidato existente
    * @param {number} id - ID del candidato
    * @param {Object} candidato - Datos actualizados
    * @returns {Promise<Object>} Candidato actualizado
@@ -98,7 +105,7 @@ export const candidatosService = {
       const response = await api.put(`/candidatos/${id}`, candidato);
       return response.data;
     } catch (error) {
-      console.error('Error al actualizar candidato:', error);
+      console.error("❌ Error al actualizar candidato:", error);
       throw error.response?.data || error.message;
     }
   },
@@ -113,7 +120,7 @@ export const candidatosService = {
       const response = await api.delete(`/candidatos/${id}`);
       return response.status === 204;
     } catch (error) {
-      console.error('Error al eliminar candidato:', error);
+      console.error("❌ Error al eliminar candidato:", error);
       throw error.response?.data || error.message;
     }
   },
@@ -128,10 +135,10 @@ export const candidatosService = {
       const response = await api.get(`/candidatos/dia/${encodeURIComponent(dia)}`);
       return response.data;
     } catch (error) {
-      console.error('Error al obtener candidatos por día:', error);
+      console.error("❌ Error al obtener candidatos por día:", error);
       throw error.response?.data || error.message;
     }
-  }
+  },
 };
 
 export default candidatosService;
