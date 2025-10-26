@@ -22,6 +22,10 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
   const [ubicacion, setUbicacion] = useState('');
   const [nombre, setNombre] = useState('');
 
+  // ✅ NUEVO: Estados para manejar franjas originales
+  const [esPublicada, setEsPublicada] = useState(false);
+  const [franjasOriginales, setFranjasOriginales] = useState({}); // { 'YYYY-MM-DD': [franjas] }
+
   const [dias, setDias] = useState([]); // array<Date>
   const [data, setData] = useState({ nombre: '', ubicacion: '', fechaDesde: '', fechaHasta: '', dias: {} });
 
@@ -46,6 +50,10 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
           setLoading(false);
           return;
         }
+        
+        // ✅ NUEVO: Detectar si está publicada
+        setEsPublicada(a.estado === 'PUBLICADA');
+        
         setNombre(a.nombre || '');
         setDescripcion(a.descripcion || '');
         setUbicacion(a.lugar || '');
@@ -54,27 +62,60 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
         setData(prev => ({ ...prev, nombre: a.nombre || '', ubicacion: a.lugar || '', fechaDesde: a.fechaInicio || '', fechaHasta: a.fechaFin || '' }));
 
         // Prefill días + franjas a partir de turnos existentes
-        const turnos = await TurnoService.listarPorAudicion(a.id);
+        const turnos = await TurnoService.listarFranjasHorarias(a.id);
         const byDateKey = {};
+        const originalesTemp = {}; // ✅ NUEVO: Para guardar franjas originales
+        
         for (const t of turnos || []) {
-          const start = t.fechaHoraInicio ? new Date(t.fechaHoraInicio) : (t.fecha ? new Date(t.fecha) : null);
-          const end = t.fechaHoraFin ? new Date(t.fechaHoraFin) : null;
-          if (!start || isNaN(start.getTime()) || !end || isNaN(end.getTime())) continue;
-          const keyISO = `${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}-${String(start.getDate()).padStart(2,'0')}`;
-          const keyDDMMYYYY = formatDDMMYYYY(start);
-          const hhmm = (d) => `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-          const durMin = Math.max(0, Math.round((end - start) / 60000));
-          const franja = { horaDesde: hhmm(start), horaHasta: hhmm(end), duracion: String(durMin) };
-          // Usar fecha local (00:00) para evitar desfasajes por timezone
-          const dateLocal = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-          if (!byDateKey[keyISO]) byDateKey[keyISO] = { date: dateLocal, keyDDMMYYYY, franjas: [] };
+          const fechaBase = t.fecha;
+          if (!fechaBase) continue;
+          
+          const [year, month, day] = fechaBase.split('-').map(Number);
+          const horaInicio = t.horaInicio;
+          const horaFin = t.horaFin;
+          
+          if (!horaInicio || !horaFin) continue;
+          
+          const localDate = new Date(year, month - 1, day);
+          const keyDDMMYYYY = formatDDMMYYYY(localDate);
+          const keyISO = fechaBase;
+          
+          const formatHora = (hora) => hora.substring(0, 5);
+          
+          const franja = { 
+            horaDesde: formatHora(horaInicio), 
+            horaHasta: formatHora(horaFin), 
+            duracion: String(t.duracionTurno || 0),
+            turnoId: t.id
+          };
+          
+          if (!byDateKey[keyISO]) {
+            byDateKey[keyISO] = { 
+              date: localDate, 
+              keyDDMMYYYY, 
+              franjas: [] 
+            };
+          }
           byDateKey[keyISO].franjas.push(franja);
+          
+          // ✅ NUEVO: Guardar en franjas originales
+          if (!originalesTemp[keyISO]) {
+            originalesTemp[keyISO] = [];
+          }
+          originalesTemp[keyISO].push({
+            horaDesde: formatHora(horaInicio),
+            horaHasta: formatHora(horaFin),
+            duracion: String(t.duracionTurno || 0)
+          });
         }
+
+        // ✅ NUEVO: Guardar franjas originales
+        setFranjasOriginales(originalesTemp);
+        console.log('📦 Franjas originales guardadas:', originalesTemp);
 
         const uniqueDates = Object.keys(byDateKey).sort();
         const toDates = uniqueDates.map(s => byDateKey[s].date);
         if (toDates.length > 0) {
-          // set days + range
           setDias(toDates);
           setDiaDesde(uniqueDates[0]);
           setDiaHasta(uniqueDates[uniqueDates.length - 1]);
@@ -117,24 +158,119 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
     setDiaHasta(`${yy}-${mm}-${dd}`);
   };
 
+  // ✅ CORREGIR: Función auxiliar para convertir DD/MM/YYYY o DD-MM-YYYY a YYYY-MM-DD
+  const convertirFechaAISO = (fechaDDMMYYYY) => {
+    if (!fechaDDMMYYYY || typeof fechaDDMMYYYY !== 'string') return null;
+    
+    // Aceptar tanto "/" como "-" como separadores
+    const separador = fechaDDMMYYYY.includes('/') ? '/' : '-';
+    const partes = fechaDDMMYYYY.split(separador);
+    
+    if (partes.length !== 3) return null;
+    
+    const [dia, mes, anio] = partes;
+    return `${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+  };
+
   const handleGuardar = async () => {
     if (!audicion?.id) return;
     setIsSaving(true);
     try {
+      // ✅ Si está en BORRADOR, eliminar todos los turnos primero
+      if (!esPublicada) {
+        console.log('Eliminando todos los turnos de la audición (BORRADOR)...');
+        await TurnoService.eliminarTurnosPorAudicion(audicion.id);
+      }
+      
+      // ✅ Filtrar franjas según el estado
+      let diasParaEnviar = {};
+      
+      if (esPublicada) {
+        // PUBLICADA: Solo enviar franjas NUEVAS (que no están en originales)
+        Object.keys(data.dias || {}).forEach(fecha => {
+          const franjasDelDia = data.dias[fecha] || [];
+          const fechaISO = convertirFechaAISO(fecha);
+          const originalesDelDia = franjasOriginales[fechaISO] || [];
+          
+          console.log(`Procesando día ${fecha} (ISO: ${fechaISO})`);
+          console.log('Franjas del día:', franjasDelDia);
+          console.log('Franjas originales:', originalesDelDia);
+          
+          const franjasNuevas = franjasDelDia.filter(franja => {
+            // Verificar si esta franja NO existía originalmente
+            const esOriginal = originalesDelDia.some(orig => 
+              orig.horaDesde === franja.horaDesde && 
+              orig.horaHasta === franja.horaHasta && 
+              orig.duracion === franja.duracion
+            );
+            
+            console.log(`Franja ${franja.horaDesde}-${franja.horaHasta} es original:`, esOriginal);
+            
+            return !esOriginal;
+          });
+          
+          console.log('Franjas nuevas filtradas:', franjasNuevas);
+          
+          // Solo incluir el día si hay franjas nuevas
+          if (franjasNuevas.length > 0) {
+            diasParaEnviar[fecha] = franjasNuevas;
+          }
+        });
+      } else {
+        // BORRADOR: Enviar todas las franjas (ya eliminamos los turnos arriba)
+        diasParaEnviar = data.dias || {};
+      }
+
+      // ✅ Validar que haya algo que enviar
+      if (Object.keys(diasParaEnviar).length === 0) {
+        Swal.fire({ 
+          icon: 'info', 
+          title: 'Sin cambios', 
+          text: 'No hay nuevas franjas horarias para agregar',
+          background: '#11103a', 
+          color: '#E8EAED' 
+        });
+        setIsSaving(false);
+        return;
+      }
+
       const payload = {
         nombre,
         descripcion,
         ubicacion,
         fechaDesde: diaDesde ? formatDDMMYYYY(new Date(diaDesde)) : '',
         fechaHasta: diaHasta ? formatDDMMYYYY(new Date(diaHasta)) : '',
-        dias: data.dias || {},
+        dias: diasParaEnviar,
       };
+
+      console.log('Estado de la audición:', esPublicada ? 'PUBLICADA' : 'BORRADOR');
+      console.log('Payload a enviar:', payload);
+      
       await saveEdicion(audicion.id, payload);
-      Swal.fire({ icon: 'success', title: 'Cambios guardados', timer: 1500, showConfirmButton: false, background: '#11103a', color: '#E8EAED' });
+      
+      const mensaje = esPublicada 
+        ? 'Se han agregado las nuevas franjas horarias' 
+        : 'Se han recreado todos los turnos según las franjas configuradas';
+      
+      Swal.fire({ 
+        icon: 'success', 
+        title: 'Cambios guardados', 
+        text: mensaje,
+        timer: 2000, 
+        showConfirmButton: false, 
+        background: '#11103a', 
+        color: '#E8EAED' 
+      });
       navigate('/audicion');
     } catch (err) {
       console.error('Error al guardar:', err);
-      Swal.fire({ icon: 'error', title: 'Error', text: err?.response?.data || err.message || 'No se pudo actualizar la audición.', background: '#11103a', color: '#E8EAED' });
+      Swal.fire({ 
+        icon: 'error', 
+        title: 'Error', 
+        text: err?.response?.data?.message || err?.response?.data || err.message || 'No se pudo actualizar la audición.', 
+        background: '#11103a', 
+        color: '#E8EAED' 
+      });
     } finally {
       setIsSaving(false);
     }
@@ -148,6 +284,20 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
         <header className='abmc-header'>
           <BackButton />
           <h1 className='abmc-title'>{title}</h1>
+          {/* ✅ NUEVO: Mostrar estado de la audición */}
+          {audicion && (
+            <span style={{ 
+              marginLeft: 'auto', 
+              padding: '4px 12px', 
+              borderRadius: '4px', 
+              backgroundColor: esPublicada ? '#28a745' : '#ffc107',
+              color: esPublicada ? 'white' : 'black',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            }}>
+              {esPublicada ? 'PUBLICADA' : 'BORRADOR'}
+            </span>
+          )}
         </header>
         <hr className='divider' />
 
@@ -191,7 +341,17 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
               <section className='content-turno-input'>
                 {dias.length > 0 ? (
                   dias.map((dia, index) => (
-                    <TurnoSection key={index} index={index} day={formatDDMMYYYY(dia)} dias={dias} setDias={setDias} data={data} setData={setData} />
+                    <TurnoSection 
+                      key={index} 
+                      index={index} 
+                      day={formatDDMMYYYY(dia)} 
+                      dias={dias} 
+                      setDias={setDias} 
+                      data={data} 
+                      setData={setData}
+                      franjasOriginales={franjasOriginales}
+                      esPublicada={esPublicada}
+                    />
                   ))
                 ) : (
                   <p>No hay días seleccionados.</p>
