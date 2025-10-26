@@ -1,14 +1,9 @@
 // src/components/pages/audiciones/ResultadosModal.jsx
-import ChoiceModal from "@/components/common/ChoiceModal.jsx";
+import { useState } from "react";
+import Modal from "@/components/common/Modal.jsx";
 import "@/styles/popup.css";
 import "@/styles/forms.css";
-import "@/styles/icons.css";
-
-/* Íconos de resultado */
-import AceptadoIcon from "@/assets/icons/resultado/AceptadoIcon.jsx";
-import RechazadoIcon from "@/assets/icons/resultado/RechazadoIcon.jsx";
-import AusenteIcon from "@/assets/icons/resultado/AusenteIcon.jsx";
-import SinResultadoIcon from "@/assets/icons/resultado/SinResultadoIcon.jsx";
+import "@/styles/icon.css";
 
 const RESULT_OPTS = [
   { value: "sin",       label: "Sin resultado" },
@@ -47,20 +42,42 @@ function previewResultadoIcon(value) {
 export default function ResultadosModal({ row, onClose, onSave }) {
   const initialEstado = String(row?.resultado?.estado || "sin").toLowerCase();
   const initialObs = row?.resultado?.obs || "";
+  const [estado, setEstado] = useState(initialEstado);
+  const [obs, setObs] = useState(initialObs);
 
   return (
-    <ChoiceModal
-      isOpen={true}
-      onClose={onClose}
-      title="Editar resultado"
-      options={RESULT_OPTS}
-      initialValue={initialEstado}
-      withTextarea={true}
-      textareaLabel="Observaciones"
-      textareaPlaceholder="Notas opcionales…"
-      initialNotes={initialObs}
-      renderPreview={previewResultadoIcon}
-      onSave={(estado, obs) => onSave?.(estado, obs)}
-    />
+    <Modal isOpen={true} onClose={onClose} title="Editar resultado" actions={(
+      // Footer: Cancel on the left, Guardar on the right
+      <>
+        <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            onSave?.(estado, obs);
+          }}
+        >
+          Guardar
+        </button>
+      </>
+    )}>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
+        {previewResultadoIcon(estado)}
+        <div style={{ flex: 1 }}>
+          <label style={{ display: "block", marginBottom: 6 }}>Estado</label>
+          <select className="input" value={estado} onChange={(e) => setEstado(e.target.value)}>
+            {RESULT_OPTS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="field">
+        <label>Observaciones</label>
+        <textarea className="input" rows={4} value={obs} onChange={(e) => setObs(e.target.value)} />
+      </div>
+    </Modal>
   );
 }

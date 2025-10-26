@@ -5,12 +5,13 @@ import "@/styles/abmc.css";
 import "@/styles/table.css";
 import "@/styles/forms.css";
 import "@/styles/popup.css";
+import ResultadosModal from "./resultados.jsx";
 
 export default function HistorialAudicionesPage() {
   const [rows, setRows] = useState([]);
   const [q, setQ] = useState("");
   const [verResultado, setVerResultado] = useState(null);
-  const [verInscripcion, setVerInscripcion] = useState(null);
+  const [, setVerInscripcion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortBy, setSortBy] = useState(null);
@@ -197,20 +198,24 @@ export default function HistorialAudicionesPage() {
 
                     {/* ✅ Resultado: solo botón, como el original */}
                     <td style={{ textAlign: "center" }}>
-                    <button
-                      className="btn-accion"
-                      onClick={() =>
-                        setVerResultado({
-                          estado: r.resultado || "Sin resultado",
-                          obs: r.observaciones || "—"
-                        })
-                      }
-                      title="Ver detalles del resultado"
-                      aria-label="Ver detalles del resultado"
-                    >
-                      Ver
-                    </button>
-                  </td>
+                      <button
+                        className="btn-accion"
+                        onClick={() =>
+                          setVerResultado({
+                            ...r,
+                            idInscripcion: r.idInscripcion || r.inscripcion?.id || r.id,
+                            resultado:
+                              typeof r.resultado === "object"
+                                ? r.resultado
+                                : { estado: r.resultado || "", obs: r.observaciones || "" },
+                          })
+                        }
+                        title="Ver detalles del resultado"
+                        aria-label="Ver detalles del resultado"
+                      >
+                        Ver
+                      </button>
+                    </td>
 
 
                     {/* ✅ Botón + alineado igual que antes */}
@@ -232,57 +237,9 @@ export default function HistorialAudicionesPage() {
         </table>
       </div>
 
-      {/* 📋 Popup resultado */}
+      {/* Resultado modal (centralized read-only view) */}
       {verResultado && (
-        <div className="pop-backdrop" onMouseDown={() => setVerResultado(null)}>
-          <div
-            className="pop-dialog"
-            onMouseDown={(e) => e.stopPropagation()}
-            style={{ maxWidth: 420 }}
-          >
-            <div className="pop-header">
-              <h3 className="pop-title">Resultado</h3>
-              <button
-                className="icon-btn"
-                aria-label="Cerrar"
-                onClick={() => setVerResultado(null)}
-              >
-                ✕
-              </button>
-            </div>
-            <div className="pop-body">
-              <div className="form-grid">
-                <div className="field">
-                  <label>Estado</label>
-                  <input
-                    className="input"
-                    value={verResultado.estado || ""}
-                    readOnly
-                    disabled
-                  />
-                </div>
-                <div className="field">
-                  <label>Observaciones</label>
-                  <textarea
-                    className="input"
-                    rows={4}
-                    value={verResultado.obs || ""}
-                    readOnly
-                    disabled
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="pop-footer" style={{ justifyContent: "flex-end" }}>
-              <button
-                className="btn btn-secondary"
-                onClick={() => setVerResultado(null)}
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
+        <ResultadosModal row={verResultado} onClose={() => setVerResultado(null)} />
       )}
 
       

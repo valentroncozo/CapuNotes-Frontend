@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
 import "@/styles/table.css";
@@ -6,6 +6,7 @@ import "@/styles/forms.css";
 import "@/styles/popup.css";
 import { candidatosService } from "@/services/candidatosService.js";
 import InfoIcon from "@/assets/InfoIcon.jsx";
+import ResultadosModal from "./resultados.jsx";
 
 export default function CandidatosPage() {
   const [rows, setRows] = useState([]);
@@ -13,19 +14,15 @@ export default function CandidatosPage() {
   const [q, setQ] = useState("");
   const [diaSel, setDiaSel] = useState("-");
   const [dias, setDias] = useState([]);
-  const [verInscripcion, setVerInscripcion] = useState(null);
+  const [, setVerInscripcion] = useState(null);
   const [editResultado, setEditResultado] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortBy, setSortBy] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
 
-  useEffect(() => {
-    loadAudicionActual();
-  }, []);
-
   // 🔹 Cargar audición actual y generar los días del rango
-  const loadAudicionActual = async () => {
+  const loadAudicionActual = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -61,7 +58,12 @@ export default function CandidatosPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // run once on mount
+  useEffect(() => {
+    loadAudicionActual();
+  }, [loadAudicionActual]);
 
   // 🔹 Cargar candidatos
   const loadCandidatos = async (audicionId) => {
@@ -145,28 +147,18 @@ export default function CandidatosPage() {
   };
   const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
 
-  // 🔹 Botón de resultado (añadir / aprobado / rechazado)
+  // 🔹 Botón de resultado (usa ResultadosModal)
   const getResultadoButton = (r) => {
-    const estado = r.resultado;
-    const idInscripcion = r.idInscripcion;
+    const estadoRaw = r.resultado || r.estado || r.estadoResultado || "";
+    const estado = String(estadoRaw || "").toLowerCase();
+    const idInscripcion = r.idInscripcion || r.inscripcionId || r.id;
 
-    const color =
-      !estado || estado === "PENDIENTE"
-        ? "#444"
-        : estado === "APROBADO"
-        ? "green"
-        : estado === "RECHAZADO"
-        ? "red"
-        : "#444";
+    const isNoResultado = !estado || estado === "pendiente" || estado === "sin";
+    const isAceptado = estado === "aceptado" || estado === "aprobado";
+    const isRechazado = estado === "rechazado";
 
-    const label =
-      !estado || estado === "PENDIENTE"
-        ? "Añadir"
-        : estado === "APROBADO"
-        ? "✅"
-        : estado === "RECHAZADO"
-        ? "❌"
-        : "Añadir";
+    const color = isNoResultado ? "#444" : isAceptado ? "green" : isRechazado ? "red" : "#444";
+    const label = isNoResultado ? "Añadir" : isAceptado ? "✅" : isRechazado ? "❌" : "Añadir";
 
     return (
       <button
@@ -179,11 +171,17 @@ export default function CandidatosPage() {
             return;
           }
 
-          setEditResultado({
+          // Normalize row shape for the modal: ensure resultado is an object
+          const modalRow = {
+            ...r,
             idInscripcion,
-            estado: estado || "",
-            obs: r.observaciones || "",
-          });
+            resultado:
+              typeof r.resultado === "object"
+                ? r.resultado
+                : { estado: r.resultado || "", obs: r.observaciones || r.obs || "" },
+          };
+
+          setEditResultado(modalRow);
         }}
       >
         {label}
@@ -319,84 +317,26 @@ export default function CandidatosPage() {
         </table>
       </div>
 
-      {/* Popup de edición de resultado */}
+      {/* Resultado modal (centralizado) */}
       {editResultado && (
-        <div className="pop-backdrop" onMouseDown={() => setEditResultado(null)}>
-          <div
-            className="pop-dialog"
-            onMouseDown={(e) => e.stopPropagation()}
-            style={{ maxWidth: 420 }}
-          >
-            <div className="pop-header">
-              <h3 className="pop-title">Resultado</h3>
-              <button className="icon-btn" aria-label="Cerrar" onClick={() => setEditResultado(null)}>
-                ✕
-              </button>
-            </div>
-
-            <div className="pop-body">
-              <div className="form-grid">
-                <div className="field">
-                  <label>Estado</label>
-                  <select
-                    className="input"
-                    value={editResultado.estado || ""}
-                    onChange={(e) =>
-                      setEditResultado((prev) => ({
-                        ...prev,
-                        estado: e.target.value,
-                      }))
-                    }
-                  >
-                    <option value="">Seleccionar...</option>
-                    <option value="APROBADO">Aprobado</option>
-                    <option value="RECHAZADO">Rechazado</option>
-                  </select>
-                </div>
-
-                <div className="field">
-                  <label>Observaciones</label>
-                  <textarea
-                    className="input"
-                    rows={4}
-                    value={editResultado.obs || ""}
-                    onChange={(e) =>
-                      setEditResultado((prev) => ({
-                        ...prev,
-                        obs: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="pop-footer" style={{ justifyContent: "flex-end" }}>
-              <button
-                className="btn btn-primary"
-                onClick={async () => {
-                  try {
-                    await candidatosService.updateResultado(
-                      editResultado.idInscripcion,
-                      editResultado
-                    );
-                    setEditResultado(null);
-                    await loadCandidatos(audicionActual.id);
-                  } catch (err) {
-                    console.error("Error al guardar resultado:", err);
-                    alert("No se pudo guardar el resultado.");
-                  }
-                }}
-              >
-                Guardar
-              </button>
-
-              <button className="btn btn-secondary" onClick={() => setEditResultado(null)}>
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
+        <ResultadosModal
+          row={editResultado}
+          onClose={() => setEditResultado(null)}
+          onSave={async (estado, obs) => {
+            try {
+              // estado comes from modal as 'aceptado'|'rechazado'|'ausente'|'sin'
+              await candidatosService.updateResultado(editResultado.idInscripcion, {
+                estado,
+                obs,
+              });
+              setEditResultado(null);
+              await loadCandidatos(audicionActual.id);
+            } catch (err) {
+              console.error("Error al guardar resultado:", err);
+              alert("No se pudo guardar el resultado.");
+            }
+          }}
+        />
       )}
     </main>
   );
