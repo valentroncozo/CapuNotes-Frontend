@@ -6,6 +6,7 @@ import AudicionService from '@/services/audicionService.js';
 import preguntasService from '@/services/preguntasService.js';
 import Modal from '@/components/common/Modal.jsx'; // <-- uso del modal genérico existente
 import TrashIcon from '@/assets/TrashIcon.jsx';
+import EditIcon from '@/assets/EditIcon';
 
 
 const tipos = [
@@ -17,7 +18,13 @@ const tipos = [
 function opcionToString(opt) {
   if (typeof opt === 'string') return opt;
   if (opt == null) return '';
-  return opt.texto ?? opt.text ?? String(opt.id ?? JSON.stringify(opt));
+  return opt.valor ?? opt.texto ?? opt.text ?? String(opt.id ?? JSON.stringify(opt));
+}
+
+function normalizeOption(o) {
+  if (o == null) return o;
+  if (typeof o === 'object') return { ...o, valor: String(o.valor ?? o.texto ?? o.text ?? (o.id != null ? o.id : '')) };
+  return { valor: String(o) };
 }
 
 export default function CuestionarioConfigPage({ title = 'Configuración de cuestionario' }) {
@@ -43,7 +50,7 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
     // Normalizar estructura mínima para evitar undefined en render
     setPreguntas((all || []).map(p => ({
       ...p,
-      opciones: Array.isArray(p.opciones) ? p.opciones : [],
+      opciones: Array.isArray(p.opciones) ? p.opciones.map(normalizeOption) : [],
       tipo: p.tipo ?? 'TEXTO'
     })));
     if (a?.id) {
@@ -58,21 +65,22 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
 
   const handleCreate = async () => {
     if (!nuevo.valor.trim()) return;
-    const saved = await preguntasService.create(nuevo);
-    setPreguntas(prev => [{ ...saved, opciones: Array.isArray(saved.opciones) ? saved.opciones : [] }, ...prev]);
+    // construir payload: backend espera lista de strings para opciones
+    const createPayload = { valor: nuevo.valor, tipo: nuevo.tipo, obligatoria: nuevo.obligatoria };
+    if (nuevo.tipo === 'OPCION' || nuevo.tipo === 'MULTIOPCION') {
+      createPayload.opciones = (nuevo.opciones || []).map(o => String(o?.valor ?? o));
+    }
+    const saved = await preguntasService.create(createPayload);
+    setPreguntas(prev => [{ ...saved, opciones: Array.isArray(saved.opciones) ? saved.opciones.map(normalizeOption) : [] }, ...prev]);
     setNuevo({ valor: '', tipo: 'TEXTO', obligatoria: true, opciones: [] });
     setNuevaOpcion('');
   };
 
   const handleUpdate = async (p) => {
     // normalizar opciones para la API: preferir id, sino texto, sino string
-    const opcionesRaw = Array.isArray(p.opciones) ? p.opciones : [];
-    const opcionesForPayload = opcionesRaw.map(o => {
-      if (o == null) return o;
-      if (typeof o === 'string' || typeof o === 'number') return o;
-      if (o.id != null) return o.id;
-      return o.texto ?? o.text ?? String(o);
-    });
+    const opcionesRaw = (Array.isArray(p.opciones) ? p.opciones : []).map(normalizeOption);
+    // backend espera lista de strings al actualizar/crear
+    const opcionesForPayload = opcionesRaw.map(o => String(o?.valor ?? ''));
 
     // enviar opciones solo para tipos que las usan
     const payload = { valor: p.valor, tipo: p.tipo, obligatoria: p.obligatoria };
@@ -80,7 +88,30 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
 
     try {
       const updated = await preguntasService.update(p.id, payload);
-      setPreguntas(prev => prev.map(x => x.id === p.id ? { ...updated, opciones: Array.isArray(updated.opciones) ? updated.opciones : opcionesRaw } : x));
+      // normalizar opciones recibidas y tratar de preservar los objetos/strings originales
+      const updatedOpciones = Array.isArray(updated.opciones) ? updated.opciones : opcionesRaw;
+      const mergedOpciones = updatedOpciones.map((uo, idx) => {
+        if (uo == null) return uo;
+        if (typeof uo === 'object') return normalizeOption(uo);
+        // uo es primitivo (id o valor) -> intentar encontrar coincidencia en opcionesRaw
+        const found = opcionesRaw.find(or => {
+          if (or == null) return false;
+          if (typeof or === 'object' && or.id != null) return String(or.id) === String(uo);
+          return String(or.valor ?? or) === String(uo);
+        });
+        if (found) return found;
+        // fallback por posición: si backend devolvió ids numéricos con mismo largo, asumir correspondencia por índice
+        const isNumeric = !isNaN(Number(uo));
+        if (isNumeric && opcionesRaw.length === updatedOpciones.length) {
+          const original = opcionesRaw[idx];
+          const valor = opcionToString(original);
+          return { id: uo, valor };
+        }
+        // si no se pudo mapear, devolver objeto con campo valor como string
+        return { valor: String(uo) };
+      });
+
+      setPreguntas(prev => prev.map(x => x.id === p.id ? { ...updated, opciones: mergedOpciones } : x));
     } catch (err) {
       console.error('Error al actualizar pregunta:', err);
       console.error('Response data:', err?.response?.data);
@@ -151,7 +182,7 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
   const handleAddOpcion = () => {
     const op = (nuevaOpcion || '').trim();
     if (!op) return;
-    setNuevo(prev => ({ ...prev, opciones: [...(prev.opciones || []), op] }));
+    setNuevo(prev => ({ ...prev, opciones: [...(prev.opciones || []), { valor: op }] }));
     setNuevaOpcion('');
   };
 
@@ -223,12 +254,12 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
                           setEditing({ ...p, opciones: Array.isArray(p.opciones) ? [...p.opciones] : [] });
                           setEditOpcionInput('');
                           setIsEditing(true);
-                        }}>Modificar</button>
+                        }}><EditIcon /></button>
                         <button type="button" className="abmc-btn abmc-btn-danger" onClick={() => handleDelete(p.id)}> <TrashIcon /></button>
                         {isAsignada ? (
-                          <button type="button" className="abmc-btn abmc-btn-danger" onClick={() => handleQuitar(p.id)}>Quitar del cuestionario</button>
+                          <button type="button" className="abmc-btn abmc-btn-danger" title="Quitar del cuestionario" onClick={() => handleQuitar(p.id)}>-</button>
                         ) : (
-                          <button type="button" className="abmc-btn abmc-btn-primary" onClick={() => handleAsignar(p.id)}>Añadir cuestionario</button>
+                          <button type="button" className="abmc-btn abmc-btn-primary" title="Añadir al cuestionario" onClick={() => handleAsignar(p.id)}>+</button>
                         )}
                       </div>
                     </td>
@@ -269,7 +300,7 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
                   <button className="abmc-btn abmc-btn-primary" type="button" onClick={() => {
                     const v = (editOpcionInput || '').trim();
                     if (!v) return;
-                    setEditing(prev => ({ ...prev, opciones: [...(prev.opciones || []), v] }));
+                    setEditing(prev => ({ ...prev, opciones: [...(prev.opciones || []), { valor: v }] }));
                     setEditOpcionInput('');
                   }}>Agregar opción</button>
                 </div>
