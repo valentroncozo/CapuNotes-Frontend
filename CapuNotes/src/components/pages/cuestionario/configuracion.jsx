@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 import BackButton from '@/components/common/BackButton.jsx';
 import AudicionService from '@/services/audicionService.js';
 import preguntasService from '@/services/preguntasService.js';
+import Modal from '@/components/common/Modal.jsx'; // <-- uso del modal genérico existente
+import TrashIcon from '@/assets/TrashIcon.jsx';
+
 
 const tipos = [
   { value: 'TEXTO', label: 'Texto' },
@@ -25,6 +28,11 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
 
   // nuevo estado agregado para el input de nueva opción en el topbar
   const [nuevaOpcion, setNuevaOpcion] = useState('');
+
+  // estados para edición en modal
+  const [isEditing, setIsEditing] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [editOpcionInput, setEditOpcionInput] = useState('');
 
   const assignedIds = useMemo(() => new Set(asignadas), [asignadas]);
 
@@ -57,9 +65,27 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
   };
 
   const handleUpdate = async (p) => {
-    const payload = { valor: p.valor, tipo: p.tipo, obligatoria: p.obligatoria, opciones: p.opciones || [] };
-    const updated = await preguntasService.update(p.id, payload);
-    setPreguntas(prev => prev.map(x => x.id === p.id ? { ...updated, opciones: Array.isArray(updated.opciones) ? updated.opciones : [] } : x));
+    // normalizar opciones para la API: preferir id, sino texto, sino string
+    const opcionesRaw = Array.isArray(p.opciones) ? p.opciones : [];
+    const opcionesForPayload = opcionesRaw.map(o => {
+      if (o == null) return o;
+      if (typeof o === 'string' || typeof o === 'number') return o;
+      if (o.id != null) return o.id;
+      return o.texto ?? o.text ?? String(o);
+    });
+
+    // enviar opciones solo para tipos que las usan
+    const payload = { valor: p.valor, tipo: p.tipo, obligatoria: p.obligatoria };
+    if (p.tipo === 'OPCION' || p.tipo === 'MULTIOPCION') payload.opciones = opcionesForPayload;
+
+    try {
+      const updated = await preguntasService.update(p.id, payload);
+      setPreguntas(prev => prev.map(x => x.id === p.id ? { ...updated, opciones: Array.isArray(updated.opciones) ? updated.opciones : opcionesRaw } : x));
+    } catch (err) {
+      console.error('Error al actualizar pregunta:', err);
+      console.error('Response data:', err?.response?.data);
+      throw err;
+    }
   };
 
   // intento genérico y tolerante de borrado en el service (prueba distintas firmas)
@@ -192,8 +218,13 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
 
                     <td>
                       <div className="abmc-actions">
-                        <button type="button" className="abmc-btn btn-secondary" onClick={() => handleUpdate(p)}>Modificar</button>
-                        <button type="button" className="abmc-btn abmc-btn-danger" onClick={() => handleDelete(p.id)}>Eliminar</button>
+                        <button type="button" className="abmc-btn btn-secondary" onClick={() => {
+                          // abrir modal con copia de la pregunta
+                          setEditing({ ...p, opciones: Array.isArray(p.opciones) ? [...p.opciones] : [] });
+                          setEditOpcionInput('');
+                          setIsEditing(true);
+                        }}>Modificar</button>
+                        <button type="button" className="abmc-btn abmc-btn-danger" onClick={() => handleDelete(p.id)}> <TrashIcon /></button>
                         {isAsignada ? (
                           <button type="button" className="abmc-btn abmc-btn-danger" onClick={() => handleQuitar(p.id)}>Quitar del cuestionario</button>
                         ) : (
@@ -207,6 +238,55 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
             </tbody>
           </table>
         </div>
+
+        {/* Modal de edición — ahora usando Modal genérico */}
+        {isEditing && editing ? (
+          <Modal isOpen={isEditing} title="Editar pregunta" onClose={() => { setIsEditing(false); setEditing(null); }}>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+              <input className="abmc-input" style={{ flex: 1 }} value={editing.valor || ''} onChange={(e) => setEditing(prev => ({ ...prev, valor: e.target.value }))} />
+              <select className="abmc-select" value={editing.tipo} onChange={(e) => setEditing(prev => ({ ...prev, tipo: e.target.value }))}>
+                {tipos.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 8 }}>
+              <strong>Opciones</strong>
+              {(editing.opciones || []).length > 0 ? (
+                <ul style={{ paddingLeft: 18 }}>
+                  {(editing.opciones || []).map((o, i) => (
+                    <li key={i} style={{ marginBottom: 4, justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
+                      {opcionToString(o)}
+                      <button type="button" className="abmc-btn abmc-btn-danger" style={{ marginLeft: 8 }} onClick={() => {
+                        setEditing(prev => ({ ...prev, opciones: prev.opciones.filter((_, idx) => idx !== i) }));
+                      }}><TrashIcon /></button>
+                    </li>
+                  ))}
+                </ul>
+              ) : <div style={{ color: '#888' }}>—</div>}
+              {(editing.tipo === 'OPCION' || editing.tipo === 'MULTIOPCION') && (
+                <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                  <input className="abmc-input" placeholder="Nueva opción" value={editOpcionInput} onChange={(e) => setEditOpcionInput(e.target.value)} />
+                  <button className="abmc-btn abmc-btn-primary" type="button" onClick={() => {
+                    const v = (editOpcionInput || '').trim();
+                    if (!v) return;
+                    setEditing(prev => ({ ...prev, opciones: [...(prev.opciones || []), v] }));
+                    setEditOpcionInput('');
+                  }}>Agregar opción</button>
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 12 }}>
+              <button className="abmc-btn" type="button" onClick={() => { setIsEditing(false); setEditing(null); }}>Cancelar</button>
+              <button className="abmc-btn abmc-btn-primary" type="button" onClick={async () => {
+                if (!editing.valor || !editing.valor.trim()) return;
+                await handleUpdate(editing);
+                setIsEditing(false);
+                setEditing(null);
+              }}>Guardar</button>
+            </div>
+          </Modal>
+        ) : null}
       </div>
     </main>
   );
