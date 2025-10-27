@@ -39,16 +39,6 @@ export default function CuestionarioPreviewPage({ title = 'Visualización de Cue
           <hr className="divisor-amarillo" />
         </header>
 
-        <section className="cuest-section">
-          <h3 className="cuest-subtitle">Datos personales</h3>
-          <ul className="cuest-list">
-            {['Nombre', 'Apellido', 'Fecha de nacimiento'].map((label) => (
-              <li key={label} className="cuest-row">
-                <input className="abmc-input cuest-input" value={label} disabled readOnly />
-              </li>
-            ))}
-          </ul>
-        </section>
 
         <section className="cuest-section">
           <h3 className="cuest-subtitle">Preguntas de conocimiento personal</h3>
