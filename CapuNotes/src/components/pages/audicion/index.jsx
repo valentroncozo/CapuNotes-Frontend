@@ -104,6 +104,29 @@ const Audicion = ({ title ='Audición'}) => {
     setFilteredData(filtered);
   };
 
+  const  handlerPublicarAudicion = async () => {
+    const res = await Swal.fire({
+      title: '¿Estás seguro de que quieres publicar la audición?',
+      showCancelButton: true,
+      confirmButtonText: 'Publicar',
+      cancelButtonText: 'Cancelar',
+      background: '#11103a',
+      color: '#E8EAED',
+      confirmButtonColor: '#ffc107',
+      cancelButtonColor: '#6c757d',
+    });
+
+    if (res.isConfirmed) {
+      await AudicionService.actualizarParcial(audicion.id, {estado: 'PUBLICADA'});
+      Swal.fire({
+        title: 'Audición publicada',
+        icon: 'success',
+        background: '#11103a',
+        color: '#E8EAED',
+      });
+    }
+  }
+
   return (
       <main className="audicion-page">
         <div className="abmc-card">
@@ -152,7 +175,7 @@ const Audicion = ({ title ='Audición'}) => {
             </div>
 
             <div className='content-footer'>
-              <button className="abmc-btn btn-primary" onClick={() => {}}>
+              <button className="abmc-btn btn-primary" onClick={handlerPublicarAudicion}>
                 Publicar Audición
               </button>
               <button className="abmc-btn btn-secondary" onClick={() => { navigate('/audicion/editar'); }}>
