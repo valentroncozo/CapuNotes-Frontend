@@ -1,6 +1,5 @@
 // src/components/pages/audiciones/ResultadosModal.jsx
-import { useState } from "react";
-import Modal from "@/components/common/Modal.jsx";
+import ChoiceModal from "@/components/common/ChoiceModal.jsx";
 import "@/styles/popup.css";
 import "@/styles/forms.css";
 import "@/styles/icons.css";
@@ -48,48 +47,20 @@ function previewResultadoIcon(value) {
 export default function ResultadosModal({ row, onClose, onSave }) {
   const initialEstado = String(row?.resultado?.estado || "sin").toLowerCase();
   const initialObs = row?.resultado?.obs || "";
-  const [estado, setEstado] = useState(initialEstado);
-  const [obs, setObs] = useState(initialObs);
 
   return (
-    <Modal
+    <ChoiceModal
       isOpen={true}
       onClose={onClose}
       title="Editar resultado"
-      actions={(
-        <>
-          <button className="btn btn-secondary" onClick={onClose}>
-            Cancelar
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              onSave?.(estado, obs);
-            }}
-          >
-            Guardar
-          </button>
-        </>
-      )}
-    >
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
-        {previewResultadoIcon(estado)}
-        <div style={{ flex: 1 }}>
-          <label style={{ display: "block", marginBottom: 6 }}>Estado</label>
-          <select className="input" value={estado} onChange={(e) => setEstado(e.target.value)}>
-            {RESULT_OPTS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      <div className="field">
-        <label>Observaciones</label>
-        <textarea className="input" rows={4} value={obs} onChange={(e) => setObs(e.target.value)} />
-      </div>
-    </Modal>
+      options={RESULT_OPTS}
+      initialValue={initialEstado}
+      withTextarea={true}
+      textareaLabel="Observaciones"
+      textareaPlaceholder="Notas opcionales…"
+      initialNotes={initialObs}
+      renderPreview={previewResultadoIcon}
+      onSave={(estado, obs) => onSave?.(estado, obs)}
+    />
   );
 }
