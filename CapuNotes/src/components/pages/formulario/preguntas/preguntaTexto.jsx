@@ -15,7 +15,7 @@ const PreguntaTexto = ({ pregunta, handleChange }) => {
 
         setRespuesta(prev => ({ ...prev, valorTexto: nuevoValor }));
         // notificar al padre con (preguntaId, valor)
-        handleChange(pregunta.id, nuevoValor);
+        handleChange(pregunta.id, respuesta);
     }
 
     return (

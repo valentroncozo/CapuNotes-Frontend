@@ -10,27 +10,33 @@ const PreguntaOpcion = ({ pregunta, respuestas, handleChange }) => {
         "opcionesSeleccionadasIds": []
     });
 
+    // onInputChange
     const onInputChange = (e) => {
-        const nuevoValor = e.target.value;
+        const value = e.target.value;                          
+        const opcionId = value === '' ? null : Number(value); 
 
-        setRespuesta(prev => ({ ...prev, valorTexto: nuevoValor }));
-        // notificar al padre con (preguntaId, valor)
-        handleChange(pregunta.id, nuevoValor);
-    }
+        const newRespuesta = {
+            ...respuesta,
+            opcionSeleccionadaId: opcionId,
+        };
 
+        setRespuesta(newRespuesta);
+        handleChange(pregunta.id, newRespuesta); 
+    };
+    
     return (
         <section className='form-group-miembro'>
             <label>{pregunta.valor}</label>
             <select
                 className='abmc-select'
-                value={respuesta.opcionSeleccionadaId || ''}
+                value={respuesta.opcionSeleccionadaId != null ? String(respuesta.opcionSeleccionadaId) : ''}
                 onChange={onInputChange}
                 required={!!pregunta.obligatoria}
             >
                 <option value="">Seleccione una opción</option>
                 {pregunta.opciones.map(opcion => (
-                    <option key={opcion.id} value={opcion.id}>
-                        {opcion.valor}
+                    <option key={opcion.id} value={String(opcion.id)}>
+                        {opcion.texto}
                     </option>
                 ))}
             </select>
@@ -39,4 +45,4 @@ const PreguntaOpcion = ({ pregunta, respuestas, handleChange }) => {
     );
 }
 
-export default PreguntaTexto;
+export default PreguntaOpcion;

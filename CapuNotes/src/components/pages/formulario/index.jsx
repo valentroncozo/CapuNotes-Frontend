@@ -2,6 +2,7 @@ import '@/styles/abmc.css'
 import BackButton from '../../common/BackButton.jsx';
 import PreguntaTexto from './preguntas/preguntaTexto.jsx';
 import PreguntaOpcion from './preguntas/preguntaOpcion.jsx';
+import PreguntaMultiOpcion from './preguntas/preguntaMultiOpcion.jsx';
 import { useEffect, useState } from 'react';
 
 
@@ -70,10 +71,10 @@ const Formulario = ({title = 'Inscripcion a Audiciones CoroCapuchino'}) => {
             const existe = prevRespuestas.find(res => res.preguntaId === preguntaId);
             if (existe) {
                 return prevRespuestas.map(res =>
-                    res.preguntaId === preguntaId ? { ...res, valorTexto: nuevoValor } : res
+                    res.preguntaId === preguntaId ? nuevoValor  : res
                 );
             }
-            return [...prevRespuestas, { preguntaId, valorTexto: nuevoValor }];
+            return [...prevRespuestas, nuevoValor ];
         });
 
     };
@@ -97,19 +98,21 @@ const Formulario = ({title = 'Inscripcion a Audiciones CoroCapuchino'}) => {
                         (pregunta.tipo === 'TEXTO')  ? (
                         <PreguntaTexto
                             key={pregunta.id}
+                            pregunta={pregunta}
                             index={index}
-                            respuestas={respuestas}
                             handleChange={handleChange}
                         />
                         ): (pregunta.tipo === 'OPCION') ? (
                             <PreguntaOpcion
                                 key={pregunta.id}
+                                pregunta={pregunta}
                                 index={index}
                                 respuestas={respuestas}
                                 handleChange={handleChange}
                             /> 
                         ): (pregunta.tipo === 'MULTIOPCION') ? (
                             <PreguntaMultiOpcion
+                                pregunta={pregunta}
                                 key={pregunta.id}
                                 index={index}
                                 respuestas={respuestas}
