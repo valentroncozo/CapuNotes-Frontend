@@ -42,26 +42,34 @@ export const candidatosService = {
   },
 
   /**
-   * 🔄 Crea o actualiza el resultado de una inscripción
-   * @param {number} idInscripcion - ID de la inscripción
-   * @param {{estado: string, obs: string}} data - Datos a guardar
-   * @returns {Promise<Object>} Inscripción actualizada
-   */
+ * 🔄 Crea o actualiza el resultado de una inscripción de audición
+ * @param {number} idInscripcion - ID de la inscripción
+ * @param {{estado: string, obs: string}} data - Datos a guardar
+ * @returns {Promise<Object>} Inscripción actualizada
+ */
   updateResultado: async (idInscripcion, data) => {
-    try {
-      // ✅ Enviamos el formato EXACTO que el backend espera
-      const payload = {
-        resultado: data.estado || null,
-        observaciones: data.obs || null,
-      };
+  try {
+    const payload = {
+      resultado: (data.estado || "SIN").toUpperCase(),
+      observaciones: data.obs || "",
+      cuerda: { name: data.cuerda || "Tenor" },
+      cancion: data.cancion || undefined,
+    };
 
-      const response = await api.patch(`/inscripciones/${idInscripcion}`, payload);
-      return response.data;
-    } catch (error) {
-      console.error("❌ Error al actualizar resultado:", error);
-      throw error.response?.data || error.message;
-    }
-  },
+    console.log("📤 PATCH /encuesta/audicion/inscripciones", idInscripcion, payload);
+
+    const response = await api.patch(
+      `/encuesta/audicion/inscripciones/${idInscripcion}`,
+      payload
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("❌ Error al actualizar resultado:", error);
+    throw error.response?.data || error.message;
+  }
+},
+
 
   /**
    * Actualiza la cuerda de la inscripción de un candidato

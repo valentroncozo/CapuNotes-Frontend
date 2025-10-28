@@ -1,77 +1,54 @@
-// src/components/pages/audiciones/ResultadosModal.jsx
 import { useState } from "react";
 import Modal from "@/components/common/Modal.jsx";
 import "@/styles/popup.css";
 import "@/styles/forms.css";
-import "@/styles/icons.css";
-
-/* Íconos de resultado */
-import AceptadoIcon from "@/assets/icons/resultado/AceptadoIcon.jsx";
-import RechazadoIcon from "@/assets/icons/resultado/RechazadoIcon.jsx";
-import AusenteIcon from "@/assets/icons/resultado/AusenteIcon.jsx";
-import SinResultadoIcon from "@/assets/icons/resultado/SinResultadoIcon.jsx";
+import "@/styles/icon.css";
 
 const RESULT_OPTS = [
-  { value: "sin",       label: "Sin resultado" },
-  { value: "aceptado",  label: "Aceptado" },
+  { value: "sin", label: "Sin resultado" },
+  { value: "aceptado", label: "Aceptado" },
   { value: "rechazado", label: "Rechazado" },
-  { value: "ausente",   label: "Ausente" },
+  { value: "ausente", label: "Ausente" },
 ];
 
-function previewResultadoIcon(value) {
-  const v = String(value || "sin").toLowerCase();
-  if (v === "aceptado" || v === "aceptada" || v === "ok")
-    return (
-      <span className="icon-estado icon-estado--ok icon-md" title="Aceptado">
-        <AceptadoIcon />
-      </span>
-    );
-  if (v === "rechazado" || v === "rechazada" || v === "bad")
-    return (
-      <span className="icon-estado icon-estado--bad icon-md" title="Rechazado">
-        <RechazadoIcon />
-      </span>
-    );
-  if (v === "ausente" || v === "pend")
-    return (
-      <span className="icon-estado icon-estado--pend icon-md" title="Ausente">
-        <AusenteIcon />
-      </span>
-    );
-  return (
-    <span className="icon-estado icon-estado--sin icon-md" title="Sin resultado">
-      <SinResultadoIcon />
-    </span>
-  );
+function normalizeEstado(value) {
+  const v = String(value || "").trim().toLowerCase();
+  if (["aprobado", "aceptado", "ok"].includes(v)) return "aceptado";
+  if (["rechazado", "no", "fail"].includes(v)) return "rechazado";
+  if (["ausente"].includes(v)) return "ausente";
+  return "sin";
 }
 
-export default function ResultadosModal({ row, onClose, onSave }) {
-  const initialEstado = String(row?.resultado?.estado || "sin").toLowerCase();
+export default function ResultadosModal({ mode = "edit", row, onSave, onClose }) {
+  const initialEstado = normalizeEstado(row?.resultado?.estado);
   const initialObs = row?.resultado?.obs || "";
+
   const [estado, setEstado] = useState(initialEstado);
   const [obs, setObs] = useState(initialObs);
 
+  const isReadOnly = mode === "view";
+  const title =
+    mode === "view"
+      ? "Resultado de la audición"
+      : mode === "create"
+      ? "Nuevo resultado"
+      : "Editar resultado";
+
   return (
-    <Modal
-      isOpen={true}
-      onClose={onClose}
-      title="Editar resultado"
-      actions={(
-        <>
-          <button className="btn btn-secondary" onClick={onClose}>
-            Cancelar
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              onSave?.(estado, obs);
-            }}
-          >
-            Guardar
-          </button>
-        </>
-      )}
-    >
+    <Modal isOpen={true} onClose={onClose} title="Editar resultado" actions={(
+      // Footer: Cancel on the left, Guardar on the right
+      <>
+        <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            onSave?.(estado, obs);
+          }}
+        >
+          Guardar
+        </button>
+      </>
+    )}>
       <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
         {previewResultadoIcon(estado)}
         <div style={{ flex: 1 }}>
@@ -88,7 +65,14 @@ export default function ResultadosModal({ row, onClose, onSave }) {
 
       <div className="field">
         <label>Observaciones</label>
-        <textarea className="input" rows={4} value={obs} onChange={(e) => setObs(e.target.value)} />
+        <textarea
+          className="input"
+          rows={4}
+          value={obs}
+          onChange={(e) => setObs(e.target.value)}
+          placeholder="Escriba una observación..."
+          readOnly={isReadOnly}
+        />
       </div>
     </Modal>
   );
