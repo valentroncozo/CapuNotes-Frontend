@@ -21,6 +21,7 @@ import CuestionarioPreview from "@/components/pages/cuestionario/preview.jsx";
 import Candidatos from "@/components/pages/candidatos/index.jsx";
 import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx";
 import HistorialCandidatos from "@/components/pages/candidatos/historial.jsx";
+import Formulario from "@/components/pages/formulario/index.jsx"; // <-- descomenta cuando exista
 
 // Estilos base (usar globals como fuente de verdad)
 import "@/styles/globals.css";
@@ -76,10 +77,11 @@ function AppRoutes() {
         <Route path="candidatos" element={<Candidatos />} />
         <Route path="candidatos-coordinadores" element={<CandidatosCoordinadores />} />
         <Route path="candidatos/historial" element={<HistorialCandidatos />} />
-
       </Route>
+     
 
       <Route path="*" element={<Navigate to="/principal" replace />} />
+      <Route path="/formulario" element={<Formulario />} /> 
     </Routes>
   );
 }
