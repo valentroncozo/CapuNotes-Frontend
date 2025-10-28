@@ -18,53 +18,55 @@ export default function HistorialAudicionesPage() {
   const [sortDir, setSortDir] = useState("asc");
 
   // 🔄 Cargar historial desde backend
+  const loadHistorial = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const data = await historialService.list();
+
+      const rowsAdaptadas = (data || []).map((item, idx) => ({
+        id: item.idInscripcion || idx + 1,
+        nombre: item.nombre || "",
+        apellido: item.apellido || "",
+        nombreAudicion: item.nombreAudicion || item.audicion || "—",
+        cancion: item.cancion || "",
+        resultado: item.resultado || null,
+        observaciones: item.observaciones || "",
+        idInscripcion: item.idInscripcion || item.inscripcion?.id || item.id,
+        inscripcion: item,
+      }));
+
+      setRows(rowsAdaptadas);
+    } catch (err) {
+      console.error("Error cargando historial:", err);
+      setError("Error cargando historial de audiciones.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const data = await historialService.list();
-
-        const rowsAdaptadas = (data || []).map((item, idx) => ({
-          id: item.idInscripcion || idx + 1,
-          nombre: item.nombre || "",
-          apellido: item.apellido || "",
-          nombreAudicion: item.nombreAudicion || item.audicion || "—",
-          cancion: item.cancion || "",
-          resultado: item.resultado || null,
-          observaciones: item.observaciones || "",
-          inscripcion: item,
-        }));
-
-        setRows(rowsAdaptadas);
-      } catch (err) {
-        console.error("Error cargando historial:", err);
-        setError("Error cargando historial de audiciones.");
-      } finally {
-        setLoading(false);
-      }
-    })();
+    loadHistorial();
   }, []);
 
-  // 🔤 Función auxiliar: quita tildes y pasa a minúsculas
-    const normalizeText = (text) =>
-      String(text || "")
-        .toLowerCase()
-        .normalize("NFD")              // separa las tildes de las letras
-        .replace(/[\u0300-\u036f]/g, ""); // elimina las tildes, diéresis, etc.
+  // 🔤 Normaliza texto (para buscar sin tildes)
+  const normalizeText = (text) =>
+    String(text || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
 
-    // 🔍 Filtro solo por nombre y apellido (ignorando tildes)
-    const filtered = useMemo(() => {
-      if (!q) return rows;
-      const t = normalizeText(q);
-      return rows.filter(
-        (r) =>
-          normalizeText(r.nombre).includes(t) ||
-          normalizeText(r.apellido).includes(t)
-      );
-    }, [rows, q]);
-
+  // 🔍 Filtro por nombre y apellido
+  const filtered = useMemo(() => {
+    if (!q) return rows;
+    const t = normalizeText(q);
+    return rows.filter(
+      (r) =>
+        normalizeText(r.nombre).includes(t) ||
+        normalizeText(r.apellido).includes(t)
+    );
+  }, [rows, q]);
 
   // 🔽 Orden solo por nombre
   const sorted = useMemo(() => {
@@ -153,18 +155,9 @@ export default function HistorialAudicionesPage() {
                 </button>
               </th>
 
-              <th>
-                <span className="th-label">Audición</span>
-              </th>
-
-              <th>
-                <span className="th-label">Canción</span>
-              </th>
-
-              <th>
-                <span className="th-label">Resultado</span>
-              </th>
-
+              <th><span className="th-label">Audición</span></th>
+              <th><span className="th-label">Canción</span></th>
+              <th><span className="th-label">Resultado</span></th>
               <th style={{ width: 60 }} aria-hidden="true" />
             </tr>
           </thead>
@@ -172,14 +165,7 @@ export default function HistorialAudicionesPage() {
           <tbody>
             {sorted.length === 0 ? (
               <tr>
-                <td
-                  colSpan="5"
-                  style={{
-                    textAlign: "center",
-                    padding: "2rem",
-                    color: "#666",
-                  }}
-                >
+                <td colSpan="5" style={{ textAlign: "center", padding: "2rem", color: "#666" }}>
                   {q
                     ? "No se encontraron resultados con ese nombre o apellido."
                     : "No hay registros en el historial de audiciones."}
@@ -196,35 +182,35 @@ export default function HistorialAudicionesPage() {
                     <td>{r.nombreAudicion || "—"}</td>
                     <td>{r.cancion || "—"}</td>
 
-                    {/* ✅ Resultado: solo botón, como el original */}
+                    {/* ✅ Botón "Ver" solo para visualizar resultado */}
                     <td style={{ textAlign: "center" }}>
                       <button
                         className="btn-accion"
                         onClick={() =>
                           setVerResultado({
                             ...r,
-                            idInscripcion: r.idInscripcion || r.inscripcion?.id || r.id,
+                            idInscripcion:
+                              r.idInscripcion || r.inscripcion?.id || r.id,
                             resultado:
                               typeof r.resultado === "object"
                                 ? r.resultado
-                                : { estado: r.resultado || "", obs: r.observaciones || "" },
+                                : {
+                                    estado: r.resultado || "",
+                                    obs: r.observaciones || "",
+                                  },
                           })
                         }
                         title="Ver detalles del resultado"
-                        aria-label="Ver detalles del resultado"
                       >
                         Ver
                       </button>
                     </td>
 
-
-                    {/* ✅ Botón + alineado igual que antes */}
                     <td style={{ textAlign: "center" }}>
                       <button
                         className="btn-accion"
                         title="Abrir cuestionario de inscripción"
                         onClick={() => setVerInscripcion(r.inscripcion || r)}
-                        aria-label="Abrir cuestionario de inscripción"
                       >
                         +
                       </button>
@@ -237,12 +223,14 @@ export default function HistorialAudicionesPage() {
         </table>
       </div>
 
-      {/* Resultado modal (centralized read-only view) */}
+      {/* 🟢 Modal de resultado (solo lectura) */}
       {verResultado && (
-        <ResultadosModal row={verResultado} onClose={() => setVerResultado(null)} />
+        <ResultadosModal
+          mode="view"
+          row={verResultado}
+          onClose={() => setVerResultado(null)}
+        />
       )}
-
-      
     </main>
   );
 }

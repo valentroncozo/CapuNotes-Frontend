@@ -60,7 +60,6 @@ export default function CandidatosPage() {
     }
   }, []);
 
-  // run once on mount
   useEffect(() => {
     loadAudicionActual();
   }, [loadAudicionActual]);
@@ -72,6 +71,7 @@ export default function CandidatosPage() {
       const res = await fetch(`http://localhost:8080/audiciones/${audicionId}/candidatos`);
       if (!res.ok) throw new Error("Error al obtener candidatos");
       const cd = await res.json();
+      console.log("📅 Datos de candidatos:", cd[0]);
 
       setRows(cd || []);
       setDiaSel("-");
@@ -149,7 +149,7 @@ export default function CandidatosPage() {
 
   // 🔹 Botón de resultado (usa ResultadosModal)
   const getResultadoButton = (r) => {
-    const estadoRaw = r.resultado || r.estado || r.estadoResultado || "";
+    const estadoRaw = r.resultado?.estado || r.resultado || r.estado || "";
     const estado = String(estadoRaw || "").toLowerCase();
     const idInscripcion = r.idInscripcion || r.inscripcionId || r.id;
 
@@ -158,7 +158,8 @@ export default function CandidatosPage() {
     const isRechazado = estado === "rechazado";
 
     const color = isNoResultado ? "#444" : isAceptado ? "green" : isRechazado ? "red" : "#444";
-    const label = isNoResultado ? "Añadir" : isAceptado ? "✅" : isRechazado ? "❌" : "Añadir";
+    const label = isNoResultado ? "Añadir" : isAceptado ? "✅" : "❌";
+    const readOnly = !isNoResultado; // ✅ Solo lectura si ya hay resultado
 
     return (
       <button
@@ -171,7 +172,6 @@ export default function CandidatosPage() {
             return;
           }
 
-          // Normalize row shape for the modal: ensure resultado is an object
           const modalRow = {
             ...r,
             idInscripcion,
@@ -181,7 +181,7 @@ export default function CandidatosPage() {
                 : { estado: r.resultado || "", obs: r.observaciones || r.obs || "" },
           };
 
-          setEditResultado(modalRow);
+          setEditResultado({ ...modalRow, readOnly }); // ✅ se pasa al modal
         }}
       >
         {label}
@@ -189,7 +189,7 @@ export default function CandidatosPage() {
     );
   };
 
-  // 🔹 Renderizado principal
+  // 🔹 Render principal
   if (loading) {
     return (
       <main className="abmc-page">
@@ -317,22 +317,41 @@ export default function CandidatosPage() {
         </table>
       </div>
 
-      {/* Resultado modal (centralizado) */}
+      {/* Modal de resultados */}
       {editResultado && (
         <ResultadosModal
           row={editResultado}
+          readOnly={editResultado.readOnly}
           onClose={() => setEditResultado(null)}
           onSave={async (estado, obs) => {
             try {
-              // estado comes from modal as 'aceptado'|'rechazado'|'ausente'|'sin'
+              // 🔹 Actualizamos el resultado en el backend
               await candidatosService.updateResultado(editResultado.idInscripcion, {
                 estado,
                 obs,
+                cuerda: editResultado.cuerda?.name,
+                cancion: editResultado.cancion,
               });
+
+              // 🔹 Actualizamos localmente sin recargar todo
+              setRows((prev) =>
+                prev.map((r) =>
+                  (r.idInscripcion || r.id) === editResultado.idInscripcion
+                    ? {
+                        ...r,
+                        resultado: {
+                          estado,
+                          obs,
+                        },
+                      }
+                    : r
+                )
+              );
+
+              // 🔹 Cerramos modal
               setEditResultado(null);
-              await loadCandidatos(audicionActual.id);
             } catch (err) {
-              console.error("Error al guardar resultado:", err);
+              console.error("❌ Error al guardar resultado:", err);
               alert("No se pudo guardar el resultado.");
             }
           }}
