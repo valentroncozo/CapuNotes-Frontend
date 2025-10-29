@@ -204,3 +204,26 @@ textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
   color: #fff !important;
   transform: scale(1.05) !important;
 }
+
+
+.form-group-checkbox{
+  display: flex;
+  flex-direction: column;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.checkbox-item {
+  gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  text-align: center;
+  align-items: center;
+  align-content: center;
+}
+

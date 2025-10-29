@@ -26,7 +26,7 @@ const PreguntaOpcion = ({ pregunta, respuestas, handleChange }) => {
     
     return (
         <section className='form-group-miembro'>
-            <label>{pregunta.valor}</label>
+            <label>{pregunta.valor} {pregunta.obligatoria && <span style={{color: 'var(--accent)'}}>*</span>}</label>
             <select
                 className='abmc-select'
                 value={respuesta.opcionSeleccionadaId != null ? String(respuesta.opcionSeleccionadaId) : ''}

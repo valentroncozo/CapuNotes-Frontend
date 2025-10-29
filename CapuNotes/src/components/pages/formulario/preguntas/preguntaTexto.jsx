@@ -12,15 +12,14 @@ const PreguntaTexto = ({ pregunta, handleChange }) => {
 
     const AgregarRespuesta = (e) => {
         const nuevoValor = e.target.value;
-
-        setRespuesta(prev => ({ ...prev, valorTexto: nuevoValor }));
-        // notificar al padre con (preguntaId, valor)
-        handleChange(pregunta.id, respuesta);
+        const newRespuesta = { ...respuesta, valorTexto: nuevoValor };
+        setRespuesta(newRespuesta);
+        handleChange(pregunta.id, newRespuesta); // el padre recibe la versión actualizada
     }
 
     return (
         <section className='form-group-miembro'>
-            <label>{pregunta.valor}</label>
+            <label>{pregunta.valor} {pregunta.obligatoria && <span style={{color: 'var(--accent)'}}>*</span>}</label>
             <input
                 type="text"
                 className='abmc-input'
