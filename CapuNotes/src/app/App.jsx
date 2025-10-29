@@ -22,6 +22,8 @@ import Candidatos from "@/components/pages/candidatos/index.jsx";
 import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx";
 import HistorialCandidatos from "@/components/pages/candidatos/historial.jsx";
 import Formulario from "@/components/pages/formulario/index.jsx"; // <-- descomenta cuando exista
+import FormularioConsulta from "@/components/pages/formulario/consulta.jsx";
+import FormularioConsultaCoordinacion from "@/components/pages/formulario/consultaCoordinacion.jsx";
 
 // Estilos base (usar globals como fuente de verdad)
 import "@/styles/globals.css";
@@ -82,6 +84,8 @@ function AppRoutes() {
 
       <Route path="*" element={<Navigate to="/principal" replace />} />
       <Route path="/formulario" element={<Formulario />} /> 
+      <Route path="/inscripcion/:id" element={<FormularioConsultaCoordinacion />} /> 
+
     </Routes>
   );
 }

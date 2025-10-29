@@ -48,6 +48,17 @@ const inscripcionService = {
         }
     },
 
+    // PATCH /encuesta/audicion/inscripciones/{id} -> actualizar solo la cuerda del candidato
+    actualizarCuerda: async (inscripcionId, cuerdaName) => {
+        try {
+            const payload = { cuerda: { name: String(cuerdaName) } };
+            const res = await api.patch(`/encuesta/audicion/inscripciones/${inscripcionId}`, payload);
+            return res.data;
+        } catch (e) {
+            handleError(e);
+        }
+    },
+
     getCandidatosPorAudicion: async (audicionId) => {
         try {
             const res = await api.get(`/encuesta/audicion/${audicionId}/candidatos`);

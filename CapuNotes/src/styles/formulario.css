@@ -13,6 +13,10 @@
 }
 
 .container-candidato h2 span {
+    display: flex;
+    
+    flex-direction: row;
+    width: 100%;
     font-size: 1rem;
     font-weight: normal;
     color: var(--text-light);

@@ -1,34 +1,44 @@
-import { useState } from 'react';
-import '@/styles/abmc.css'
+import { useState, useEffect } from 'react';
+import '@/styles/abmc.css';
 
-const PreguntaTexto = ({ pregunta, handleChange }) => {
+const PreguntaTexto = ({ pregunta, res = null, handleChange, disabled = false }) => {
+  const [respuesta, setRespuesta] = useState({
+    preguntaId: pregunta.id,
+    valorTexto: res?.valorTexto ?? '',
+    opcionSeleccionadaId: res?.opcionSeleccionadaId ?? null,
+    opcionesSeleccionadasIds: Array.isArray(res?.opcionesSeleccionadasIds) ? res.opcionesSeleccionadasIds : []
+  });
 
-    const [respuesta, setRespuesta] = useState({
-        "preguntaId": pregunta.id,
-        "valorTexto": '',
-        "opcionSeleccionadaId": null,
-        "opcionesSeleccionadasIds": []
+  // sincronizar si res cambia (modo consulta / carga inicial)
+  useEffect(() => {
+    setRespuesta({
+      preguntaId: pregunta.id,
+      valorTexto: res?.valorTexto ?? '',
+      opcionSeleccionadaId: res?.opcionSeleccionadaId ?? null,
+      opcionesSeleccionadasIds: Array.isArray(res?.opcionesSeleccionadasIds) ? res.opcionesSeleccionadasIds : []
     });
+  }, [res, pregunta.id]);
 
-    const AgregarRespuesta = (e) => {
-        const nuevoValor = e.target.value;
-        const newRespuesta = { ...respuesta, valorTexto: nuevoValor };
-        setRespuesta(newRespuesta);
-        handleChange(pregunta.id, newRespuesta); // el padre recibe la versión actualizada
-    }
+  const onChange = (e) => {
+    if (disabled) return;
+    const nuevo = { ...respuesta, valorTexto: e.target.value };
+    setRespuesta(nuevo);
+    handleChange && handleChange(pregunta.id, nuevo);
+  };
 
-    return (
-        <section className='form-group-miembro'>
-            <label>{pregunta.valor} {pregunta.obligatoria && <span style={{color: 'var(--accent)'}}>*</span>}</label>
-            <input
-                type="text"
-                className='abmc-input'
-                value={respuesta.valorTexto || ''}
-                onChange={AgregarRespuesta}
-                required={!!pregunta.obligatoria}
-            />
-        </section>
-    );
-}
+  return (
+    <section className='form-group-miembro'>
+      <label>{pregunta.valor}{pregunta.obligatoria && <span style={{color:'var(--accent)'}}>*</span>}</label>
+      <input
+        type="text"
+        className='abmc-input'
+        value={respuesta.valorTexto ?? ''}
+        onChange={onChange}
+        disabled={disabled}
+        readOnly={disabled}
+      />
+    </section>
+  );
+};
 
 export default PreguntaTexto;

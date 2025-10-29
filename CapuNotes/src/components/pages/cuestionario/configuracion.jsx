@@ -77,44 +77,91 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
   };
 
   const handleUpdate = async (p) => {
-    // normalizar opciones para la API: preferir id, sino texto, sino string
+    // normalizar opciones a objetos internos
     const opcionesRaw = (Array.isArray(p.opciones) ? p.opciones : []).map(normalizeOption);
-    // backend espera lista de strings al actualizar/crear
-    const opcionesForPayload = opcionesRaw.map(o => String(o?.valor ?? ''));
 
-    // enviar opciones solo para tipos que las usan
+    // convertir a strings, trim, filtrar vacíos y eliminar duplicados (preservando orden)
+    const opcionesStrings = opcionesRaw
+      .map(o => String(o?.valor ?? o?.texto ?? o?.text ?? o?.id ?? ''))
+      .map(s => s.trim())
+      .filter(s => s !== '');
+
+    const opcionesClean = opcionesStrings.filter((v, i, a) => a.indexOf(v) === i);
+    if (opcionesStrings.length !== opcionesClean.length) {
+      console.warn('Se eliminaron opciones duplicadas o vacías antes de enviar:', { before: opcionesStrings, after: opcionesClean });
+    }
+
+    // armar payload (enviar opciones solo si corresponde)
     const payload = { valor: p.valor, tipo: p.tipo, obligatoria: p.obligatoria };
-    if (p.tipo === 'OPCION' || p.tipo === 'MULTIOPCION') payload.opciones = opcionesForPayload;
+    if (p.tipo === 'OPCION' || p.tipo === 'MULTIOPCION') {
+      payload.opciones = opcionesClean;
+    }
+
+    // log claro del payload JSON enviado
+    console.log('Updating pregunta payload (clean):', { id: p.id, payload });
 
     try {
       const updated = await preguntasService.update(p.id, payload);
-      // normalizar opciones recibidas y tratar de preservar los objetos/strings originales
+
+      // normalizar respuesta y preservar mapping lo mejor posible
       const updatedOpciones = Array.isArray(updated.opciones) ? updated.opciones : opcionesRaw;
       const mergedOpciones = updatedOpciones.map((uo, idx) => {
         if (uo == null) return uo;
         if (typeof uo === 'object') return normalizeOption(uo);
-        // uo es primitivo (id o valor) -> intentar encontrar coincidencia en opcionesRaw
         const found = opcionesRaw.find(or => {
           if (or == null) return false;
           if (typeof or === 'object' && or.id != null) return String(or.id) === String(uo);
           return String(or.valor ?? or) === String(uo);
         });
         if (found) return found;
-        // fallback por posición: si backend devolvió ids numéricos con mismo largo, asumir correspondencia por índice
-        const isNumeric = !isNaN(Number(uo));
-        if (isNumeric && opcionesRaw.length === updatedOpciones.length) {
+        if (!isNaN(Number(uo)) && opcionesRaw.length === updatedOpciones.length) {
           const original = opcionesRaw[idx];
           const valor = opcionToString(original);
           return { id: uo, valor };
         }
-        // si no se pudo mapear, devolver objeto con campo valor como string
         return { valor: String(uo) };
       });
 
       setPreguntas(prev => prev.map(x => x.id === p.id ? { ...updated, opciones: mergedOpciones } : x));
+      return updated;
     } catch (err) {
-      console.error('Error al actualizar pregunta:', err);
+      console.error('Error al actualizar pregunta (primera tentativa):', err);
       console.error('Response data:', err?.response?.data);
+
+      // fallback: intentar enviar ids/valores originales pero usando las opciones limpiadas
+      if (payload.opciones && payload.opciones.length) {
+        try {
+          const altOpciones = opcionesRaw.map(o => (o?.id ? String(o.id) : String(o.valor ?? o))).filter(s => s.trim() !== '');
+          const altPayload = { valor: p.valor, tipo: p.tipo, obligatoria: p.obligatoria, opciones: altOpciones };
+          console.log('Reintentando update con payload alternativo:', { id: p.id, altPayload });
+          const updatedAlt = await preguntasService.update(p.id, altPayload);
+
+          const updatedOpciones = Array.isArray(updatedAlt.opciones) ? updatedAlt.opciones : opcionesRaw;
+          const mergedOpciones = updatedOpciones.map((uo, idx) => {
+            if (uo == null) return uo;
+            if (typeof uo === 'object') return normalizeOption(uo);
+            const found = opcionesRaw.find(or => {
+              if (or == null) return false;
+              if (typeof or === 'object' && or.id != null) return String(or.id) === String(uo);
+              return String(or.valor ?? or) === String(uo);
+            });
+            if (found) return found;
+            if (!isNaN(Number(uo)) && opcionesRaw.length === updatedOpciones.length) {
+              const original = opcionesRaw[idx];
+              const valor = opcionToString(original);
+              return { id: uo, valor };
+            }
+            return { valor: String(uo) };
+          });
+
+          setPreguntas(prev => prev.map(x => x.id === p.id ? { ...updatedAlt, opciones: mergedOpciones } : x));
+          return updatedAlt;
+        } catch (err2) {
+          console.error('Fallback update también falló:', err2);
+          console.error('Response data (fallback):', err2?.response?.data);
+        }
+      }
+
       throw err;
     }
   };
@@ -311,9 +358,15 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
               <button className="abmc-btn" type="button" onClick={() => { setIsEditing(false); setEditing(null); }}>Cancelar</button>
               <button className="abmc-btn abmc-btn-primary" type="button" onClick={async () => {
                 if (!editing.valor || !editing.valor.trim()) return;
-                await handleUpdate(editing);
-                setIsEditing(false);
-                setEditing(null);
+                try {
+                  await handleUpdate(editing);
+                  setIsEditing(false);
+                  setEditing(null);
+                } catch (err) {
+                  console.error('No se pudo guardar la pregunta:', err);
+                  // Mensaje simple al usuario (puedes usar Swal si lo importas)
+                  alert('Error al guardar la pregunta. Revisa la consola para más detalles.');
+                }
               }}>Guardar</button>
             </div>
           </Modal>
