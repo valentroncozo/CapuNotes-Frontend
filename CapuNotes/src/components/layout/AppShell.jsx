@@ -37,11 +37,7 @@ export default function AppShell({ onLogout }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [orgOpen, setOrgOpen] = useState(false);
-<<<<<<< HEAD
   const [audOpen, setAudOpen] = useState(false);
-=======
-  const [audicionOpen, setAudicionOpen] = useState(false);
->>>>>>> Francisco-Demaria
   const [gearOpen, setGearOpen] = useState(false);
 
   useEffect(() => {
@@ -117,13 +113,8 @@ export default function AppShell({ onLogout }) {
           <Menu
             orgOpen={orgOpen}
             setOrgOpen={setOrgOpen}
-<<<<<<< HEAD
             audOpen={audOpen}
             setAudOpen={setAudOpen}
-=======
-            audicionOpen={audicionOpen}
-            setAudicionOpen={setAudicionOpen}
->>>>>>> Francisco-Demaria
             onNavigate={handleNavigate}
           />
         </div>
@@ -145,11 +136,7 @@ export default function AppShell({ onLogout }) {
   );
 }
 
-<<<<<<< HEAD
 function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
-=======
-function Menu({ orgOpen, setOrgOpen, audicionOpen, setAudicionOpen, onNavigate }) {
->>>>>>> Francisco-Demaria
   return (
     <div className="appshell-menu">
       <a
@@ -199,7 +186,6 @@ function Menu({ orgOpen, setOrgOpen, audicionOpen, setAudicionOpen, onNavigate }
 
       <div className="appshell-accordion-outer">
         <button
-<<<<<<< HEAD
           className={`appshell-accordion-trigger ${audOpen ? "open" : ""}`}
           onClick={() => setAudOpen((v) => !v)}
           aria-expanded={audOpen}
@@ -209,50 +195,22 @@ function Menu({ orgOpen, setOrgOpen, audicionOpen, setAudicionOpen, onNavigate }
         </button>
 
         {audOpen && (
-=======
-          className={`appshell-accordion-trigger ${audicionOpen ? "open" : ""}`}
-          onClick={() => setAudicionOpen((v) => !v)}
-          aria-expanded={audicionOpen}
-        >
-          Audiciones
-          <span className="appshell-accordion-caret">{audicionOpen ? "▴" : "▾"}</span>
-        </button>
-
-        {audicionOpen && (
->>>>>>> Francisco-Demaria
           <div className="appshell-accordion-content">
             <a
               href="/audicion"
               className="nav-link"
               onClick={(e) => { e.preventDefault(); onNavigate("/audicion"); }}
             >
-<<<<<<< HEAD
               Audición
             </a>
             <a
               href="/candidatos"
               className="nav-link"
               onClick={(e) => { e.preventDefault(); onNavigate("/candidatos"); }}
-=======
-              Audiciones
-            </a>
-            <a
-              href="/audicion/historial"
-              className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/historial"); }}
-            >
-              Historial de Audiciones
-            </a>
-            <a
-              href="/audicion/candidatos"
-              className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/candidatos"); }}
->>>>>>> Francisco-Demaria
             >
               Candidatos
             </a>
             <a
-<<<<<<< HEAD
               href="/candidatos-coordinadores"
               className="nav-link"
               onClick={(e) => { e.preventDefault(); onNavigate("/candidatos-coordinadores"); }}
@@ -272,13 +230,6 @@ function Menu({ orgOpen, setOrgOpen, audicionOpen, setAudicionOpen, onNavigate }
               onClick={(e) => { e.preventDefault(); onNavigate("/cuestionario/configuracion"); }}
             >
               Configurar Cuestionario
-=======
-              href="/audicion/cuestionario"
-              className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/cuestionario"); }}
-            >
-              Configuración del Cuestionario
->>>>>>> Francisco-Demaria
             </a>
           </div>
         )}
