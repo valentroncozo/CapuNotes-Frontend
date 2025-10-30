@@ -19,7 +19,7 @@ const Audicion = ({ title ='Audición'}) => {
 
   const navigate = useNavigate();
 
-  const [setAudicion] = useState({});
+  const [audicion, setAudicion] = useState({});
   const [data, setData] = useState([]);
 
   const [filteredData, setFilteredData] = useState(data);
@@ -146,8 +146,8 @@ const Audicion = ({ title ='Audición'}) => {
               />
 
               <button 
-                className="abmc-btn btn-primary"
-                onClick={() => { navigate('/audicion/agregar'); }}
+              className="abmc-btn btn-primary"
+              onClick={() => { navigate('/audicion/agregar'); }}
               >
                 Agregar Audición
               </button>
@@ -192,4 +192,3 @@ const Audicion = ({ title ='Audición'}) => {
 };
 
 export default Audicion;
-
