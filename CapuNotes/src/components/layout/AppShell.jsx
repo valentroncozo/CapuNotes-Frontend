@@ -213,9 +213,9 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
             <a
               href="/candidatos-coordinadores"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/candidatos-coordinadores"); }}
+              onClick={(e) => { e.preventDefault(); onNavigate("/candidatos-administracion"); }}
             >
-              Candidatos (Coordinadores)
+              Candidatos (Administración)
             </a>
             <a
               href="/candidatos/historial"
