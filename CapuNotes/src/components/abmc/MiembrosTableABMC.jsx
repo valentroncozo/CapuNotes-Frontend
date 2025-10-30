@@ -6,6 +6,7 @@ import { PencilFill, XCircleFill, CheckCircleFill } from "react-bootstrap-icons"
 import Swal from "sweetalert2";
 import { miembrosService } from "@/services/miembrosService.js";
 import { cuerdasService } from "@/services/cuerdasService.js";
+import { areasService } from "@/services/areasService.js";
 
 import "../../styles/abmc.css";
 import "../../styles/miembros.css";
@@ -17,15 +18,17 @@ export default function MiembrosTableABMC({
   const navigate = useNavigate();
   const [listaMiembros, setListaMiembros] = useState([]);
   const [cuerdas, setCuerdas] = useState([]);
+  const [areas, setAreas] = useState([]);
   const [filtroTexto, setFiltroTexto] = useState("");
   const [filtroCuerda, setFiltroCuerda] = useState("");
 
   // 🔹 Cargar miembros y cuerdas desde el backend
   const load = async () => {
     try {
-      const [miembrosData, cuerdasData] = await Promise.all([
+      const [miembrosData, cuerdasData, areasData] = await Promise.all([
         miembrosService.list(),
         cuerdasService.list(),
+        areasService.list(),
       ]);
 
 
@@ -50,6 +53,7 @@ export default function MiembrosTableABMC({
 
       setListaMiembros(ordenados);
       setCuerdas(cuerdasData);
+      setAreas(areasData || []);
     } catch (err) {
       console.error("Error cargando datos:", err);
       Swal.fire("Error", "No se pudieron cargar los datos", "error");
@@ -197,7 +201,26 @@ export default function MiembrosTableABMC({
                 >
                   <td>{`${m.nombre || "-"} ${m.apellido || ""}`}</td>
                   <td>{m.cuerda?.name || "-"}</td>
-                  <td>{m.area?.nombre || "-"}</td>
+                  <td>
+                    {(() => {
+                      // varias formas en que el backend puede devolver el área:
+                      // - objeto: { id, nombre }
+                      // - id numérico
+                      // - nombre como string
+                      const a = m.area;
+                      if (!a) return "-";
+                      if (typeof a === "string") return a;
+                      if (typeof a === "number") {
+                        const found = areas.find((x) => x.id === a);
+                        return found?.nombre || String(a);
+                      }
+                      if (a.id) {
+                        const found = areas.find((x) => x.id === a.id);
+                        return found?.nombre || a.nombre || a.name || "-";
+                      }
+                      return a.nombre || a.name || "-";
+                    })()}
+                  </td>
                   <td>
                     <Badge
                       bg={m.activo ? "success" : "secondary"}

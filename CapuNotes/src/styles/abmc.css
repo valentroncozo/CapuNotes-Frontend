@@ -13,24 +13,27 @@
 .abmc-card {
   margin: 0 auto;
   width: min(980px, 96vw);
+<<<<<<< HEAD
   background: var(--surface-1);
+=======
+  background: rgba(255, 255, 255, .05);
+>>>>>>> Francisco-Demaria
   border: 1px solid rgba(255,255,255,.08);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 20px;
 }
 
-/* Header con flecha + título centrado */
+/* Header */
 .abmc-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  justify-content: space-between;
+  justify-content: flex-end;
   position: relative;
   margin-bottom: 14px;
 }
 
-/* Título */
 .abmc-title {
   flex: 2;
   margin: 0;
@@ -39,24 +42,50 @@
   font-size: 1.8rem;
 }
 
-/* Topbar: alta + buscar */
+/* Topbar */
 .abmc-topbar {
   display: flex;
   align-items: center;
   justify-content: center;
-  align-content: center;
   gap: 8px;
   margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
+<<<<<<< HEAD
+=======
+/* Helper de botón local (forma/padding). 
+   ✅ Recomendación: usar variantes globales .btn .btn-primary/.btn-secondary.
+   Mantengo .abmc-btn para compatibilidad en pantallas actuales. */
+.abmc-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .15s ease;
+  font-family: var(--font-sans);
+}
+
+/* Alias compat: algunas vistas viejas usan .abmc-btn-primary.
+   Lo dejamos como equivalente visual a un primario. */
+.abmc-btn-primary {
+  background: var(--accent);
+  color: var(--text-dark);
+  box-shadow: var(--shadow);
+}
+.abmc-btn-primary:hover { filter: brightness(0.95); }
+.abmc-btn-primary:active { filter: brightness(0.9); }
+
+/* Grupos */
+>>>>>>> Francisco-Demaria
 .form-group-agregar {
   width: 90%;
-  height: auto;
   display: flex;
   gap: 0.8rem;
-  flex: row;
+  flex-direction: row;       /* fix */
   flex-wrap: wrap;
+<<<<<<< HEAD
 }
 
 .form-group-agregar label {
@@ -65,14 +94,18 @@
 
 .form-group-agregar .abmc-select {
   flex:3;
+=======
+>>>>>>> Francisco-Demaria
 }
+.form-group-agregar label { width: 100%; }
+.form-group-agregar .abmc-select { flex:3; }
 
 .form-group-agregar-acciones {
   width: 90%;
   padding-top: calc(24px + 0.8rem);
   display: flex;
   gap: 0.8rem;
-  flex: row;
+  flex-direction: row;       /* fix */
   flex-wrap: wrap;
 }
 
@@ -80,6 +113,7 @@
   width: 90%;
   display: flex;
   gap: 0.8rem;
+<<<<<<< HEAD
   flex: row;
 }
 
@@ -178,3 +212,7 @@
   outline: none;
   background-color: rgba(255, 255, 255, 0.1);
 }
+=======
+  flex-direction: row;       /* fix */
+}
+>>>>>>> Francisco-Demaria
