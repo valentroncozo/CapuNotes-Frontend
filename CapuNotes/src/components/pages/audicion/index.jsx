@@ -132,9 +132,9 @@ const Audicion = ({ title ='Audición'}) => {
         <div className="abmc-card">
           <header className="abmc-header">
             <BackButton />
-            <h1>{title}</h1>
-            <hr className='divisor-amarillo'></hr>
+            <h1 className='abmc-title'>{title}</h1>
           </header>
+            <hr className='divider'></hr>
     
           <div className="abmc-topbar">
               <input
