@@ -149,6 +149,9 @@ export default function MiembrosTableABMC({
           <h1 className="abmc-title">{title}</h1>
         </div>
 
+        <hr className="divisor-amarillo" style={{ margin: "1rem 0rem", color: 'var(--accent)' }} />
+        
+
         {/* === Barra superior con buscador y filtro === */}
         <div className="abmc-topbar">
           <input

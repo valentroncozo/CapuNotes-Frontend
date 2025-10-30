@@ -289,6 +289,8 @@ export default function EntityTableABMC({
           <hr className="divisor-amarillo" />
         </div>
 
+        <hr className="divisor-amarillo" style={{ margin: "1rem 0rem", color: 'var(--accent)' }} />
+
         <form className="abmc-topbar" onSubmit={handleAgregar}>
           {schema.map((f) =>
             f.type === "select" ? (

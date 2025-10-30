@@ -11,12 +11,11 @@
 }
 
 .abmc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   margin: 0 auto;
   width: min(980px, 96vw);
-  background: var(--surface-1);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
   padding: 20px;
 }
 
@@ -43,7 +42,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 32px;
   margin-bottom: 12px;
   flex-wrap: wrap;
 }

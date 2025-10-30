@@ -24,12 +24,14 @@ const Audicion = ({ title ='Audición'}) => {
 
   const [filteredData, setFilteredData] = useState(data);
   const [filtroDia, setFiltroDia] = useState('');
-
+  const [esPublicada, setEsPublicada] = useState(false);
 
   const  load = async () => {
     const audicion = await AudicionService.getActual();
 
     setAudicion(audicion);
+
+    setEsPublicada(audicion?.estado === 'PUBLICADA');
 
     if (!audicion) {
       setData([]);
@@ -124,8 +126,35 @@ const Audicion = ({ title ='Audición'}) => {
         background: '#11103a',
         color: '#E8EAED',
       });
+      setEsPublicada(true);
     }
   }
+
+  const  handlerCerrarAudicion = async () => {
+    const res = await Swal.fire({
+      title: '¿Estás seguro de que quieres cerrar la audición?',
+      text: 'Esta acción no se puede deshacer.',
+      showCancelButton: true,
+      confirmButtonText: 'Cerrar Audición',
+      cancelButtonText: 'Cancelar',
+      background: '#11103a',
+      color: '#E8EAED',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+    });
+
+    if (res.isConfirmed) {
+      await AudicionService.actualizarParcial(audicion.id, {estado: 'CERRADA'});
+      Swal.fire({
+        title: 'Audición cerrada',
+        icon: 'success',
+        background: '#11103a',
+        color: '#E8EAED',
+      });
+      setEsPublicada(false);
+    }
+  }
+
 
   return (
       <main className="audicion-page">
@@ -133,6 +162,19 @@ const Audicion = ({ title ='Audición'}) => {
           <header className="abmc-header">
             <BackButton />
             <h1 className='abmc-title'>{title}</h1>
+            {audicion && (
+            <span style={{ 
+              marginLeft: 'auto', 
+              padding: '4px 12px', 
+              borderRadius: '4px', 
+              backgroundColor: esPublicada ? '#28a745' : '#ffc107',
+              color: esPublicada ? 'white' : 'black',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            }}>
+              {esPublicada ? 'PUBLICADA' : 'BORRADOR'}
+            </span>
+          )}
           </header>
             <hr className='divider'></hr>
     
@@ -175,9 +217,15 @@ const Audicion = ({ title ='Audición'}) => {
             </div>
 
             <div className='content-footer'>
+              {!esPublicada ? (
               <button className="abmc-btn btn-primary" onClick={handlerPublicarAudicion}>
                 Publicar Audición
               </button>
+              ) : ( audicion?.estado === 'PUBLICADA' ? (
+                <button className="abmc-btn btn-primary" onClick={() => { handlerCerrarAudicion(); }}>
+                  Cerrar Audición
+                </button>
+              ) : null)}
               <button className="abmc-btn btn-secondary" onClick={() => { navigate('/audicion/editar'); }}>
                 Modificar Audición
               </button>
