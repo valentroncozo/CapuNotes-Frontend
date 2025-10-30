@@ -15,8 +15,17 @@ function withTimeout(ms = 15000) {
 }
 
 function buildUrl(path, params) {
-  const base = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '') ?? '';
-  const url = new URL(`${base}${path.startsWith('/') ? '' : '/'}${path}`);
+  // Permitir que VITE_API_BASE_URL sea absoluto (http...) o relativo (ej. '/api').
+  const rawBase = import.meta.env.VITE_API_BASE_URL?.replace(/\/+$/, '') ?? '';
+  const base = rawBase
+    ? rawBase.startsWith('http')
+      ? rawBase
+      : `${window.location.origin}${rawBase}`
+    : '';
+  const pathWithSlash = path.startsWith('/') ? path : `/${path}`;
+  // Si no hay base, usamos URL relativa (resuelta contra location.href)
+  const urlString = base ? `${base}${pathWithSlash}` : pathWithSlash;
+  const url = new URL(urlString, window.location.href);
   if (params && typeof params === 'object') {
     Object.entries(params).forEach(([k, v]) => {
       if (v !== undefined && v !== null) url.searchParams.set(k, String(v));
