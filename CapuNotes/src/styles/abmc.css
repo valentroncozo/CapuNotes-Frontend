@@ -20,17 +20,16 @@
   padding: 20px;
 }
 
-/* Header con flecha + título centrado */
+/* Header */
 .abmc-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  justify-content: space-between;
+  justify-content: flex-end;
   position: relative;
   margin-bottom: 14px;
 }
 
-/* Título */
 .abmc-title {
   flex: 2;
   margin: 0;
@@ -39,12 +38,11 @@
   font-size: 1.8rem;
 }
 
-/* Topbar: alta + buscar */
+/* Topbar */
 .abmc-topbar {
   display: flex;
   align-items: center;
   justify-content: center;
-  align-content: center;
   gap: 8px;
   margin-bottom: 12px;
   flex-wrap: wrap;
@@ -52,10 +50,9 @@
 
 .form-group-agregar {
   width: 90%;
-  height: auto;
   display: flex;
   gap: 0.8rem;
-  flex: row;
+  flex-direction: row;       /* fix */
   flex-wrap: wrap;
 }
 
@@ -66,13 +63,15 @@
 .form-group-agregar .abmc-select {
   flex:3;
 }
+.form-group-agregar label { width: 100%; }
+.form-group-agregar .abmc-select { flex:3; }
 
 .form-group-agregar-acciones {
   width: 90%;
   padding-top: calc(24px + 0.8rem);
   display: flex;
   gap: 0.8rem;
-  flex: row;
+  flex-direction: row;       /* fix */
   flex-wrap: wrap;
 }
 

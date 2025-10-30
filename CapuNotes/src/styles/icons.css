@@ -1,4 +1,4 @@
-
+/* Small icon helpers used by assets (moved from src/assets/icon.css) */
 .container-toggle {
   display: flex;
   padding: 0;
@@ -15,5 +15,3 @@
     border: inherit;
     opacity: 0.8;
 }
-
-

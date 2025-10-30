@@ -30,7 +30,6 @@ const MENU_ITEMS = [
   ["/asistencias", "Asistencias"],
   ["/canciones", "Canciones"],
   ["/eventos", "Eventos"],
-  ["/fraternidades", "Fraternidades"],
   ["/usuarios-roles", "Usuarios y roles"],
 ];
 
@@ -207,7 +206,7 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
             <a
               href="/candidatos"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/candidatos"); }}
+              onClick={(e) => { e.preventDefault(); onNavigate("audicion/candidatos"); }}
             >
               Candidatos
             </a>
@@ -221,7 +220,7 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
             <a
               href="/candidatos/historial"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/candidatos/historial"); }}
+              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/historial"); }}
             >
               Historial Candidatos
             </a>

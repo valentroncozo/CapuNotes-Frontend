@@ -18,9 +18,9 @@ import AudicionAgregar from "@/components/pages/audicion/agregar.jsx";
 import AudicionEditar from "@/components/pages/audicion/editar.jsx";
 import CuestionarioConfig from "@/components/pages/cuestionario/configuracion.jsx";
 import CuestionarioPreview from "@/components/pages/cuestionario/preview.jsx";
-import Candidatos from "@/components/pages/candidatos/index.jsx";
+import Candidatos from "@/components/pages/audicion/candidatos.jsx";
 import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx";
-import HistorialCandidatos from "@/components/pages/candidatos/historial.jsx";
+import HistorialAudiciones from "@/components/pages/audicion/historial.jsx";
 import Formulario from "@/components/pages/formulario/index.jsx"; // <-- descomenta cuando exista
 import FormularioConsulta from "@/components/pages/formulario/consulta.jsx";
 import FormularioConsultaCoordinacion from "@/components/pages/formulario/consultaCoordinacion.jsx";
@@ -69,26 +69,27 @@ function AppRoutes() {
         <Route path="miembros/editar" element={<MiembrosEditar />} />
         <Route path="cuerdas" element={<Cuerdas />} />
         <Route path="areas" element={<Areas />} />
-        <Route path="fraternidades" element={<Fraternidades />} />
+        <Route path="cuestionario/configuracion" element={<CuestionarioConfig />} />
+        <Route path="cuestionario/preview" element={<CuestionarioPreview />} />
+        <Route path="candidatos-coordinadores" element={<CandidatosCoordinadores />} />
         <Route path="audicion" element={<Audicion />} />
         <Route path="audicion/agregar" element={<AudicionAgregar />} />
         <Route path="audicion/editar" element={<AudicionEditar />} />
+        <Route path="audicion/candidatos" element={<Candidatos />} />
+        <Route path="audicion/historial" element={<HistorialAudiciones />} />
         <Route path="audicion/cronograma/:id" element={<Navigate to="/candidatos-coordinadores" replace />} />
-        <Route path="cuestionario/configuracion" element={<CuestionarioConfig />} />
-        <Route path="cuestionario/preview" element={<CuestionarioPreview />} />
-        <Route path="candidatos" element={<Candidatos />} />
-        <Route path="candidatos-coordinadores" element={<CandidatosCoordinadores />} />
-        <Route path="candidatos/historial" element={<HistorialCandidatos />} />
+        <Route path="/inscripcion/:id" element={<FormularioConsulta />} />
+        <Route path="/inscripcion/coordinadores/:id" element={<FormularioConsultaCoordinacion />} />
       </Route>
      
 
       <Route path="*" element={<Navigate to="/principal" replace />} />
       <Route path="/formulario" element={<Formulario />} /> 
-      <Route path="/inscripcion/:id" element={<FormularioConsultaCoordinacion />} /> 
 
     </Routes>
   );
 }
+
 
 export default function App() {
   return (
