@@ -1,26 +1,66 @@
-import axios from 'axios';
+import axios from "axios";
 
-const DEV_PROXY_BASE = '/api';
-const resolvedBaseURL = import.meta.env.DEV
-  ? DEV_PROXY_BASE
-  : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
+const base = import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
 
 const api = axios.create({
-  baseURL: resolvedBaseURL,
-  headers: { 'Content-Type': 'application/json' },
+    baseURL: base,
+    timeout: 10000,
+    headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    },
+    withCredentials: true
 });
 
-export const historialService = {
-  list: async () => {
-    try {
-      const r = await api.get('/historial');
-      return r.data;
-    } catch (e) {
-      // Propagar un mensaje simple; la vista muestra un aviso amigable
-      throw new Error(e?.response?.data || e?.message || 'No se pudo obtener el historial');
+function handleError(err) {
+    if (err.response) {
+        throw err.response.data || { message: err.response.statusText };
     }
-  },
+    throw { message: err.message || "Error de red" };
+}
+
+export const historialService = {
+    /**
+     * Obtener historial de audiciones
+     * @returns {Promise<Array>} Lista de inscripciones históricas
+     */
+    list: async () => {
+        try {
+            const res = await api.get('/audiciones/historial');
+            return res.data;
+        } catch (e) {
+            handleError(e);
+        }
+    },
+
+    /**
+     * Obtener historial por candidato
+     * @param {string} tipoDocumento - Tipo de documento del candidato
+     * @param {string} nroDocumento - Número de documento del candidato
+     * @returns {Promise<Array>} Lista de audiciones del candidato
+     */
+    getByCandidato: async (tipoDocumento, nroDocumento) => {
+        try {
+            const res = await api.get(`/audiciones/candidato/${encodeURIComponent(tipoDocumento)}/${encodeURIComponent(nroDocumento)}`);
+            return res.data;
+        } catch (e) {
+            handleError(e);
+        }
+    },
+
+    /**
+     * Obtener detalle de una inscripción específica
+     * @param {number} inscripcionId - ID de la inscripción
+     * @returns {Promise<Object>} Detalle de la inscripción
+     */
+    getInscripcion: async (inscripcionId) => {
+        try {
+            const res = await api.get(`/encuesta/${inscripcionId}`);
+            return res.data;
+        } catch (e) {
+            handleError(e);
+        }
+    }
 };
 
 export default historialService;
-

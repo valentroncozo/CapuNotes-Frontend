@@ -15,6 +15,7 @@ import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
 import Audicion from "@/components/pages/audicion/index.jsx";
 import AudicionAgregar from "@/components/pages/audicion/agregar.jsx";
+import HistorialAudiciones from "@/components/pages/audicion/historial.jsx";
 import AudicionEditar from "@/components/pages/audicion/editar.jsx";
 import CuestionarioConfig from "@/components/pages/cuestionario/configuracion.jsx";
 import CuestionarioPreview from "@/components/pages/cuestionario/preview.jsx";
@@ -79,6 +80,9 @@ function AppRoutes() {
         <Route path="candidatos" element={<Candidatos />} />
         <Route path="candidatos-coordinadores" element={<CandidatosCoordinadores />} />
         <Route path="candidatos/historial" element={<HistorialCandidatos />} />
+        <Route path="audicion/historial" element={<HistorialAudiciones />} />
+        <Route path="audicion/candidatos" element={<Candidatos />} />
+
       </Route>
      
 
@@ -89,6 +93,7 @@ function AppRoutes() {
     </Routes>
   );
 }
+
 
 export default function App() {
   return (

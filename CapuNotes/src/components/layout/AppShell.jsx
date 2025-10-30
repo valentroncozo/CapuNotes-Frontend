@@ -30,7 +30,6 @@ const MENU_ITEMS = [
   ["/asistencias", "Asistencias"],
   ["/canciones", "Canciones"],
   ["/eventos", "Eventos"],
-  ["/fraternidades", "Fraternidades"],
   ["/usuarios-roles", "Usuarios y roles"],
 ];
 
@@ -38,7 +37,7 @@ export default function AppShell({ onLogout }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [orgOpen, setOrgOpen] = useState(false);
-  const [audOpen, setAudOpen] = useState(false);
+  const [audicionOpen, setAudicionOpen] = useState(false);
   const [gearOpen, setGearOpen] = useState(false);
 
   useEffect(() => {
@@ -114,8 +113,8 @@ export default function AppShell({ onLogout }) {
           <Menu
             orgOpen={orgOpen}
             setOrgOpen={setOrgOpen}
-            audOpen={audOpen}
-            setAudOpen={setAudOpen}
+            audicionOpen={audicionOpen}
+            setAudicionOpen={setAudicionOpen}
             onNavigate={handleNavigate}
           />
         </div>
@@ -137,7 +136,7 @@ export default function AppShell({ onLogout }) {
   );
 }
 
-function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
+function Menu({ orgOpen, setOrgOpen, audicionOpen, setAudicionOpen, onNavigate }) {
   return (
     <div className="appshell-menu">
       <a
@@ -187,50 +186,43 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
 
       <div className="appshell-accordion-outer">
         <button
-          className={`appshell-accordion-trigger ${audOpen ? "open" : ""}`}
-          onClick={() => setAudOpen((v) => !v)}
-          aria-expanded={audOpen}
+          className={`appshell-accordion-trigger ${audicionOpen ? "open" : ""}`}
+          onClick={() => setAudicionOpen((v) => !v)}
+          aria-expanded={audicionOpen}
         >
           Audiciones
-          <span className="appshell-accordion-caret">{audOpen ? "▴" : "▾"}</span>
+          <span className="appshell-accordion-caret">{audicionOpen ? "▴" : "▾"}</span>
         </button>
 
-        {audOpen && (
+        {audicionOpen && (
           <div className="appshell-accordion-content">
             <a
               href="/audicion"
               className="nav-link"
               onClick={(e) => { e.preventDefault(); onNavigate("/audicion"); }}
             >
-              Audición
+              Audiciones
             </a>
             <a
-              href="/candidatos"
+              href="/audicion/historial"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/candidatos"); }}
+              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/historial"); }}
+            >
+              Historial de Audiciones
+            </a>
+            <a
+              href="/audicion/candidatos"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/candidatos"); }}
             >
               Candidatos
             </a>
             <a
-              href="/candidatos-coordinadores"
+              href="/audicion/cuestionario"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/candidatos-coordinadores"); }}
+              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/cuestionario"); }}
             >
-              Candidatos (Coordinadores)
-            </a>
-            <a
-              href="/candidatos/historial"
-              className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/candidatos/historial"); }}
-            >
-              Historial Candidatos
-            </a>
-            <a
-              href="/cuestionario/configuracion"
-              className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/cuestionario/configuracion"); }}
-            >
-              Configurar Cuestionario
+              Configuración del Cuestionario
             </a>
           </div>
         )}
