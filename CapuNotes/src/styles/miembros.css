@@ -66,6 +66,41 @@ textarea {
   min-width: 260px;
 }
 
+.form-row-cuerda-area {
+  width: 100%;
+  gap: 16px;
+  margin-top: 10px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.form-row-cuerda-area .mitad {
+  display: flex;
+  flex-direction: column;
+  height: 90px;
+  min-width: 50%;
+  max-width: 100%;
+  min-width: 260px;
+}
+
+.form-row-cuerda-area .mitad .input-with-button {
+  width: 100%;
+}
+
+.form-row-cuerda-area .mitad .input-with-button .abmc-btn {
+  flex: .5;
+  min-width: 50px;
+}
+
+.form-row-cuerda-area .mitad label {
+  text-align: left;
+  width: 100%;
+}
+
+
 .input-with-button {
   display: flex;
   align-items: center;
@@ -269,4 +304,12 @@ select.abmc-select:focus,
 .acciones-form-miembro {
   margin-top: 40px !important; /* antes 20px */
   padding-top: 8px;
+}
+
+
+@media (width < 606px) {
+  .form-row-cuerda-area .mitad {
+    min-width: 100%;
+  }
+  
 }
