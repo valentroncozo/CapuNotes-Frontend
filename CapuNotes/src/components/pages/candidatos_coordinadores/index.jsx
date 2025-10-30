@@ -2,13 +2,14 @@ import '@/styles/abmc.css';
 import '@/styles/table.css';
 import BackButton from '@/components/common/BackButton.jsx';
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
 import AudicionService from '@/services/audicionService.js';
 import InscripcionView from '@/components/common/InscripcionView.jsx';
 import TableABMC from '@/components/common/table.jsx';
 import TurnoService from '@/services/turnoServices';
 import { XCircleFill } from "react-bootstrap-icons";
-import AddIcon from '@/assets/AddIcon';
+import EyeOnIcon from '@/assets/VisibilityOnIcon';
 
 
 export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Administrador)' }) {
@@ -22,6 +23,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Admin
 
   const [sp, setSearchParams] = useSearchParams();
 
+  const navigate = useNavigate();
 
   const handlerCancelarTurno = async (d) => {
     if (!d || !d.id) {
@@ -130,10 +132,10 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Admin
       label: ''
     },
     {
-      className: 'abmc-btn btn-secondary',
-      onClick: (d) => { if (d?.inscripcion) setViewRow(d); else console.warn('sin inscripción'); },
+      className: 'abmc-btn ',
+      onClick: (d) => { navigate(`/inscripcion/${d.id}`); },
       title: 'Ver inscripción',
-      icon: <AddIcon/>
+      icon: <EyeOnIcon/>,
     }
   ];
 

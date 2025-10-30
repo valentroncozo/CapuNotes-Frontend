@@ -25,6 +25,7 @@ import Formulario from "@/components/pages/formulario/index.jsx"; // <-- descome
 import FormularioConsulta from "@/components/pages/formulario/consulta.jsx";
 import FormularioConsultaCoordinacion from "@/components/pages/formulario/consultaCoordinacion.jsx";
 
+
 // Estilos base (usar globals como fuente de verdad)
 import "@/styles/globals.css";
 

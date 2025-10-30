@@ -12,10 +12,10 @@ import AusenteIcon from "@/assets/icons/resultado/AusenteIcon.jsx";
 import SinResultadoIcon from "@/assets/icons/resultado/SinResultadoIcon.jsx";
 
 const RESULT_OPTS = [
-  { value: "PENDIENTE", label: "-" },
-  { value: "APROBADO",  label: "APROBADO" },
-  { value: "RECHAZADO", label: "RECHAZADO" },
-  { value: "CANCELADA",   label: "CANCELADA" },
+  { value: "pendiente", label: "PENDIENTE" },
+  { value: "aprobado",  label: "APROBADO" },
+  { value: "rechazado", label: "RECHAZADO" },
+  { value: "cancelada",   label: "CANCELADA" },
 ];
 
 function previewResultadoIcon(value) {

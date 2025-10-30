@@ -1,157 +1,159 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
-import BackButton from "@/components/common/BackButton.jsx";
-import "@/styles/abmc.css";
-import "@/styles/table.css";
-import "@/styles/forms.css";
-import "@/styles/popup.css";
-import { candidatosService } from "@/services/candidatosService.js";
-import InfoIcon from "@/assets/InfoIcon.jsx";
-import ResultadosModal from "./resultados.jsx";
+import '@/styles/abmc.css';
+import '@/styles/table.css';
+import BackButton from '@/components/common/BackButton.jsx';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import AudicionService from '@/services/audicionService.js';
+import ResultadosModal from '../audicion/resultados.jsx';
+import candidatosService from '@/services/candidatosService.js';
+import { InfoCircle as InfoIcon } from 'react-bootstrap-icons';
 
-export default function CandidatosPage() {
+export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Coordinador)' }) {
+
+  const [dias, setDias] = useState([]); // [{ value, label }]
+  const [diaSel, setDiaSel] = useState('-');
+  const [cronograma, setCronograma] = useState([]);
   const [rows, setRows] = useState([]);
-  const [audicionActual, setAudicionActual] = useState(null);
-  const [q, setQ] = useState("");
-  const [diaSel, setDiaSel] = useState("-");
-  const [dias, setDias] = useState([]);
-  const [, setVerInscripcion] = useState(null);
+  const [q, setQ] = useState('');
   const [editResultado, setEditResultado] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [sortBy, setSortBy] = useState(null);
-  const [sortDir, setSortDir] = useState("asc");
+  const [sortDir, setSortDir] = useState('asc');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // 🔹 Cargar audición actual y generar los días del rango
-  const loadAudicionActual = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const [sp, setSearchParams] = useSearchParams();
 
-      const res = await fetch("http://localhost:8080/audiciones/actual");
-      if (res.status === 204) {
-        setError("No hay audiciones activas actualmente.");
-        setLoading(false);
-        return;
-      }
+  const navigate = useNavigate();
 
-      if (!res.ok) throw new Error("Error al obtener audición actual");
-      const audicion = await res.json();
-      setAudicionActual(audicion);
-
-      // Generar días entre fechaInicio y fechaFin
-      const startDate = new Date(audicion.fechaInicio + "T00:00:00");
-      const endDate = new Date(audicion.fechaFin + "T00:00:00");
-      const diasArray = [];
-
-      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, "0");
-        const dd = String(d.getDate()).padStart(2, "0");
-        diasArray.push(`${yyyy}-${mm}-${dd}`);
-      }
-
-      setDias(diasArray);
-      await loadCandidatos(audicion.id);
-    } catch (err) {
-      console.error("Error al obtener audición actual:", err);
-      setError("Error al obtener la audición actual.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadAudicionActual();
-  }, [loadAudicionActual]);
-
-  // 🔹 Cargar candidatos
-  const loadCandidatos = async (audicionId) => {
-    try {
-      setLoading(true);
-      const res = await fetch(`http://localhost:8080/audiciones/${audicionId}/candidatos`);
-      if (!res.ok) throw new Error("Error al obtener candidatos");
-      const cd = await res.json();
-      console.log("📅 Datos de candidatos:", cd[0]);
-
-      setRows(cd || []);
-      setDiaSel("-");
-    } catch (err) {
-      console.error("Error al cargar candidatos:", err);
-      setError("No se pudieron cargar los candidatos de la audición actual.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 🔹 Normalización texto
-  const normalizeText = (text) =>
-    text?.toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() || "";
-
-  // 🔹 Filtrado por texto
-  const filteredByText = useMemo(() => {
-    if (!q) return rows;
-    const t = normalizeText(q);
-    return rows.filter((r) => {
-      const ape = normalizeText(r.apellido);
-      const nom = normalizeText(r.nombre);
-      const apynom = `${ape}, ${nom}`;
-      return ape.includes(t) || nom.includes(t) || apynom.includes(t);
-    });
-  }, [rows, q]);
-
-  // 🔹 Filtrado por día
-  const filtered = useMemo(() => {
-    if (diaSel === "-") return filteredByText;
-    return filteredByText.filter((r) => {
-      const fechaTurno =
-        r?.inscripcion?.turno?.fechaHoraInicio ||
-        r?.fechaAudicion ||
-        r?.dia ||
-        "";
-      if (!fechaTurno) return false;
-      const fechaStr = fechaTurno.split("T")[0];
-      return fechaStr === diaSel;
-    });
-  }, [filteredByText, diaSel]);
-
-  // 🔹 Ordenamiento
-  const sorted = useMemo(() => {
-    if (!sortBy) return filtered;
-    const dir = sortDir === "desc" ? -1 : 1;
-    return [...filtered].sort((a, b) => {
-      if (sortBy === "apynom") {
-        const av = normalizeText(`${a.apellido || ""} ${a.nombre || ""}`);
-        const bv = normalizeText(`${b.apellido || ""} ${b.nombre || ""}`);
-        return av.localeCompare(bv) * dir;
-      }
-      if (sortBy === "hora") {
-        const toMinutes = (h) => {
-          if (!h) return 0;
-          const [hh, mm] = String(h).split(":").map(Number);
-          return (hh || 0) * 60 + (mm || 0);
-        };
-        return (toMinutes(a.hora) - toMinutes(b.hora)) * dir;
-      }
-      return 0;
-    });
-  }, [filtered, sortBy, sortDir]);
-
-  // 🔹 Utils UI
-  const toggleSort = (key) => {
-    if (sortBy !== key) {
-      setSortBy(key);
-      setSortDir("asc");
+  // Función para ordenar
+  const toggleSort = (col) => {
+    if (sortBy === col) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      setSortBy(col);
+      setSortDir('asc');
     }
   };
-  const thClass = (key) => (sortBy === key ? `th-sortable sorted-${sortDir}` : "th-sortable");
+
+  // Función para clases de ordenamiento
+  const thClass = (col) => {
+    if (sortBy !== col) return '';
+    return sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc';
+  };
+
+
+
+  // Cargar cronograma y construir lista de días únicos
+  useEffect(() => {
+    (async () => {
+      try {
+        const a = await AudicionService.getActual();
+        if (!a?.id) {
+          setDias([]);
+          setCronograma([]);
+          setDiaSel('-');
+          return;
+        }
+
+        const cron = await AudicionService.getCronograma(a.id);
+        setCronograma(cron || []);
+
+        const mapa = new Map();
+        (cron || []).forEach(item => {
+          const f = item?.turno?.fecha;
+          if (!f) return;
+          const label = item?.turno?.diaString ? `${item.turno.diaString} — ${f}` : f;
+          if (!mapa.has(f)) mapa.set(f, { value: f, label });
+        });
+
+        const ds = Array.from(mapa.values());
+        setDias(ds);
+
+        const qp = sp.get('dia');
+        setDiaSel((qp && ds.find(d => d.value === qp)) ? qp : (ds[0]?.value || '-'));
+      } catch (e) {
+        console.error('Error cargando cronograma/días', e);
+        setDias([]);
+        setCronograma([]);
+        setDiaSel('-');
+      }
+    })();
+  }, [sp, refreshTrigger]);
+
+  // Calcular rows a partir del cronograma y diaSel
+  useEffect(() => {
+    const build = () => {
+      if (!cronograma || cronograma.length === 0) { setRows([]); return; }
+      const items = (diaSel && diaSel !== '-') ? cronograma.filter(it => it?.turno?.fecha === diaSel) : cronograma;
+      const mapped = items.map(item => {
+        const horaRaw = item?.turno?.horaInicio || item?.turno?.hora || item?.turno?.fechaHoraInicio || '';
+        const hora = horaRaw ? String(horaRaw).slice(0,5) : '-';
+        
+        console.log('📦 Mapeando item del cronograma:', item);
+        
+        return {
+          id: item?.id ?? item?.turno?.id,
+          idInscripcion: item?.id,
+          hora,
+          nombre: item?.nombre || '-',
+          apellido: item?.apellido || '-',
+          cancion: item?.cancion || '-',
+          turnoEstado: item?.turno?.estado || '',
+          resultado: item?.resultado || null,
+          observaciones: item?.observaciones || '',
+          cuerda: item?.cuerda || null,
+          inscripcion: item?.inscripcion || null,
+          raw: item,
+        };
+      });
+      setRows(mapped);
+    };
+
+    build();
+  }, [cronograma, diaSel]);
+
+  const filtered = useMemo(() => {
+    let result = rows;
+    
+    // Filtro por búsqueda
+    if (q) {
+      const t = q.toLowerCase();
+      result = result.filter(r => 
+        `${r.apellido || ''}, ${r.nombre || ''}`.toLowerCase().includes(t) || 
+        String(r.cancion || '').toLowerCase().includes(t)
+      );
+    }
+
+    // Aplicar ordenamiento
+    if (sortBy) {
+      result = [...result].sort((a, b) => {
+        let valA, valB;
+        
+        if (sortBy === 'hora') {
+          valA = a.hora || '';
+          valB = b.hora || '';
+        } else if (sortBy === 'apynom') {
+          valA = `${a.apellido || ''} ${a.nombre || ''}`.toLowerCase();
+          valB = `${b.apellido || ''} ${b.nombre || ''}`.toLowerCase();
+        } else {
+          return 0;
+        }
+
+        if (valA < valB) return sortDir === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return result;
+  }, [rows, q, sortBy, sortDir]);
 
   // 🔹 Botón de resultado (usa ResultadosModal)
   const getResultadoButton = (r) => {
     const estadoRaw = r.resultado?.estado || r.resultado || r.estado || "";
     const estado = String(estadoRaw || "").toLowerCase();
     const idInscripcion = r.idInscripcion || r.inscripcionId || r.id;
+
+    console.log("🚧 Estado del candidato:", estado, r);
 
     const isNoResultado = !estado || estado === "pendiente" || estado === "sin";
     const isAceptado = estado === "aceptado" || estado === "aprobado";
@@ -189,68 +191,30 @@ export default function CandidatosPage() {
     );
   };
 
-  // 🔹 Render principal
-  if (loading) {
-    return (
-      <main className="abmc-page">
-        <div className="abmc-card">
-          <div className="abmc-header">
-            <BackButton />
-            <h1 className="abmc-title">Candidatos</h1>
-          </div>
-          <p style={{ textAlign: "center", padding: "2rem" }}>Cargando...</p>
-        </div>
-      </main>
-    );
-  }
-
-  if (error) {
-    return (
-      <main className="abmc-page">
-        <div className="abmc-card">
-          <div className="abmc-header">
-            <BackButton />
-            <h1 className="abmc-title">Candidatos</h1>
-          </div>
-          <p style={{ textAlign: "center", padding: "2rem", color: "red" }}>{error}</p>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="abmc-page">
       <div className="abmc-card">
         <div className="abmc-header">
           <BackButton />
-          <h1 className="abmc-title">
-            Candidatos — {audicionActual?.nombre || "Audición actual"}
-          </h1>
+          <h1 className="abmc-title">{title}</h1>
         </div>
 
         <div className="abmc-topbar">
-          <input
-            className="abmc-input"
-            placeholder="Buscar por apellido o nombre"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-          />
+          <input className="abmc-input" placeholder="Buscar por apellido o canción" value={q} onChange={(e) => setQ(e.target.value)} />
 
-          <select
-            className="abmc-input"
-            value={diaSel}
-            onChange={(e) => setDiaSel(e.target.value)}
-          >
-            <option value="-">Todos los días</option>
-            {dias.map((d) => (
-              <option key={d} value={d}>
-                {new Date(d + "T00:00:00").toLocaleDateString("es-AR", {
-                  weekday: "long",
-                  day: "2-digit",
-                  month: "2-digit",
-                })}
-              </option>
-            ))}
+          <select className="abmc-input" value={diaSel} onChange={(e) => {
+            const v = e.target.value;
+            setDiaSel(v);
+            const params = new URLSearchParams(sp);
+            if (v === '-' || v == null) {
+              params.delete('dia');
+            } else {
+              params.set('dia', v);
+            }
+            setSearchParams(params);
+          }}>
+            <option value="-">-</option>
+            {dias.map((d) => <option key={d.value} value={d.value}>{d.label}</option>)}
           </select>
         </div>
 
@@ -288,23 +252,23 @@ export default function CandidatosPage() {
           </thead>
 
           <tbody>
-            {sorted.length === 0 ? (
+            {filtered.length === 0 ? (
               <tr>
                 <td colSpan="5" style={{ textAlign: "center", padding: "2rem" }}>
                   No hay candidatos en esta audición.
                 </td>
               </tr>
             ) : (
-              sorted.map((r) => (
-                <tr key={r.idInscripcion || r.id} className="abmc-row">
+              filtered.map((r) => (
+                <tr key={r.id} className="abmc-row">
                   <td>{r.hora || "—"}</td>
-                  <td>{r.nombre || "—"}</td>
+                  <td>{`${r.apellido || ''}, ${r.nombre || ''}` || "—"}</td>
                   <td>{r.cancion || "—"}</td>
                   <td style={{ textAlign: "center" }}>{getResultadoButton(r)}</td>
                   <td style={{ textAlign: "center" }}>
                     <button
                       className="btn-accion btn-accion--icon"
-                      onClick={() => setVerInscripcion(r)}
+                      onClick={() => navigate(`/inscripcion/coordinadores/${r.id}`)}
                       title="Ver inscripción"
                     >
                       <InfoIcon size={18} />
@@ -316,7 +280,6 @@ export default function CandidatosPage() {
           </tbody>
         </table>
       </div>
-
       {/* Modal de resultados */}
       {editResultado && (
         <ResultadosModal
@@ -333,20 +296,8 @@ export default function CandidatosPage() {
                 cancion: editResultado.cancion,
               });
 
-              // 🔹 Actualizamos localmente sin recargar todo
-              setRows((prev) =>
-                prev.map((r) =>
-                  (r.idInscripcion || r.id) === editResultado.idInscripcion
-                    ? {
-                        ...r,
-                        resultado: {
-                          estado,
-                          obs,
-                        },
-                      }
-                    : r
-                )
-              );
+              // 🔹 Recargamos el cronograma completo desde el backend
+              setRefreshTrigger(prev => prev + 1);
 
               // 🔹 Cerramos modal
               setEditResultado(null);
@@ -356,7 +307,7 @@ export default function CandidatosPage() {
             }
           }}
         />
-      )}
+      )}     
     </main>
   );
 }
