@@ -6,16 +6,18 @@ import "@/styles/table.css";
 import "@/styles/forms.css";
 import "@/styles/popup.css";
 import ResultadosModal from "./resultados.jsx";
+import { useNavigate } from "react-router-dom";
 
 export default function HistorialAudicionesPage() {
   const [rows, setRows] = useState([]);
   const [q, setQ] = useState("");
   const [verResultado, setVerResultado] = useState(null);
-  const [, setVerInscripcion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortBy, setSortBy] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
+
+  const navigate = useNavigate();
 
   // 🔄 Cargar historial desde backend
   const loadHistorial = async () => {
@@ -210,7 +212,7 @@ export default function HistorialAudicionesPage() {
                       <button
                         className="btn-accion"
                         title="Abrir cuestionario de inscripción"
-                        onClick={() => setVerInscripcion(r.inscripcion || r)}
+                        onClick={() => navigate(`/inscripcion/${r.inscripcion?.id || r.id}`)}
                       >
                         +
                       </button>

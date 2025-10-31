@@ -72,11 +72,11 @@ function AppRoutes() {
         <Route path="areas" element={<Areas />} />
         <Route path="cuestionario/configuracion" element={<CuestionarioConfig />} />
         <Route path="cuestionario/preview" element={<CuestionarioPreview />} />
-        <Route path="candidatos-administracion" element={<CandidatosCoordinadores />} />
         <Route path="audicion" element={<Audicion />} />
         <Route path="audicion/agregar" element={<AudicionAgregar />} />
         <Route path="audicion/editar" element={<AudicionEditar />} />
         <Route path="audicion/candidatos" element={<Candidatos />} />
+        <Route path="candidatos-administracion" element={<CandidatosCoordinadores />} />
         <Route path="audicion/historial" element={<HistorialAudiciones />} />
         <Route path="audicion/cronograma/:id" element={<Navigate to="/candidatos-administracion" replace />} />
         <Route path="/inscripcion/:id" element={<FormularioConsulta />} />

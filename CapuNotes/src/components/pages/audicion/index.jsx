@@ -71,16 +71,16 @@ const Audicion = ({ title ='Audición'}) => {
       title: '¿Quién está usando el sistema hoy?',
       showDenyButton: true,
       confirmButtonText: 'Coordinador',
-      denyButtonText: 'Evaluador',
+      denyButtonText: 'Administrador',
       background: '#11103a',
       color: '#E8EAED',
       confirmButtonColor: '#ffc107',
       denyButtonColor: '#6c757d',
     });
     if (res.isConfirmed) {
-      navigate(`/candidatos-coordinadores?dia=${encodeURIComponent(diaIso)}`);
+      navigate(`/audicion/candidatos?dia=${encodeURIComponent(diaIso)}`);
     } else if (res.isDenied) {
-      navigate(`/candidatos?dia=${encodeURIComponent(diaIso)}`);
+      navigate(`/candidatos-administracion?dia=${encodeURIComponent(diaIso)}`);
     }
   };
 
