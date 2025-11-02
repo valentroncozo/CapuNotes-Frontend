@@ -21,6 +21,8 @@ import CuestionarioPreview from "@/components/pages/cuestionario/preview.jsx";
 import Candidatos from "@/components/pages/audicion/candidatos.jsx";
 import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx";
 import HistorialAudiciones from "@/components/pages/audicion/historial.jsx";
+import AsistenciaEnsayos from "@/components/pages/asistencias/asistenciaEnsayos.jsx";
+import AsistenciaEnsayosDetalle from "@/components/pages/asistencias/asistenciaEnsayosDetalle.jsx";
 import Formulario from "@/components/pages/formulario/index.jsx"; // <-- descomenta cuando exista
 import FormularioConsulta from "@/components/pages/formulario/consulta.jsx";
 import FormularioConsultaCoordinacion from "@/components/pages/formulario/consultaCoordinacion.jsx";
@@ -78,6 +80,8 @@ function AppRoutes() {
         <Route path="audicion/candidatos" element={<Candidatos />} />
         <Route path="candidatos-administracion" element={<CandidatosCoordinadores />} />
         <Route path="audicion/historial" element={<HistorialAudiciones />} />
+  <Route path="asistencias/ensayos" element={<AsistenciaEnsayos />} />
+  <Route path="asistencias/ensayos/:fecha" element={<AsistenciaEnsayosDetalle />} />
         <Route path="audicion/cronograma/:id" element={<Navigate to="/candidatos-administracion" replace />} />
         <Route path="/inscripcion/:id" element={<FormularioConsulta />} />
         <Route path="/inscripcion/coordinadores/:id" element={<FormularioConsultaCoordinacion />} />
