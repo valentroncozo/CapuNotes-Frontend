@@ -39,16 +39,14 @@ export default function AsistenciaEnsayosDetalle() {
           <h1 className="abmc-title">Asistencia ensayo {fechaDisplay}</h1>
         </div>
 
-        <div style={{ borderBottom: "2px solid rgba(200,140,40,0.6)", margin: "0 1rem" }} />
-
-        <div style={{ padding: "1.5rem 2rem" }}>
+        <div className="">
           <table className="abmc-table abmc-table-rect">
             <thead className="abmc-thead">
               <tr className="abmc-row">
-                <th style={{ width: "60%" }}>
+                <th>
                   <span className="th-label">Miembros</span>
                 </th>
-                <th style={{ textAlign: "center" }}>
+                <th>
                   <span className="th-label">Asistencia</span>
                 </th>
               </tr>
@@ -57,18 +55,10 @@ export default function AsistenciaEnsayosDetalle() {
               {members.map((m) => (
                 <tr className="abmc-row" key={m.id}>
                   <td>{m.nombre}</td>
-                  <td style={{ textAlign: "center" }}>
-                    <div style={{ display: "inline-flex", gap: 12 }}>
+                  <td>
+                    <div className="abmc-actions" role="group" aria-label={`asistencia-${m.id}`}>
                       <button
-                        className="btn"
-                        style={{
-                          background: m.asistencia === "no" ? "#f0a500" : "transparent",
-                          borderRadius: 999,
-                          width: 40,
-                          height: 40,
-                          color: m.asistencia === "no" ? "#fff" : "#fff",
-                          border: m.asistencia === "no" ? "2px solid #f0a500" : "2px solid rgba(255,255,255,0.15)",
-                        }}
+                        className={m.asistencia === "no" ? "btn btn-primary" : "btn btn-secondary"}
                         onClick={() => handleSetAsistencia(m.id, "no")}
                         aria-pressed={m.asistencia === "no"}
                         title="Ausente">
@@ -76,15 +66,7 @@ export default function AsistenciaEnsayosDetalle() {
                       </button>
 
                       <button
-                        className="btn"
-                        style={{
-                          background: m.asistencia === "half" ? "#f0a500" : "transparent",
-                          borderRadius: 999,
-                          width: 40,
-                          height: 40,
-                          color: m.asistencia === "half" ? "#fff" : "#fff",
-                          border: m.asistencia === "half" ? "2px solid #f0a500" : "2px solid rgba(255,255,255,0.15)",
-                        }}
+                        className={m.asistencia === "half" ? "btn btn-primary" : "btn btn-secondary"}
                         onClick={() => handleSetAsistencia(m.id, "half")}
                         aria-pressed={m.asistencia === "half"}
                         title="Medio">
@@ -92,15 +74,7 @@ export default function AsistenciaEnsayosDetalle() {
                       </button>
 
                       <button
-                        className="btn"
-                        style={{
-                          background: m.asistencia === "yes" ? "#f0a500" : "transparent",
-                          borderRadius: 999,
-                          width: 40,
-                          height: 40,
-                          color: m.asistencia === "yes" ? "#fff" : "#fff",
-                          border: m.asistencia === "yes" ? "2px solid #f0a500" : "2px solid rgba(255,255,255,0.15)",
-                        }}
+                        className={m.asistencia === "yes" ? "btn btn-primary" : "btn btn-secondary"}
                         onClick={() => handleSetAsistencia(m.id, "yes")}
                         aria-pressed={m.asistencia === "yes"}
                         title="Presente">
@@ -112,13 +86,8 @@ export default function AsistenciaEnsayosDetalle() {
               ))}
             </tbody>
           </table>
-
-          <div style={{ display: "flex", justifyContent: "center", marginTop: 24 }}>
-            <button
-              className="btn"
-              style={{ background: "#f0a500", color: "#fff", borderRadius: 999, padding: "10px 36px" }}
-              onClick={handleGuardar}
-            >
+          <div className="pop-footer" style={{ justifyContent: "center" }}>
+            <button className="btn-primary btn" onClick={handleGuardar} aria-label="guardar-asistencia">
               Guardar
             </button>
           </div>

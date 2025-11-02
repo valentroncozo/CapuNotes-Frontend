@@ -42,9 +42,7 @@ export default function AsistenciaEnsayos() {
           <h1 className="abmc-title">Asistencia ensayos</h1>
         </div>
 
-        <div style={{ borderBottom: "2px solid rgba(200,140,40,0.6)", margin: "0 1rem" }} />
-
-        <div className="abmc-topbar" style={{ marginTop: 18 }}>
+        <div className="abmc-topbar">
           <input
             className="abmc-input"
             placeholder="Buscar por día"
@@ -54,7 +52,7 @@ export default function AsistenciaEnsayos() {
           />
         </div>
 
-        <table className="abmc-table abmc-table-rect" style={{ marginTop: 12 }}>
+        <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
             <tr className="abmc-row">
               <th>
@@ -66,14 +64,14 @@ export default function AsistenciaEnsayos() {
               <th>
                 <span className="th-label">Estado</span>
               </th>
-              <th style={{ width: 140 }} aria-hidden="true"></th>
+              <th aria-hidden="true"></th>
             </tr>
           </thead>
 
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={4} style={{ textAlign: "center", padding: "2rem" }}>
+                <td colSpan={4}>
                   No hay ensayos que coincidan.
                 </td>
               </tr>
@@ -84,20 +82,18 @@ export default function AsistenciaEnsayos() {
                     <td>{r.fecha}</td>
                     <td>{r.descripcion}</td>
                     <td>{r.tomada ? (r.saved ? "Tomada" : "Tomada (sin guardar)") : "No tomada"}</td>
-                    <td style={{ textAlign: "center" }}>
-                      {/* Only two visible actions: 'Asistencia' (yellow) when not saved OR not taken, 'Ver' (blue) only when tomada && saved */}
+                    <td className="abmc-actions">
+                      {/* Only two visible actions: 'Asistencia' when not saved OR not taken, 'Ver' only when tomada && saved */}
                       {r.tomada && r.saved ? (
                         <button
-                          className="btn"
-                          style={{ background: "#0b3b73", color: "#fff", border: "2px solid #fff", borderRadius: 20, padding: "6px 14px" }}
+                          className="btn btn-secondary"
                           onClick={() => navigate(`/asistencias/ensayos/${encodeURIComponent(r.fecha)}`)}
                           aria-label={`Ver ensayo ${r.fecha}`}>
                           Ver
                         </button>
                       ) : (
                         <button
-                          className="btn"
-                          style={{ background: "#f0a500", color: "#fff", borderRadius: 20, padding: "6px 14px" }}
+                          className="btn btn-primary"
                           onClick={() => toggleAsistencia(r.id)}
                           aria-pressed={r.tomada}>
                           Asistencia

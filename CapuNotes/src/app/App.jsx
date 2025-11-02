@@ -80,8 +80,8 @@ function AppRoutes() {
         <Route path="audicion/candidatos" element={<Candidatos />} />
         <Route path="candidatos-administracion" element={<CandidatosCoordinadores />} />
         <Route path="audicion/historial" element={<HistorialAudiciones />} />
-  <Route path="asistencias/ensayos" element={<AsistenciaEnsayos />} />
-  <Route path="asistencias/ensayos/:fecha" element={<AsistenciaEnsayosDetalle />} />
+        <Route path="asistencias/ensayos" element={<AsistenciaEnsayos />} />
+        <Route path="asistencias/ensayos/:fecha" element={<AsistenciaEnsayosDetalle />} />
         <Route path="audicion/cronograma/:id" element={<Navigate to="/candidatos-administracion" replace />} />
         <Route path="/inscripcion/:id" element={<FormularioConsulta />} />
         <Route path="/inscripcion/coordinadores/:id" element={<FormularioConsultaCoordinacion />} />
