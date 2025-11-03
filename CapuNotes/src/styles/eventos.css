@@ -1,0 +1,251 @@
+/* ===========================
+   ESTILOS DE PANTALLA EVENTOS
+=========================== */
+.eventos-container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  color: #fff;
+}
+
+.abmc-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 15px;
+}
+
+.abmc-title h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
+  color: #fff;
+}
+
+.divisor-amarillo {
+  border: none;
+  height: 2px;
+  background-color: #ffcc80;
+  margin: 15px 0;
+}
+
+/* ===========================
+   BUSCADOR Y BOTÓN AGREGAR
+=========================== */
+.eventos-search {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.eventos-search-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #1a1a40;
+  color: #fff;
+}
+
+.eventos-search-input::placeholder {
+  color: #aaa;
+}
+
+.eventos-profile {
+  margin-left: 10px;
+}
+
+.evento-btn.agregar {
+  background-color: #ffcc80;
+  color: #000;
+  font-size: 20px;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.evento-btn.agregar:hover {
+  background-color: #ffa726;
+}
+
+/* ===========================
+   GRID DE EVENTOS
+=========================== */
+.eventos-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.evento-card {
+  background-color: #e0f7fa;
+  border-radius: 10px;
+  padding: 15px;
+  width: 200px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  color: #000;
+  transition: transform 0.2s ease;
+}
+
+.evento-card:hover {
+  transform: translateY(-3px);
+}
+
+.evento-card h3,
+.evento-card p {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.evento-icon {
+  font-size: 16px;
+}
+
+.evento-actions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+.evento-btn {
+  background-color: #ffcc80;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.evento-btn:hover {
+  background-color: #ffa726;
+}
+
+/* ===========================
+   POPUP EVENTOS (sin scroll y ajustable)
+=========================== */
+.popup-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #0f1036; /* mismo azul que pantalla eventos */
+  color: #fff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  width: 90%;
+  max-width: 520px;
+
+  /* ✅ Ajuste automático sin scroll */
+  height: auto;
+  max-height: 95vh;
+  overflow: visible;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: popupFadeIn 0.25s ease;
+}
+
+/* Animación de aparición suave */
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Ajuste automático si la pantalla es más baja */
+@media (max-height: 800px) {
+  .popup-container {
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+
+@media (max-height: 700px) {
+  .popup-container {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+@media (max-height: 600px) {
+  .popup-container {
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+}
+
+/* ===========================
+   FORMULARIO POPUP
+=========================== */
+.popup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.popup-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field label {
+  font-weight: 500;
+  font-size: 14px;
+  color: #ffcc80;
+}
+
+.field input,
+.field select {
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #1a1a40;
+  color: #fff;
+  font-size: 14px;
+}
+
+/* ===========================
+   BOTONES DEL POPUP
+=========================== */
+.popup-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.btn-cancel,
+.btn-submit {
+  background-color: #ffcc80;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  color: #000;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.btn-cancel:hover,
+.btn-submit:hover {
+  background-color: #ffa726;
+}

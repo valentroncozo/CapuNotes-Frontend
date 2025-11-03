@@ -21,6 +21,7 @@ import MiembrosEditar from '@/components/pages/miembros/editar.jsx';
 import Audicion from '@/components/pages/audicion/index.jsx';
 import AudicionAgregar from '@/components/pages/audicion/agregar.jsx';
 import FormularioBasico from '@/components/pages/formularioInscripcion/index.jsx';
+import Eventos from '@/components/pages/eventos/index.jsx';
 
 // Estilos base (usar globals como fuente de verdad)
 import '@/styles/globals.css';
@@ -74,6 +75,7 @@ function AppRoutes() {
         <Route path="audicion" element={<Audicion />} />
         <Route path="audicion/agregar" element={<AudicionAgregar />} />
         <Route path="formulario" element={<FormularioBasico />} />
+        <Route path="eventos" element={<Eventos />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/principal" replace />} />
