@@ -5,7 +5,8 @@ import "@/styles/abmc.css";
 import "@/styles/table.css";
 
 export default function AsistenciaEnsayos() {
-  const [q, setQ] = useState("");
+  // qDate holds yyyy-mm-dd from the date picker; we will convert to dd/mm/yyyy for matching rows
+  const [qDate, setQDate] = useState("");
   const navigate = useNavigate();
 
   // Mock rows: 'saved' === true means the attendance was persisted and should show "Ver"
@@ -18,10 +19,15 @@ export default function AsistenciaEnsayos() {
   ]);
 
   const filtered = useMemo(() => {
-    const t = String(q || "").trim().toLowerCase();
-    if (!t) return rows;
-    return rows.filter((r) => r.fecha.toLowerCase().includes(t) || r.descripcion.toLowerCase().includes(t));
-  }, [rows, q]);
+    // if date selected, convert yyyy-mm-dd -> dd/mm/yyyy and filter by exact match on fecha
+    if (qDate) {
+      const [y, m, d] = qDate.split("-");
+      const formatted = `${d}/${m}/${y}`;
+      return rows.filter((r) => r.fecha === formatted);
+    }
+    // no date selected: show all
+    return rows;
+  }, [rows, qDate]);
 
   // Toggle asistencia: mark as tomada but unsaved (saved: false). This keeps UI showing 'Asistencia' until persisted.
   const toggleAsistencia = (id) => {
@@ -45,12 +51,17 @@ export default function AsistenciaEnsayos() {
 
         <div className="abmc-topbar">
           <input
+            type="date"
             className="abmc-input"
-            placeholder="Buscar por día"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            aria-label="Buscar por día"
+            value={qDate}
+            onChange={(e) => setQDate(e.target.value)}
+            aria-label="Seleccionar fecha"
           />
+          {qDate && (
+            <button className="btn btn-secondary" style={{ marginLeft: 8 }} onClick={() => setQDate("")}>
+              Borrar
+            </button>
+          )}
         </div>
 
         <table className="abmc-table abmc-table-rect">
