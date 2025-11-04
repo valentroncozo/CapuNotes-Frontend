@@ -1,0 +1,39 @@
+/* Styles specific to attendance buttons in the ensayo detail page */
+
+.attendance-actions {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.attendance-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  background: var(--bg); /* matches app background */
+  color: var(--text-light);
+  border: 2px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: background-color 0.12s ease, border-color 0.12s ease, transform 0.08s ease;
+  padding: 0;
+  font-weight: 700;
+}
+
+.attendance-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Selected state: yellow accent */
+.attendance-btn.selected {
+  background: var(--accent) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--accent) !important;
+}
+
+/* Make small label icons fit */
+.attendance-btn.small {
+  width: 34px;
+  height: 34px;
+}

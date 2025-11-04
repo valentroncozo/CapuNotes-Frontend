@@ -10,11 +10,11 @@ export default function AsistenciaEnsayos() {
 
   // Mock rows: 'saved' === true means the attendance was persisted and should show "Ver"
   const [rows, setRows] = useState(() => [
-    { id: 1, fecha: "27/10/2025", descripcion: "Ensayo general", tomada: true, saved: true },
-    { id: 2, fecha: "21/10/2025", descripcion: "Sección cuerdas", tomada: false, saved: false },
-    { id: 3, fecha: "14/10/2025", descripcion: "Ensayo rítmico", tomada: false, saved: false },
-    { id: 4, fecha: "07/10/2025", descripcion: "Ensayo vocal", tomada: false, saved: false },
-    { id: 5, fecha: "01/10/2025", descripcion: "Ensayo general 2", tomada: false, saved: false },
+    { id: 1, fecha: "27/10/2025", descripcion: "Ensayo general", tomada: true, saved: true, clicked: false },
+    { id: 2, fecha: "21/10/2025", descripcion: "Sección cuerdas", tomada: false, saved: false, clicked: false },
+    { id: 3, fecha: "14/10/2025", descripcion: "Ensayo rítmico", tomada: false, saved: false, clicked: false },
+    { id: 4, fecha: "07/10/2025", descripcion: "Ensayo vocal", tomada: false, saved: false, clicked: false },
+    { id: 5, fecha: "01/10/2025", descripcion: "Ensayo general 2", tomada: false, saved: false, clicked: false },
   ]);
 
   const filtered = useMemo(() => {
@@ -28,8 +28,9 @@ export default function AsistenciaEnsayos() {
     setRows((prev) =>
       prev.map((r) => {
         if (r.id !== id) return r;
-        if (!r.tomada) return { ...r, tomada: true, saved: false };
-        return { ...r, tomada: false, saved: false };
+        // mark as clicked on first interaction and keep clicked=true afterwards
+        if (!r.tomada) return { ...r, tomada: true, saved: false, clicked: true };
+        return { ...r, tomada: false, saved: false, clicked: true };
       })
     );
   };
@@ -93,7 +94,7 @@ export default function AsistenciaEnsayos() {
                         </button>
                       ) : (
                         <button
-                          className="btn btn-primary"
+                          className={r.clicked ? "btn btn-primary" : "btn btn-secondary"}
                           onClick={() => toggleAsistencia(r.id)}
                           aria-pressed={r.tomada}>
                           Asistencia
