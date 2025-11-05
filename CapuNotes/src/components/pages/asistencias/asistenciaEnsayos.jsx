@@ -1,44 +1,68 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ensayosService } from "@/services/ensayosService.js";
+import { asistenciasService } from "@/services/asistenciasService.js";
 import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
 import "@/styles/table.css";
 
 export default function AsistenciaEnsayos() {
-  // qDate holds yyyy-mm-dd from the date picker; we will convert to dd/mm/yyyy for matching rows
+  const [rows, setRows] = useState([]);
   const [qDate, setQDate] = useState("");
+  const [loadingId, setLoadingId] = useState(null);
   const navigate = useNavigate();
 
-  // Mock rows: 'saved' === true means the attendance was persisted and should show "Ver"
-  const [rows, setRows] = useState(() => [
-    { id: 1, fecha: "27/10/2025", descripcion: "Ensayo general", tomada: true, saved: true, clicked: false },
-    { id: 2, fecha: "21/10/2025", descripcion: "Sección cuerdas", tomada: false, saved: false, clicked: false },
-    { id: 3, fecha: "14/10/2025", descripcion: "Ensayo rítmico", tomada: false, saved: false, clicked: false },
-    { id: 4, fecha: "07/10/2025", descripcion: "Ensayo vocal", tomada: false, saved: false, clicked: false },
-    { id: 5, fecha: "01/10/2025", descripcion: "Ensayo general 2", tomada: false, saved: false, clicked: false },
-  ]);
+  // 🔹 Cargar lista de ensayos al montar
+  useEffect(() => {
+    const fetchEnsayos = async () => {
+      try {
+        const data = await ensayosService.list();
+        setRows(data);
+      } catch (error) {
+        console.error("❌ Error cargando ensayos:", error);
+      }
+    };
+    fetchEnsayos();
+  }, []);
 
+  // 🔹 Filtro por fecha
   const filtered = useMemo(() => {
-    // if date selected, convert yyyy-mm-dd -> dd/mm/yyyy and filter by exact match on fecha
     if (qDate) {
       const [y, m, d] = qDate.split("-");
       const formatted = `${d}/${m}/${y}`;
       return rows.filter((r) => r.fecha === formatted);
     }
-    // no date selected: show all
     return rows;
   }, [rows, qDate]);
 
-  // Toggle asistencia: mark as tomada but unsaved (saved: false). This keeps UI showing 'Asistencia' until persisted.
-  const toggleAsistencia = (id) => {
-    setRows((prev) =>
-      prev.map((r) => {
-        if (r.id !== id) return r;
-        // mark as clicked on first interaction and keep clicked=true afterwards
-        if (!r.tomada) return { ...r, tomada: true, saved: false, clicked: true };
-        return { ...r, tomada: false, saved: false, clicked: true };
-      })
-    );
+  // 🔹 Cambiar estado de asistencia (abrir/cerrar)
+  const toggleAsistencia = async (ensayo) => {
+    if (loadingId === ensayo.id) return; // evitar doble click
+    setLoadingId(ensayo.id);
+
+    try {
+      if (ensayo.estadoAsistencia === "ABIERTA") {
+        // Cerrar asistencia
+        await asistenciasService.cerrarAsistencia(ensayo.id);
+        setRows((prev) =>
+          prev.map((r) =>
+            r.id === ensayo.id ? { ...r, estadoAsistencia: "CERRADA" } : r
+          )
+        );
+      } else {
+        // Reabrir asistencia
+        await asistenciasService.reabrirAsistencia(ensayo.id);
+        setRows((prev) =>
+          prev.map((r) =>
+            r.id === ensayo.id ? { ...r, estadoAsistencia: "ABIERTA" } : r
+          )
+        );
+      }
+    } catch (err) {
+      console.error("❌ Error al cambiar estado de asistencia:", err);
+    } finally {
+      setLoadingId(null);
+    }
   };
 
   return (
@@ -46,9 +70,10 @@ export default function AsistenciaEnsayos() {
       <div className="abmc-card">
         <div className="abmc-header">
           <BackButton />
-          <h1 className="abmc-title">Asistencia ensayos</h1>
+          <h1 className="abmc-title">Asistencia a ensayos</h1>
         </div>
 
+        {/* 🔹 Filtro por fecha */}
         <div className="abmc-topbar">
           <input
             type="date"
@@ -58,64 +83,63 @@ export default function AsistenciaEnsayos() {
             aria-label="Seleccionar fecha"
           />
           {qDate && (
-            <button className="btn btn-secondary" style={{ marginLeft: 8 }} onClick={() => setQDate("")}>
+            <button
+              className="btn btn-secondary"
+              style={{ marginLeft: 8 }}
+              onClick={() => setQDate("")}
+            >
               Borrar
             </button>
           )}
         </div>
 
+        {/* 🔹 Tabla de ensayos */}
         <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
             <tr className="abmc-row">
-              <th>
-                <span className="th-label">Fecha</span>
-              </th>
-              <th>
-                <span className="th-label">Descripción</span>
-              </th>
-              <th>
-                <span className="th-label">Estado</span>
-              </th>
-              <th aria-hidden="true"></th>
+              <th>Fecha</th>
+              <th>Descripción</th>
+              <th>Estado Asistencia</th>
+              <th>Acciones</th>
             </tr>
           </thead>
-
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={4}>
-                  No hay ensayos que coincidan.
-                </td>
+                <td colSpan={4}>No hay ensayos que coincidan.</td>
               </tr>
             ) : (
               filtered.map((r) => (
-                <React.Fragment key={r.id}>
-                  <tr className="abmc-row">
-                    <td>{r.fecha}</td>
-                    <td>{r.descripcion}</td>
-                    <td>{r.tomada ? (r.saved ? "Tomada" : "Tomada (sin guardar)") : "No tomada"}</td>
-                    <td className="abmc-actions">
-                      {/* Only two visible actions: 'Asistencia' when not saved OR not taken, 'Ver' only when tomada && saved */}
-                      {r.tomada && r.saved ? (
-                        <button
-                          className="btn btn-secondary"
-                          onClick={() => navigate(`/asistencias/ensayos/${encodeURIComponent(r.fecha)}`)}
-                          aria-label={`Ver ensayo ${r.fecha}`}>
-                          Ver
-                        </button>
-                      ) : (
-                        <button
-                          className={r.clicked ? "btn btn-primary" : "btn btn-secondary"}
-                          onClick={() => toggleAsistencia(r.id)}
-                          aria-pressed={r.tomada}>
-                          Asistencia
-                        </button>
-                      )}
-                    </td>
-                  </tr>
+                <tr key={r.id} className="abmc-row">
+                  <td>{r.fecha}</td>
+                  <td>{r.descripcion}</td>
+                  <td>{r.estadoAsistencia}</td>
+                  <td className="abmc-actions">
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => navigate(`/asistencias/ensayos/${r.id}`)}
+                    >
+                      Ver
+                    </button>
 
-                  
-                </React.Fragment>
+                    <button
+                      className={
+                        r.estadoAsistencia === "ABIERTA"
+                          ? "btn btn-danger"
+                          : "btn btn-primary"
+                      }
+                      style={{ marginLeft: 8 }}
+                      disabled={loadingId === r.id}
+                      onClick={() => toggleAsistencia(r)}
+                    >
+                      {loadingId === r.id
+                        ? "Procesando..."
+                        : r.estadoAsistencia === "ABIERTA"
+                        ? "Cerrar asistencia"
+                        : "Reabrir asistencia"}
+                    </button>
+                  </td>
+                </tr>
               ))
             )}
           </tbody>
