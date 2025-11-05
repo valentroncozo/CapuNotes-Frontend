@@ -1,13 +1,13 @@
 import React from 'react';
 import '@/styles/globals.css';
-import '@/styles/eventos.css';
+import '@/styles/popup.css';
 
 const ConfirmDeletePopup = ({ onClose, onConfirm }) => {
   return (
     <div className="popup-container">
       <header className="abmc-header">
         <div className="abmc-title">
-          <h1>¿Estás seguro de eliminar este evento?</h1>
+          <h1>¿Estás seguro de cancelar este evento?</h1>
         </div>
       </header>
       <hr className="divisor-amarillo" />

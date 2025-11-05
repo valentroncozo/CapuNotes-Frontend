@@ -13,6 +13,7 @@
   align-items: center;
   justify-content: flex-start;
   gap: 15px;
+  margin-bottom: 1px; /* Acerca más la línea divisora */
 }
 
 .abmc-title h1 {
@@ -26,6 +27,7 @@
   border: none;
   height: 2px;
   background-color: #ffcc80;
+  margin-top: 0px; /* Reduce aún más la distancia desde el título */
   margin: 15px 0;
 }
 
@@ -36,7 +38,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px; /* Aumenta la distancia hacia las tarjetas de eventos */
 }
 
 .eventos-search-input {
@@ -60,8 +62,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #ffcc80;
-  color: #000;
+  background-color: #ffc107;
   font-size: 20px;
   border: none;
   border-radius: 50%;
@@ -71,8 +72,18 @@
   transition: background-color 0.3s;
 }
 
-.evento-btn.agregar:hover {
-  background-color: #ffa726;
+.evento-btn.redondeado {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffc107;
+  font-size: 20px;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 /* ===========================
@@ -87,7 +98,7 @@
 
 .evento-card {
   background-color: #e0f7fa;
-  border-radius: 10px;
+  border-radius: 0; /* Bordes rectos */
   padding: 15px;
   width: 200px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
@@ -110,6 +121,7 @@
 
 .evento-icon {
   font-size: 16px;
+  color: #4a4a4a; /* Gris más oscuro para los íconos */
 }
 
 .evento-actions {
@@ -119,16 +131,16 @@
 }
 
 .evento-btn {
-  background-color: #ffcc80;
+  background-color: #ffc107;
   border: none;
   border-radius: 5px;
   padding: 5px 10px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
 }
 
-.evento-btn:hover {
-  background-color: #ffa726;
+.evento-btn.agregar,
+.evento-btn editar,
+.evento-btn eliminar {
+  background-color: ffc107;
 }
 
 /* ===========================
@@ -188,67 +200,4 @@
   .popup-container {
     transform: translate(-50%, -50%) scale(0.85);
   }
-}
-
-/* ===========================
-   FORMULARIO POPUP
-=========================== */
-.popup-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.popup-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.field label {
-  font-weight: 500;
-  font-size: 14px;
-  color: #ffcc80;
-}
-
-.field input,
-.field select {
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  background-color: #1a1a40;
-  color: #fff;
-  font-size: 14px;
-}
-
-/* ===========================
-   BOTONES DEL POPUP
-=========================== */
-.popup-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-.btn-cancel,
-.btn-submit {
-  background-color: #ffcc80;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  cursor: pointer;
-  color: #000;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
-}
-
-.btn-cancel:hover,
-.btn-submit:hover {
-  background-color: #ffa726;
 }

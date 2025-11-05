@@ -1,6 +1,6 @@
 import React from 'react';
 import '@/styles/globals.css';
-import '@/styles/eventos.css';
+import '@/styles/popup.css';
 
 const PopUpEventos = ({
   modo = 'crear',
@@ -41,6 +41,32 @@ const PopUpEventos = ({
           </div>
 
           <div className="field">
+            <label>Tipo de evento</label>
+            <select name="tipoEvento" disabled={isViewMode}>
+              <option value="">Seleccionar</option>
+              {/* Opciones dinámicas */}
+            </select>
+          </div>
+
+          <div className="field-inline">
+            <div className="field">
+              <label>Fecha</label>
+              <select name="fecha" disabled={isViewMode}>
+                <option value="">Elegir</option>
+                {/* Opciones dinámicas */}
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Hora</label>
+              <select name="hora" disabled={isViewMode}>
+                <option value="">--:--</option>
+                {/* Opciones dinámicas */}
+              </select>
+            </div>
+          </div>
+
+          <div className="field">
             <label>Lugar</label>
             <input
               type="text"
@@ -48,30 +74,6 @@ const PopUpEventos = ({
               defaultValue={eventoSeleccionado?.lugar || ''}
               disabled={isViewMode}
             />
-          </div>
-
-          <div className="field">
-            <label>Fecha</label>
-            <select name="fecha" disabled={isViewMode}>
-              <option value="">Elegir</option>
-              {/* Opciones dinámicas */}
-            </select>
-          </div>
-
-          <div className="field">
-            <label>Hora</label>
-            <select name="hora" disabled={isViewMode}>
-              <option value="">--:--</option>
-              {/* Opciones dinámicas */}
-            </select>
-          </div>
-
-          <div className="field">
-            <label>Tipo de evento</label>
-            <select name="tipoEvento" disabled={isViewMode}>
-              <option value="">Seleccionar</option>
-              {/* Opciones dinámicas */}
-            </select>
           </div>
         </div>
 

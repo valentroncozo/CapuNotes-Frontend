@@ -1,5 +1,5 @@
 /* src/styles/popup.css */
-@import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
 
 /* Usa tokens globales (colors, radius, shadow, font) */
 .pop-backdrop {
@@ -28,7 +28,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 18px;
-  border-bottom: 1px solid var(--accent) ;
+  border-bottom: 1px solid var(--accent);
 }
 
 .pop-title {
@@ -49,9 +49,14 @@
   border-radius: 10px;
   transition: all 0.15s;
 }
-.icon-btn:hover { opacity: 1; background: rgba(255, 255, 255, 0.08); }
+.icon-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
 
-.pop-body { padding: 18px; }
+.pop-body {
+  padding: 18px;
+}
 
 .pop-footer {
   display: flex;
@@ -59,6 +64,13 @@
   gap: 10px;
   padding: 14px 18px 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
 }
 
 /* Botones coherentes con tokens */
@@ -77,18 +89,27 @@
   color: var(--text-dark) !important;
   box-shadow: var(--shadow);
 }
-.btn-primary:hover { filter: brightness(0.95); }
-.btn-primary:active { filter: brightness(0.9); }
+.btn-primary:hover {
+  filter: brightness(0.95);
+}
+.btn-primary:active {
+  filter: brightness(0.9);
+}
 
 .btn-secondary {
   background: transparent !important;
   color: var(--card) !important;
   border: 2px solid var(--card) !important;
 }
-.btn-secondary:hover { background: rgba(179, 205, 250, 0.1); }
+.btn-secondary:hover {
+  background: rgba(179, 205, 250, 0.1);
+}
 
 /* Form grid */
-.form-grid { display: grid; gap: 16px; }
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
 
 .field label {
   display: block;
@@ -116,7 +137,9 @@ textarea.input:focus {
   box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25);
 }
 .input::placeholder,
-textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
+textarea.input::placeholder {
+  color: rgba(232, 234, 237, 0.6);
+}
 
 /* --- Botones específicos del modal (sobrescriben los globales) --- */
 .pop-footer .btn {
@@ -124,7 +147,7 @@ textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
   border-radius: var(--radius);
   padding: 10px 18px;
   font-weight: 700;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 /* Botón Guardar (principal) */
@@ -141,7 +164,7 @@ textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
 /* Botón Cancelar (gris) */
 .pop-footer .btn-secondary {
   background-color: #9e9e9e !important; /* gris */
-  color: #E8EAED !important;            /* texto claro */
+  color: #e8eaed !important; /* texto claro */
   border: none !important;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -162,4 +185,3 @@ textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
   border: none !important;
   box-shadow: none !important;
 }
-
