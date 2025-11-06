@@ -4,6 +4,7 @@ import PopUpEventos from './popUpEventos.jsx';
 import ConfirmDeletePopup from './ConfirmDeletePopup.jsx';
 import '@/styles/globals.css';
 import '@/styles/eventos.css';
+import { eventosService } from '@/services/eventosService.js';
 
 const Eventos = () => {
   const [popupMode, setPopupMode] = useState(null);
@@ -12,32 +13,17 @@ const Eventos = () => {
   const [eventos, setEventos] = useState([]);
 
   useEffect(() => {
-    // Simulación de carga de eventos
-    const simulatedEventos = [
-      {
-        nombre: 'Casamiento Sofi y Juan',
-        lugar: 'Villa Allende',
-        fechaHora: '12/09/2024 15:00',
-        tipo: 'Tipo evento 1',
-      },
-      {
-        nombre: 'Bautismo Sofía',
-        lugar: 'Nueva Córdoba',
-        fechaHora: '20/09/2024 11:00',
-        tipo: 'Tipo evento 2',
-      },
-      { nombre: 'Misa Pascuas', lugar: 'Iglesia', tipo: 'Tipo evento' },
-      {
-        nombre: 'Casamiento Lara y Tomás',
-        lugar: 'Carlos Paz',
-        fechaHora: '05/10/2024 16:00',
-        tipo: 'Tipo evento 1',
-      },
-      { nombre: 'Ensayo', lugar: 'Nueva Córdoba', tipo: 'Tipo evento 2' },
-      { nombre: 'Retiro', lugar: 'Río Ceballos', tipo: 'Tipo evento' },
-    ];
-    setEventos(simulatedEventos);
-  }, []);
+  const fetchEventos = async () => {
+    try {
+      const data = await eventosService.listarEventos();
+      setEventos(data);
+    } catch (error) {
+      console.error('Error al obtener eventos:', error);
+    }
+  };
+  fetchEventos();
+}, []);
+
 
   const handleOpenPopup = (mode, evento = null) => {
     setPopupMode(mode);
@@ -49,10 +35,22 @@ const Eventos = () => {
     setSelectedEvento(null);
   };
 
-  const handleDeleteEvent = () => {
-    console.log('Evento eliminado');
+  const handleDeleteEvent = async () => {
+  try {
+    if (!selectedEvento) return;
+
+    await eventosService.delete(
+      selectedEvento.id,
+      selectedEvento.tipoEvento || selectedEvento.tipo
+    );
+
+    setEventos(prev => prev.filter(e => e.id !== selectedEvento.id));
     setShowDeletePopup(false);
-  };
+    setSelectedEvento(null);
+  } catch (error) {
+    console.error('Error al eliminar el evento:', error);
+  }
+};
 
   return (
     <div className="eventos-container">
@@ -117,7 +115,7 @@ const Eventos = () => {
                   <path d="M856-390 570-104q-12 12-27 18t-30 6q-15 0-30-6t-27-18L103-457q-11-11-17-25.5T80-513v-287q0-33 23.5-56.5T160-880h287q16 0 31 6.5t26 17.5l352 353q12 12 17.5 27t5.5 30q0 15-5.5 29.5T856-390ZM513-160l286-286-353-354H160v286l353 354ZM260-640q25 0 42.5-17.5T320-700q0-25-17.5-42.5T260-760q-25 0-42.5 17.5T200-700q0 25 17.5 42.5T260-640Zm220 160Z" />
                 </svg>
               </span>{' '}
-              {evento.tipo}
+              {evento.tipoEvento}
             </p>
 
             <p>
@@ -132,7 +130,7 @@ const Eventos = () => {
                   <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" />
                 </svg>
               </span>{' '}
-              {evento.fechaHora}
+              {evento.fechaInicio}
             </p>
 
             <p>
@@ -166,7 +164,10 @@ const Eventos = () => {
               </button>
               <button
                 className="evento-btn eliminar redondeado"
-                onClick={() => setShowDeletePopup(true)}
+                onClick={() => {
+                  setSelectedEvento(evento);
+                  setShowDeletePopup(true);
+                }}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -195,10 +196,15 @@ const Eventos = () => {
           modo={popupMode}
           eventoSeleccionado={selectedEvento}
           onClose={handleClosePopup}
-          onSave={() => {
-            console.log('Evento guardado');
+          onSave={async () => {
+          try {
+            const data = await eventosService.getAll();
+            setEventos(data);
             handleClosePopup();
-          }}
+          } catch (error) {
+            console.error('Error al refrescar eventos:', error);
+          }
+        }}
         />
       )}
     </div>
