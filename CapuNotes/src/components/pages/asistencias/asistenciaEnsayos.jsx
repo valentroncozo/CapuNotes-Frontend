@@ -8,7 +8,10 @@ import "@/styles/table.css";
 
 export default function AsistenciaEnsayos() {
   const [rows, setRows] = useState([]);
-  const [qDate, setQDate] = useState("");
+  // selectedMonth: bound to the month picker input (yyyy-mm)
+  // appliedMonth: the month currently applied to the filter (yyyy-mm)
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [appliedMonth, setAppliedMonth] = useState("");
   const [loadingId, setLoadingId] = useState(null);
   const navigate = useNavigate();
 
@@ -16,10 +19,29 @@ export default function AsistenciaEnsayos() {
   useEffect(() => {
     const fetchEnsayos = async () => {
       try {
-        // La lista principal se obtiene de ensayosService
-        const data = await ensayosService.list(); 
-        // FIX para el error .map: aseguramos que siempre sea un array
-        setRows(Array.isArray(data) ? data : []); 
+        // La lista principal se obtiene de ensayosService (devuelve /api/eventos)
+        const data = await ensayosService.list();
+        // Filtrar SOLO los eventos que son tipo ENSAYO y normalizar campos esperados por esta pantalla
+        const ensayos = (Array.isArray(data) ? data : [])
+          .filter((e) => String(e.tipoEvento || e.tipo || '').toUpperCase() === 'ENSAYO')
+          .map((e) => {
+            // fechaInicio viene como YYYY-MM-DD, convertimos a DD/MM/YYYY para visual
+            const fechaIso = e.fechaInicio || e.fecha || null;
+            let fecha = fechaIso;
+            if (fechaIso) {
+              const parts = fechaIso.split('-');
+              if (parts.length === 3) fecha = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            }
+            return {
+              id: e.id,
+              fecha,
+              fechaInicio: fechaIso,
+              descripcion: e.nombre || e.descripcion || '',
+              estadoAsistencia: e.estadoAsistencia || e.estado || (e.asistencias ? 'CERRADA' : 'ABIERTA'),
+            };
+          });
+
+        setRows(ensayos);
       } catch (error) {
         console.error("❌ Error cargando ensayos:", error);
       }
@@ -27,15 +49,26 @@ export default function AsistenciaEnsayos() {
     fetchEnsayos();
   }, []);
 
-  // 🔹 Filtro por fecha
+  // 🔹 Filtro por mes (selección por usuario + botón Buscar)
   const filtered = useMemo(() => {
-    if (qDate) {
-      const [y, m, d] = qDate.split("-");
-      const formatted = `${d}/${m}/${y}`;
-      return rows.filter((r) => r.fecha === formatted);
+    if (appliedMonth) {
+      // appliedMonth tiene formato yyyy-mm (desde input type=month)
+      return rows.filter((r) => {
+        if (r.fechaInicio) return r.fechaInicio.startsWith(appliedMonth);
+        // Fallback: r.fecha es dd/mm/yyyy -> construir yyyy-mm para comparar
+        if (r.fecha) {
+          const parts = (r.fecha || '').split('/'); // [dd,mm,yyyy]
+          if (parts.length === 3) {
+            const mm = parts[1];
+            const yyyy = parts[2];
+            return `${yyyy}-${mm}` === appliedMonth;
+          }
+        }
+        return false;
+      });
     }
     return rows;
-  }, [rows, qDate]);
+  }, [rows, appliedMonth]);
 
   // 🔹 Cambiar estado de asistencia (abrir/cerrar)
   const toggleAsistencia = async (ensayo) => {
@@ -74,24 +107,34 @@ export default function AsistenciaEnsayos() {
           <h1 className="abmc-title">Asistencia a ensayos</h1>
         </div>
 
-        {/* 🔹 Filtro por fecha */}
-        <div className="abmc-topbar">
-          <input
-            type="date"
-            className="abmc-input"
-            value={qDate}
-            onChange={(e) => setQDate(e.target.value)}
-            aria-label="Seleccionar fecha"
-          />
-          {qDate && (
-            <button
-              className="btn btn-secondary"
-              style={{ marginLeft: 8 }}
-              onClick={() => setQDate("")}
-            >
-              Borrar
-            </button>
-          )}
+        {/* 🔹 Filtro por mes (se aplica al presionar Buscar) */}
+        <div className="abmc-topbar" style={{ alignItems: 'center', gap: 8 }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ color: '#666' }}>Mes:</span>
+            <input
+              type="month"
+              className="abmc-input"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              aria-label="Seleccionar mes"
+            />
+          </label>
+
+          <button
+            className="btn btn-primary"
+            onClick={() => setAppliedMonth(selectedMonth)}
+            disabled={!selectedMonth}
+          >
+            Buscar
+          </button>
+
+          <button
+            className="btn btn-secondary"
+            style={{ marginLeft: 8 }}
+            onClick={() => { setSelectedMonth(""); setAppliedMonth(""); }}
+          >
+            Limpiar
+          </button>
         </div>
 
         {/* 🔹 Tabla de ensayos */}

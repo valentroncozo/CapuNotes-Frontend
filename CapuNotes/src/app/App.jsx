@@ -20,6 +20,12 @@ import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
 import Audicion from "@/components/pages/audicion/index.jsx";
 import AudicionAgregar from "@/components/pages/audicion/agregar.jsx";
+import CuestionarioConfig from '@/components/pages/cuestionario/configuracion.jsx';
+import CuestionarioPreview from '@/components/pages/cuestionario/preview.jsx';
+import Formulario from '@/components/pages/formulario/consulta.jsx';
+import AsistenciaEnsayos from '@/components/pages/asistencias/asistenciaEnsayos.jsx';
+import AsistenciaEnsayosDetalle from '@/components/pages/asistencias/asistenciaEnsayosDetalle.jsx';
+import Eventos from '@/components/pages/eventos/index.jsx';
 
 // Estilos base (usar globals como fuente de verdad)
 import '@/styles/globals.css';
@@ -72,6 +78,9 @@ function AppRoutes() {
         <Route path="areas" element={<Areas />} />
         <Route path="cuestionario/configuracion" element={<CuestionarioConfig />} />
         <Route path="cuestionario/preview" element={<CuestionarioPreview />} />
+        <Route path="asistencias" element={<AsistenciaEnsayos />} />
+        <Route path="asistencias/ensayos/:idEnsayo" element={<AsistenciaEnsayosDetalle />} />
+        <Route path="eventos" element={<Eventos />} />
         <Route path="audicion" element={<Audicion />} />
         <Route path="audicion/agregar" element={<AudicionAgregar />} />
 

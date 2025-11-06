@@ -39,7 +39,7 @@ const Eventos = () => {
   try {
     if (!selectedEvento) return;
 
-    await eventosService.delete(
+    await eventosService.eliminarEvento(
       selectedEvento.id,
       selectedEvento.tipoEvento || selectedEvento.tipo
     );
@@ -198,7 +198,7 @@ const Eventos = () => {
           onClose={handleClosePopup}
           onSave={async () => {
           try {
-            const data = await eventosService.getAll();
+            const data = await eventosService.listarEventos();
             setEventos(data);
             handleClosePopup();
           } catch (error) {
