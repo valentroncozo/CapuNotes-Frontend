@@ -3,6 +3,7 @@ import { useState } from "react";
 import "@/styles/login.css";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import { useNavigate } from "react-router-dom";
 
 import WavyClipPath from "@/assets/WavyClipPath.jsx";
 import MobileWavyClipPath from "@/assets/MobileWavyClipPath.jsx";
@@ -10,11 +11,17 @@ import AccountUser from "@/assets/AccountUserIcon.jsx";
 import PasswordToggleIcon from "@/assets/PasswordToggleIcon.jsx";
 import { validateLoginFields, hasErrors } from "@/components/common/validators.js";
 
-export default function Login({ onLogin }) {
+// usar el auth context
+import { useAuth } from "@/context/AuthContext.jsx";
+
+export default function Login(/* { onLogin } */) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({ usuario: null, contraseña: null });
+  const [serverError, setServerError] = useState(null);
+  const navigate = useNavigate();
+  const { login, loading } = useAuth();
 
   const runValidation = (nextState) => {
     const nextErrors = validateLoginFields(nextState);
@@ -22,10 +29,19 @@ export default function Login({ onLogin }) {
     return !hasErrors(nextErrors);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError(null);
     const isValid = runValidation({ username, password });
-    if (isValid) onLogin(username, password);
+    if (!isValid) return;
+    try {
+      await login(username, password);
+      // redirigir a principal tras login exitoso
+      navigate("/principal", { replace: true });
+    } catch (err) {
+      console.error(err);
+      setServerError("Credenciales inválidas o error de conexión.");
+    }
   };
 
   const togglePasswordVisibility = () => setShowPassword((v) => !v);
@@ -82,9 +98,11 @@ export default function Login({ onLogin }) {
           </Form.Group>
           <p className="menssaje-error-login">{errors.contraseña}</p>
 
+          {serverError && <p className="menssaje-error-login">{serverError}</p>}
+
           <Form.Group className="custom-input-group">
-            <Button type="submit" className="button-login">
-              Ingresar
+            <Button type="submit" className="button-login" disabled={loading}>
+              {loading ? "Ingresando..." : "Ingresar"}
             </Button>
           </Form.Group>
         </Form>

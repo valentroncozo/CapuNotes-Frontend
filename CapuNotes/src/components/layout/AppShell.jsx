@@ -3,6 +3,9 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "@/styles/offcanvas.css";
 
+// agregar import del contexto
+import { useAuth } from "@/context/AuthContext.jsx";
+
 /* Ícono de cierre (X) */
 function CloseIcon(props) {
   return (
@@ -40,6 +43,9 @@ export default function AppShell({ onLogout }) {
   const [audOpen, setAudOpen] = useState(false);
   const [gearOpen, setGearOpen] = useState(false);
 
+  // obtener logout desde contexto
+  const { logout } = useAuth();
+
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
     window.addEventListener("keydown", onKey);
@@ -53,10 +59,14 @@ export default function AppShell({ onLogout }) {
     navigate(to);
   };
 
-  const handleLogout = () => {
+  // usar logout del contexto
+  const handleLogout = async () => {
     setOpen(false);
-    onLogout?.();
-    navigate("/login");
+    try {
+      await logout();
+    } finally {
+      navigate("/login");
+    }
   };
 
   return (

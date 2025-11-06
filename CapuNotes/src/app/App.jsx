@@ -1,6 +1,8 @@
 // src/App.jsx
-import { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+// agregar imports faltantes desde react-router-dom y useAuth desde el contexto
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/context/AuthContext.jsx";
 
 import AppShell from "@/components/layout/AppShell.jsx";
 
@@ -9,7 +11,6 @@ import Login from "@/components/pages/login/index.jsx";
 import Principal from "@/components/pages/principal/index.jsx";
 import Cuerdas from "@/components/pages/cuerdas/index.jsx";
 import Areas from "@/components/pages/areas/index.jsx";
-import Fraternidades from "@/components/pages/fraternidades/index.jsx";
 import Miembros from "@/components/pages/miembros/index.jsx";
 import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
@@ -24,37 +25,44 @@ import HistorialAudiciones from "@/components/pages/audicion/historial.jsx";
 import Formulario from "@/components/pages/formulario/index.jsx"; // <-- descomenta cuando exista
 import FormularioConsulta from "@/components/pages/formulario/consulta.jsx";
 import FormularioConsultaCoordinacion from "@/components/pages/formulario/consultaCoordinacion.jsx";
-
+import Error401 from "../components/pages/errors/Error401";
+import Error403 from "../components/pages/errors/Error403";
 
 // Estilos base (usar globals como fuente de verdad)
 import "@/styles/globals.css";
 
 function ProtectedRoute({ children }) {
-  const isAuth = localStorage.getItem("capunotes_auth") === "1";
-  return isAuth ? children : <Navigate to="/login" replace />;
+  const { isAuthenticated, loading } = useAuth();
+  // mientras carga, podrías mostrar spinner; aquí solo bloqueamos la navegación
+  if (loading) return null;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
 
 function AppRoutes() {
   const navigate = useNavigate();
-  const [username, setUsername] = useState(localStorage.getItem("capunotes_user") || "");
+  const location = useLocation();
+  const { isAuthenticated, loading, user } = useAuth();
+  // redirigir automáticamente a /principal cuando la sesión quede confirmada
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      const p = location.pathname;
+      if (p === "/login" || p === "/") navigate("/principal", { replace: true });
+    }
+  }, [isAuthenticated, loading, location.pathname, navigate]);
 
-  const handleLogin = (user) => {
-    localStorage.setItem("capunotes_auth", "1");
-    localStorage.setItem("capunotes_user", user);
-    setUsername(user);
-    navigate("/principal", { replace: true });
-  };
+  const username = user?.username || "";
 
   const handleLogout = () => {
-    localStorage.removeItem("capunotes_auth");
-    localStorage.removeItem("capunotes_user");
-    setUsername("");
+    // si necesitas propagar logout al AppShell, usa useAuth dentro de AppShell y llama logout()
+    // aquí solo navegamos a login
+    navigate("/login", { replace: true });
   };
 
   return (
     <Routes>
-      <Route path="/login" element={<Login onLogin={(u) => handleLogin(u)} />} />
-
+      <Route path="/login" element={<Login />} />
+      <Route path="/401" element={<Error401 />} />
+      <Route path="/403" element={<Error403 />} />
       <Route
         path="/"
         element={
@@ -82,20 +90,19 @@ function AppRoutes() {
         <Route path="/inscripcion/:id" element={<FormularioConsulta />} />
         <Route path="/inscripcion/coordinadores/:id" element={<FormularioConsultaCoordinacion />} />
       </Route>
-     
 
+      <Route path="/formulario" element={<Formulario />} />
       <Route path="*" element={<Navigate to="/principal" replace />} />
-      <Route path="/formulario" element={<Formulario />} /> 
-
     </Routes>
   );
 }
 
-
 export default function App() {
   return (
     <BrowserRouter>
-      <AppRoutes />
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </BrowserRouter>
   );
 }

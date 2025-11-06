@@ -1,52 +1,86 @@
 // src/services/areasService.js
-import axios from "axios";
+import apiClient from "@/services/apiClient";
 
-const API_URL = "/api/areas";
+const API_URL = "/areas";
+
+function handleApiError(err) {
+  const status = err?.status ?? err?.response?.status;
+  console.error('API error details:', err?.details ?? err?.response?.data ?? err);
+  if (status === 401) {
+    window.location.replace("/401");
+    return;
+  }
+  if (status === 403) {
+    window.location.replace("/403");
+    return;
+  }
+  throw err;
+}
 
 export const areasService = {
   // Obtener todas las áreas
   list: async () => {
-    const res = await axios.get(API_URL);
-    console.log("📡 Datos recibidos del backend:", res.data);
-    return res.data.map((a) => ({
-      id: a.id,
-      nombre: a.name,
-      descripcion: a.description,
-    }));
+    try {
+      // apiClient.get devuelve directamente los datos (no { res, data })
+      const data = await apiClient.get(API_URL);
+      console.log("📡 Datos recibidos del backend:", data);
+      return (data || []).map((a) => ({
+        id: a.id,
+        nombre: a.name,
+        descripcion: a.description,
+      }));
+    } catch (err) {
+      handleApiError(err);
+      throw err;
+    }
   },
 
   // Crear nueva área
   create: async (data) => {
-    const payload = {
-      name: data.nombre,
-      description: data.descripcion,
-    };
-    const res = await axios.post(API_URL, payload);
-    return {
-      id: res.data.id,
-      nombre: res.data.name,
-      descripcion: res.data.description,
-    };
+    try {
+      const payload = {
+        name: data.nombre,
+        description: data.descripcion,
+      };
+      const res = await apiClient.post(API_URL, { body: payload });
+      return {
+        id: res.id,
+        nombre: res.name,
+        descripcion: res.description,
+      };
+    } catch (err) {
+      handleApiError(err);
+      throw err;
+    }
   },
 
   // Editar área existente
   update: async (data) => {
-    // data debe incluir id, nombre, descripcion
-    const payload = {
-      name: data.nombre,
-      description: data.descripcion,
-    };
-    const res = await axios.patch(`${API_URL}/${data.id}`, payload);
-    return {
-      id: res.data.id,
-      nombre: res.data.name,
-      descripcion: res.data.description,
-    };
+    try {
+      const payload = {
+        name: data.nombre,
+        description: data.descripcion,
+      };
+      const res = await apiClient.patch(`${API_URL}/${data.id}`, { body: payload });
+      return {
+        id: res.id,
+        nombre: res.name,
+        descripcion: res.description,
+      };
+    } catch (err) {
+      handleApiError(err);
+      throw err;
+    }
   },
 
   // Eliminar área
   remove: async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
+    try {
+      await apiClient.delete(`${API_URL}/${id}`);
+    } catch (err) {
+      handleApiError(err);
+      throw err;
+    }
   },
 };
 
