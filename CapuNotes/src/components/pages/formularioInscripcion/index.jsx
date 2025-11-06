@@ -3,6 +3,8 @@ import { useDropzone } from 'react-dropzone';
 import '@/styles/formulario-inscripcion.css';
 import BackButton from '../../common/BackButton.jsx';
 import { IMaskInput } from 'react-imask';
+import { cuerdasService } from '@/services/cuerdasService';
+import TurnoService from '@/services/turnoServices';
 
 const FormularioBasico = () => {
   const [formData, setFormData] = useState({
@@ -33,6 +35,9 @@ const FormularioBasico = () => {
   });
 
   const [preview, setPreview] = useState(null);
+  const [cuerdas, setCuerdas] = useState([]);
+  const [dias, setDias] = useState([]);
+  const [horarios, setHorarios] = useState([]);
 
   // Maneja cualquier cambio en inputs normales
   const handleChange = (e) => {
@@ -82,6 +87,31 @@ const FormularioBasico = () => {
     };
   }, [preview]);
 
+  useEffect(() => {
+    const fetchCuerdas = async () => {
+      const data = await cuerdasService.list();
+      setCuerdas(data);
+    };
+    fetchCuerdas();
+  }, []);
+
+  useEffect(() => {
+    const fetchTurnos = async () => {
+      const audicionId = 'ID_DE_AUDICION'; // Reemplazar con el ID real de la audición
+      const turnos = await TurnoService.listarPorAudicion(audicionId);
+
+      const diasUnicos = [...new Set(turnos.map((turno) => turno.dia))];
+      setDias(diasUnicos);
+
+      const horariosUnicos = turnos.map(
+        (turno) => `${turno.horaInicio} - ${turno.horaFin}`
+      );
+      setHorarios(horariosUnicos);
+    };
+
+    fetchTurnos();
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Datos del formulario:', formData);
@@ -91,7 +121,7 @@ const FormularioBasico = () => {
     <div className="formulario-container">
       <header className="abmc-header">
         <BackButton />
-        <div className="abmdc-title">
+        <div className="abmc-title">
           <h1>Formulario inscripción audición</h1>
         </div>
       </header>
@@ -188,11 +218,18 @@ const FormularioBasico = () => {
 
             <div className="field">
               <label>Cuerda</label>
-              <select name="cuerda">
+              <select
+                name="cuerda"
+                value={formData.cuerda}
+                onChange={handleChange}
+                required
+              >
                 <option value="">Seleccione</option>
-                <option value="primera">Primera</option>
-                <option value="segunda">Segunda</option>
-                <option value="tercera">Tercera</option>
+                {cuerdas.map((cuerda) => (
+                  <option key={cuerda.name} value={cuerda.name}>
+                    {cuerda.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -294,15 +331,35 @@ const FormularioBasico = () => {
             <div className="horario-row">
               <div className="field">
                 <label>Día</label>
-                <select name="dia" required>
-                  <option value=""></option>
+                <select
+                  name="dia"
+                  value={formData.dia}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Seleccione</option>
+                  {dias.map((dia) => (
+                    <option key={dia} value={dia}>
+                      {dia}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="field">
                 <label>Horario</label>
-                <select name="horario" required>
-                  <option value=""></option>
+                <select
+                  name="horario"
+                  value={formData.horario}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Seleccione</option>
+                  {horarios.map((horario, index) => (
+                    <option key={index} value={horario}>
+                      {horario}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
