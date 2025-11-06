@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ensayosService } from "@/services/ensayosService.js";
-import { asistenciasService } from "@/services/asistenciasService.js";
+import { asistenciasService } from "@/services/asistenciasService.js"; 
 import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
 import "@/styles/table.css";
@@ -16,8 +16,10 @@ export default function AsistenciaEnsayos() {
   useEffect(() => {
     const fetchEnsayos = async () => {
       try {
-        const data = await ensayosService.list();
-        setRows(data);
+        // La lista principal se obtiene de ensayosService
+        const data = await ensayosService.list(); 
+        // FIX para el error .map: aseguramos que siempre sea un array
+        setRows(Array.isArray(data) ? data : []); 
       } catch (error) {
         console.error("❌ Error cargando ensayos:", error);
       }
@@ -37,12 +39,12 @@ export default function AsistenciaEnsayos() {
 
   // 🔹 Cambiar estado de asistencia (abrir/cerrar)
   const toggleAsistencia = async (ensayo) => {
-    if (loadingId === ensayo.id) return; // evitar doble click
+    if (loadingId === ensayo.id) return; 
     setLoadingId(ensayo.id);
 
     try {
+      // 🛑 CAMBIO 2: Usamos asistenciasService para cerrar/reabrir
       if (ensayo.estadoAsistencia === "ABIERTA") {
-        // Cerrar asistencia
         await asistenciasService.cerrarAsistencia(ensayo.id);
         setRows((prev) =>
           prev.map((r) =>
@@ -50,7 +52,6 @@ export default function AsistenciaEnsayos() {
           )
         );
       } else {
-        // Reabrir asistencia
         await asistenciasService.reabrirAsistencia(ensayo.id);
         setRows((prev) =>
           prev.map((r) =>
