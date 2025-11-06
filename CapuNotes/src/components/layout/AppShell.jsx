@@ -27,7 +27,7 @@ function GearIcon(props) {
 }
 
 const MENU_ITEMS = [
-  ["/asistencias", "Asistencias"],
+  ["/asistencias/ensayos", "Asistencias"],
   ["/canciones", "Canciones"],
   ["/eventos", "Eventos"],
   ["/usuarios-roles", "Usuarios y roles"],
