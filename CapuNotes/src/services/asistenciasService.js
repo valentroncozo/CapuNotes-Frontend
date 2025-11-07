@@ -33,38 +33,24 @@ export const asistenciasService = {
    * Registrar o actualizar una asistencia individual.
    * POST /api/asistencias/ensayo/{idEnsayo}
    */
-  registrarAsistencia: async (idEnsayo, body) => {
+  // Registrar varias asistencias una por una
+  registrarAsistenciasMasivas: async (idEnsayo, bodyArray) => {
     try {
-      const res = await axios.post(`${API_URL}/ensayo/${idEnsayo}`, body, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      });
-      return res.data; 
-    } catch (err) {
-      console.error("Error registrando asistencia individual:", err?.response || err);
-      throw err;
-    }
+      const responses = await Promise.all(
+        bodyArray.map(body =>
+          axios.post(`${API_URL}/ensayo/${idEnsayo}`, body, {
+            withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        })
+      )
+    );
+    return responses.map(r => r.data);
+  } catch (err) {
+    console.error("Error registrando asistencias masivas:", err?.response || err);
+    throw err;
+  }
   },
 
-  // --------------------------------------------------
-  // REGISTRO MASIVO
-  // --------------------------------------------------
-  /**
-   * Registrar asistencias masivas.
-   * POST /api/asistencias/ensayo/{idEnsayo}/masivo
-   */
-  registrarAsistenciasMasivas: async (idEnsayo, body) => {
-    try {
-      const res = await axios.post(`${API_URL}/ensayo/${idEnsayo}/masivo`, body, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      });
-      return res.data; 
-    } catch (err) {
-      console.error("Error registrando asistencias masivas:", err?.response || err);
-      throw err;
-    }
-  },
 
   // --------------------------------------------------
   // CERRAR / REABRIR
