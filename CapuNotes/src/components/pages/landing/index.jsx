@@ -132,10 +132,16 @@ const LandingPage = () => {
                     <div className='container-photo-activities'>
                         <CutActivityContainer id='activity-cut'/>
                         <ContainerPhoto>
-                            <img src="./public/Retiro2022.jpg" 
-                            alt="Retiro2022" 
+                            <img src="./public/coro con sauro.jpg" 
+                            alt="Coro con Sauro" 
                             className='activity-photo'/>
                         </ContainerPhoto>
+                        <ContainerPhoto>
+                            <img src="./public/misa fin de año 2020.jpg" 
+                            alt="Misa fin de año" 
+                            className='activity-photo'/>
+                        </ContainerPhoto>
+                        
                         <ContainerPhoto>
                             <img src="./public/Retiro2022.jpg" 
                             alt="Retiro2022" 
@@ -143,16 +149,16 @@ const LandingPage = () => {
                         </ContainerPhoto>
                         
                         <ContainerPhoto>
+                            <img src="./public/convi coro 2022.jpg" alt="Coro con Sauro" className='activity-photo'/>
+                        </ContainerPhoto>
+
+                        <ContainerPhoto>
                             <img src="./public/Retiro2023.jpg" 
                             alt="Retiro2023" 
                             className='activity-photo'/>
-                        </ContainerPhoto>                        
-                        <ContainerPhoto>
-                            <img src="./public/Retiro2023.jpg" alt="Retiro2023" className='activity-photo'/>
-                        </ContainerPhoto>
-                                    <ContainerPhoto>
-                            <img src="./public/Retiro2023.jpg" alt="Retiro2023" className='activity-photo'/>
-                        </ContainerPhoto>
+                        </ContainerPhoto>   
+
+
                         
                     </div>
                 <hr className='dividir'/>
