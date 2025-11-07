@@ -27,6 +27,8 @@ import FormularioConsulta from "@/components/pages/formulario/consulta.jsx";
 import FormularioConsultaCoordinacion from "@/components/pages/formulario/consultaCoordinacion.jsx";
 import Error401 from "../components/pages/errors/Error401";
 import Error403 from "../components/pages/errors/Error403";
+import LandingPage from "../components/pages/landing";
+
 
 // Estilos base (usar globals como fuente de verdad)
 import "@/styles/globals.css";
@@ -60,6 +62,7 @@ function AppRoutes() {
 
   return (
     <Routes>
+      <Route path="/home" element={<LandingPage />} />
       <Route path="/login" element={<Login />} />
       <Route path="/401" element={<Error401 />} />
       <Route path="/403" element={<Error403 />} />

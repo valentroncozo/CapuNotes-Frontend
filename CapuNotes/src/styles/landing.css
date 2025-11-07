@@ -1,0 +1,176 @@
+@import url('tokens.css');
+
+#root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --adaptable-width: 70%;
+    --direction: row;
+}
+
+/* reset mínimo y box-sizing para evitar sorpresas */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden; /* evita micro-desbordes horizontales */
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+html {
+  scroll-behavior: smooth; /* scroll suave para anclas */
+}
+
+.landing-page {
+  font-family: var(--font-sans);
+    padding: 0;
+    margin: 0;
+    font-family: var(--font-sans);
+    color: var(--text-light);
+    background-color: var(--bg);
+    margin: 0;
+    padding: 0;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: center;
+    height: 100vh;
+    width: 100%; /* <-- usar 100% en vez de 100vw */
+    overflow-y: auto; /* preferible a 'scroll' si no quieres barra siempre visible */
+    overflow-x: hidden;
+}
+
+.landing-header {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(
+    to bottom, 
+    #090928 40%,
+    #101231 50%,
+    #171A39 61%,
+    #282c58 70%,
+    #B3CDFA 100%
+  );
+
+  clip-path: url(#topvar-clip);
+  -webkit-clip-path: url(#topvar-clip);
+  overflow: hidden;
+  will-change: clip-path;
+
+  justify-content: flex-start;
+  align-items:center;
+  align-content: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-header nav {
+  width: var(--adaptable-width);
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-header nav ul {
+  display: flex;
+  flex-direction: var(--direction);
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+  gap: 2rem;
+  padding: 2rem 0rem;
+  margin: 0;
+}
+
+.landing-header nav ul li {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.landing-header nav ul * {
+  color: var(--text-light);
+  list-style: none;
+  text-decoration: none;
+}
+
+.dividir {
+  color: var(--accent);
+}
+
+.landing-header .logo {
+  width: 60px;
+}
+
+
+.landing-header nav ul li:first-child {
+  flex:1;
+}
+
+
+.header-content {
+ width: var(--adaptable-width);
+ display: flex;
+ flex-direction: row;
+ justify-content: space-around;
+ align-items: flex-start;
+ align-content: center;
+ 
+}
+
+.header-content .header-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-content: center;
+  width: 90%;
+  height: 90%;
+}
+
+.header-content .header-text h1 {
+  font-size: 5rem;
+  margin: 0;
+  padding: 2rem 0rem;
+}
+
+.header-content .header-logo {
+  display: flex;
+  justify-content: center;
+  align-items: top;
+  align-content: top;
+  width: 50%;
+  height: auto;
+}
+
+.header-content .logo {
+  width: 80%;
+  height: 80%;
+}
+
+.contactos {
+  display: flex;
+  gap: .5rem;
+  align-content: center;
+  align-items: center;
+}
+
+.contactos a {
+  text-decoration: none;
+  list-style: none;
+}
