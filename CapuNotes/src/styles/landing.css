@@ -328,3 +328,51 @@ nav ul li:first-child {
   cursor: pointer;
   transition: background-color .2s ease-in-out, color .2s ease-in-out;
 }
+
+
+
+@media (width < 451px) {
+
+  :root {
+    --adaptable-width: 90%;
+    --direction: column;
+  }
+  nav ul {
+    flex-direction: row;
+    gap: .5rem;
+  }
+  nav {
+    height: 3rem;
+    padding: 35px 0;
+  }
+
+   nav ul li:not(:first-child):not(:nth-last-child(-n+2)) {
+    display: none;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2rem;
+  }
+  
+  .header-content .header-text,
+  .header-content .header-text h1,
+  .header-content .contactos {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .header-content .header-logo {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .header-logo .logo {
+    width: 100px;
+    height: auto;
+  }
+
+  
+}

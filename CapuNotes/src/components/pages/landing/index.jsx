@@ -61,7 +61,7 @@ const LandingPage = () => {
                     <li><img src="./public/logo-coro-sin-fondo.png" alt="Logo" className="logo"/></li>
                     <li><a href="#quienes-somos">Quienes Somos</a></li>
                     <li><a href="#Actividades">Actividades</a></li>
-                    <li><a href="#Unite">Unite</a></li>
+                    <li><a href="#Unete">Unete</a></li>
                     <li><Link to="/login">Login</Link></li>
                 </ul>
              </nav>
@@ -162,8 +162,8 @@ const LandingPage = () => {
                         
                     </div>
                 <hr className='dividir'/>
-                <section id="Unite" className="section-line">
-                    <h2><strong>Unite</strong></h2>
+                <section id="Unete" className="section-line">
+                    <h2><strong>Unete</strong></h2>
                     <p>
                         Nosotros, como ministerio de música, prestamos nuestro servicio en la Misa de los domingos a las 21.
                         Además, también cantamos en misas especiales, eventos solidarios, encuentros de coros y en otras comunidades que necesiten de nuestro servicio, agregando ensayos excepcionales en caso de ser necesario.
