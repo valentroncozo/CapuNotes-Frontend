@@ -10,13 +10,12 @@ import "@/styles/abmc.css";
 import "@/styles/table.css";
 import "@/styles/asistencia.css";
 
-// 🛑 Definimos las constantes del estado de asistencia para mapear al Backend (Java Enum)
+// 🛠️ Corregido: mapeo al Enum real del backend
 const ESTADOS_MAP = {
     no: "AUSENTE",
-    half: "MEDIO",
+    half: "MEDIA_FALTA",  // <-- antes decía "MEDIO"
     yes: "PRESENTE",
 };
-
 // Reverse map: backend state -> local key
 const REVERSE_ESTADOS = Object.entries(ESTADOS_MAP).reduce((acc, [k, v]) => {
     acc[v] = k; return acc;
@@ -76,26 +75,55 @@ export default function AsistenciaEnsayosDetalle() {
                 // Mapear los miembros (todos) y unir con la asistencia si existe
                 // Generamos un uid estable por fila para evitar colisiones cuando `id` no sea primitivo
                 const mappedMembers = (Array.isArray(miembrosData) ? miembrosData : []).map((m, idx) => {
-                    const doc = m.id?.nroDocumento || m.numeroDocumento || m.id || '';
-                    const nameKey = `${(m.nombre||'').trim().toLowerCase()}|${(m.apellido||'').trim().toLowerCase()}`;
+                    // Raw member object as returned by la API de miembros
+                    const raw = m || {};
 
-                    const found = asistenciaMap.get(String(doc)) || asistenciaMap.get(nameKey) || asistenciaMap.get(String(m.id)) || null;
+                    // Prefer explicit document or numeric DB id as primary identifier
+                    const doc = raw.id && typeof raw.id === 'object' ? (raw.id.nroDocumento || raw.id.numeroDocumento || null) : (raw.numeroDocumento || raw.nroDocumento || raw.id || null);
+                    const nameKey = `${(raw.nombre||'').trim().toLowerCase()}|${(raw.apellido||'').trim().toLowerCase()}`;
+
+                    const found = asistenciaMap.get(String(doc)) || asistenciaMap.get(nameKey) || asistenciaMap.get(String(raw.id)) || null;
 
                     const estadoBackend = found?.estado || found?.estadoAsistencia || found?.estadoAsistenciaCodigo || null;
                     const asistenciaLocal = estadoBackend ? REVERSE_ESTADOS[estadoBackend] || null : null;
 
-                    // uid: prefer numeric/string document or DB id; fallback to name+idx to guarantee uniqueness
-                    const uidBase = doc || (m.id !== undefined && m.id !== null ? String(m.id) : null) || `${m.nombre || ''}-${m.apellido || ''}-${idx}`;
-                    const uid = String(uidBase);
+                    // Build a stable uid using best available identifier(s)
+                    let uid;
+                    if (raw.id !== undefined && raw.id !== null) {
+                        if (typeof raw.id === 'object') {
+                            // If id is an object, prefer composite key nroDocumento + tipoDocumento when available
+                            const nro = raw.id.nroDocumento || raw.id.numeroDocumento || null;
+                            const tipo = raw.id.tipoDocumento || raw.id.tipo || null;
+                            if (nro && tipo) {
+                                uid = `${String(nro)}-${String(tipo)}`;
+                            } else {
+                                // fallback to any available nested identifier
+                                uid = String(nro || raw.id.id || JSON.stringify(raw.id));
+                            }
+                        } else {
+                            uid = String(raw.id);
+                        }
+                    } else if (raw.numeroDocumento || raw.nroDocumento) {
+                        // If both documento and tipoDocumento are available at root, use composite
+                        const nro = raw.numeroDocumento || raw.nroDocumento;
+                        const tipo = raw.tipoDocumento || raw.tipo || null;
+                        uid = tipo ? `${String(nro)}-${String(tipo)}` : String(nro);
+                    } else {
+                        // Fallback to a deterministic name+index
+                        uid = `${(raw.nombre||'').trim()}-${(raw.apellido||'').trim()}-${idx}`;
+                    }
+
+                    // For payload, keep an `id` that reflects DB id when numeric, else keep raw.id or uid
+                    const payloadId = (raw.id !== undefined && raw.id !== null && !isNaN(Number(raw.id))) ? Number(raw.id) : (raw.id ?? uid);
 
                     return {
                         uid,
-                        id: doc || (m.id !== undefined && m.id !== null ? m.id : uid),
-                        nombre: `${m.nombre || ''} ${m.apellido || ''}`.trim(),
+                        id: payloadId,
+                        nombre: `${raw.nombre || ''} ${raw.apellido || ''}`.trim(),
                         asistencia: asistenciaLocal,
-                        cuerda: m.cuerda?.name || m.cuerda?.nombre || (m.cuerda || '') ,
+                        cuerda: raw.cuerda?.name || raw.cuerda?.nombre || (raw.cuerda || ''),
                         ensayoId: idEnsayo,
-                        raw: m,
+                        raw: raw,
                     };
                 });
 
@@ -144,93 +172,140 @@ export default function AsistenciaEnsayosDetalle() {
 
     // Ahora identificamos filas por uid para evitar colisiones en `id`/objects
     const handleSetAsistencia = (uid, value) => {
-        setMembers((prev) => prev.map((m) => (m.uid === uid ? { ...m, asistencia: value } : m)));
+        // Si el usuario hace click sobre el mismo estado, lo desmarcamos (toggle off).
+        console.log('✅ Clic detectado:', uid, '→', value);
+        setMembers((prev) => prev.map((m) => {
+            if (m.uid !== uid) return m;
+            // Si ya tiene el mismo valor, lo quitamos (null) para que quede "no marcado"
+            const newVal = m.asistencia === value ? null : value;
+            return { ...m, asistencia: newVal };
+        }));
     };
 
-    // ----------------------------------------------------
-    // 🔹 Guardar Asistencia (Registro Masivo)
-    // ----------------------------------------------------
-    const handleGuardar = async () => {
+   // ----------------------------------------------------
+// 🔹 Guardar Asistencia (Registro Masivo)
+// ----------------------------------------------------
+const handleGuardar = async () => {
     setSaving(true);
     try {
-        const registradoPor = localStorage.getItem('capunotes_user') || 'UsuarioActual';
+            const registradoPor = localStorage.getItem('capunotes_user') || 'UsuarioActual';
 
-        // Filtramos los miembros que tienen asistencia marcada
-        const asistencias = members.filter((m) => m.asistencia);
+            // Depuración: mostrar el estado actual de members antes de filtrar
+            console.log("📋 Estado actual de members antes de filtrar:");
+            members.forEach((m, i) => {
+                console.log(i, m.nombre, "→ asistencia:", m.asistencia, "uid:", m.uid);
+            });
 
-        if (asistencias.length === 0) {
-        Swal.fire({
-            icon: 'info',
-            title: 'Sin cambios',
-            text: 'No se seleccionó ninguna asistencia.',
-            background: '#11103a',
-            color: '#E8EAED'
-        });
-        setSaving(false);
-        return;
-        }
+            // Filtramos los miembros que tienen asistencia marcada
+            const asistencias = members.filter((m) => m.asistencia);
 
-                // Construimos un array para el endpoint masivas: [ { miembroId, estado, registradoPor }, ... ]
+            if (asistencias.length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Sin cambios',
+                    text: 'No se seleccionó ninguna asistencia.',
+                    background: '#11103a',
+                    color: '#E8EAED'
+                });
+                setSaving(false);
+                return;
+            }
+
+            // 🧩 Construcción del payload (ya no hace falta mapear estados)
                 const asistenciasPayloadArray = asistencias
-                    .map((m) => {
-                        const estado = ESTADOS_MAP[m.asistencia];
-                        if (!estado) return null;
+                .map((m) => {
+                    const estadoParaBackend = ESTADOS_MAP[m.asistencia]; // "AUSENTE", "MEDIA_FALTA" o "PRESENTE"
+                    if (!estadoParaBackend) return null;
 
-                        const raw = m.raw || null;
-                        let miembroId = null;
+                    const raw = m.raw || {};
+                    const entry = { estado: estadoParaBackend, registradoPor };
 
-                        if (raw) {
-                            // Preferir id numérico si existe
-                            if (raw.id !== undefined && raw.id !== null && !isNaN(Number(raw.id))) {
-                                miembroId = Number(raw.id);
-                            } else if (raw.miembroId !== undefined && raw.miembroId !== null && !isNaN(Number(raw.miembroId))) {
-                                miembroId = Number(raw.miembroId);
-                            } else if (raw.numeroDocumento || raw.nroDocumento) {
-                                // fallback: usar documento como identificador si el backend lo acepta
-                                miembroId = raw.numeroDocumento || raw.nroDocumento;
-                            }
-                        } else if (m.id !== undefined && m.id !== null && !isNaN(Number(m.id))) {
-                            miembroId = Number(m.id);
-                        }
-
-                        const entry = { estado, registradoPor };
-                        if (miembroId !== null && miembroId !== undefined && miembroId !== '') entry.miembroId = miembroId;
-                        else if (raw) entry.miembro = { id: raw.id ?? raw }; // última opción: enviar objeto miembro
-
+                    // 1) raw.id puede ser un objeto con tipoDocumento/nroDocumento
+                    if (raw.id && typeof raw.id === 'object' && (raw.id.tipoDocumento || raw.id.tipo) && (raw.id.nroDocumento || raw.id.numeroDocumento)) {
+                        entry.miembro = { id: { tipoDocumento: raw.id.tipoDocumento || raw.id.tipo, nroDocumento: raw.id.nroDocumento || raw.id.numeroDocumento } };
                         return entry;
-                    })
-                    .filter(Boolean);
+                    }
 
-                console.log('📤 Payload asistencias masivas (array) (enviando):', asistenciasPayloadArray);
+                    // 2) raw.miembro?.id anidado
+                    if (raw.miembro && raw.miembro.id && (raw.miembro.id.tipoDocumento || raw.miembro.id.tipo) && (raw.miembro.id.nroDocumento || raw.miembro.id.numeroDocumento)) {
+                        entry.miembro = { id: { tipoDocumento: raw.miembro.id.tipoDocumento || raw.miembro.id.tipo, nroDocumento: raw.miembro.id.nroDocumento || raw.miembro.id.numeroDocumento } };
+                        return entry;
+                    }
 
-                await asistenciasService.registrarAsistenciasMasivas(idEnsayo, asistenciasPayloadArray);
+                    // 3) campos en root: tipoDocumento + nroDocumento
+                    if ((raw.tipoDocumento || raw.tipo) && (raw.nroDocumento || raw.numeroDocumento)) {
+                        entry.miembro = { id: { tipoDocumento: raw.tipoDocumento || raw.tipo, nroDocumento: raw.nroDocumento || raw.numeroDocumento } };
+                        return entry;
+                    }
 
-        Swal.fire({
-            icon: 'success',
-            title: 'Asistencias guardadas',
-            text: 'Se registraron correctamente todas las asistencias.',
-            timer: 1600,
-            showConfirmButton: false,
-            background: '#11103a',
-            color: '#E8EAED'
-        });
+                    // 4) sólo nroDocumento disponible -> incluir con tipo por defecto si es necesario
+                    if (raw.nroDocumento || raw.numeroDocumento) {
+                        entry.miembro = { id: { tipoDocumento: raw.tipoDocumento || raw.tipo || 'DNI', nroDocumento: raw.nroDocumento || raw.numeroDocumento } };
+                        return entry;
+                    }
 
-        navigate(-1);
-    } catch (error) {
-        console.error("❌ Error al guardar asistencia:", error);
-        const msg = error?.response?.data || error?.message || "Error desconocido";
-        Swal.fire({
-        icon: 'error',
-        title: 'No se pudo guardar',
-        html: `<pre style="text-align:left;white-space:pre-wrap">${JSON.stringify(msg, null, 2)}</pre>`,
-        background: '#11103a',
-        color: '#E8EAED'
-        });
-    } finally {
-        setSaving(false);
-    }
+                    // 5) miembroId numérico (fallback)
+                    if (raw.miembroId !== undefined && raw.miembroId !== null && !isNaN(Number(raw.miembroId))) {
+                        entry.miembroId = Number(raw.miembroId);
+                        return entry;
+                    }
+
+                    // 6) raw.id es número (fallback)
+                    if (raw.id !== undefined && raw.id !== null && !isNaN(Number(raw.id))) {
+                        entry.miembroId = Number(raw.id);
+                        return entry;
+                    }
+
+                    // Último recurso: enviar raw para que el backend intente mapearlo
+                    console.warn('⚠️ No se pudo construir ID de miembro compuesto, enviando raw como último recurso:', raw);
+                    entry.miembro = { id: raw.id ?? raw };
+                    return entry;
+                })
+                .filter(Boolean);
+
+            console.log("📤 Payload asistencias masivas (array) (enviando):", asistenciasPayloadArray);
+
+            // Log detallado por registro para depuración (miembro / estado / registradoPor)
+            asistenciasPayloadArray.forEach((a, i) => {
+                console.log(`➡️ Registro ${i}:`, JSON.stringify(a, null, 2));
+            });
+
+            // Construir payload final con la clave que espera el backend
+            const payload = {
+                registradoPor,
+                asistencias: asistenciasPayloadArray
+            };
+
+            console.log('📦 Payload final a enviar:', JSON.stringify(payload, null, 2));
+
+            // 🚀 Enviar al backend (espera un objeto con { registradoPor, asistencias: [...] })
+            await asistenciasService.registrarAsistenciasMasivas(idEnsayo, payload);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Asistencias guardadas',
+                text: 'Se registraron correctamente todas las asistencias.',
+                timer: 1600,
+                showConfirmButton: false,
+                background: '#11103a',
+                color: '#E8EAED'
+            });
+
+            navigate(-1);
+        } catch (error) {
+            console.error("❌ Error al guardar asistencia:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'No se pudo guardar',
+                background: '#11103a',
+                color: '#E8EAED'
+            });
+        } finally {
+            setSaving(false);
+        }
     };
-
+    // ----------------------------------------------------
+    // 🔹 Renderizado
 
     if (loading) {
         return <div className="loading-spinner">Cargando asistencias...</div>;
