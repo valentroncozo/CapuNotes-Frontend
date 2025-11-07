@@ -39,18 +39,19 @@ function GearIcon(props) {
 }
 
 const MENU_ITEMS = [
-  ['/asistencias', 'Asistencias'],
-  ['/audicion', 'Audiciones'],
-  ['/canciones', 'Canciones'],
-  ['/eventos', 'Eventos'],
-  ['/fraternidades', 'Fraternidades'],
-  ['/usuarios-roles', 'Usuarios y roles'],
+  ["/asistencias", "Asistencias"],
+  ["/audicion", "Audiciones"],
+  ["/canciones", "Canciones"],
+  ["/eventos", "Eventos"],
+  ["/fraternidades", "Fraternidades"],
+  ["/usuarios-roles", "Usuarios y roles"],
 ];
 
 export default function AppShell({ onLogout }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [orgOpen, setOrgOpen] = useState(false);
+  const [audOpen, setAudOpen] = useState(false);
   const [gearOpen, setGearOpen] = useState(false);
 
   useEffect(() => {
@@ -61,9 +62,7 @@ export default function AppShell({ onLogout }) {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  useEffect(() => {
-    if (!open) setGearOpen(false);
-  }, [open]);
+  useEffect(() => { if (!open) setGearOpen(false); }, [open]);
 
   const handleNavigate = (to) => {
     setOpen(false);
@@ -137,6 +136,8 @@ export default function AppShell({ onLogout }) {
           <Menu
             orgOpen={orgOpen}
             setOrgOpen={setOrgOpen}
+            audOpen={audOpen}
+            setAudOpen={setAudOpen}
             onNavigate={handleNavigate}
           />
         </div>
@@ -158,7 +159,7 @@ export default function AppShell({ onLogout }) {
   );
 }
 
-function Menu({ orgOpen, setOrgOpen, onNavigate }) {
+function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
   return (
     <div className="appshell-menu">
       <a
@@ -215,6 +216,57 @@ function Menu({ orgOpen, setOrgOpen, onNavigate }) {
               }}
             >
               Miembros
+            </a>
+          </div>
+        )}
+      </div>
+
+      <div className="appshell-accordion-outer">
+        <button
+          className={`appshell-accordion-trigger ${audOpen ? "open" : ""}`}
+          onClick={() => setAudOpen((v) => !v)}
+          aria-expanded={audOpen}
+        >
+          Audiciones
+          <span className="appshell-accordion-caret">{audOpen ? "▴" : "▾"}</span>
+        </button>
+
+        {audOpen && (
+          <div className="appshell-accordion-content">
+            <a
+              href="/audicion"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/audicion"); }}
+            >
+              Audición
+            </a>
+            <a
+              href="/candidatos"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("audicion/candidatos"); }}
+            >
+              Candidatos
+            </a>
+            <a
+              href="/candidatos-coordinadores"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/candidatos-administracion"); }}
+            >
+              Candidatos (Administración)
+            </a>
+            <a
+              href="/candidatos/historial"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/historial"); }}
+            >
+              Historial Candidatos
+            </a>
+            <a
+              href="/cuestionario/configuracion"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/cuestionario/configuracion"); }}
+            >
+              Configurar Cuestionario
             </a>
           </div>
         )}

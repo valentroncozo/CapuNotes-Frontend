@@ -34,14 +34,14 @@ const TableABMC = ({ headers = [], data = [], actions = [], columns = [], emptyM
               <td className="abmc-actions">
                 {actions.length > 0 ? (
                   actions.map((action, index) => (
-                    <Button
+                    <button
                       key={index}
-                      className={action.className}
+                      className={action.className ? action.className : action.style}
                       onClick={() => action.onClick(d)}
                       title={action.title}
                     >
                       {action.icon} <span>{action.label}</span>
-                    </Button>
+                    </button>
                   ))
                 ) : (
                   // Si no hay acciones, mostrar un placeholder vacío para mantener la columna

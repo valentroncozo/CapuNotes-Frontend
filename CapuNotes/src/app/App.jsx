@@ -11,16 +11,20 @@ import {
 import AppShell from '@/components/layout/AppShell.jsx';
 
 // Pages
-import Login from '@/components/pages/login/index.jsx';
-import Principal from '@/components/pages/principal/index.jsx';
-import Cuerdas from '@/components/pages/cuerdas/index.jsx';
-import Areas from '@/components/pages/areas/index.jsx';
-import Miembros from '@/components/pages/miembros/index.jsx';
-import MiembrosAgregar from '@/components/pages/miembros/agregar.jsx';
-import MiembrosEditar from '@/components/pages/miembros/editar.jsx';
-import Audicion from '@/components/pages/audicion/index.jsx';
-import AudicionAgregar from '@/components/pages/audicion/agregar.jsx';
-import FormularioBasico from '@/components/pages/formularioInscripcion/index.jsx';
+import Login from "@/components/pages/login/index.jsx";
+import Principal from "@/components/pages/principal/index.jsx";
+import Cuerdas from "@/components/pages/cuerdas/index.jsx";
+import Areas from "@/components/pages/areas/index.jsx";
+import Miembros from "@/components/pages/miembros/index.jsx";
+import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
+import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
+import Audicion from "@/components/pages/audicion/index.jsx";
+import AudicionAgregar from "@/components/pages/audicion/agregar.jsx";
+import CuestionarioConfig from '@/components/pages/cuestionario/configuracion.jsx';
+import CuestionarioPreview from '@/components/pages/cuestionario/preview.jsx';
+import Formulario from '@/components/pages/formulario/consulta.jsx';
+import AsistenciaEnsayos from '@/components/pages/asistencias/asistenciaEnsayos.jsx';
+import AsistenciaEnsayosDetalle from '@/components/pages/asistencias/asistenciaEnsayosDetalle.jsx';
 import Eventos from '@/components/pages/eventos/index.jsx';
 
 // Estilos base (usar globals como fuente de verdad)
@@ -72,16 +76,24 @@ function AppRoutes() {
         <Route path="miembros/editar" element={<MiembrosEditar />} />
         <Route path="cuerdas" element={<Cuerdas />} />
         <Route path="areas" element={<Areas />} />
+        <Route path="cuestionario/configuracion" element={<CuestionarioConfig />} />
+        <Route path="cuestionario/preview" element={<CuestionarioPreview />} />
+        <Route path="asistencias" element={<AsistenciaEnsayos />} />
+        <Route path="asistencias/ensayos/:idEnsayo" element={<AsistenciaEnsayosDetalle />} />
+        <Route path="eventos" element={<Eventos />} />
         <Route path="audicion" element={<Audicion />} />
         <Route path="audicion/agregar" element={<AudicionAgregar />} />
-        <Route path="formulario" element={<FormularioBasico />} />
-        <Route path="eventos" element={<Eventos />} />
+
       </Route>
+     
 
       <Route path="*" element={<Navigate to="/principal" replace />} />
+      <Route path="/formulario" element={<Formulario />} /> 
+
     </Routes>
   );
 }
+
 
 export default function App() {
   return (

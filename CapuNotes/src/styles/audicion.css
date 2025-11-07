@@ -1,4 +1,3 @@
-
 .audicion-page {
   display: flex;
   flex-direction: column;
@@ -70,6 +69,4 @@
   .abmc-card {
     margin: 0;
   }
-
-
 }

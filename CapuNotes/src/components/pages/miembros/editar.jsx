@@ -295,7 +295,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
           </div>
 
           {/* Cuerda y Área */}
-          <div className="form-row-miembros">
+          <div className="form-row-cuerda-area">
             <div className="mitad">
               <label>
                 Cuerda <span className="required">*</span>

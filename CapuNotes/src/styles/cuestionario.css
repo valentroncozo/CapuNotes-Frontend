@@ -1,0 +1,6 @@
+/* Minimal styles aligned with existing abmc look */
+.cuest-section { margin: 24px 0; }
+.cuest-subtitle { color: #E8EAED; font-weight: 600; margin: 8px 0 12px; }
+.cuest-list { list-style: none; padding: 0; margin: 0; }
+.cuest-row { display: flex; align-items: center; gap: 12px; margin: 8px 0; }
+.cuest-input { flex: 1; }

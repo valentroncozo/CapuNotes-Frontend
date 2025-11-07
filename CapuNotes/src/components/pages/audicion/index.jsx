@@ -10,7 +10,7 @@ import BackButton from '../../common/BackButton.jsx';
 
 import TurnoService from '@/services/turnoServices.js';
 import AudicionService from '@/services/audicionService.js';
-import aggregateTurnosByDaySimple from '@/services/ParsingTurnos.js';
+import Swal from 'sweetalert2';
 
 const Audicion = ({ title ='Audición'}) => {
 
@@ -24,34 +24,72 @@ const Audicion = ({ title ='Audición'}) => {
 
   const [filteredData, setFilteredData] = useState(data);
   const [filtroDia, setFiltroDia] = useState('');
-
+  const [esPublicada, setEsPublicada] = useState(false);
 
   const  load = async () => {
     const audicion = await AudicionService.getActual();
 
     setAudicion(audicion);
 
+    setEsPublicada(audicion?.estado === 'PUBLICADA');
+
     if (!audicion) {
       setData([]);
     } else {
-      const turnos = await TurnoService.listarPorAudicion(audicion.id);
-      const aggregated = aggregateTurnosByDaySimple(turnos);
+      // Delegar agregación al backend
+      const resumen = await TurnoService.listarResumenPorDia(audicion.id);
 
-      console.log('Aggregated turnos by day:', aggregated);
+      // enriquecer con etiqueta 'dia' para la UI evitando desfases de zona horaria
+      const parseLocalDate = (yyyyMmDd) => {
+        const [y, m, d] = String(yyyyMmDd).split('-').map(Number);
+        return new Date(y, (m || 1) - 1, d || 1);
+      };
+      const formatDia = (isoDate) => {
+        const d = parseLocalDate(isoDate);
+        const nombreDia = new Intl.DateTimeFormat('es-ES', { weekday: 'long' }).format(d);
+        return `${nombreDia.charAt(0).toUpperCase()}${nombreDia.slice(1)} ${d.getDate()}`;
+      };
 
-      setData(aggregated);
-      setFilteredData(aggregated);
+      const rows = (resumen || []).map(r => ({
+        fecha: r.fecha,
+        dia: formatDia(r.fecha),
+        cantidadTurnos: r.cantidadTurnos,
+        turnosDisponibles: r.turnosDisponibles
+      }));
+
+      setData(rows);
+      setFilteredData(rows);
     }
   };
 
   useEffect(() => { load(); }, []);
 
-  // Botones que peuden figurar en la tabla
+  // Selector temporal de rol para redirección
+  const handleVerCronograma = async (row) => {
+    const diaIso = row?.fecha; // 'YYYY-MM-DD'
+    const res = await Swal.fire({
+      title: '¿Quién está usando el sistema hoy?',
+      showDenyButton: true,
+      confirmButtonText: 'Coordinador',
+      denyButtonText: 'Administrador',
+      background: '#11103a',
+      color: '#E8EAED',
+      confirmButtonColor: '#ffc107',
+      denyButtonColor: '#6c757d',
+    });
+    if (res.isConfirmed) {
+      navigate(`/audicion/candidatos?dia=${encodeURIComponent(diaIso)}`);
+    } else if (res.isDenied) {
+      navigate(`/candidatos-administracion?dia=${encodeURIComponent(diaIso)}`);
+    }
+  };
+
+  // Botones que pueden figurar en la tabla
   const actions = [{
     title: 'Ver Cronograma',
     className: 'abmc-btn btn-primary',
     label: 'Ver Cronograma',
-    onClick:(d) => { navigate(`${URLCRONOGRAMA}/${d.id}?dia=${d.dia}`); }
+    onClick: (row) => handleVerCronograma(row),
   }];
 
   const handleFilterChange = (e) => {
@@ -68,14 +106,77 @@ const Audicion = ({ title ='Audición'}) => {
     setFilteredData(filtered);
   };
 
+  const  handlerPublicarAudicion = async () => {
+    const res = await Swal.fire({
+      title: '¿Estás seguro de que quieres publicar la audición?',
+      showCancelButton: true,
+      confirmButtonText: 'Publicar',
+      cancelButtonText: 'Cancelar',
+      background: '#11103a',
+      color: '#E8EAED',
+      confirmButtonColor: '#ffc107',
+      cancelButtonColor: '#6c757d',
+    });
+
+    if (res.isConfirmed) {
+      await AudicionService.actualizarParcial(audicion.id, {estado: 'PUBLICADA'});
+      Swal.fire({
+        title: 'Audición publicada',
+        icon: 'success',
+        background: '#11103a',
+        color: '#E8EAED',
+      });
+      setEsPublicada(true);
+    }
+  }
+
+  const  handlerCerrarAudicion = async () => {
+    const res = await Swal.fire({
+      title: '¿Estás seguro de que quieres cerrar la audición?',
+      text: 'Esta acción no se puede deshacer.',
+      showCancelButton: true,
+      confirmButtonText: 'Cerrar Audición',
+      cancelButtonText: 'Cancelar',
+      background: '#11103a',
+      color: '#E8EAED',
+      confirmButtonColor: '#dc3545',
+      cancelButtonColor: '#6c757d',
+    });
+
+    if (res.isConfirmed) {
+      await AudicionService.actualizarParcial(audicion.id, {estado: 'CERRADA'});
+      Swal.fire({
+        title: 'Audición cerrada',
+        icon: 'success',
+        background: '#11103a',
+        color: '#E8EAED',
+      });
+      setEsPublicada(false);
+    }
+  }
+
+
   return (
       <main className="audicion-page">
         <div className="abmc-card">
           <header className="abmc-header">
             <BackButton />
-            <h1>{title}</h1>
-            <hr className='divisor-amarillo'></hr>
+            <h1 className='abmc-title'>{title}</h1>
+            {audicion && (
+            <span style={{ 
+              marginLeft: 'auto', 
+              padding: '4px 12px', 
+              borderRadius: '4px', 
+              backgroundColor: esPublicada ? '#28a745' : '#ffc107',
+              color: esPublicada ? 'white' : 'black',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            }}>
+              {esPublicada ? 'PUBLICADA' : 'BORRADOR'}
+            </span>
+          )}
           </header>
+            <hr className='divider'></hr>
     
           <div className="abmc-topbar">
               <input
@@ -110,16 +211,22 @@ const Audicion = ({ title ='Audición'}) => {
           <footer className="audicion-footer">
 
             <div className='content-footer'>
-              <button className="abmc-btn btn-secondary" onClick={() => {}}>
+              <button className="abmc-btn btn-secondary" onClick={() => { navigate('/cuestionario/preview'); }}>
                 Visualizar Cuestionario
               </button>
             </div>
 
             <div className='content-footer'>
-              <button className="abmc-btn btn-primary" onClick={() => {}}>
+              {!esPublicada ? (
+              <button className="abmc-btn btn-primary" onClick={handlerPublicarAudicion}>
                 Publicar Audición
               </button>
-              <button className="abmc-btn btn-secondary" onClick={() => {}}>
+              ) : ( audicion?.estado === 'PUBLICADA' ? (
+                <button className="abmc-btn btn-primary" onClick={() => { handlerCerrarAudicion(); }}>
+                  Cerrar Audición
+                </button>
+              ) : null)}
+              <button className="abmc-btn btn-secondary" onClick={() => { navigate('/audicion/editar'); }}>
                 Modificar Audición
               </button>
             </div>
@@ -133,4 +240,3 @@ const Audicion = ({ title ='Audición'}) => {
 };
 
 export default Audicion;
-

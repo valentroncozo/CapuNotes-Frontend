@@ -13,6 +13,7 @@ const TurnoService = {
   listarPorAudicion: async (audicionId) => {
     try {
       const r = await api.get(`/turnos/audicion/${encodeURIComponent(audicionId)}`);
+      console.log('Turnos obtenidos:', r.data);
       return r.data;
     } catch (e) {
       throw e.response?.data || e.message;
@@ -22,6 +23,24 @@ const TurnoService = {
   listarDisponibles: async (audicionId) => {
     try {
       const r = await api.get(`/turnos/audicion/${encodeURIComponent(audicionId)}/disponibles`);
+      return r.data;
+    } catch (e) {
+      throw e.response?.data || e.message;
+    }
+  },
+
+  listarResumenPorDia: async (audicionId) => {
+    try {
+      const r = await api.get(`/turnos/audicion/${encodeURIComponent(audicionId)}/resumen-diario`);
+      return r.data;
+    } catch (e) {
+      throw e.response?.data || e.message;
+    }
+  },
+  
+  listarFranjasHorarias: async (audicionId) => {
+    try {
+      const r = await api.get(`/turnos/audicion/${encodeURIComponent(audicionId)}/generacion-requests`);
       return r.data;
     } catch (e) {
       throw e.response?.data || e.message;
@@ -50,6 +69,15 @@ const TurnoService = {
   eliminar: async (turnoId) => {
     try {
       const r = await api.delete(`/turnos/${encodeURIComponent(turnoId)}`);
+      return r.status === 204;
+    } catch (e) {
+      throw e.response?.data || e.message;
+    }
+  },
+
+  eliminarTurnosPorAudicion: async (audicionId) => {
+    try {
+      const r = await api.delete(`/turnos/audicion/${encodeURIComponent(audicionId)}`);
       return r.status === 204;
     } catch (e) {
       throw e.response?.data || e.message;

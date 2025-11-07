@@ -298,7 +298,7 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
 
 
           {/* Cuerda y Área */}
-          <div className="form-row-miembros">
+          <div className="form-row-cuerda-area">
             <div className="mitad">
               <label>
                 Cuerda <span className="required">*</span>

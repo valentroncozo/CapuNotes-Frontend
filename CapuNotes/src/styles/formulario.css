@@ -1,0 +1,47 @@
+
+.container-candidato {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.container-candidato h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+    
+}
+
+.container-candidato h2 span {
+    display: flex;
+    
+    flex-direction: row;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: normal;
+    color: var(--text-light);
+}
+
+.form-group-miembro {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-group-miembro option {
+    background-color: var(--bg);
+}
+
+
+.mitad {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mitad :nth-child(n) {
+    flex: 1 1 calc(50% - 12px);
+}

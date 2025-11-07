@@ -3,24 +3,9 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import GenericEditPopup from "./GenericEditPopup";
 import BackButton from "../common/BackButton";
+import TrashIcon from "@/assets/TrashIcon";
+import EditIcon from "@/assets/EditIcon";
 import "@/styles/abmc.css";
-
-/* Iconitos inline (SVG) */
-function EditIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" {...props}>
-      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="currentColor" />
-      <path d="M20.71 7.04a1.003 1.003 0 0 0 0-1.42L18.37 3.29a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.83z" fill="currentColor" />
-    </svg>
-  );
-}
-function TrashIcon(props) {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" {...props}>
-      <path d="M6 7h12l-1 13a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 7zm3-3h6l1 2H8l1-2z" fill="currentColor" />
-    </svg>
-  );
-}
 
 // Alerta genérica para registros duplicados
 function showDuplicateAlert(uniqueBy) {
@@ -50,16 +35,29 @@ export default function EntityTableABMC({
   const [selected, setSelected] = useState(null);
 
   const load = async () => {
-    const data = await service.list();
+    try {
+      const data = await service.list();
 
-    // Ordenar alfabéticamente por el campo "nombre"
-    const sorted = Array.isArray(data)
-      ? [...data].sort((a, b) =>
-        (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" })
-      )
-      : [];
+      // Ordenar alfabéticamente por el campo "nombre"
+      const sorted = Array.isArray(data)
+        ? [...data].sort((a, b) =>
+          (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" })
+        )
+        : [];
 
-    setItems(sorted);
+      setItems(sorted);
+    } catch (err) {
+      console.error("❌ Error al cargar la lista:", err);
+      setItems([]);
+      Swal.fire({
+        icon: "error",
+        title: "Error al cargar",
+        text: err?.response?.data || "No se pudieron cargar los datos.",
+        background: "#11103a",
+        color: "#E8EAED",
+        confirmButtonColor: "#7c83ff",
+      });
+    }
   };
 
 
@@ -291,6 +289,8 @@ export default function EntityTableABMC({
           <hr className="divisor-amarillo" />
         </div>
 
+        <hr className="divisor-amarillo" style={{ margin: "1rem 0rem", color: 'var(--accent)' }} />
+
         <form className="abmc-topbar" onSubmit={handleAgregar}>
           {schema.map((f) =>
             f.type === "select" ? (
@@ -334,7 +334,7 @@ export default function EntityTableABMC({
                 {f.label}
               </button>
             ) : f.type === "submit" ? (
-              <button type="submit" className="abmc-btn abmc-btn-primary">
+              <button key={f.key} type="submit" className="abmc-btn abmc-btn-primary">
                 {f.label}
               </button>
             ) : f.type === "label" ? (
