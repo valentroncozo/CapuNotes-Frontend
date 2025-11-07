@@ -158,8 +158,6 @@ const LandingPage = () => {
                             className='activity-photo'/>
                         </ContainerPhoto>   
 
-
-                        
                     </div>
                 <hr className='dividir'/>
                 <section id="Unete" className="section-line">
