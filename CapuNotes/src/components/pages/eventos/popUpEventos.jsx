@@ -6,6 +6,8 @@ const PopUpEventos = ({
   eventoSeleccionado,
   onClose,
   onSave,
+  opcionesFecha = [],
+  opcionesHora = [],
 }) => {
   const isViewMode = modo === 'ver';
   return (
@@ -46,30 +48,37 @@ const PopUpEventos = ({
           <div className="field">
             {' '}
             <label>Tipo de evento</label>{' '}
-            <select name="tipoEvento" disabled={isViewMode}>
-              {' '}
-              <option value="">
-                Seleccionar
-              </option> {/* Opciones dinámicas */}{' '}
+            <select
+              name="tipoEvento"
+              defaultValue={eventoSeleccionado?.tipoEvento || ''}
+              disabled={isViewMode}
+            >
+              <option value="">Seleccionar</option>
+              <option value="presentacion">PRESENTACIÓN</option>
+              <option value="ensayo">ENSAYO</option>
             </select>{' '}
           </div>{' '}
           <div className="field-inline">
             {' '}
             <div className="field">
               {' '}
-              <label>Fecha</label>{' '}
-              <select name="fecha" disabled={isViewMode}>
-                {' '}
-                <option value="">Elegir</option> {/* Opciones dinámicas */}{' '}
-              </select>{' '}
+              <label>Fecha</label>
+              <input
+                type="date"
+                name="fecha"
+                defaultValue={eventoSeleccionado?.fecha || ''}
+                disabled={modo !== 'crear' && modo !== 'editar'}
+              />
             </div>{' '}
             <div className="field">
               {' '}
-              <label>Hora</label>{' '}
-              <select name="hora" disabled={isViewMode}>
-                {' '}
-                <option value="">--:--</option> {/* Opciones dinámicas */}{' '}
-              </select>{' '}
+              <label>Hora</label>
+              <input
+                type="time"
+                name="hora"
+                defaultValue={eventoSeleccionado?.hora || ''}
+                disabled={modo !== 'crear' && modo !== 'editar'}
+              />
             </div>{' '}
           </div>{' '}
           <div className="field">
@@ -85,12 +94,19 @@ const PopUpEventos = ({
         </div>{' '}
         <div className="popup-actions">
           {' '}
-          <button type="button" className="btn-cancel" onClick={onClose}>
+          <button type="button" className="btn-primary" onClick={onClose}>
             {' '}
             Cancelar{' '}
           </button>{' '}
           {!isViewMode && (
-            <button type="submit" className="btn-submit" onClick={onSave}>
+            <button
+              type="submit"
+              className="btn-primary"
+              onClick={(e) => {
+                e.preventDefault(); // Evita el comportamiento predeterminado del formulario
+                onSave(); // Llama a la función onSave
+              }}
+            >
               {' '}
               Aceptar{' '}
             </button>
@@ -100,4 +116,5 @@ const PopUpEventos = ({
     </div>
   );
 };
+
 export default PopUpEventos;

@@ -13,17 +13,16 @@ const Eventos = () => {
   const [eventos, setEventos] = useState([]);
 
   useEffect(() => {
-  const fetchEventos = async () => {
-    try {
-      const data = await eventosService.listarEventos();
-      setEventos(data);
-    } catch (error) {
-      console.error('Error al obtener eventos:', error);
-    }
-  };
-  fetchEventos();
-}, []);
-
+    const fetchEventos = async () => {
+      try {
+        const data = await eventosService.listarEventos();
+        setEventos(data);
+      } catch (error) {
+        console.error('Error al obtener eventos:', error);
+      }
+    };
+    fetchEventos();
+  }, []);
 
   const handleOpenPopup = (mode, evento = null) => {
     setPopupMode(mode);
@@ -36,21 +35,21 @@ const Eventos = () => {
   };
 
   const handleDeleteEvent = async () => {
-  try {
-    if (!selectedEvento) return;
+    try {
+      if (!selectedEvento) return;
 
-    await eventosService.delete(
-      selectedEvento.id,
-      selectedEvento.tipoEvento || selectedEvento.tipo
-    );
+      await eventosService.eliminarEvento(
+        selectedEvento.id,
+        selectedEvento.tipoEvento || selectedEvento.tipo
+      );
 
-    setEventos(prev => prev.filter(e => e.id !== selectedEvento.id));
-    setShowDeletePopup(false);
-    setSelectedEvento(null);
-  } catch (error) {
-    console.error('Error al eliminar el evento:', error);
-  }
-};
+      setEventos((prev) => prev.filter((e) => e.id !== selectedEvento.id));
+      setShowDeletePopup(false);
+      setSelectedEvento(null);
+    } catch (error) {
+      console.error('Error al eliminar el evento:', error);
+    }
+  };
 
   return (
     <div className="eventos-container">
@@ -130,7 +129,7 @@ const Eventos = () => {
                   <path d="M200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-80h80v80h320v-80h80v80h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Zm280 240q-17 0-28.5-11.5T440-440q0-17 11.5-28.5T480-480q17 0 28.5 11.5T520-440q0 17-11.5 28.5T480-400Zm-160 0q-17 0-28.5-11.5T280-440q0-17 11.5-28.5T320-480q17 0 28.5 11.5T360-440q0 17-11.5 28.5T320-400Zm320 0q-17 0-28.5-11.5T600-440q0-17 11.5-28.5T640-480q17 0 28.5 11.5T680-440q0 17-11.5 28.5T640-400ZM480-240q-17 0-28.5-11.5T440-280q0-17 11.5-28.5T480-320q17 0 28.5 11.5T520-280q0 17-11.5 28.5T480-240Zm-160 0q-17 0-28.5-11.5T280-280q0-17 11.5-28.5T320-320q17 0 28.5 11.5T360-280q0 17-11.5 28.5T320-240Zm320 0q-17 0-28.5-11.5T600-280q0-17 11.5-28.5T640-320q17 0 28.5 11.5T680-280q0 17-11.5 28.5T640-240Z" />
                 </svg>
               </span>{' '}
-              {evento.fechaInicio}
+              {evento.fechaInicio} - {evento.hora}
             </p>
 
             <p>
@@ -194,17 +193,31 @@ const Eventos = () => {
       {popupMode && (
         <PopUpEventos
           modo={popupMode}
-          eventoSeleccionado={selectedEvento}
+          eventoSeleccionado={{
+            nombre: selectedEvento?.nombre || '',
+            tipoEvento: selectedEvento?.tipoEvento || '',
+            fecha: selectedEvento?.fechaInicio || '',
+            hora: selectedEvento?.hora || '',
+            lugar: selectedEvento?.lugar || '',
+          }}
           onClose={handleClosePopup}
           onSave={async () => {
-          try {
-            const data = await eventosService.getAll();
-            setEventos(data);
-            handleClosePopup();
-          } catch (error) {
-            console.error('Error al refrescar eventos:', error);
-          }
-        }}
+            try {
+              const nuevoEvento = {
+                nombre: selectedEvento?.nombre || '',
+                tipoEvento: selectedEvento?.tipoEvento || '',
+                fechaInicio: selectedEvento?.fecha || '',
+                hora: selectedEvento?.hora || '',
+                lugar: selectedEvento?.lugar || '',
+              };
+              await eventosService.crearEvento(nuevoEvento);
+              const data = await eventosService.listarEventos();
+              setEventos(data);
+              handleClosePopup();
+            } catch (error) {
+              console.error('Error al crear el evento:', error);
+            }
+          }}
         />
       )}
     </div>
