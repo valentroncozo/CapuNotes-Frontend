@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api/eventos';
+const API_URL = 'api/eventos';
 
 export const eventosService = {
   // 🔹 Listar eventos (con filtros opcionales)
@@ -43,7 +43,7 @@ export const eventosService = {
   // 🔹 Editar evento existente
   async editarEvento(id, data) {
     try {
-      const res = await axios.patch(`${API_URL}/${id}`, data);
+      const res = await axios.put(`${API_URL}/${id}`, data);
       console.log(`✏️ Evento ${id} editado:`, res.data);
       return res.data;
     } catch (err) {

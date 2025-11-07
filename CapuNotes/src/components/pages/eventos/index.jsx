@@ -201,21 +201,24 @@ const Eventos = () => {
             lugar: selectedEvento?.lugar || '',
           }}
           onClose={handleClosePopup}
-          onSave={async () => {
+          onSave={async (nuevoEvento) => {
             try {
-              const nuevoEvento = {
-                nombre: selectedEvento?.nombre || '',
-                tipoEvento: selectedEvento?.tipoEvento || '',
-                fechaInicio: selectedEvento?.fecha || '',
-                hora: selectedEvento?.hora || '',
-                lugar: selectedEvento?.lugar || '',
-              };
-              await eventosService.crearEvento(nuevoEvento);
+              if (popupMode === 'crear') {
+                // Crear nuevo evento
+                await eventosService.crearEvento(nuevoEvento);
+              } else if (popupMode === 'editar') {
+                // Modificar evento existente
+                await eventosService.actualizarEvento(
+                  selectedEvento.id,
+                  nuevoEvento
+                );
+              }
+
               const data = await eventosService.listarEventos();
               setEventos(data);
               handleClosePopup();
             } catch (error) {
-              console.error('Error al crear el evento:', error);
+              console.error('Error al guardar el evento:', error);
             }
           }}
         />

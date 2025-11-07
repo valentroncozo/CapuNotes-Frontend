@@ -10,6 +10,22 @@ const PopUpEventos = ({
   opcionesHora = [],
 }) => {
   const isViewMode = modo === 'ver';
+
+  const handleSubmit = (e) => {
+    e.preventDefault(); // Evita que se recargue la página
+
+    const formData = new FormData(e.target); // obtiene todos los valores del form
+    const nuevoEvento = {
+      nombre: formData.get('nombre'),
+      tipoEvento: formData.get('tipoEvento'),
+      fechaInicio: formData.get('fecha'),
+      hora: formData.get('hora'),
+      lugar: formData.get('lugar'),
+    };
+
+    onSave(nuevoEvento); // Llama al onSave con los datos del formulario
+  };
+
   return (
     <div
       className="popup-container"
@@ -31,7 +47,7 @@ const PopUpEventos = ({
         </div>{' '}
       </header>{' '}
       <hr className="divisor-amarillo" />{' '}
-      <form className="popup-form">
+      <form className="popup-form" onSubmit={handleSubmit}>
         {' '}
         <div className="popup-grid">
           {' '}
@@ -46,18 +62,17 @@ const PopUpEventos = ({
             />{' '}
           </div>{' '}
           <div className="field">
-            {' '}
-            <label>Tipo de evento</label>{' '}
+            <label>Tipo de evento</label>
             <select
               name="tipoEvento"
-              defaultValue={eventoSeleccionado?.tipoEvento || ''}
               disabled={isViewMode}
+              defaultValue={eventoSeleccionado?.tipoEvento || ''}
             >
               <option value="">Seleccionar</option>
-              <option value="presentacion">PRESENTACIÓN</option>
-              <option value="ensayo">ENSAYO</option>
-            </select>{' '}
-          </div>{' '}
+              <option value="ENSAYO">Ensayo</option>
+              <option value="PRESENTACION">Presentación</option>
+            </select>
+          </div>
           <div className="field-inline">
             {' '}
             <div className="field">
@@ -99,14 +114,7 @@ const PopUpEventos = ({
             Cancelar{' '}
           </button>{' '}
           {!isViewMode && (
-            <button
-              type="submit"
-              className="btn-primary"
-              onClick={(e) => {
-                e.preventDefault(); // Evita el comportamiento predeterminado del formulario
-                onSave(); // Llama a la función onSave
-              }}
-            >
+            <button type="submit" className="btn-primary">
               {' '}
               Aceptar{' '}
             </button>
