@@ -19,91 +19,123 @@ html, body, #root {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  overflow-x: hidden; /* evita micro-desbordes horizontales */
+  scroll-behavior: smooth; /* scroll suave para anclas */
 }
 
 *, *::before, *::after {
   box-sizing: inherit;
 }
 
-html {
-  scroll-behavior: smooth; /* scroll suave para anclas */
-}
 
 .landing-page {
   font-family: var(--font-sans);
-    padding: 0;
-    margin: 0;
-    font-family: var(--font-sans);
-    color: var(--text-light);
-    background-color: var(--bg);
-    margin: 0;
-    padding: 0;
-    
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    align-content: center;
-    height: 100vh;
-    width: 100%; /* <-- usar 100% en vez de 100vw */
-    overflow-y: auto; /* preferible a 'scroll' si no quieres barra siempre visible */
-    overflow-x: hidden;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--text-light);
+  background-color: var(--bg);
+  margin: 0;
+  padding: 0;
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  align-content: center;
+  /* permitir que la página crezca con su contenido; mínimo una pantalla completa */
+  min-height: 100vh;
+  width: 100%; /* <-- usar 100% en vez de 100vw */
+  overflow-x: hidden; /* evitar scroll horizontal por elementos que se salgan */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* momentum scrolling en iOS */
+  scrollbar-width: none;
+}
+
+/* Hide root scrollbars and use .landing-page as the scrolling container on desktop
+   We use pointer: fine to avoid changing touch/mobile behaviour. */
+@media (pointer: fine) {
+  html, body, #root {
+    overflow: hidden;
+  }
+
+  .landing-page {
+    height: 100vh; /* make landing-page exactly the viewport height and scroll internally */
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
 }
 
 .landing-header {
-  padding: 0;
   margin: 0;
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
-  left: 0;
-  right: 0;
-  height: 100%;
+  min-width: 100%;
+  min-height: 500px;
   background: linear-gradient(
     to bottom, 
     #090928 40%,
-    #101231 50%,
-    #171A39 61%,
-    #282c58 70%,
+    #101231 75%,
+    #171A39 80%,
+    #282c58 99.99%,
     #B3CDFA 100%
   );
 
   clip-path: url(#topvar-clip);
   -webkit-clip-path: url(#topvar-clip);
-  overflow: hidden;
+  /* quitar will-change por defecto: si no se anima, reservaba recursos y podía afectar el scroll */
   will-change: clip-path;
-
-  justify-content: flex-start;
   align-items:center;
-  align-content: center;
   display: flex;
   flex-direction: column;
 }
 
-.landing-header nav {
+/* Evitar que el SVG de decoracion superior capture eventos del ratón
+   (TopVarLanding usa position:absolute y puede interceptar wheel/scroll) */
+.landing-header > svg,
+.landing-header svg {
+  pointer-events: none;
+}
+
+nav {
+  position: sticky;
+  height: 10rem;
+  width: 100%;
+  display: flex;
+  background-color: #090928;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  top: 0;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: background-color .25s ease, backdrop-filter .25s ease, box-shadow .25s ease;
+  /* mantener interacción en elementos internos */
+  pointer-events: auto;
+}
+
+nav ul {
   width: var(--adaptable-width);
-  display: flex;
-  flex-direction: column;
-}
-
-.landing-header nav ul {
   display: flex;
   flex-direction: var(--direction);
   justify-content: space-between;
   align-items: center;
   align-content: center;
-  gap: 2rem;
-  padding: 2rem 0rem;
+  gap: 1rem;
+  padding: 1rem 0rem;
   margin: 0;
 }
 
-.landing-header nav ul li {
+nav ul li {
   font-size: 1rem;
   font-weight: 500;
 }
 
-.landing-header nav ul * {
+nav ul *:hover {
+  color: var(--accent);
+  cursor: pointer;
+  transition: color .2s ease-in-out;
+}
+
+nav ul * {
   color: var(--text-light);
   list-style: none;
   text-decoration: none;
@@ -111,23 +143,26 @@ html {
 
 .dividir {
   color: var(--accent);
+  z-index: 3;
+  width: var(--adaptable-width);
 }
 
-.landing-header .logo {
+nav .logo {
   width: 60px;
 }
 
 
-.landing-header nav ul li:first-child {
+nav ul li:first-child {
   flex:1;
 }
 
 
 .header-content {
+  
  width: var(--adaptable-width);
  display: flex;
- flex-direction: row;
- justify-content: space-around;
+ flex-direction: var(--direction);
+ justify-content: space-between;
  align-items: flex-start;
  align-content: center;
  
@@ -139,38 +174,157 @@ html {
   justify-content: space-between;
   align-items: flex-start;
   align-content: center;
-  width: 90%;
-  height: 90%;
+  width: 60%;
+  height: 100%;
 }
 
 .header-content .header-text h1 {
-  font-size: 5rem;
+  font-size: clamp(20px, 8vw, 5rem);
   margin: 0;
   padding: 2rem 0rem;
 }
 
 .header-content .header-logo {
   display: flex;
-  justify-content: center;
-  align-items: top;
-  align-content: top;
-  width: 50%;
-  height: auto;
+  justify-content: flex-end;
+  align-items: flex-end;
+  align-content: flex-end;
+  width: 40%;
+  height: 100%;
+
 }
 
-.header-content .logo {
-  width: 80%;
-  height: 80%;
+.header-logo .logo {
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
+  object-position: right top;
+
 }
 
 .contactos {
+  z-index: 1;
+  width: 100%;
   display: flex;
   gap: .5rem;
   align-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-end;
 }
 
 .contactos a {
   text-decoration: none;
   list-style: none;
+}
+
+.contactos a *{
+  color: var(--text-light);
+  transition: color .2s ease-in-out;
+}
+
+.contactos :first-child:hover * {
+  stroke: var(--accent);
+}
+
+.contactos a:hover *  {
+  color: var(--accent);
+  stroke: var(--accent);
+}
+
+.contactos .instagram-link:hover *{
+  fill: var(--accent);
+  stroke: transparent;
+  color: transparent;
+}
+
+
+.landing-article {
+  width: 100%;
+  /* dejar que el artículo se expanda con su contenido en lugar de forzar 100vh */
+  height: auto;
+  padding: 3rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+}
+
+.landing-article .section-line {
+
+  width: var(--adaptable-width);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  align-content: center;
+}
+
+.section-line h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  padding-bottom: 2rem ;
+}
+
+.section-line p {
+  font-weight: 300;
+}
+
+.container-photo-activities {
+  overflow-x: auto;
+  display: flex;
+  height: 400px; /* container height fixed, images keep their sizes */
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  padding: 1rem;
+  justify-content: flex-start;
+  background: transparent; /* decorative cut handled by CutActivityContainer */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  align-items: center;
+  align-content: center;
+  width: 100%;
+
+  clip-path: url(#activity-cut);
+    background: linear-gradient(
+    to bottom, 
+    #090928 40%,
+    #101231 75%,
+    #171A39 80%,
+    #282c58 99.99%,
+    #B3CDFA 100%
+  );
+
+}
+
+.activity-photo {
+  width: 95%;
+  height: 90%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 8px;
+}
+
+.photo-item {
+  background-color: var(--text-light);
+  flex: 0 0 auto; /* don't shrink or grow, keep fixed width */
+  width: 300px; /* fixed photo container width */
+  height: 210px; /* fixed height matches image inside */
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button-inscribirse {
+  padding: .5rem .5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-light);
+  background-color: var(--accent);
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background-color .2s ease-in-out, color .2s ease-in-out;
 }
