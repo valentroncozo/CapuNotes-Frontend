@@ -10,6 +10,7 @@ import BackButton from '../../common/BackButton.jsx';
 
 import TurnoService from '@/services/turnoServices.js';
 import AudicionService from '@/services/audicionService.js';
+import PreguntasService from '@/services/preguntasService.js'; // <-- nuevo import (ajusta la ruta si es necesario)
 import Swal from 'sweetalert2';
 
 const Audicion = ({ title ='Audición'}) => {
@@ -25,6 +26,7 @@ const Audicion = ({ title ='Audición'}) => {
   const [filteredData, setFilteredData] = useState(data);
   const [filtroDia, setFiltroDia] = useState('');
   const [esPublicada, setEsPublicada] = useState(false);
+  const [formulario, setFormulario] = useState([]);
 
   const  load = async () => {
     const audicion = await AudicionService.getActual();
@@ -63,6 +65,15 @@ const Audicion = ({ title ='Audición'}) => {
   };
 
   useEffect(() => { load(); }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const encuesta = await preguntasService.getFormulario(perfil.audicionId);
+      setFormulario(encuesta);
+    };
+    fetchData();
+
+  }, []);
 
   // Selector temporal de rol para redirección
   const handleVerCronograma = async (row) => {
@@ -107,28 +118,55 @@ const Audicion = ({ title ='Audición'}) => {
   };
 
   const  handlerPublicarAudicion = async () => {
-    const res = await Swal.fire({
-      title: '¿Estás seguro de que quieres publicar la audición?',
-      showCancelButton: true,
-      confirmButtonText: 'Publicar',
-      cancelButtonText: 'Cancelar',
-      background: '#11103a',
-      color: '#E8EAED',
-      confirmButtonColor: '#ffc107',
-      cancelButtonColor: '#6c757d',
-    });
+      // formulario es un array. Si está vacío, intentar recargar desde API
+      let formularioActual = formulario;
+      if ((!Array.isArray(formularioActual) || formularioActual.length === 0) && audicion?.id) {
+        try {
+          const result = await PreguntasService.getFormulario(audicion.id);
+          formularioActual = Array.isArray(result) ? result : Array.isArray(result?.preguntas) ? result.preguntas : [];
+          setFormulario(formularioActual);
+        } catch (err) {
+          console.error('Error cargando formulario:', err);
+          formularioActual = [];
+        }
+      }
 
-    if (res.isConfirmed) {
-      await AudicionService.actualizarParcial(audicion.id, {estado: 'PUBLICADA'});
-      Swal.fire({
-        title: 'Audición publicada',
-        icon: 'success',
+      const tienePreguntas = Array.isArray(formularioActual) ? formularioActual.length > 0 : false;
+
+      if (!tienePreguntas) {
+        await Swal.fire({
+          title: 'No se puede publicar',
+          text: 'La audición no tiene preguntas asignadas. Asigna al menos una pregunta antes de publicar.',
+          icon: 'warning',
+          background: '#11103a',
+          color: '#E8EAED',
+          confirmButtonText: 'Entendido',
+        });
+        return;
+      }
+
+      const res = await Swal.fire({
+        title: '¿Estás seguro de que quieres publicar la audición?',
+        showCancelButton: true,
+        confirmButtonText: 'Publicar',
+        cancelButtonText: 'Cancelar',
         background: '#11103a',
         color: '#E8EAED',
+        confirmButtonColor: '#ffc107',
+        cancelButtonColor: '#6c757d',
       });
-      setEsPublicada(true);
+
+      if (res.isConfirmed ) {
+        await AudicionService.actualizarParcial(audicion.id, {estado: 'PUBLICADA'});
+        Swal.fire({
+          title: 'Audición publicada',
+          icon: 'success',
+          background: '#11103a',
+          color: '#E8EAED',
+        });
+        setEsPublicada(true);
+      }
     }
-  }
 
   const  handlerCerrarAudicion = async () => {
     const res = await Swal.fire({
