@@ -5,7 +5,6 @@ import '@/styles/audicion-agregar.css';
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
 
 import TableABMC from '../../common/table.jsx';
 import BackButton from '../../common/BackButton.jsx';
