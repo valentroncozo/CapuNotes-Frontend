@@ -76,3 +76,66 @@
     border: none !important;
     color: var(--bg) !important;
 }
+
+/* ===================================================
+   ESTILOS AUDICIÓN - AGREGAR Y BOTONES RELACIONADOS
+   =================================================== */
+
+/* Botones generales */
+.abmc-btn {
+  border-radius: 1.5rem;
+  font-weight: 600;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+  transition: all 0.25s ease-in-out;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* Primario (botón de acción principal) */
+.btn-primary {
+  background-color: #ffffff;
+  color: #11103a;
+  border: 1px solid #ffffff;
+}
+.btn-primary:hover {
+  filter: brightness(0.92);
+}
+
+/* Secundario (como Cancelar, Visualizar, Modificar) */
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+}
+.btn-secondary:hover {
+  background-color: #ffffff;
+  color: #11103a;
+  border: 1px solid #ffffff;
+}
+
+/* Botones de tamaño fijo tipo "Cancelar" / "Visualizar" / "Modificar" */
+.btn-dias {
+  width: 14rem;              /* antes 11rem */
+  align-self: flex-start;
+  margin-top: 1rem;
+  white-space: nowrap;       /* evita el salto de línea */
+}
+
+/* Hover específico heredado del diseño original */
+.btn-dias:hover {
+  filter: brightness(0.92);
+}
+
+/* Asegura consistencia de altura */
+.abmc-btn,
+.btn-dias {
+  padding: 0.7rem 1.4rem;
+  min-height: 2.7rem;
+  line-height: 1.2rem;
+}
+
+/* Deshabilitados */
+.abmc-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

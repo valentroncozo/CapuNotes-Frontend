@@ -70,3 +70,16 @@
     margin: 0;
   }
 }
+
+/* --- Ajuste de alineación de columnas --- */
+.abmc-table-container table.abmc-table th,
+.abmc-table-container table.abmc-table td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 0.8rem 1rem;
+}
+
+/* --- Ajuste de color de íconos en botones de acción --- */
+.abmc-btn.btn-transparent .material-symbols-outlined {
+  color: #ffffff !important;
+}
