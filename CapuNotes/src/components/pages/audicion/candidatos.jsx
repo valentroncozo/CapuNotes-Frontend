@@ -13,7 +13,7 @@ import { audicionesService } from "@/services/audicionesService.js";
 import { estadoLabel } from "@/constants/candidatos.js";
 import { horaToMinutes } from "@/components/common/datetime.js";
 
-import ResultadosModal from "./ResultadosModal.jsx";
+import ResultadosModal from "./resultados.jsx";
 import InscripcionView from "@/components/common/InscripcionView.jsx";
 import { success } from "@/utils/alerts.js";
 

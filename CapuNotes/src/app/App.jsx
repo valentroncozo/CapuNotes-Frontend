@@ -30,8 +30,10 @@ import Formulario from "@/components/pages/formulario/index.jsx";
 import FormularioConsulta from "@/components/pages/formulario/consulta.jsx";
 import FormularioConsultaCoordinacion from "@/components/pages/formulario/consultaCoordinacion.jsx";
 import Eventos from '@/components/pages/eventos/index.jsx';
+import Candidatos from "@/components/pages/audicion/candidatos.jsx";
+import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx";
 
-// Estilos base (usar globals como fuente de verdad)
+// Estilos base (usar globals como fuente deFverdad)
 import '@/styles/globals.css';
 
 function ProtectedRoute({ children }) {
@@ -91,6 +93,8 @@ function AppRoutes() {
         <Route path="audicion/historial" element={<HistorialAudiciones />} />
         <Route path="/inscripcion/:id" element={<FormularioConsulta />} />
         <Route path="/inscripcion/coordinadores/:id" element={<FormularioConsultaCoordinacion />} />
+                <Route path="audicion/candidatos" element={<Candidatos />} />
+        <Route path="candidatos-administracion" element={<CandidatosCoordinadores />} />
       </Route>
      
 
