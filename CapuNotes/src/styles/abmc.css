@@ -69,69 +69,72 @@
   margin-bottom: 1.5rem;
 }
 
-/* Page-specific override: align title left on Cuerdas page only */
+/* CUERDAS PAGE STYLES
+   -------------------- */
+
+/* Título alineado a la izquierda */
 .cuerdas-page .abmc-title {
   text-align: left;
 }
 
-/* Improved visual for Cuerdas: filled accent buttons and circular icon actions */
-.cuerdas-page .abmc-topbar .abmc-btn,
-.cuerdas-page .abmc-topbar .abmc-btn-primary,
-.cuerdas-page .abmc-topbar button.abmc-btn {
-  background: var(--accent) !important; /* filled accent */
-  color: #ffffff !important;
+/* === Botones principales para todas las páginas === */
+.abmc-topbar .abmc-btn,
+.abmc-topbar button {
+  background: var(--accent) !important;
+  color: #fff !important;
   border: none !important;
   padding: 10px 18px !important;
   border-radius: 10px !important;
   font-weight: 700 !important;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.28) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28) !important;
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-.cuerdas-page .abmc-topbar .abmc-btn:hover,
-.cuerdas-page .abmc-topbar .abmc-btn-primary:hover,
-.cuerdas-page .abmc-topbar button.abmc-btn:hover {
+.abmc-topbar .abmc-btn:hover,
+.abmc-topbar button:hover {
   transform: translateY(-2px);
   filter: brightness(1.02);
 }
 
-.cuerdas-page .abmc-actions .abmc-btn-icon {
+/* === Botones de acción con ícono para todas las páginas === */
+.abmc-actions .abmc-btn-icon {
   background: var(--accent) !important;
-  color: #ffffff !important;
-  border-radius: 8px !important;
+  color: #fff !important;
+  border-radius: 10px !important;
   padding: 8px !important;
   min-width: 40px !important;
   min-height: 40px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.25) !important;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25) !important;
+  transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-.cuerdas-page .abmc-actions .abmc-btn-icon:hover {
-  transform: translateY(-2px) !important;
-  background: var(--accent) !important;
-  filter: brightness(0.98) !important;
+.abmc-actions .abmc-btn-icon:hover {
+  transform: translateY(-2px);
+  filter: brightness(0.98);
 }
 
-.cuerdas-page .abmc-actions .abmc-btn-icon:active {
-  transform: translateY(1px) scale(0.98) !important;
+.abmc-actions .abmc-btn-icon:active {
+  transform: translateY(1px) scale(0.98);
 }
 
-/* Alinear la primera columna (nombres) con su encabezado en la página Cuerdas */
+/* === Tabla: primera columna alineada === */
 .cuerdas-page .abmc-table th:first-child,
 .cuerdas-page .abmc-table td:first-child {
   text-align: left !important;
   padding-left: 18px !important;
 }
 
-/* Asegura consistencia en dispositivos pequeños */
+/* === Responsivo === */
 @media (max-width: 480px) {
   .cuerdas-page .abmc-table th:first-child,
   .cuerdas-page .abmc-table td:first-child {
-    text-align: left !important;
     padding-left: 12px !important;
   }
 }
+
 
 /* Topbar */
 .abmc-topbar {
@@ -341,5 +344,10 @@
 /* Ajuste fino de filtros */
 .asistencia-header + .filtros {
   margin-top: 1.8rem;
+}
+
+/* === Unificar border-radius para todos los botones === */
+button, .abmc-btn, .abmc-btn-icon {
+  border-radius: 10px !important;
 }
 

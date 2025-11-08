@@ -146,17 +146,14 @@ export default function MiembrosTableABMC({
         {/* === Encabezado === */}
         <div className="abmc-header">
           {showBackButton && <BackButton />}
-          <h1 className="abmc-title">{title}</h1>
+          <h1 className="abmc-title" style={{ display: "inline-block", marginRight: "1rem" }}>{title}</h1>
         </div>
-
-        <hr className="divisor-amarillo" style={{ margin: "1rem 0rem", color: 'var(--accent)' }} />
-        
 
         {/* === Barra superior con buscador y filtro === */}
         <div className="abmc-topbar">
           <input
             type="text"
-            placeholder="Buscar por nombre o apellido..."
+            placeholder="Buscar por nombre o apellido"
             value={filtroTexto}
             onChange={(e) => setFiltroTexto(e.target.value)}
             className="abmc-input"
@@ -179,7 +176,7 @@ export default function MiembrosTableABMC({
             className="abmc-btn abmc-btn-primary"
             onClick={() => navigate("/miembros/agregar")}
           >
-            Agregar miembro
+            +
           </Button>
         </div>
 

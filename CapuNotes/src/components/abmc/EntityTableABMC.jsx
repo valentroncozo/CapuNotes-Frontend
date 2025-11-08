@@ -155,7 +155,7 @@ export default function EntityTableABMC({
   const handleEliminar = async (id, displayName) => {
     // 🔠 Detectar género de la entidad
     const femenino = ["cuerda", "área", "audición", "especialidad"]; // podés agregar más si querés
-    const articulo = femenino.includes(entityName.toLowerCase()) ? "la" : "el";
+    const articulo = femenino.includes(entityName.toLowerCase()) ? entityName.charAt(0).toUpperCase() + entityName.slice(1).toLowerCase() : entityName;
 
     // 🔔 Confirmación antes de borrar
     const res = await Swal.fire({
@@ -181,9 +181,8 @@ export default function EntityTableABMC({
       // ✅ Aviso de éxito al eliminar
       Swal.fire({
         icon: "success",
-        title: `${entityName.charAt(0).toUpperCase() + entityName.slice(1)
-          } eliminad${femenino.includes(entityName.toLowerCase()) ? "a" : "o"}`,
-        text: `${entityName} "${displayName}" se eliminó correctamente.`,
+        title: `${articulo} eliminad${femenino.includes(entityName.toLowerCase()) ? "a" : "o"}`,
+        text: `${articulo} "${displayName}" se eliminó correctamente.`,
         timer: 1500,
         showConfirmButton: false,
         background: "#11103a",
@@ -194,7 +193,7 @@ export default function EntityTableABMC({
 
       Swal.fire({
         icon: "error",
-        title: `No se puede eliminar ${articulo} ${entityName}`,
+        title: `No se puede eliminar ${articulo}`,
         text: "Tiene elementos asociados o un error impide eliminarlo.",
         background: "#11103a",
         color: "#E8EAED",
@@ -285,11 +284,8 @@ export default function EntityTableABMC({
       <div className="abmc-card">
         <div className="abmc-header">
           {showBackButton && <BackButton />}
-          <h1 className="abmc-title">{title}</h1>
-          <hr className="divisor-amarillo" />
+          <h1 className="abmc-title" style={{ fontSize: "1.5rem" }}>{title}</h1>
         </div>
-
-        <hr className="divisor-amarillo" style={{ margin: "1rem 0rem", color: 'var(--accent)' }} />
 
         <form className="abmc-topbar" onSubmit={handleAgregar}>
           {schema.map((f) =>
@@ -338,19 +334,9 @@ export default function EntityTableABMC({
                 key={f.key}
                 type="submit"
                 className="abmc-btn abmc-btn-primary"
-                aria-label={f.label}
+                aria-label="Agregar nuevo registro"
               >
-                {/* Si el schema provee un icon, lo renderizamos (acepta string SVG o elemento JSX) */}
-                {f.icon
-                  ? (typeof f.icon === "string" ? (
-                      <span
-                        // Intentamos inyectar el string SVG. Esto permite definir el icono desde el schema.
-                        dangerouslySetInnerHTML={{ __html: f.icon }}
-                      />
-                    ) : (
-                      f.icon
-                    ))
-                  : f.label}
+                <span className="material-icons">+</span>
               </button>
             ) : f.type === "label" ? (
               <label key={f.key} className="abmc-label">{f.label}</label>
@@ -358,9 +344,12 @@ export default function EntityTableABMC({
           )}
         </form>
 
-        {/* Título específico para Cuerdas */}
+        {/* Subtítulos específicos para entidades */}
         {entityName.toLowerCase() === "cuerda" && (
-          <h2 className="abmc-subtitle">Cuerdas registradas</h2>
+          <h2 className="abmc-subtitle" style={{ fontSize: "1.5rem" }}>Cuerdas registradas</h2>
+        )}
+        {entityName.toLowerCase() === "área" && (
+          <h2 className="abmc-subtitle" style={{ fontSize: "1.5rem" }}>Áreas registradas</h2>
         )}
 
         <div className="abmc-topbar" style={{ marginTop: 0 }}>
