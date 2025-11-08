@@ -98,6 +98,8 @@
 
 .evento-card {
   background-color: #e0f7fa;
+  position: relative;
+  z-index: 1; /* Asegura que los iconos permanezcan visibles */
   border-radius: 0; /* Bordes rectos */
   padding: 15px;
   width: 200px;
@@ -122,6 +124,9 @@
 .evento-icon {
   font-size: 16px;
   color: #4a4a4a; /* Gris más oscuro para los íconos */
+  display: inline-block;
+  vertical-align: middle;
+  z-index: 600; /* Asegurar que los iconos estén por encima del popup */
 }
 
 .evento-actions {
@@ -156,7 +161,7 @@
   border-radius: 15px;
   padding: 25px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-  z-index: 1000;
+  z-index: 500; /* Reducir el z-index para evitar conflictos con los iconos */
   width: 90%;
   max-width: 520px;
 
