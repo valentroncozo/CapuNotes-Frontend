@@ -116,10 +116,14 @@
 
 .field label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 4px; /* Más cerca del input */
   font-size: 0.9rem;
   color: var(--text-light);
   opacity: 0.9;
+}
+
+.field {
+  margin-bottom: 16px; /* Más separado del input anterior */
 }
 
 .input,
