@@ -100,7 +100,7 @@
   background-color: #e0f7fa;
   position: relative;
   z-index: 1; /* Asegura que los iconos permanezcan visibles */
-  border-radius: 0; /* Bordes rectos */
+  border-radius: 20px; /* Bordes redondeados */
   padding: 15px;
   width: 200px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
