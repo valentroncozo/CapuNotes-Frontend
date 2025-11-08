@@ -1,458 +1,361 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-// 🛑 Importar el nuevo servicio de asistencias
-import { asistenciasService } from '@/services/asistenciasService.js';
-import { miembrosService } from '@/services/miembrosService.js';
-import { ensayosService } from '@/services/ensayosService.js';
-import BackButton from '@/components/common/BackButton.jsx';
-import Swal from 'sweetalert2';
-import '@/styles/abmc.css';
-import '@/styles/table.css';
-import '@/styles/asistencia.css';
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { asistenciasService } from "@/services/asistenciasService.js";
+import { miembrosService } from "@/services/miembrosService.js";
+import { ensayosService } from "@/services/ensayosService.js";
+import { cuerdasService } from "@/services/cuerdasService.js";
+import BackButton from "@/components/common/BackButton.jsx";
+import Swal from "sweetalert2";
+import "@/styles/abmc.css";
+import "@/styles/table.css";
+import "@/styles/asistencia.css";
+import Loader from "@/components/common/Loader.jsx";
 
-// 🛑 Definimos las constantes del estado de asistencia para mapear al Backend (Java Enum)
 const ESTADOS_MAP = {
-  no: 'AUSENTE',
-  half: 'MEDIO',
-  yes: 'PRESENTE',
+  no: "AUSENTE",
+  half: "MEDIA_FALTA",
+  yes: "PRESENTE",
 };
-
-// Reverse map: backend state -> local key
-const REVERSE_ESTADOS = Object.entries(ESTADOS_MAP).reduce((acc, [k, v]) => {
-  acc[v] = k;
-  return acc;
-}, {});
 
 export default function AsistenciaEnsayosDetalle() {
   const navigate = useNavigate();
-  // 🛑 CAMBIO: Obtener idEnsayo de los parámetros
   const { idEnsayo } = useParams();
 
-  // Estado para la información del Ensayo (nombre, fecha)
   const [ensayoInfo, setEnsayoInfo] = useState({
     id: null,
-    fecha: '-',
-    descripcion: '',
+    fecha: "-",
+    nombre: "-",
+    estadoAsistencia: "PENDIENTE",
   });
 
-  // Estado para la lista real de asistencias
   const [members, setMembers] = useState([]);
+  const [cuerdas, setCuerdas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [filterName, setFilterName] = useState("");
+  const [filterCuerda, setFilterCuerda] = useState("todas");
 
-  const [filterName, setFilterName] = useState('');
-  const [filterCuerda, setFilterCuerda] = useState('Todas');
-
-  // ----------------------------------------------------
-  // 🔹 Carga Inicial de Datos (Ensayos y Asistencias)
-  // ----------------------------------------------------
+  // ============================================================
+  // 🔹 Cargar Ensayo + Miembros + Asistencias + Cuerdas
+  // ============================================================
   useEffect(() => {
     if (!idEnsayo) {
       setLoading(false);
       return;
     }
 
-    const fetchAsistencias = async () => {
+    const fetchData = async () => {
       setLoading(true);
       try {
-        // Llama al Backend con el ID del Ensayo
-        const [asistenciasData, miembrosData] = await Promise.all([
-          asistenciasService.listPorEnsayo(idEnsayo).catch(() => []),
+        const ensayoData = await ensayosService.getById(idEnsayo);
+        const estadoEnsayo = ensayoData?.estadoAsistencia || "PENDIENTE";
+
+        const [miembrosData, asistenciasData, cuerdasData] = await Promise.all([
           miembrosService.list().catch(() => []),
+          asistenciasService.listPorEnsayo(idEnsayo).catch(() => []),
+          cuerdasService.list().catch(() => []),
         ]);
 
-        // Normalizar asistencias existentes en un mapa para búsqueda rápida
-        const asistenciaMap = new Map();
-        (Array.isArray(asistenciasData) ? asistenciasData : []).forEach((a) => {
-          // posibles formas de identificar al miembro en la respuesta
-          const keys = [];
-          if (a.miembroId) keys.push(String(a.miembroId));
-          if (a.miembro && a.miembro.id && a.miembro.id.nroDocumento)
-            keys.push(String(a.miembro.id.nroDocumento));
-          if (a.miembroNroDocumento) keys.push(String(a.miembroNroDocumento));
-          // además, formar por nombre-apellido (fallback)
-          const nombreKey = `${(a.miembroNombre || a.miembro?.nombre || '')
-            .trim()
-            .toLowerCase()}|${(a.miembroApellido || a.miembro?.apellido || '')
-            .trim()
-            .toLowerCase()}`;
-          keys.push(nombreKey);
+        setCuerdas(cuerdasData);
 
-          keys.forEach((k) => {
-            if (k) asistenciaMap.set(k, a);
-          });
+        const asistenciaMap = new Map();
+        asistenciasData.forEach((a) => {
+          const nombre = (a.nombreMiembro || "").trim().toLowerCase();
+          const apellido = (a.apellidoMiembro || "").trim().toLowerCase();
+          asistenciaMap.set(`${nombre}-${apellido}`, a.estado);
         });
 
-        // Mapear los miembros (todos) y unir con la asistencia si existe
-        // Generamos un uid estable por fila para evitar colisiones cuando `id` no sea primitivo
-        const mappedMembers = (
-          Array.isArray(miembrosData) ? miembrosData : []
-        ).map((m, idx) => {
-          const doc = m.id?.nroDocumento || m.numeroDocumento || m.id || '';
-          const nameKey = `${(m.nombre || '').trim().toLowerCase()}|${(
-            m.apellido || ''
-          )
-            .trim()
-            .toLowerCase()}`;
+        const mappedMembers = miembrosData.map((m, i) => {
+          const nombre = (m.nombre || "").trim().toLowerCase();
+          const apellido = (m.apellido || "").trim().toLowerCase();
+          const clave = `${nombre}-${apellido}`;
+          const estadoBackend = asistenciaMap.get(clave);
 
-          const found =
-            asistenciaMap.get(String(doc)) ||
-            asistenciaMap.get(nameKey) ||
-            asistenciaMap.get(String(m.id)) ||
-            null;
+          const estado =
+            estadoEnsayo === "PENDIENTE"
+              ? "AUSENTE"
+              : estadoBackend || "AUSENTE";
 
-          const estadoBackend =
-            found?.estado ||
-            found?.estadoAsistencia ||
-            found?.estadoAsistenciaCodigo ||
-            null;
-          const asistenciaLocal = estadoBackend
-            ? REVERSE_ESTADOS[estadoBackend] || null
-            : null;
-
-          // uid: prefer numeric/string document or DB id; fallback to name+idx to guarantee uniqueness
-          const uidBase =
-            doc ||
-            (m.id !== undefined && m.id !== null ? String(m.id) : null) ||
-            `${m.nombre || ''}-${m.apellido || ''}-${idx}`;
-          const uid = String(uidBase);
+          const asistenciaLocal =
+            Object.entries(ESTADOS_MAP).find(([k, v]) => v === estado)?.[0] ||
+            "no";
 
           return {
-            uid,
-            id: doc || (m.id !== undefined && m.id !== null ? m.id : uid),
-            nombre: `${m.nombre || ''} ${m.apellido || ''}`.trim(),
+            uid: `${nombre}-${apellido}-${i}`,
+            id: m.id,
+            nombre: `${m.nombre || ""} ${m.apellido || ""}`.trim(),
+            cuerdaId: m.cuerda?.id || null,
+            cuerdaNombre: m.cuerda?.name || "-",
             asistencia: asistenciaLocal,
-            cuerda: m.cuerda?.name || m.cuerda?.nombre || m.cuerda || '',
-            ensayoId: idEnsayo,
             raw: m,
           };
         });
 
-        // Intentar obtener info del ensayo desde el endpoint de ensayos/eventos
-        try {
-          const ensayo = await ensayosService
-            .getById(idEnsayo)
-            .catch(() => null);
-          if (ensayo) {
-            setEnsayoInfo({
-              id: ensayo.id || idEnsayo,
-              fecha: ensayo.fechaInicio || ensayo.fecha || '-',
-              descripcion: ensayo.nombre || ensayo.descripcion || '-',
-            });
-          } else if (
-            Array.isArray(asistenciasData) &&
-            asistenciasData.length > 0
-          ) {
-            setEnsayoInfo({
-              id: idEnsayo,
-              fecha:
-                asistenciasData[0].ensayoFecha ||
-                asistenciasData[0].fechaInicio ||
-                '-',
-              descripcion:
-                asistenciasData[0].ensayoDescripcion ||
-                asistenciasData[0].nombre ||
-                '-',
-            });
-          } else {
-            setEnsayoInfo({ id: idEnsayo, fecha: '-', descripcion: '-' });
-          }
-        } catch {
-          setEnsayoInfo({ id: idEnsayo, fecha: '-', descripcion: '-' });
-        }
-        console.table(
-          mappedMembers.map((m) => ({
-            uid: m.uid,
-            nombre: m.nombre,
-            doc:
-              m.raw?.id?.nroDocumento ||
-              m.raw?.numeroDocumento ||
-              m.raw?.id ||
-              '',
-          }))
-        );
+        setEnsayoInfo({
+          id: ensayoData?.id || idEnsayo,
+          fecha: ensayoData?.fechaInicio || "-",
+          nombre: ensayoData?.nombre || ensayoData?.descripcion || "-",
+          estadoAsistencia: estadoEnsayo,
+        });
 
         setMembers(mappedMembers);
-      } catch (error) {
-        console.error('❌ Error al cargar asistencias:', error);
+      } catch (err) {
+        console.error("❌ Error cargando datos:", err);
         setMembers([]);
       } finally {
         setLoading(false);
       }
     };
-    fetchAsistencias();
-  }, [idEnsayo]); // Se ejecuta al cargar y si cambia el ID
 
-  // ----------------------------------------------------
-  // 🔹 Filtros y Opciones
-  // ----------------------------------------------------
+    fetchData();
+  }, [idEnsayo]);
+
+  // ============================================================
+  // 🔹 Filtros
+  // ============================================================
   const cuerdaOptions = useMemo(() => {
-    const set = new Set(members.map((m) => m.cuerda).filter(Boolean));
-    return ['Todas', ...Array.from(set)];
-  }, [members]);
+    return [{ id: "todas", name: "Todas las cuerdas" }, ...cuerdas];
+  }, [cuerdas]);
 
   const filteredMembers = useMemo(() => {
-    const name = String(filterName || '')
-      .trim()
-      .toLowerCase();
-    // 🛑 CAMBIO: Usar id para filtrar si es necesario (asumimos que la API filtra por cuerda/nombre)
+    const name = filterName.trim().toLowerCase();
     return members.filter((m) => {
-      if (filterCuerda && filterCuerda !== 'Todas' && m.cuerda !== filterCuerda)
+      // 🎵 Filtrar por cuerda (por id)
+      if (filterCuerda !== "todas" && m.cuerdaId?.toString() !== filterCuerda) {
         return false;
-      if (!name) return true;
-      return m.nombre.toLowerCase().includes(name);
+      }
+      // 🎵 Filtrar por nombre
+      if (name && !m.nombre.toLowerCase().includes(name)) return false;
+      return true;
     });
   }, [members, filterName, filterCuerda]);
 
-  // Ahora identificamos filas por uid para evitar colisiones en `id`/objects
+  // ============================================================
+  // 🔹 Cambiar estado local de asistencia
+  // ============================================================
   const handleSetAsistencia = (uid, value) => {
+    if (ensayoInfo.estadoAsistencia === "CERRADA") return;
     setMembers((prev) =>
       prev.map((m) => (m.uid === uid ? { ...m, asistencia: value } : m))
     );
   };
 
-  // ----------------------------------------------------
-  // 🔹 Guardar Asistencia (Registro Masivo)
-  // ----------------------------------------------------
-  const handleGuardar = async () => {
+  // ============================================================
+  // 🔹 Guardar (y opcionalmente cerrar)
+  // ============================================================
+  const handleGuardar = async (cerrar = false) => {
     setSaving(true);
     try {
-      const registradoPor =
-        localStorage.getItem('capunotes_user') || 'UsuarioActual';
+      const payload = {
+        asistencias: members.map((m) => ({
+          estado: ESTADOS_MAP[m.asistencia],
+          miembro: {
+            id: {
+              tipoDocumento: m.raw?.id?.tipoDocumento || "DNI",
+              nroDocumento: m.raw?.id?.nroDocumento || m.raw?.nroDocumento,
+            },
+          },
+        })),
+      };
 
-      // Filtramos los miembros que tienen asistencia marcada
-      const asistencias = members.filter((m) => m.asistencia);
-
-      if (asistencias.length === 0) {
-        Swal.fire({
-          icon: 'info',
-          title: 'Sin cambios',
-          text: 'No se seleccionó ninguna asistencia.',
-          background: '#11103a',
-          color: '#E8EAED',
-        });
-        setSaving(false);
-        return;
-      }
-
-      // Construimos un array para el endpoint masivas: [ { miembroId, estado, registradoPor }, ... ]
-      const asistenciasPayloadArray = asistencias
-        .map((m) => {
-          const estado = ESTADOS_MAP[m.asistencia];
-          if (!estado) return null;
-
-          const raw = m.raw || null;
-          let miembroId = null;
-
-          if (raw) {
-            // Preferir id numérico si existe
-            if (
-              raw.id !== undefined &&
-              raw.id !== null &&
-              !isNaN(Number(raw.id))
-            ) {
-              miembroId = Number(raw.id);
-            } else if (
-              raw.miembroId !== undefined &&
-              raw.miembroId !== null &&
-              !isNaN(Number(raw.miembroId))
-            ) {
-              miembroId = Number(raw.miembroId);
-            } else if (raw.numeroDocumento || raw.nroDocumento) {
-              // fallback: usar documento como identificador si el backend lo acepta
-              miembroId = raw.numeroDocumento || raw.nroDocumento;
-            }
-          } else if (
-            m.id !== undefined &&
-            m.id !== null &&
-            !isNaN(Number(m.id))
-          ) {
-            miembroId = Number(m.id);
-          }
-
-          const entry = { estado, registradoPor };
-          if (miembroId !== null && miembroId !== undefined && miembroId !== '')
-            entry.miembroId = miembroId;
-          else if (raw) entry.miembro = { id: raw.id ?? raw }; // última opción: enviar objeto miembro
-
-          return entry;
-        })
-        .filter(Boolean);
-
-      console.log(
-        '📤 Payload asistencias masivas (array) (enviando):',
-        asistenciasPayloadArray
-      );
-
-      await asistenciasService.registrarAsistenciasMasivas(
-        idEnsayo,
-        asistenciasPayloadArray
-      );
+      await asistenciasService.registrarAsistenciasMasivas(idEnsayo, payload);
+      if (cerrar) await asistenciasService.cerrarAsistencia(idEnsayo);
 
       Swal.fire({
-        icon: 'success',
-        title: 'Asistencias guardadas',
-        text: 'Se registraron correctamente todas las asistencias.',
-        timer: 1600,
+        icon: "success",
+        title: cerrar
+          ? "Asistencia guardada y cerrada"
+          : "Asistencias guardadas correctamente",
+        timer: 1500,
         showConfirmButton: false,
-        background: '#11103a',
-        color: '#E8EAED',
+        background: "#11103a",
+        color: "#E8EAED",
       });
 
-      navigate(-1);
+      setTimeout(() => navigate(-1), 1300);
     } catch (error) {
-      console.error('❌ Error al guardar asistencia:', error);
-      const msg =
-        error?.response?.data || error?.message || 'Error desconocido';
+      console.error("❌ Error al guardar asistencias:", error);
       Swal.fire({
-        icon: 'error',
-        title: 'No se pudo guardar',
-        html: `<pre style="text-align:left;white-space:pre-wrap">${JSON.stringify(
-          msg,
-          null,
-          2
-        )}</pre>`,
-        background: '#11103a',
-        color: '#E8EAED',
+        icon: "error",
+        title: "Error al guardar asistencias",
+        text: "Ocurrió un error al procesar las asistencias.",
+        background: "#11103a",
+        color: "#E8EAED",
       });
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) {
-    return <div className="loading-spinner">Cargando asistencias...</div>;
-  }
+  // ============================================================
+  // 🔹 Render
+  // ============================================================
+  if (loading) return <Loader />;
 
-  if (!ensayoInfo.id) {
-    return (
-      <div className="error-message">
-        Error: Ensayo no encontrado o ID inválido.
-      </div>
-    );
-  }
+  const isCerrada = ensayoInfo.estadoAsistencia === "CERRADA";
 
   return (
     <main className="abmc-page">
       <div className="abmc-card">
-        <div className="abmc-header">
-          <BackButton />
-          {/* 🛑 CAMBIO: Usar info real del estado, no de URL */}
-          <h1 className="abmc-title">Asistencia Ensayo {ensayoInfo.fecha}</h1>
-          <p className="abmc-subtitle">{ensayoInfo.descripcion}</p>
+        {/* ======= ENCABEZADO ======= */}
+        <div className="abmc-header asistencia-header">
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <BackButton />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <h1
+                className="abmc-title"
+                style={{
+                  fontSize: "1.9rem",
+                  fontWeight: 700,
+                  marginBottom: "0.3rem",
+                }}
+              >
+                Asistencia {ensayoInfo.nombre}
+              </h1>
+              <span
+                style={{
+                  fontSize: "1.05rem",
+                  opacity: 0.85,
+                  marginTop: "0.1rem",
+                }}
+              >
+                {ensayoInfo.fecha
+                  ? ensayoInfo.fecha.split("-").reverse().join("/")
+                  : "-"}
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div>
-          <div className="abmc-topbar">
-            <input
-              className="abmc-input"
-              placeholder="Buscar por nombre"
-              value={filterName}
-              onChange={(e) => setFilterName(e.target.value)}
-              aria-label="Buscar por nombre"
-            />
-            {/* El filtro por cuerda debería interactuar con la API si la lista es muy grande. 
-                           Por ahora, filtramos localmente sobre la lista completa. */}
-            <select
-              className="abmc-select"
-              value={filterCuerda}
-              onChange={(e) => setFilterCuerda(e.target.value)}
-              aria-label="Filtrar por cuerda"
-            >
-              {cuerdaOptions.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div
+          className="asistencia-estado"
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            width: "100%",
+            marginBottom: "1.6rem",
+          }}
+        >
+          <span
+            className="badge"
+            style={{
+              backgroundColor:
+                ensayoInfo.estadoAsistencia === "CERRADA"
+                  ? "#D32F2F"
+                  : ensayoInfo.estadoAsistencia === "ABIERTA"
+                    ? "#1FA453"
+                    : "#b6b4b4ff",
+              color: "var(--text-light)",
+              padding: "0.4rem 0.8rem",
+              borderRadius: "8px",
+              fontWeight: 600,
+              fontSize: "0.9rem",
+            }}
+          >
+            {ensayoInfo.estadoAsistencia}
+          </span>
+        </div>
 
-          <table className="abmc-table abmc-table-rect">
-            <thead className="abmc-thead">
-              <tr className="abmc-row">
-                <th>
-                  <span className="th-label">
-                    {filterCuerda && filterCuerda !== 'Todas'
-                      ? `Miembros - ${filterCuerda}`
-                      : 'Miembros'}
-                  </span>
-                </th>
-                <th>
-                  <span className="th-label">Asistencia</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredMembers.map((m) => (
-                <tr className="abmc-row" key={m.uid}>
-                  <td>{m.nombre}</td>
-                  <td>
-                    <div
-                      className="attendance-actions"
-                      role="group"
-                      aria-label={`asistencia-${m.uid}`}
+
+        {/* 🔸 Filtros */}
+        <div className="abmc-topbar">
+          <input
+            className="abmc-input"
+            placeholder="Buscar por nombre"
+            value={filterName}
+            onChange={(e) => setFilterName(e.target.value)}
+            disabled={isCerrada}
+          />
+          <select
+            className="abmc-select"
+            value={filterCuerda}
+            onChange={(e) => setFilterCuerda(e.target.value)}
+            disabled={isCerrada}
+          >
+            {cuerdaOptions.map((c) => (
+              <option key={c.id} value={c.id.toString()}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 🔸 Tabla */}
+        <table className="abmc-table abmc-table-rect">
+          <thead className="abmc-thead">
+            <tr className="abmc-row">
+              <th>Miembro</th>
+              <th>Cuerda</th>
+              <th>Asistencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredMembers.map((m) => (
+              <tr key={m.uid} className="abmc-row">
+                <td>{m.nombre}</td>
+                <td>{m.cuerdaNombre}</td>
+                <td>
+                  <div className="attendance-actions">
+                    <button
+                      className={`attendance-btn ${m.asistencia === "no" ? "selected" : ""
+                        }`}
+                      onClick={() => handleSetAsistencia(m.uid, "no")}
+                      title="Ausente"
+                      disabled={saving || isCerrada}
                     >
-                      <button
-                        className={`attendance-btn ${
-                          m.asistencia === 'no' ? 'selected' : ''
-                        }`}
-                        onClick={() => handleSetAsistencia(m.uid, 'no')}
-                        aria-pressed={m.asistencia === 'no'}
-                        title="Ausente"
-                        disabled={saving}
-                      >
-                        ✖
-                      </button>
+                      ✖
+                    </button>
 
-                      <button
-                        className={`attendance-btn ${
-                          m.asistencia === 'half' ? 'selected' : ''
+                    <button
+                      className={`attendance-btn ${m.asistencia === "half" ? "selected" : ""
                         }`}
-                        onClick={() => handleSetAsistencia(m.uid, 'half')}
-                        aria-pressed={m.asistencia === 'half'}
-                        title="Medio"
-                        disabled={saving}
-                      >
-                        ½
-                      </button>
+                      onClick={() => handleSetAsistencia(m.uid, "half")}
+                      title="Media falta"
+                      disabled={saving || isCerrada}
+                    >
+                      ½
+                    </button>
 
-                      <button
-                        className={`attendance-btn ${
-                          m.asistencia === 'yes' ? 'selected' : ''
+                    <button
+                      className={`attendance-btn ${m.asistencia === "yes" ? "selected" : ""
                         }`}
-                        onClick={() => handleSetAsistencia(m.uid, 'yes')}
-                        aria-pressed={m.asistencia === 'yes'}
-                        title="Presente"
-                        disabled={saving}
-                      >
-                        ✓
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="pop-footer" style={{ justifyContent: 'center' }}>
-            <button
-              className="btn btn-secondary"
-              onClick={() => navigate(-1)}
-              aria-label="cerrar-sin-guardar"
-              style={{ marginRight: 8 }}
-              disabled={saving}
-            >
-              Cerrar
-            </button>
+                      onClick={() => handleSetAsistencia(m.uid, "yes")}
+                      title="Presente"
+                      disabled={saving || isCerrada}
+                    >
+                      ✓
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-            <button
-              className="btn-primary btn"
-              onClick={handleGuardar}
-              aria-label="guardar-asistencia"
-              disabled={saving}
-            >
-              {saving ? 'Guardando...' : 'Guardar'}
-            </button>
-          </div>
+        {/* 🔸 Botones */}
+        <div
+          className="pop-footer"
+          style={{
+            justifyContent: "space-between",
+            gap: "1rem",
+            marginTop: "1rem",
+          }}
+        >
+          <button
+            className="btn btn-primary"
+            onClick={() => handleGuardar(false)}
+            disabled={saving || isCerrada}
+          >
+            {saving ? "Guardando..." : "Guardar"}
+          </button>
+
+          <button
+            className="btn btn-danger"
+            onClick={() => handleGuardar(true)}
+            disabled={saving || isCerrada}
+          >
+            {saving ? "Cerrando..." : "Guardar y cerrar asistencia"}
+          </button>
         </div>
       </div>
     </main>

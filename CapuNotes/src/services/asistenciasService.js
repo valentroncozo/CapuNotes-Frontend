@@ -1,107 +1,112 @@
+// src/services/asistenciasService.js
 import axios from "axios";
 
-// Base para la gestión de ASISTENCIAS
-const API_URL = "/api/asistencias"; 
+const API_URL = "/api/asistencias";
 
 export const asistenciasService = {
-  
-  // --------------------------------------------------
-  // LISTAR ASISTENCIAS
-  // --------------------------------------------------
+  // =======================================================
+  // 🔹 LISTAR ASISTENCIAS POR ENSAYO
+  // =======================================================
   /**
-   * Listar asistencias de un ensayo con filtros opcionales.
-   * GET /api/asistencias/ensayo/{idEnsayo}?cuerdaId=...&nombre=...
+   * GET /api/asistencias/ensayo/{idEnsayo}?cuerdaId=&nombre=
    */
   listPorEnsayo: async (idEnsayo, { cuerdaId = null, nombre = null } = {}) => {
     try {
       const res = await axios.get(`${API_URL}/ensayo/${idEnsayo}`, {
-        params: { ...(cuerdaId != null ? { cuerdaId } : {}), ...(nombre ? { nombre } : {}) },
-        withCredentials: true,
+        params: { ...(cuerdaId ? { cuerdaId } : {}), ...(nombre ? { nombre } : {}) },
       });
-      // retorna List<AsistenciaResponse>
-      return res.data;
+      console.log("📡 Asistencias recibidas:", res.data);
+      return Array.isArray(res.data) ? res.data : [];
     } catch (err) {
-      console.error("Error listando asistencias (ensayo):", err?.response || err);
+      console.error("❌ Error listando asistencias:", err?.response || err);
       throw err;
     }
   },
 
-  // --------------------------------------------------
-  // REGISTRAR / ACTUALIZAR INDIVIDUAL
-  // --------------------------------------------------
+  // =======================================================
+  // 🔹 REGISTRAR / ACTUALIZAR UNA ASISTENCIA INDIVIDUAL
+  // =======================================================
   /**
-   * Registrar o actualizar una asistencia individual.
    * POST /api/asistencias/ensayo/{idEnsayo}
+   * Body esperado:
+   * {
+   *   miembroId: { tipoDocumento, nroDocumento },
+   *   estado: "PRESENTE" | "AUSENTE" | "MEDIA_FALTA"
+   * }
    */
-  // Registrar varias asistencias una por una
-  registrarAsistenciasMasivas: async (idEnsayo, bodyArray) => {
+  registrarAsistencia: async (idEnsayo, body) => {
     try {
-      const responses = await Promise.all(
-        bodyArray.map(body =>
-          axios.post(`${API_URL}/ensayo/${idEnsayo}`, body, {
-            withCredentials: true,
-          headers: { "Content-Type": "application/json" },
-        })
-      )
-    );
-    return responses.map(r => r.data);
-  } catch (err) {
-    console.error("Error registrando asistencias masivas:", err?.response || err);
-    throw err;
-  }
+      const res = await axios.post(`${API_URL}/ensayo/${idEnsayo}`, body, {
+        headers: { "Content-Type": "application/json" },
+      });
+      console.log("✅ Asistencia registrada:", res.data);
+      return res.data;
+    } catch (err) {
+      console.error("❌ Error registrando asistencia individual:", err?.response || err);
+      throw err;
+    }
   },
 
+  // =======================================================
+  // 🔹 REGISTRO MASIVO
+  // =======================================================
+  /**
+   * POST /api/asistencias/ensayo/{idEnsayo}/masivo
+   * Body esperado:
+   * {
+   *   asistencias: [
+   *     { miembro: { id: { tipoDocumento, nroDocumento } }, estado }
+   *   ]
+   * }
+   */
+  registrarAsistenciasMasivas: async (idEnsayo, body) => {
+    try {
+      const res = await axios.post(`${API_URL}/ensayo/${idEnsayo}/masivo`, body, {
+        headers: { "Content-Type": "application/json" },
+      });
+      console.log("📤 Asistencias masivas enviadas:", res.data);
+      return res.data;
+    } catch (err) {
+      console.error("❌ Error registrando asistencias masivas:", err?.response || err);
+      throw err;
+    }
+  },
 
-  // --------------------------------------------------
-  // CERRAR / REABRIR
-  // --------------------------------------------------
-  /** Cerrar la asistencia de un ensayo. */
+  // =======================================================
+  // 🔹 CERRAR / REABRIR ASISTENCIA
+  // =======================================================
   cerrarAsistencia: async (idEnsayo) => {
     try {
-      const res = await axios.patch(`${API_URL}/ensayo/${idEnsayo}/cerrar`, null, {
-        withCredentials: true,
-      });
-      return res.data; 
+      const res = await axios.patch(`${API_URL}/ensayo/${idEnsayo}/cerrar`);
+      console.log("🔒 Asistencia cerrada:", res.data);
+      return res.data;
     } catch (err) {
-      console.error("Error cerrando asistencia:", err?.response || err);
+      console.error("❌ Error cerrando asistencia:", err?.response || err);
       throw err;
     }
   },
 
-  /** Reabrir la asistencia de un ensayo. */
   reabrirAsistencia: async (idEnsayo) => {
     try {
-      const res = await axios.patch(`${API_URL}/ensayo/${idEnsayo}/abrir`, null, {
-        withCredentials: true,
-      });
-      return res.data; 
-    } catch (err) {
-      console.error("Error reabriendo asistencia:", err?.response || err);
-      throw err;
-    }
-  },
-
-  // --------------------------------------------------
-  // ELIMINACIONES
-  // --------------------------------------------------
-  /** Eliminar una asistencia individual. */
-  eliminarAsistencia: async (idAsistencia) => {
-    try {
-      const res = await axios.delete(`${API_URL}/${idAsistencia}`, { withCredentials: true });
+      const res = await axios.patch(`${API_URL}/ensayo/${idEnsayo}/abrir`);
+      console.log("🔓 Asistencia reabierta:", res.data);
       return res.data;
     } catch (err) {
-      console.error("Error eliminando asistencia:", err?.response || err);
+      console.error("❌ Error reabriendo asistencia:", err?.response || err);
       throw err;
     }
   },
 
-  /** Eliminar todas las asistencias de un ensayo. */
+  // =======================================================
+  // 🔹 ELIMINAR
+  // =======================================================
   eliminarAsistenciasPorEnsayo: async (idEnsayo) => {
     try {
-      const res = await axios.delete(`${API_URL}/ensayo/${idEnsayo}`, { withCredentials: true });
+      const res = await axios.delete(`${API_URL}/ensayo/${idEnsayo}`);
+      console.log("🗑️ Asistencias eliminadas del ensayo:", res.data);
       return res.data;
     } catch (err) {
-      console.error("Error eliminando asistencias por ensayo:", err?.response || err);
+      console.error("❌ Error eliminando asistencias:", err?.response || err);
       throw err;
     }
   },

@@ -1,0 +1,57 @@
+/* ====== LOADER CAPUNOTES ELEGANTE ====== */
+.logo-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: var(--bg);
+  gap: 1.5rem;
+}
+
+.logo-loader {
+  width: 120px;
+  height: 120px;
+  animation: rotateLogo 3s linear infinite, colorFade 4s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.15));
+  transition: transform 0.3s ease;
+}
+
+@keyframes rotateLogo {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes colorFade {
+  0% {
+    filter: drop-shadow(0 0 10px #4061d0);
+  }
+  50% {
+    filter: drop-shadow(0 0 16px #5c8df0);
+  }
+  100% {
+    filter: drop-shadow(0 0 10px #4061d0);
+  }
+}
+
+.loader-text {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  animation: fadeIn 2s ease-in-out infinite alternate;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
