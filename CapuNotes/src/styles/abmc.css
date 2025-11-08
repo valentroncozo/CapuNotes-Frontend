@@ -19,22 +19,54 @@
   padding: 20px;
 }
 
-/* Header */
+/* ====== HEADER ASISTENCIA A ENSAYOS ====== */
 .abmc-header {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: space-between;
+  align-items: flex-start;        /* flecha y texto alineados arriba */
+  gap: 16px;
+  justify-content: flex-start;
   position: relative;
-  margin-bottom: 14px;
+  margin-bottom: 32px;            /* más espacio con los filtros */
 }
 
+/* Flecha back */
+.abmc-header button,
+.abmc-header svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -4px;               /* 👈 la sube un poco, alineación perfecta con la A */
+  transform: translateY(2px);     /* microajuste óptico */
+}
+
+/* Título */
 .abmc-title {
-  flex: 2;
-  margin: 0;
   font-weight: 700;
-  text-align: center;
   font-size: 1.8rem;
+  margin: 0;
+  color: var(--text-light);
+  position: relative;
+}
+
+/* Línea amarilla institucional */
+.abmc-header::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--accent);
+  border-radius: 2px;
+}
+
+/* ====== FILTROS ====== */
+.filtros {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 28px;               /* 👈 más aire respecto al header */
+  margin-bottom: 1.5rem;
 }
 
 /* Topbar */
@@ -176,3 +208,67 @@
   outline: none;
   background-color: rgba(255, 255, 255, 0.1);
 }
+
+/* ====== FILTROS OSCUROS CON ESTILO CAPUNOTES (MATCH INPUT) ====== */
+.filtros select.abmc-input {
+  background-color: rgba(255, 255, 255, 0.05); /* igual que el input de búsqueda */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* tenue y elegante */
+  color: var(--text-light);
+  border-radius: 10px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.95rem;
+  font-family: var(--font);
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  min-width: 150px; /* alineación visual */
+}
+
+/* 🔹 Hover y focus: ilumina con el acento dorado */
+.filtros select.abmc-input:hover,
+.filtros select.abmc-input:focus {
+  border-color: var(--accent); /* amarillo institucional */
+  box-shadow: 0 0 6px rgba(255, 193, 7, 0.25);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* 🔹 Opciones desplegadas */
+.filtros select.abmc-input option {
+  background-color: #11103a;
+  color: var(--text-light);
+}
+
+/* 🔹 Placeholder ("Mes", "Año", "Estado") */
+.filtros select.abmc-input option[value=""] {
+  color: #bbb;
+}
+/* ====== ESTILOS ESPECÍFICOS DE ASISTENCIAS ====== */
+.asistencia-header {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 0.5rem !important;
+  margin-bottom: 2.5rem !important;
+}
+
+/* Línea amarilla institucional */
+.asistencia-linea {
+  width: 100%;
+  height: 2px;
+  background-color: var(--accent);
+  margin: 0.8rem 0 0.8rem 0;
+  border-radius: 2px;
+}
+
+/* Estado alineado a la derecha */
+.asistencia-estado {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.6rem;
+}
+
+/* Ajuste fino de filtros */
+.asistencia-header + .filtros {
+  margin-top: 1.8rem;
+}
+

@@ -1,17 +1,22 @@
+// src/services/ensayosService.js
 import axios from "axios";
 
-// Base para la gestión de ENSAYOS (CRUD básico)
-const ENSAYOS_API_URL = "/api/eventos";
+const ENSAYOS_API_URL = "/api/ensayos";
 
 export const ensayosService = {
-  // --------------------------------------------------
-  // ENSAYOS CRUD (usa ENSAYOS_API_URL)
-  // --------------------------------------------------
-  // Obtener todos los ensayos (list en AsistenciaEnsayos.jsx usa esto)
+  // Obtener todos los ensayos con estado y porcentaje
   list: async () => {
     const res = await axios.get(ENSAYOS_API_URL);
     console.log("📡 Ensayos recibidos del backend:", res.data);
-    return res.data;
+    return res.data.map((e) => ({
+      id: e.id,
+      nombre: e.nombre,
+      descripcion: e.descripcion,
+      fechaInicio: e.fechaInicio,
+      tipoEvento: e.tipoEvento,
+      estadoAsistencia: e.estadoAsistencia,
+      porcentajeAsistencia: e.porcentajeAsistencia,
+    }));
   },
 
   // Obtener ensayo por id
@@ -27,7 +32,7 @@ export const ensayosService = {
     return res.data;
   },
 
-  // Actualizar (PATCH)
+  // Actualizar ensayo existente
   update: async (id, updated) => {
     const res = await axios.patch(`${ENSAYOS_API_URL}/${id}`, updated);
     console.log("✏️ Ensayo actualizado:", res.data);

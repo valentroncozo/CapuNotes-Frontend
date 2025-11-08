@@ -1,0 +1,100 @@
+/* ============================================================
+   🎨 Estilos personalizados para AsistenciaEnsayos
+   ============================================================ */
+
+/* Botón amarillo CapuNotes */
+.btn-amarillo {
+  background-color: #ffc107 !important;       /* Amarillo institucional */
+  color: var(--text-light) !important;        /* Blanco cálido */
+  font-weight: 600 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 8px;
+  padding: 0.4rem 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover: un poco más claro */
+.btn-amarillo:hover {
+  background-color: #ffcf40 !important;
+  transform: translateY(-1px);
+}
+
+/* Botón deshabilitado */
+.btn-amarillo:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Línea debajo del título */
+.divisor-amarillo {
+  width: 140px;
+  height: 3px;
+  background-color: #ffc107;
+  border-radius: 2px;
+  margin-top: 0.3rem;
+}
+
+/* Alineación general de filtros */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Ajustes de inputs del filtro */
+.filtros select,
+.filtros input[type="month"] {
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+}
+
+.filtros select:focus,
+.filtros input[type="month"]:focus {
+  outline: none;
+  border-color: #ffc107;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+/* ====== FILTROS OSCUROS ====== */
+.filtros select.abmc-input {
+  background-color: #11103a;
+  border: 2px solid #68B2AB; /* celeste institucional */
+  color: var(--text-light);
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.95rem;
+  font-family: var(--font);
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.filtros select.abmc-input:focus {
+  border-color: var(--accent);
+}
+
+.filtros option {
+  background-color: #11103a;
+  color: var(--text-light);
+}
+
+/* ====== BOTONES AMARILLOS SIN BORDE ====== */
+.btn-amarillo {
+  background-color: var(--accent);
+  color: var(--text-light);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  transition: background 0.2s;
+}
+
+.btn-amarillo:hover {
+  background-color: #ffb300;
+}
