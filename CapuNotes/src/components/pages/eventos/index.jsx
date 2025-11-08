@@ -216,16 +216,26 @@ const Eventos = () => {
           onClose={handleClosePopup}
           onSave={async (nuevoEvento) => {
             try {
+              console.log('🟡 Evento a guardar:', nuevoEvento);
+
               if (popupMode === 'crear') {
                 await eventoService.create(nuevoEvento);
               } else if (popupMode === 'editar') {
                 await eventoService.update(selectedEvento.id, nuevoEvento);
               }
+
               const data = await eventoService.list();
               setEventos(data);
               handleClosePopup();
             } catch (error) {
               console.error('❌ Error al guardar el evento:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Error al guardar',
+                text: 'No se pudo guardar el evento. Revisa los datos.',
+                background: '#11103a',
+                color: '#E8EAED',
+              });
             }
           }}
         />

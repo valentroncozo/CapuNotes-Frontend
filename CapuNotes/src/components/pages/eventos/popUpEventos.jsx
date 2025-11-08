@@ -24,7 +24,7 @@ const PopUpEventos = ({
     const nuevoEvento = {
       nombre: formData.get('nombre'),
       tipoEvento: formData.get('tipoEvento'),
-      fechaInicio: selectedDate ? selectedDate.toLocaleDateString('es-ES') : '',
+      fechaInicio: selectedDate ? selectedDate.toISOString().split('T')[0] : '',
       hora: formData.get('hora'),
       lugar: formData.get('lugar'),
     };
