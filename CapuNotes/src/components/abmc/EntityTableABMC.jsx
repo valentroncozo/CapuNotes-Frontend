@@ -334,8 +334,23 @@ export default function EntityTableABMC({
                 {f.label}
               </button>
             ) : f.type === "submit" ? (
-              <button key={f.key} type="submit" className="abmc-btn abmc-btn-primary">
-                {f.label}
+              <button
+                key={f.key}
+                type="submit"
+                className="abmc-btn abmc-btn-primary"
+                aria-label={f.label}
+              >
+                {/* Si el schema provee un icon, lo renderizamos (acepta string SVG o elemento JSX) */}
+                {f.icon
+                  ? (typeof f.icon === "string" ? (
+                      <span
+                        // Intentamos inyectar el string SVG. Esto permite definir el icono desde el schema.
+                        dangerouslySetInnerHTML={{ __html: f.icon }}
+                      />
+                    ) : (
+                      f.icon
+                    ))
+                  : f.label}
               </button>
             ) : f.type === "label" ? (
               <label key={f.key} className="abmc-label">{f.label}</label>
@@ -343,14 +358,19 @@ export default function EntityTableABMC({
           )}
         </form>
 
+        {/* Título específico para Cuerdas */}
+        {entityName.toLowerCase() === "cuerda" && (
+          <h2 className="abmc-subtitle">Cuerdas registradas</h2>
+        )}
+
         <div className="abmc-topbar" style={{ marginTop: 0 }}>
           <input
             type="text"
-            placeholder="Buscar..."
+            placeholder="Buscar por nombre"
             value={filtro}
             onChange={(e) => setFiltro(e.target.value)}
             className="abmc-input"
-            aria-label="Buscar"
+            aria-label="Buscar por nombre"
           />
         </div>
 

@@ -56,6 +56,13 @@
 
 .pop-body {
   padding: 18px;
+  width: 100%;
+}
+
+.pop-body .input {
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
 }
 
 .pop-footer {
