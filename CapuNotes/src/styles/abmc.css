@@ -202,8 +202,8 @@
 .abmc-actions .abmc-btn-icon svg path {
   opacity: 1 !important;
   background-color: var(--accent) !important;
-  color: #ffffff !important;
-  fill: #ffffff !important;
+  color: #E8EAED !important;
+  fill: #E8EAED !important;
   stroke: none !important;
   border: none !important;
 }
@@ -214,14 +214,14 @@
   border: none !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
   background-color: var(--accent); /* amarillo institucional */
-  color: #ffffff;
+  color: #E8EAED;
   transition: all 0.2s ease-in-out;
 }
 
 /* Hover: aclara el fondo e ícono, sin borde */
 .abmc-actions .abmc-btn-icon:hover {
   background-color: var(--accent); /* mantener mismo amarillo */
-  color: #ffffff; /* icono en blanco */
+  color: #E8EAED; /* icono en blanco */
   filter: brightness(0.98);
   transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);

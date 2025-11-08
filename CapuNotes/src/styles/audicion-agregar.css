@@ -1,78 +1,107 @@
-
 :root {
-    --height-turnos: 4.5rem;
+  --height-turnos: 4.5rem;
+  --gap-small: 0.8rem;
+  --gap-medium: 1.2rem;
 }
 
+/* ===== CONTENEDOR GENERAL ===== */
 .content-form-audicion {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    flex-direction: column;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
-.divider {
-    width: 100%;
-    border: 1px solid var(--accent);
-    margin: 3.5rem 0rem;
+hr.divider {
+  display: none;
 }
 
+/* ===== FORMULARIO ===== */
 .form-audicion {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    align-content: center;
-    height: auto;
-    gap: .8rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-small);
 }
 
+/* ===== FILA DE FECHAS ===== */
 .content-inputs-date-audicion {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-    max-height: var(--height-turnos);
-    gap: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--gap-medium);
+  width: 100%;
 }
 
-
+/* ===== CADA INPUT (fecha desde / fecha hasta) ===== */
 .inputs-date-audicion {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
+.inputs-date-audicion label {
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+
+.inputs-date-audicion input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+/* ===== BOTÓN DE FECHAS ===== */
 .button-date-audicion {
-    min-height: 64px;
-    min-width: 174px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  min-width: 174px;
+  min-height: var(--height-turnos);
 }
 
+/* Ajustar estilos de los botones en Agregar Audición */
+.abmc-btn.btn-secondary {
+  background-color: #6c757d !important; /* Forzar color gris para el botón de cancelar */
+  color: #fff !important; /* Forzar texto blanco para contraste */
+  border: none !important;
+}
 
+.abmc-btn.btn-secondary:hover {
+  background-color: #5a6268 !important; /* Forzar un gris más oscuro al pasar el mouse */
+}
+
+.abmc-btn.btn-primary {
+  background-color: #ffc107; /* Color amarillo para el botón de guardar */
+  color: #000; /* Texto negro para contraste */
+  border: none;
+}
+
+.abmc-btn.btn-primary:hover {
+  background-color: #e0a800; /* Oscurecer el amarillo al pasar el mouse */
+}
+
+/* ===== SECCIÓN DE TURNOS ===== */
 .content-turno-input {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 2rem;
-    min-height: var(--height-turnos);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-height: var(--height-turnos);
 }
 
-
-
+/* ===== BOTÓN DE DÍAS ===== */
 .btn-dias {
-    width: 11rem;
-    align-self: flex-start;
-    margin-top: 1rem;
+  width: 11rem;
+  align-self: flex-start;
+  margin-top: 1rem;
 }
 
 .btn-dias:hover {
-    background-color: var(--accent) !important; 
-    border: none !important;
-    color: var(--bg) !important;
+  background-color: var(--accent) !important;
+  border: none !important;
+  color: var(--bg) !important;
 }
