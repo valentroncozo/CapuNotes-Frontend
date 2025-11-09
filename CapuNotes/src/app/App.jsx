@@ -35,6 +35,7 @@ import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores
 
 // Estilos base (usar globals como fuente deFverdad)
 import '@/styles/globals.css';
+import LandingPage from '../components/pages/landing';
 
 function ProtectedRoute({ children }) {
   const isAuth = localStorage.getItem('capunotes_auth') === '1';
@@ -93,7 +94,7 @@ function AppRoutes() {
         <Route path="audicion/historial" element={<HistorialAudiciones />} />
         <Route path="/inscripcion/:id" element={<FormularioConsulta />} />
         <Route path="/inscripcion/coordinadores/:id" element={<FormularioConsultaCoordinacion />} />
-                <Route path="audicion/candidatos" element={<Candidatos />} />
+        <Route path="audicion/candidatos" element={<Candidatos />} />
         <Route path="candidatos-administracion" element={<CandidatosCoordinadores />} />
       </Route>
      
@@ -101,6 +102,7 @@ function AppRoutes() {
       <Route path="*" element={<Navigate to="/principal" replace />} />
       <Route path="/formulario" element={<Formulario />} /> 
 
+      <Route path="landing" element={< LandingPage/>} />
     </Routes>
   );
 }
