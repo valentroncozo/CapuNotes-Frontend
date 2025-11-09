@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { act } from 'react';
 
 const DEV_PROXY_BASE = '/api';
 const resolvedBaseURL = import.meta.env.DEV ? DEV_PROXY_BASE : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
@@ -9,6 +10,7 @@ const mapPreguntaToPayload = (p) => ({
   tipo: p.tipo, // TEXTO | OPCION | MULTIOPCION
   obligatoria: Boolean(p.obligatoria),
   opciones: Array.isArray(p.opciones) ? p.opciones : [],
+  activa: Boolean(p.activa),
 });
 
 const preguntasService = {
