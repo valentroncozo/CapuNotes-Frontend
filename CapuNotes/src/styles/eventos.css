@@ -10,25 +10,31 @@
 
 .abmc-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;        /* flecha y texto alineados arriba */
+  gap: 16px;
   justify-content: flex-start;
-  gap: 15px;
-  margin-bottom: 1px; /* Acerca más la línea divisora */
+  position: relative;
+  margin-bottom: 32px;            /* más espacio con los filtros */
 }
-
 .abmc-title h1 {
+  font-weight: 700;
   font-size: 1.8rem;
-  font-weight: 600;
   margin: 0;
-  color: #fff;
+  color: var(--text-light);
+  position: relative;
+  text-align: left;
 }
 
-.divisor-amarillo {
-  border: none;
+/* Línea amarilla institucional */
+.abmc-header::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
   height: 2px;
-  background-color: #ffcc80;
-  margin-top: 0px; /* Reduce aún más la distancia desde el título */
-  margin: 15px 0;
+  background-color: var(--accent);
+  border-radius: 2px;
 }
 
 /* ===========================
@@ -36,9 +42,10 @@
 =========================== */
 .eventos-search {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px; /* Aumenta la distancia hacia las tarjetas de eventos */
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 28px;               /* 👈 más aire respecto al header */
+  margin-bottom: 1.5rem;
 }
 
 .eventos-search-input {

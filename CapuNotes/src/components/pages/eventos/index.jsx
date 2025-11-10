@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import BackButton from '@/components/common/BackButton.jsx';
 import PopUpEventos from './popUpEventos.jsx';
 import ConfirmDeletePopup from './ConfirmDeletePopup.jsx';
-import '@/styles/globals.css';
 import '@/styles/eventos.css';
 import { eventoService } from '@/services/eventoService.js'; // 👈 corregido
 
@@ -62,7 +61,7 @@ const Eventos = () => {
           <h1>Eventos</h1>
         </div>
       </header>
-      <hr className="divisor-amarillo" />
+      <hr className="abmc-header::after" />
 
       {/* 🔍 Buscador y botón agregar */}
       <div className="eventos-search">
