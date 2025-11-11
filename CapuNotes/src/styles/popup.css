@@ -1,5 +1,5 @@
 /* src/styles/popup.css */
-@import url("https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&display=swap');
 
 /* Usa tokens globales (colors, radius, shadow, font) */
 .pop-backdrop {
@@ -28,7 +28,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 18px;
-  border-bottom: 1px solid var(--accent) ;
+  border-bottom: 1px solid var(--accent);
 }
 
 .pop-title {
@@ -49,9 +49,21 @@
   border-radius: 10px;
   transition: all 0.15s;
 }
-.icon-btn:hover { opacity: 1; background: rgba(255, 255, 255, 0.08); }
+.icon-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
 
-.pop-body { padding: 18px; }
+.pop-body {
+  padding: 18px;
+  width: 100%;
+}
+
+.pop-body .input {
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+}
 
 .pop-footer {
   display: flex;
@@ -59,6 +71,13 @@
   gap: 10px;
   padding: 14px 18px 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
 }
 
 /* Botones coherentes con tokens */
@@ -74,33 +93,49 @@
 
 .btn-primary {
   background: var(--accent) !important;
-  color: var(--text-dark) !important;
+  color: #ffffff !important; /* Forzar color blanco para el texto */
   box-shadow: var(--shadow);
+  border-radius: 50px; /* Puntas redondeadas */
+  padding: 15px 25px; /* Tamaño más grande */
+  font-size: 1.1rem; /* Texto más grande */
 }
-.btn-primary:hover { filter: brightness(0.95); }
-.btn-primary:active { filter: brightness(0.9); }
+.btn-primary:hover {
+  filter: brightness(0.95);
+}
+.btn-primary:active {
+  filter: brightness(0.9);
+}
 
 .btn-secondary {
   background: transparent !important;
   color: var(--card) !important;
   border: 2px solid var(--card) !important;
 }
-.btn-secondary:hover { background: rgba(179, 205, 250, 0.1); }
+.btn-secondary:hover {
+  background: rgba(179, 205, 250, 0.1);
+}
 
 /* Form grid */
-.form-grid { display: grid; gap: 16px; }
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
 
 .field label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 4px; /* Más cerca del input */
   font-size: 0.9rem;
   color: var(--text-light);
   opacity: 0.9;
 }
 
+.field {
+  margin-bottom: 16px; /* Más separado del input anterior */
+}
+
 .input,
 textarea.input {
-  width: 100%;
+  width: 100%; /* Ocupa todo el ancho disponible */
   background: #0f1036;
   color: var(--text-light);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -116,7 +151,14 @@ textarea.input:focus {
   box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25);
 }
 .input::placeholder,
-textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
+textarea.input::placeholder {
+  color: rgba(232, 234, 237, 0.6);
+}
+
+.popup-form {
+  width: 100%; /* Asegura que el formulario ocupe todo el ancho disponible */
+  padding: 0 18px; /* Ajusta el padding para alinear con la línea divisora */
+}
 
 /* --- Botones específicos del modal (sobrescriben los globales) --- */
 .pop-footer .btn {
@@ -124,13 +166,13 @@ textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
   border-radius: var(--radius);
   padding: 10px 18px;
   font-weight: 700;
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 /* Botón Guardar (principal) */
 .pop-footer .btn-primary {
   background-color: var(--accent) !important; /* amarillo */
-  color: var(--text-dark) !important;
+  color: #ffffff;
   box-shadow: var(--shadow);
 }
 .pop-footer .btn-primary:hover {
@@ -141,7 +183,7 @@ textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
 /* Botón Cancelar (gris) */
 .pop-footer .btn-secondary {
   background-color: #9e9e9e !important; /* gris */
-  color: #E8EAED !important;            /* texto claro */
+  color: #e8eaed !important; /* texto claro */
   border: none !important;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -163,3 +205,32 @@ textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
   box-shadow: none !important;
 }
 
+/* Alineación visual entre cabecera, línea amarilla e inputs */
+.abmc-header,
+.divisor-amarillo {
+  padding: 0 18px;
+}
+
+/* Ajustes estéticos opcionales */
+.divisor-amarillo {
+  margin: 0;
+  border: none;
+  border-top: 3px solid var(--accent); /* mantiene la línea amarilla */
+}
+
+select[name='tipoEvento'] option {
+  background-color: #11103a; /* Fondo azul oscuro */
+  color: #ffffff; /* Letra blanca */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  outline: none;
+  appearance: none; /* 🔹 elimina el borde y la flecha nativa */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+select[name='tipoEvento']:focus {
+  border-color: var(--card);
+  box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25);
+}

@@ -1,7 +1,7 @@
 // src/schemas/cuerdas.js
 export const cuerdaSchema = [
   { key: "name", label: "Nombre", required: true, max: 100, type: "text" },
-  { key: "primary", label: "Agregar", type: "submit" },
+  { key: "primary", label: "", type: "submit" },
 ];
 
 export const cuerdaUniqueBy = "name";

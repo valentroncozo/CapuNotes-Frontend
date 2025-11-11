@@ -69,7 +69,7 @@ export default function GenericEditPopup({
         {schema
           .filter((f) => !["submit", "button", "label"].includes(f.type))
           .map((f) => (
-            <div className="field" key={f.key}>
+            <div className="field" key={f.key} style={{ gridColumn: "1 / -1" }}>
               <label htmlFor={`field-${f.key}`}>{f.label}</label>
 
               {f.type === "select" ? (
@@ -79,6 +79,7 @@ export default function GenericEditPopup({
                   className="input"
                   value={form[f.key] || ""}
                   onChange={onChange}
+                  style={{ width: "100%" }}
                 >
                   <option value="">Seleccionar</option>
                   {(f.options || []).map((opt) => {
@@ -101,6 +102,7 @@ export default function GenericEditPopup({
                   onChange={onChange}
                   maxLength={f.max}
                   placeholder={f.label}
+                  style={{ width: "100%" }}
                 />
               )}
             </div>

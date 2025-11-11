@@ -42,7 +42,7 @@ textarea {
 
 .form-group-miembro,
 .form-group-agregar {
-  margin-bottom: 16px;
+  margin-bottom: 16px; /* Reducir el margen inferior */
 }
 
 /* === SELECT CON FLECHA VISIBLE === */
@@ -55,22 +55,24 @@ textarea {
 /* === FILA DE CUERDA Y ÁREA === */
 .form-row-miembros {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
+  flex-direction: column; /* Asegurar que los campos estén en columna */
+  gap: 20px; /* Asegurar un espaciado uniforme entre TipoDocumento y NroDocumento */
   margin-top: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .form-row-miembros .mitad {
   flex: 1;
   min-width: 260px;
+  width: 100%; /* Asegurar que ocupen todo el ancho */
+  margin-bottom: 10px; /* Espaciado uniforme con otros campos */
 }
 
 .form-row-cuerda-area {
   width: 100%;
-  gap: 16px;
+  gap: 12px; /* Ajustar el espacio entre elementos */
   margin-top: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -138,25 +140,22 @@ button.abmc-btn.agregar-btn:hover {
 
 /* Botón gris (Cancelar) */
 .abmc-btn-secondary {
-  background-color: #6c757d !important;
-  border: none !important;
-  color: #fff !important;
-  padding: 8px 18px;
-  border-radius: 8px;
-  font-weight: 500;
-  transition: background-color 0.2s ease;
+  background-color: #6c757d; /* Color gris para el botón de cancelar */
+  color: #fff; /* Texto blanco para contraste */
+  border: none;
 }
 
 .abmc-btn-secondary:hover {
-  background-color: #5a6268 !important;
+  background-color: #5a6268; /* Oscurecer el gris al pasar el mouse */
 }
 
 /* === ACCIONES (botones al final) === */
 .acciones-form-miembro {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 20px;
+  justify-content: center; /* Centrar horizontalmente */
+  gap: 12px; /* Mantener espacio entre los botones */
+  margin-top: 40px; /* Espaciado superior */
+  padding-top: 8px;
 }
 
 /* === GRID DEL FORMULARIO === */
@@ -301,15 +300,37 @@ select.abmc-select:focus,
   margin-bottom: 30px; /* antes 10px o 16px */
 }
 
-.acciones-form-miembro {
-  margin-top: 40px !important; /* antes 20px */
-  padding-top: 8px;
+/* Simplificar y generalizar el diseño para labels e inputs */
+.form-row-miembros {
+  display: flex;
+  gap: 20px; /* Espacio entre las mitades */
 }
 
+.form-row-miembros .mitad {
+  flex: 1; /* Cada mitad ocupa el 50% del espacio */
+  display: flex;
+  flex-direction: column; /* Apilar label encima del input */
+  align-items: flex-start; /* Alinear texto a la izquierda */
+  gap: 4px; /* Espacio entre label e input */
+  width: 100%;
+}
 
-@media (width < 606px) {
-  .form-row-cuerda-area .mitad {
-    min-width: 100%;
-  }
-  
+/* Forzar el espaciado vertical entre los campos del formulario */
+.pantalla-miembros .abmc-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Asegurar espaciado uniforme entre todos los campos */
+}
+
+.pantalla-miembros .abmc-card .form-group-miembro,
+.pantalla-miembros .abmc-card .form-row-miembros {
+  margin-bottom: 20px !important; /* Forzar margen uniforme */
+}
+
+/* Ajustar el interlineado para evitar agrupaciones de pares */
+.pantalla-miembros .abmc-card .form-group-miembro,
+.pantalla-miembros .abmc-card .form-group-agregar,
+.pantalla-miembros .abmc-card .form-row-miembros,
+.pantalla-miembros .abmc-card .form-row-cuerda-area {
+  margin-bottom: 20px; /* Incrementar el margen para evitar agrupaciones visuales */
 }

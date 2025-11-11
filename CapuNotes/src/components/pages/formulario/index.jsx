@@ -12,6 +12,7 @@ import inscripcionService from '@/services/incripcionService.js';
 const Formulario = ({title = 'Inscripcion a Audiciones CoroCapuchino'}) => {
     // Estados para datos dinámicos
     const [audicionId, setAudicionId] = useState(null);
+    const [audicion, setAudicion] = useState(null);
     const [preguntas, setPreguntas] = useState([]);
     const [cuerdas, setCuerdas] = useState([]);
     const [turnos, setTurnos] = useState([]);
@@ -56,6 +57,7 @@ const Formulario = ({title = 'Inscripcion a Audiciones CoroCapuchino'}) => {
                 }
 
                 setAudicionId(audicion.id);
+                setAudicion(audicion);
                 const encuesta = await inscripcionService.getEncuesta(audicion.id);
                 
                 setPreguntas(encuesta.preguntas || []);
@@ -225,7 +227,13 @@ const Formulario = ({title = 'Inscripcion a Audiciones CoroCapuchino'}) => {
         }
      };
 
-    return (
+    return audicion && audicion.estado !== 'PUBLICADA' ? (
+        <main className="encuesta-container">
+            <div className="abmc-card" style={{display: 'flex', justifyContent:'center', alignItems: 'center'}}>
+                <p>Las inscripciones para esta audición están cerradas en este momento.</p>
+            </div>
+        </main>
+    ) : (
         <main className="encuesta-container">
             <div className="abmc-card">
                 <header className="abmc-header">
@@ -377,10 +385,6 @@ const Formulario = ({title = 'Inscripcion a Audiciones CoroCapuchino'}) => {
                                     required
                                 />
                             </div>
-
-
-
-
                         </div>
                     </section>
                     <hr className='divider'/>
@@ -444,7 +448,7 @@ const Formulario = ({title = 'Inscripcion a Audiciones CoroCapuchino'}) => {
                                     <option value="">-</option>
                                     {availableTurnos.map((turno) => (
                                         <option key={turno.id} value={String(turno.id)}>
-                                          {turno.diaString} - {turno.horaInicio}
+                                        {turno.diaString} - {turno.horaInicio}
                                         </option>
                                     ))}
                                 </select>
@@ -461,7 +465,6 @@ const Formulario = ({title = 'Inscripcion a Audiciones CoroCapuchino'}) => {
 
                 </form>
                 )}
-
             </div>
         </main>
     );

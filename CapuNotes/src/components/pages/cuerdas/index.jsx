@@ -5,12 +5,14 @@ import { cuerdaSchema, cuerdaUniqueBy, cuerdaEntityName } from "@/schemas/cuerda
 
 export default function CuerdasPage() {
   return (
-    <EntityTableABMC
-      title="Cuerdas"
-      service={cuerdasService}
-      schema={cuerdaSchema}
-      uniqueBy={cuerdaUniqueBy}
-      entityName={cuerdaEntityName}
-    />
+    <div className="cuerdas-page">
+      <EntityTableABMC
+        title="Cuerdas"
+        service={cuerdasService}
+        schema={cuerdaSchema}
+        uniqueBy={cuerdaUniqueBy}
+        entityName={cuerdaEntityName}
+      />
+    </div>
   );
 }

@@ -8,8 +8,18 @@ import EventIcon from '@mui/icons-material/Event';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import MicIcon from '@mui/icons-material/Mic';
 import "@/styles/principal.css";
+import { useNavigate } from 'react-router-dom';
 
 export default function Principal({ username }) {
+  const navigate = useNavigate();
+
+  const navHandler = (path) => (e) => {
+    if (e.type === 'click' || e.key === 'Enter' || e.key === ' ') {
+      if (e.key) e.preventDefault();
+      navigate(path);
+    }
+  };
+
   return (
     <div className="principal-container">
       <div className="home-container">
@@ -75,12 +85,28 @@ export default function Principal({ username }) {
         <section className="tareas-section">
           <h4 className="section-title">Tareas principales</h4>
           <div className="tareas-grid">
-            <div className="tarea-card">
+            <div
+              className="tarea-card"
+              role="button"
+              tabIndex={0}
+              onClick={navHandler('/asistencias')}
+              onKeyDown={navHandler('/asistencias')}
+              style={{ cursor: 'pointer' }}
+              aria-label="Ir a Asistencias"
+            >
               <AssignmentIcon className="tarea-icon" />
               <span>Asistencia</span>
             </div>
 
-            <div className="tarea-card tarea-activa">
+            <div
+              className="tarea-card tarea-activa"
+              role="button"
+              tabIndex={0}
+              onClick={navHandler('/eventos')}
+              onKeyDown={navHandler('/eventos')}
+              style={{ cursor: 'pointer' }}
+              aria-label="Ir a Eventos"
+            >
               <EventIcon className="tarea-icon" />
               <span>Eventos</span>
             </div>
@@ -90,7 +116,15 @@ export default function Principal({ username }) {
               <span>Actividades complementarias</span>
             </div>
 
-            <div className="tarea-card">
+            <div
+              className="tarea-card"
+              role="button"
+              tabIndex={0}
+              onClick={navHandler('/audicion')}
+              onKeyDown={navHandler('/audicion')}
+              style={{ cursor: 'pointer' }}
+              aria-label="Ir a Audiciones"
+            >
               <MicIcon className="tarea-icon" />
               <span>Audiciones</span>
             </div>

@@ -21,6 +21,7 @@ export default function MiembrosTableABMC({
   const [areas, setAreas] = useState([]);
   const [filtroTexto, setFiltroTexto] = useState("");
   const [filtroCuerda, setFiltroCuerda] = useState("");
+  const [ordenEstadoAscendente, setOrdenEstadoAscendente] = useState(true);
 
   // 🔹 Cargar miembros y cuerdas desde el backend
   const load = async () => {
@@ -140,23 +141,29 @@ export default function MiembrosTableABMC({
     }
   };
 
+  const ordenarPorEstado = () => {
+    const ordenados = [...listaMiembros].sort((a, b) => {
+      if (a.activo === b.activo) return 0;
+      return ordenEstadoAscendente ? (a.activo ? -1 : 1) : (a.activo ? 1 : -1);
+    });
+    setListaMiembros(ordenados);
+    setOrdenEstadoAscendente(!ordenEstadoAscendente);
+  };
+
   return (
     <main className="abmc-page">
       <div className="abmc-card">
         {/* === Encabezado === */}
         <div className="abmc-header">
           {showBackButton && <BackButton />}
-          <h1 className="abmc-title">{title}</h1>
+          <h1 className="abmc-title" style={{ display: "inline-block", marginRight: "1rem" }}>{title}</h1>
         </div>
-
-        <hr className="divisor-amarillo" style={{ margin: "1rem 0rem", color: 'var(--accent)' }} />
-        
 
         {/* === Barra superior con buscador y filtro === */}
         <div className="abmc-topbar">
           <input
             type="text"
-            placeholder="Buscar por nombre o apellido..."
+            placeholder="Buscar por nombre o apellido"
             value={filtroTexto}
             onChange={(e) => setFiltroTexto(e.target.value)}
             className="abmc-input"
@@ -179,7 +186,7 @@ export default function MiembrosTableABMC({
             className="abmc-btn abmc-btn-primary"
             onClick={() => navigate("/miembros/agregar")}
           >
-            Agregar miembro
+            +
           </Button>
         </div>
 
@@ -190,7 +197,9 @@ export default function MiembrosTableABMC({
               <th>Nombre y Apellido</th>
               <th>Cuerda</th>
               <th>Área</th>
-              <th>Estado</th>
+              <th onClick={ordenarPorEstado} style={{ cursor: "pointer" }}>
+                Estado {ordenEstadoAscendente ? "▲" : "▼"}
+              </th>
               <th style={{ textAlign: "center" }}>Acciones</th>
             </tr>
           </thead>
@@ -241,7 +250,7 @@ export default function MiembrosTableABMC({
                       }
                       title="Editar"
                     >
-                      <PencilFill size={18} />
+                      <PencilFill size={18} color="#E8EAED" />
                     </Button>
                     <Button
                       className="btn-accion"
@@ -250,9 +259,9 @@ export default function MiembrosTableABMC({
                       title={m.activo ? "Dar de baja" : "Reactivar"}
                     >
                       {m.activo ? (
-                        <XCircleFill size={18} />
+                        <XCircleFill size={18} color="#E8EAED" />
                       ) : (
-                        <CheckCircleFill size={18} />
+                        <CheckCircleFill size={18} color="#E8EAED" />
                       )}
                     </Button>
                   </td>
