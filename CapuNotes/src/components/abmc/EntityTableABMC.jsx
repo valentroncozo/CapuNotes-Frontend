@@ -6,6 +6,7 @@ import BackButton from "../common/BackButton";
 import TrashIcon from "@/assets/TrashIcon";
 import EditIcon from "@/assets/EditIcon";
 import "@/styles/abmc.css";
+import AddIcon from "@/assets/AddIcon";
 
 // Alerta genérica para registros duplicados
 function showDuplicateAlert(uniqueBy) {
@@ -155,7 +156,7 @@ export default function EntityTableABMC({
   const handleEliminar = async (id, displayName) => {
     // 🔠 Detectar género de la entidad
     const femenino = ["cuerda", "área", "audición", "especialidad"]; // podés agregar más si querés
-    const articulo = femenino.includes(entityName.toLowerCase()) ? "la" : "el";
+    const articulo = femenino.includes(entityName.toLowerCase()) ? entityName.charAt(0).toUpperCase() + entityName.slice(1).toLowerCase() : entityName;
 
     // 🔔 Confirmación antes de borrar
     const res = await Swal.fire({
@@ -181,9 +182,8 @@ export default function EntityTableABMC({
       // ✅ Aviso de éxito al eliminar
       Swal.fire({
         icon: "success",
-        title: `${entityName.charAt(0).toUpperCase() + entityName.slice(1)
-          } eliminad${femenino.includes(entityName.toLowerCase()) ? "a" : "o"}`,
-        text: `${entityName} "${displayName}" se eliminó correctamente.`,
+        title: `${articulo} eliminad${femenino.includes(entityName.toLowerCase()) ? "a" : "o"}`,
+        text: `${articulo} "${displayName}" se eliminó correctamente.`,
         timer: 1500,
         showConfirmButton: false,
         background: "#11103a",
@@ -194,7 +194,7 @@ export default function EntityTableABMC({
 
       Swal.fire({
         icon: "error",
-        title: `No se puede eliminar ${articulo} ${entityName}`,
+        title: `No se puede eliminar ${articulo}`,
         text: "Tiene elementos asociados o un error impide eliminarlo.",
         background: "#11103a",
         color: "#E8EAED",
@@ -205,6 +205,8 @@ export default function EntityTableABMC({
   };
 
   const handleEditSave = async (updated) => {
+    // Antes: solo update. Ahora unificamos create/update según exista updated.id
+
     // 🔹 Validar duplicado (si aplica)
     if (uniqueBy && Array.isArray(items)) {
       const baseValue = updated?.[uniqueBy];
@@ -225,28 +227,56 @@ export default function EntityTableABMC({
       }
     }
 
-    try {
-      await service.update(updated);
-      await load();
-
-      // ✅ Aviso de éxito
+    // Validación extra para "área"
+    if (!updated.descripcion && entityName.toLowerCase() === "área") {
       Swal.fire({
-        icon: "success",
-        title: "Actualizado correctamente",
-        text: `${entityName} se actualizó con éxito.`,
+        icon: "warning",
+        title: "Falta completar",
+        text: "Debés ingresar una descripción para el área.",
         background: "#11103a",
         color: "#E8EAED",
         confirmButtonColor: "#7c83ff",
-        timer: 1500,
-        showConfirmButton: false,
       });
+      return;
+    }
+
+    try {
+      if (updated?.id) {
+        await service.update(updated);
+        Swal.fire({
+          icon: "success",
+          title: "Actualizado correctamente",
+          text: `${entityName} se actualizó con éxito.`,
+          background: "#11103a",
+          color: "#E8EAED",
+          confirmButtonColor: "#7c83ff",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } else {
+        await service.create(updated);
+        Swal.fire({
+          icon: "success",
+          title: "Creado correctamente",
+          text: `${entityName} se creó con éxito.`,
+          background: "#11103a",
+          color: "#E8EAED",
+          confirmButtonColor: "#7c83ff",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
+
+      await load();
+      setEditOpen(false);
+      setSelected(null);
     } catch (err) {
-      console.error("❌ Error al actualizar:", err);
+      console.error("❌ Error al guardar:", err);
 
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: err.response?.data || "No se pudo actualizar el registro.",
+        text: err.response?.data || "No se pudo guardar el registro.",
         background: "#11103a",
         color: "#E8EAED",
         confirmButtonColor: "#7c83ff",
@@ -286,72 +316,29 @@ export default function EntityTableABMC({
         <div className="abmc-header">
           {showBackButton && <BackButton />}
           <h1 className="abmc-title">{title}</h1>
-          <hr className="divisor-amarillo" />
         </div>
 
-        <hr className="divisor-amarillo" style={{ margin: "1rem 0rem", color: 'var(--accent)' }} />
 
-        <form className="abmc-topbar" onSubmit={handleAgregar}>
-          {schema.map((f) =>
-            f.type === "select" ? (
-              <select
-                key={f.key}
-                name={f.key}
-                value={nuevo[f.key] || ""}
-                onChange={handleChangeNuevo}
-                className="abmc-select"
-                aria-label={f.label}
-              >
-                <option value="">{f.label}</option>
-                {(f.options || []).map((opt) => {
-                  const value = opt.value ?? opt;
-                  const label = opt.label ?? opt;
-                  return (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  );
-                })}
-              </select>
-            ) : f.type === "text" ? (
-              <input
-                key={f.key}
-                type={f.type || "text"}
-                name={f.key}
-                placeholder={f.label}
-                value={nuevo[f.key] || ""}
-                onChange={handleChangeNuevo}
-                className="abmc-input"
-                aria-label={f.label}
-              />
-            ) : f.type === "button" ? (
-              <button
-                key={f.key}
-                type="button"
-                onClick={f.handler}
-                className={`abmc-btn abmc-btn-${f.key}`}
-              >
-                {f.label}
-              </button>
-            ) : f.type === "submit" ? (
-              <button key={f.key} type="submit" className="abmc-btn abmc-btn-primary">
-                {f.label}
-              </button>
-            ) : f.type === "label" ? (
-              <label key={f.key} className="abmc-label">{f.label}</label>
-            ) : null
-          )}
-        </form>
 
         <div className="abmc-topbar" style={{ marginTop: 0 }}>
           <input
             type="text"
-            placeholder="Buscar..."
+            placeholder="Buscar por nombre"
             value={filtro}
             onChange={(e) => setFiltro(e.target.value)}
             className="abmc-input"
-            aria-label="Buscar"
+            aria-label="Buscar por nombre"
           />
+          <button
+            type="button"
+            className="abmc-btn abmc-btn-primary"
+            onClick={() => {
+              setSelected({}); // entidad vacía => modo crear en el popup
+              setEditOpen(true);
+            }}
+          >
+            <AddIcon fill="var(--text-light)" />
+          </button>
         </div>
 
         <table className="abmc-table abmc-table-rect">
@@ -360,7 +347,7 @@ export default function EntityTableABMC({
               {columnas.map((c) => (
                 <th key={c}>{c}</th>
               ))}
-              <th>Acciones</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -417,7 +404,7 @@ export default function EntityTableABMC({
           entityName={entityName}
           schema={schema}
           entity={selected}
-          onSave={handleEditSave}
+          onSave={handleEditSave} /* ahora maneja create/update según updated.id */
         />
       )}
 

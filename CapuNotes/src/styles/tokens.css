@@ -1,7 +1,7 @@
 /* src/styles/tokens.css */
 :root {
   /* Paleta base */
-  --bg: #11103a;
+  --bg: #090928;
   --surface-1: #0f1036;             /* para cards oscuras (antes hardcodeado) */
   --accent: #ffc107;
   --card: #b3cdfa;

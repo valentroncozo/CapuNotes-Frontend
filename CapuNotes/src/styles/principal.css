@@ -112,6 +112,7 @@
 }
 
 .tarea-card:hover {
+  border: 1px solid var(--text-light);
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,.45);
 }
@@ -137,6 +138,6 @@
 .divisor-amarillo {
   border: none;
   border-top: 2px solid var(--accent);
-  border-radius: 2px;
-  margin: .75rem 0 1.25rem;
+  height: .5px;
+  opacity: 1;
 }

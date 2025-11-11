@@ -1,0 +1,216 @@
+/* ===========================
+   ESTILOS DE PANTALLA EVENTOS
+=========================== */
+.eventos-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  color: #fff;
+}
+
+.abmc-header {
+  display: flex;
+  align-items: flex-start;        /* flecha y texto alineados arriba */
+  gap: 16px;
+  justify-content: flex-start;
+  position: relative;
+  margin-bottom: 32px;            /* más espacio con los filtros */
+}
+
+
+/* Línea amarilla institucional */
+.abmc-header::after {
+  content: "";
+  position: absolute;
+  bottom: -30px;
+  left: 0;
+  width: 100%;
+  height: .5px;
+  background-color: var(--accent);
+  border-radius: 2px;
+}
+
+/* ===========================
+   BUSCADOR Y BOTÓN AGREGAR
+=========================== */
+.eventos-search {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 28px;               /* 👈 más aire respecto al header */
+  margin-bottom: 1.5rem;
+}
+
+.eventos-search-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #1a1a40;
+  color: #fff;
+}
+
+.eventos-search-input::placeholder {
+  color: #aaa;
+}
+
+.eventos-profile {
+  margin-left: 10px;
+}
+
+.evento-btn.agregar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffc107;
+  font-size: 20px;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.evento-btn.redondeado {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffc107;
+  font-size: 20px;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* ===========================
+   GRID DE EVENTOS
+=========================== */
+.eventos-grid {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+.evento-card {
+  background-color: #AFD1F0;
+  position: relative;
+  z-index: 1; /* Asegura que los iconos permanezcan visibles */
+  border-radius: 20px; /* Bordes redondeados */
+  padding: 4px 16px;
+  min-width: 32%;
+  max-height: 300px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  color: var(--text-dark);
+  transition: transform 0.2s ease;
+  font-family: var(--font-sans);
+}
+
+.evento-card:hover {
+  transform: translateY(-3px);
+}
+
+
+
+.evento-card h3,
+.evento-card p {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0 !important;
+}
+
+.evento-icon {
+  font-size: 16px;
+  color: #4a4a4a; /* Gris más oscuro para los íconos */
+  display: inline-block;
+  vertical-align: middle;
+  z-index: 600; /* Asegurar que los iconos estén por encima del popup */
+}
+
+.evento-actions {
+  gap: 0.5rem;
+  display: flex;
+  justify-content:center;
+  margin-top: 0;
+}
+
+.evento-btn {
+  background-color: #ffc107;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+.evento-btn.agregar,
+.evento-btn editar,
+.evento-btn eliminar {
+  background-color: ffc107;
+}
+
+/* ===========================
+   POPUP EVENTOS (sin scroll y ajustable)
+=========================== */
+.popup-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #0f1036; /* mismo azul que pantalla eventos */
+  color: #fff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  z-index: 500; /* Reducir el z-index para evitar conflictos con los iconos */
+  width: 90%;
+  max-width: 520px;
+
+  /* ✅ Ajuste automático sin scroll */
+  height: auto;
+  max-height: 95vh;
+  overflow: visible;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  animation: popupFadeIn 0.25s ease;
+}
+
+/* Animación de aparición suave */
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Ajuste automático si la pantalla es más baja */
+@media (max-height: 800px) {
+  .popup-container {
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+}
+
+@media (max-height: 700px) {
+  .popup-container {
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+}
+
+@media (max-height: 600px) {
+  .popup-container {
+    transform: translate(-50%, -50%) scale(0.85);
+  }
+}

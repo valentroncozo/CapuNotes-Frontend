@@ -9,6 +9,7 @@ const mapPreguntaToPayload = (p) => ({
   tipo: p.tipo, // TEXTO | OPCION | MULTIOPCION
   obligatoria: Boolean(p.obligatoria),
   opciones: Array.isArray(p.opciones) ? p.opciones : [],
+  activa: Boolean(p.activa),
 });
 
 const preguntasService = {
@@ -36,7 +37,7 @@ const preguntasService = {
   },
 
   getFormulario: async (audicionId) => {
-    const r = await api.get(`/audiciones/${encodeURIComponent(audicionId)}/formulario`);
+    const r = await api.get(`/audiciones/${Number(audicionId)}/formulario`);
     return r.data;
   },
 

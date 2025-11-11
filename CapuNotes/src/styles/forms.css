@@ -34,10 +34,11 @@ body .abmc-input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(92%) sepia(6%) saturate(8%) hue-rotate(180deg) brightness(99%) contrast(95%);
 }
 
-body .abmc-select option {
+body .abmc-select option, main option {
   background: var(--bg);
   color: var(--text-light);
 }
+
 
 body .abmc-select:focus {
   color: var(--text-light) !important;
@@ -59,11 +60,11 @@ body .abmc-btn {
 
 body .abmc-btn-primary {
   background: var(--accent);
-  color: var(--text-dark);
+  color: var(--text-light);
   box-shadow: var(--shadow);
 }
 
-.abmc-btn-primary:hover { filter: brightness(.95); }
+
 
 .btn {
   border: none;
@@ -77,18 +78,22 @@ body .abmc-btn-primary {
 
 .btn-primary {
   background: var(--accent) !important;
-  color: var(--text-dark) !important;
+  color: var(--text-light) !important;
   box-shadow: var(--shadow);
 }
-.btn-primary:hover { filter: brightness(0.95); }
-.btn-primary:active { filter: brightness(0.9); }
+
 
 .btn-secondary {
   background: transparent !important;
-  color: var(--card) !important;
-  border: 2px solid var(--card) !important;
+  color: var(--text-light) !important;
+  border: 2px solid var(--text-light) !important;
 }
-.btn-secondary:hover { background-color: var(--accent) ;  border:none; color: var(--text-dark); }
+
+.btn-secondary:hover { 
+  background-color: var(--accent) ;  
+  border:inherit !important; 
+  color: var(--text-light); 
+}
 
 /* Form grid */
 .form-grid { display: grid; gap: 16px; }
@@ -165,7 +170,7 @@ textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
 /* --- ACCIONES --- */
 .btn-accion {
   background: var(--accent) !important;
-  color: var(--text-dark) !important;
+  color: var(--text-light) !important;
   border: none !important;
   border-radius: 12px;
   padding: 6px 10px;
@@ -177,12 +182,12 @@ textarea.input::placeholder { color: rgba(232, 234, 237, 0.6); }
   transform: scale(1.05);
 }
 
-.btn-accion.eliminar {
+.btn-accion .eliminar {
   background: var(--danger) !important;
   color: white !important;
 }
 
-.btn-accion.eliminar:hover {
+.btn-accion .eliminar:hover {
   background: var(--danger-600) !important;
   transform: scale(1.1);
 }

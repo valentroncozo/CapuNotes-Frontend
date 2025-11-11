@@ -13,7 +13,7 @@
 }
 
 /* reset mínimo y box-sizing para evitar sorpresas */
-html, body, #root {
+html, body{
   height: 100%;
   width: 100%;
   margin: 0;
@@ -54,7 +54,7 @@ html, body, #root {
 /* Hide root scrollbars and use .landing-page as the scrolling container on desktop
    We use pointer: fine to avoid changing touch/mobile behaviour. */
 @media (pointer: fine) {
-  html, body, #root {
+  html, body {
     overflow: hidden;
   }
 
@@ -94,7 +94,7 @@ html, body, #root {
   pointer-events: none;
 }
 
-nav {
+.landing-page nav {
   position: sticky;
   height: 10rem;
   width: 100%;
@@ -112,7 +112,7 @@ nav {
   pointer-events: auto;
 }
 
-nav ul {
+.landing-page nav ul {
   width: var(--adaptable-width);
   display: flex;
   flex-direction: var(--direction);
@@ -124,18 +124,18 @@ nav ul {
   margin: 0;
 }
 
-nav ul li {
+.landing-page nav ul li {
   font-size: 1rem;
   font-weight: 500;
 }
 
-nav ul *:hover {
+.landing-page nav ul *:hover {
   color: var(--accent);
   cursor: pointer;
   transition: color .2s ease-in-out;
 }
 
-nav ul * {
+.landing-page nav ul * {
   color: var(--text-light);
   list-style: none;
   text-decoration: none;
@@ -147,12 +147,12 @@ nav ul * {
   width: var(--adaptable-width);
 }
 
-nav .logo {
+.landing-page nav .logo {
   width: 60px;
 }
 
 
-nav ul li:first-child {
+.landing-page nav ul li:first-child {
   flex:1;
 }
 
@@ -334,19 +334,32 @@ nav ul li:first-child {
 @media (width < 451px) {
 
   :root {
-    --adaptable-width: 90%;
+    --adaptable-width: 100%;
     --direction: column;
   }
-  nav ul {
+  .landing-page nav ul {
+    width: 100%;
     flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
     gap: .5rem;
   }
-  nav {
+
+  .landing-page nav {
     height: 3rem;
-    padding: 35px 0;
+    padding: 1rem 1rem;
   }
 
-   nav ul li:not(:first-child):not(:nth-last-child(-n+2)) {
+  .landing-page nav ul li{
+    height: auto;
+    flex: 1;
+  }
+  
+  .landing-page nav ul:first-child img{
+    width: 30px;
+  }
+
+  .landing-page nav ul li:not(:first-child):not(:nth-last-child(-n+2)) {
     display: none;
   }
   
@@ -354,7 +367,7 @@ nav ul li:first-child {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 2rem;
+    gap: 1rem;
   }
   
   .header-content .header-text,

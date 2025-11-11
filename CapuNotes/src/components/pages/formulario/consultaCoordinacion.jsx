@@ -131,7 +131,6 @@ export default function FormularioConsultaCoordinacion({ title = 'Consulta de In
           <BackButton />
           <h1 className='abmc-title'>{title}</h1>
         </header>
-        <hr className='divider' />
 
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center' }}>

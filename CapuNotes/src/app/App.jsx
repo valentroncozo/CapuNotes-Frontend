@@ -1,10 +1,14 @@
 // src/App.jsx
-import React, { useEffect } from "react";
-// agregar imports faltantes desde react-router-dom y useAuth desde el contexto
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
-import { AuthProvider, useAuth } from "@/context/AuthContext.jsx";
+import { useState } from 'react';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+} from 'react-router-dom';
 
-import AppShell from "@/components/layout/AppShell.jsx";
+import AppShell from '@/components/layout/AppShell.jsx';
 
 // Pages
 import Login from "@/components/pages/login/index.jsx";
@@ -15,57 +19,55 @@ import Miembros from "@/components/pages/miembros/index.jsx";
 import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
 import Audicion from "@/components/pages/audicion/index.jsx";
-import AudicionAgregar from "@/components/pages/audicion/agregar.jsx";
 import AudicionEditar from "@/components/pages/audicion/editar.jsx";
-import CuestionarioConfig from "@/components/pages/cuestionario/configuracion.jsx";
-import CuestionarioPreview from "@/components/pages/cuestionario/preview.jsx";
-import Candidatos from "@/components/pages/audicion/candidatos.jsx";
-import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx";
+import AudicionAgregar from "@/components/pages/audicion/agregar.jsx";
+import CuestionarioConfig from '@/components/pages/cuestionario/configuracion.jsx';
+import CuestionarioPreview from '@/components/pages/cuestionario/preview.jsx';
+import AsistenciaEnsayos from '@/components/pages/asistencias/asistenciaEnsayos.jsx';
+import AsistenciaEnsayosDetalle from '@/components/pages/asistencias/asistenciaEnsayosDetalle.jsx';
 import HistorialAudiciones from "@/components/pages/audicion/historial.jsx";
-import Formulario from "@/components/pages/formulario/index.jsx"; // <-- descomenta cuando exista
+import Formulario from "@/components/pages/formulario/index.jsx"; 
 import FormularioConsulta from "@/components/pages/formulario/consulta.jsx";
 import FormularioConsultaCoordinacion from "@/components/pages/formulario/consultaCoordinacion.jsx";
-import Error401 from "../components/pages/errors/Error401";
-import Error403 from "../components/pages/errors/Error403";
-import LandingPage from "../components/pages/landing";
+import Eventos from '@/components/pages/eventos/index.jsx';
+import Candidatos from "@/components/pages/audicion/candidatos.jsx";
+import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx";
 
-
-// Estilos base (usar globals como fuente de verdad)
-import "@/styles/globals.css";
+// Estilos base (usar globals como fuente deFverdad)
+import '@/styles/globals.css';
+import LandingPage from '../components/pages/landing';
 
 function ProtectedRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth();
-  // mientras carga, podrías mostrar spinner; aquí solo bloqueamos la navegación
-  if (loading) return null;
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  const isAuth = localStorage.getItem('capunotes_auth') === '1';
+  return isAuth ? children : <Navigate to="/login" replace />;
 }
 
 function AppRoutes() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { isAuthenticated, loading, user } = useAuth();
-  // redirigir automáticamente a /principal cuando la sesión quede confirmada
-  useEffect(() => {
-    if (!loading && isAuthenticated) {
-      const p = location.pathname;
-      if (p === "/login" || p === "/") navigate("/principal", { replace: true });
-    }
-  }, [isAuthenticated, loading, location.pathname, navigate]);
+  const [username, setUsername] = useState(
+    localStorage.getItem('capunotes_user') || ''
+  );
 
-  const username = user?.username || "";
+  const handleLogin = (user) => {
+    localStorage.setItem('capunotes_auth', '1');
+    localStorage.setItem('capunotes_user', user);
+    setUsername(user);
+    navigate('/principal', { replace: true });
+  };
 
   const handleLogout = () => {
-    // si necesitas propagar logout al AppShell, usa useAuth dentro de AppShell y llama logout()
-    // aquí solo navegamos a login
-    navigate("/login", { replace: true });
+    localStorage.removeItem('capunotes_auth');
+    localStorage.removeItem('capunotes_user');
+    setUsername('');
   };
 
   return (
     <Routes>
-      <Route path="/home" element={<LandingPage />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/401" element={<Error401 />} />
-      <Route path="/403" element={<Error403 />} />
+      <Route
+        path="/login"
+        element={<Login onLogin={(u) => handleLogin(u)} />}
+      />
+
       <Route
         path="/"
         element={
@@ -83,19 +85,24 @@ function AppRoutes() {
         <Route path="areas" element={<Areas />} />
         <Route path="cuestionario/configuracion" element={<CuestionarioConfig />} />
         <Route path="cuestionario/preview" element={<CuestionarioPreview />} />
+        <Route path="asistencias" element={<AsistenciaEnsayos />} />
+        <Route path="asistencias/ensayos/:idEnsayo" element={<AsistenciaEnsayosDetalle />} />
+        <Route path="eventos" element={<Eventos />} />
         <Route path="audicion" element={<Audicion />} />
         <Route path="audicion/agregar" element={<AudicionAgregar />} />
         <Route path="audicion/editar" element={<AudicionEditar />} />
-        <Route path="audicion/candidatos" element={<Candidatos />} />
-        <Route path="candidatos-administracion" element={<CandidatosCoordinadores />} />
         <Route path="audicion/historial" element={<HistorialAudiciones />} />
-        <Route path="audicion/cronograma/:id" element={<Navigate to="/candidatos-administracion" replace />} />
         <Route path="/inscripcion/:id" element={<FormularioConsulta />} />
         <Route path="/inscripcion/coordinadores/:id" element={<FormularioConsultaCoordinacion />} />
+        <Route path="audicion/candidatos" element={<Candidatos />} />
+        <Route path="candidatos-administracion" element={<CandidatosCoordinadores />} />
       </Route>
 
       <Route path="/formulario" element={<Formulario />} />
       <Route path="*" element={<Navigate to="/principal" replace />} />
+      <Route path="/formulario" element={<Formulario />} /> 
+
+      <Route path="landing" element={< LandingPage/>} />
     </Routes>
   );
 }

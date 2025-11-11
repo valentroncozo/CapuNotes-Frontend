@@ -262,7 +262,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Coord
               filtered.map((r) => (
                 <tr key={r.id} className="abmc-row">
                   <td>{r.hora || "—"}</td>
-                  <td>{`${r.apellido || ''}, ${r.nombre || ''}` || "—"}</td>
+                  <td>{(r.apellido || r.nombre) ? `${r.apellido || ''}, ${r.nombre || ''}` : "—"}</td>
                   <td>{r.cancion || "—"}</td>
                   <td style={{ textAlign: "center" }}>{getResultadoButton(r)}</td>
                   <td style={{ textAlign: "center" }}>

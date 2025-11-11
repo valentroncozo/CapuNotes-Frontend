@@ -28,8 +28,13 @@ a:hover { opacity: .9; }
 
 /* BOTONES */
 button, .btn { cursor: pointer; border: none; border-radius: var(--radius); transition: all .2s ease-in-out; }
-.btn-primary, .btn-warning, .btn { background-color: var(--accent) !important; color: var(--text-dark) !important; box-shadow: var(--shadow); }
-.btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+.btn-primary, .btn-warning, .btn { 
+  background-color: var(--accent) !important; 
+  color: var(--text-light) !important;
+  fill: var(--text-light);
+  box-shadow: var(--shadow); 
+  }
+
 
 /* FORMULARIOS */
 input, select, textarea {
