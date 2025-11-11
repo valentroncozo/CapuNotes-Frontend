@@ -88,8 +88,10 @@ async function request(method, path, { params, body, headers = {}, timeoutMs } =
       credentials: 'include',
     };
 
-    // adjuntar CSRF header para mutaciones (no GET)
-    if (method && method.toUpperCase() !== 'GET') {
+    // adjuntar CSRF header para mutaciones (no GET) excepto login
+    // el endpoint /api/auth/login está exento de CSRF en el backend
+    const isLogin = path && (path.includes('/auth/login') || path.includes('/api/auth/login'));
+    if (method && method.toUpperCase() !== 'GET' && !isLogin) {
       const xsrf = getCookie(CSRF_COOKIE_NAME);
       if (xsrf) init.headers[CSRF_HEADER] = xsrf;
     }
