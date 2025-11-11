@@ -66,6 +66,8 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
         const byDateKey = {};
         const originalesTemp = {}; // ✅ NUEVO: Para guardar franjas originales
         
+        console.log('Turnos obtenidos para la audición:', turnos);
+
         for (const t of turnos || []) {
           const fechaBase = t.fecha;
           if (!fechaBase) continue;
@@ -299,7 +301,6 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
             </span>
           )}
         </header>
-        <hr className='divider' />
 
         {!audicion ? (
           <p style={{ padding: 16 }}>No hay audición actual para modificar.</p>
@@ -360,9 +361,9 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
                 <button type='button' className='abmc-btn btn-primary btn-dias' onClick={handleAgregarDia}>Agregar día</button>
               </section>
 
-              <section className='abmc-topbar'>
+              <section className='footer-audicion'>
                 <button type='button' className='abmc-btn btn-secondary btn-dias' onClick={() => navigate('/audicion')}>Cancelar</button>
-                <button type='button' className='abmc-btn btn-primary btn-dias' onClick={handleGuardar} disabled={isSaving}>{isSaving ? 'Guardando...' : 'Guardar Cambios'}</button>
+                <button type='button' className='abmc-btn btn-primary btn-dias' onClick={handleGuardar} disabled={isSaving}>{isSaving ? 'Guardando...' : 'Guardar'}</button>
               </section>
             </section>
           </>

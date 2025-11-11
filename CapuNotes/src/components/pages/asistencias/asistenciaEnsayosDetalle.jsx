@@ -10,6 +10,8 @@ import "@/styles/abmc.css";
 import "@/styles/table.css";
 import "@/styles/asistencia.css";
 import Loader from "@/components/common/Loader.jsx";
+import CheckIcon from "@/assets/CheckIcon";
+import CloseIcon from "@/assets/CloseIcon";
 
 const ESTADOS_MAP = {
   no: "AUSENTE",
@@ -303,7 +305,7 @@ export default function AsistenciaEnsayosDetalle() {
                       title="Ausente"
                       disabled={saving || isCerrada}
                     >
-                      ✖
+                      <CloseIcon fill='var(--text-light)' />
                     </button>
 
                     <button
@@ -323,7 +325,7 @@ export default function AsistenciaEnsayosDetalle() {
                       title="Presente"
                       disabled={saving || isCerrada}
                     >
-                      ✓
+                      <CheckIcon fill='var(--text-light)' />
                     </button>
                   </div>
                 </td>

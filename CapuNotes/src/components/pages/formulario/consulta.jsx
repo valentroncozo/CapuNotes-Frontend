@@ -8,7 +8,8 @@ import { useEffect, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import AudicionService from '@/services/audicionService.js';
-import incripcionService from '@/services/incripcionService.js';
+import preguntasService from '@/services/preguntasService.js';
+
 
 export default function FormularioConsulta({ title = 'Consulta de Inscripción' }) {
   const { id: inscripcionIdParam } = useParams();
@@ -29,24 +30,10 @@ export default function FormularioConsulta({ title = 'Consulta de Inscripción' 
       try {
         setLoading(true);
 
-        // 1) audición actual
-        const aud = await AudicionService.getActual();
-        if (!aud?.id) {
-          Swal.fire({ icon: 'warning', title: 'No hay audiciones activas' });
-          setLoading(false);
-          return;
-        }
-        setAudicionId(aud.id);
-
-        // 2) encuesta (preguntas, turnos, cuerdas)
-        const encuesta = await incripcionService.getEncuesta(aud.id);
-        setPreguntas(encuesta.preguntas || []);
-        setTurnos(encuesta.turnos || []);
-        setCuerdas(encuesta.cuerdas || []);
-
-        // 3) perfil de la inscripción (si viene id en la ruta)
-        if (inscripcionId) {
+          
+       if (inscripcionId) {
           const perfil = await AudicionService.getPerfilInscripcion(inscripcionId);
+          console.log('Perfil de inscripción cargado:', perfil);
           setCantidadAudiciones(perfil?.cantidadAudiciones ?? null);
           setCandidato(perfil?.candidato ?? null);
 
@@ -59,9 +46,18 @@ export default function FormularioConsulta({ title = 'Consulta de Inscripción' 
             if (r?.preguntaId != null) rawById.set(String(r.preguntaId), r);
             if (r?.id != null) rawById.set(String(r.id), r);
           });
+
+        // 2) encuesta (preguntas, turnos, cuerdas)
+        const encuesta = await preguntasService.getFormulario(perfil.audicionId);
+        console.log('Encuesta cargada:', encuesta);
+          
+        setPreguntas(encuesta || []);
+        setTurnos(encuesta.turnos || []);
+        setCuerdas(encuesta.cuerdas || []);
+
           const rawByText = new Map(raw.map(r => [String(r.pregunta ?? '').trim().toLowerCase(), r]));
 
-          const normalized = (encuesta.preguntas || []).map(p => {
+          const normalized = (encuesta || []).map(p => {
             // buscar por id primero, luego por texto (valor)
             const keyId = String(p.id);
             const keyText = String(p.valor ?? '').trim().toLowerCase();
@@ -82,7 +78,7 @@ export default function FormularioConsulta({ title = 'Consulta de Inscripción' 
             const idMatch = normalized.some(n => String(n.preguntaId) === String(r.preguntaId) || String(n.preguntaId) === String(r.id));
             const textMatch = normalized.some(n => {
               const rawText = String(r.pregunta ?? '').trim().toLowerCase();
-              const p = encuesta.preguntas?.find(q => String(q.id) === String(n.preguntaId));
+              const p = encuesta?.find(q => String(q.id) === String(n.preguntaId));
               return p && String(p.valor ?? '').trim().toLowerCase() === rawText;
             });
             return !idMatch && !textMatch;
@@ -121,7 +117,7 @@ export default function FormularioConsulta({ title = 'Consulta de Inscripción' 
           <BackButton />
           <h1 className='abmc-title'>{title}</h1>
         </header>
-        <hr className='divider' />
+
 
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center' }}>

@@ -19,16 +19,23 @@ import Miembros from "@/components/pages/miembros/index.jsx";
 import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
 import Audicion from "@/components/pages/audicion/index.jsx";
+import AudicionEditar from "@/components/pages/audicion/editar.jsx";
 import AudicionAgregar from "@/components/pages/audicion/agregar.jsx";
 import CuestionarioConfig from '@/components/pages/cuestionario/configuracion.jsx';
 import CuestionarioPreview from '@/components/pages/cuestionario/preview.jsx';
-import Formulario from '@/components/pages/formulario/consulta.jsx';
 import AsistenciaEnsayos from '@/components/pages/asistencias/asistenciaEnsayos.jsx';
 import AsistenciaEnsayosDetalle from '@/components/pages/asistencias/asistenciaEnsayosDetalle.jsx';
+import HistorialAudiciones from "@/components/pages/audicion/historial.jsx";
+import Formulario from "@/components/pages/formulario/index.jsx"; 
+import FormularioConsulta from "@/components/pages/formulario/consulta.jsx";
+import FormularioConsultaCoordinacion from "@/components/pages/formulario/consultaCoordinacion.jsx";
 import Eventos from '@/components/pages/eventos/index.jsx';
+import Candidatos from "@/components/pages/audicion/candidatos.jsx";
+import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx";
 
-// Estilos base (usar globals como fuente de verdad)
+// Estilos base (usar globals como fuente deFverdad)
 import '@/styles/globals.css';
+import LandingPage from '../components/pages/landing';
 
 function ProtectedRoute({ children }) {
   const isAuth = localStorage.getItem('capunotes_auth') === '1';
@@ -83,13 +90,19 @@ function AppRoutes() {
         <Route path="eventos" element={<Eventos />} />
         <Route path="audicion" element={<Audicion />} />
         <Route path="audicion/agregar" element={<AudicionAgregar />} />
-
+        <Route path="audicion/editar" element={<AudicionEditar />} />
+        <Route path="audicion/historial" element={<HistorialAudiciones />} />
+        <Route path="/inscripcion/:id" element={<FormularioConsulta />} />
+        <Route path="/inscripcion/coordinadores/:id" element={<FormularioConsultaCoordinacion />} />
+        <Route path="audicion/candidatos" element={<Candidatos />} />
+        <Route path="candidatos-administracion" element={<CandidatosCoordinadores />} />
       </Route>
      
 
       <Route path="*" element={<Navigate to="/principal" replace />} />
       <Route path="/formulario" element={<Formulario />} /> 
 
+      <Route path="landing" element={< LandingPage/>} />
     </Routes>
   );
 }

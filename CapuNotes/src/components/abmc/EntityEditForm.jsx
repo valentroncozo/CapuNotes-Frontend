@@ -73,6 +73,15 @@ export default function EntityEditForm({ isOpen, onClose, entityName, schema, en
                   return <option key={value} value={value}>{label}</option>;
                 })}
               </select>
+            ) : f.key === "descripcion" ? (
+              <textarea
+                name={f.key}
+                value={formData[f.key] || ""}
+                onChange={handleChange}
+                className="input"
+                rows="4"
+                style={{ resize: "vertical" }}
+              />
             ) : (
               <input
                 type={f.type || "text"}

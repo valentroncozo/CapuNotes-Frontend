@@ -22,8 +22,9 @@
 /* ====== HEADER ASISTENCIA A ENSAYOS ====== */
 .abmc-header {
   display: flex;
-  align-items: flex-start;        /* flecha y texto alineados arriba */
+  align-items: flex-end;        /* flecha y texto alineados arriba */
   gap: 16px;
+  align-content: flex-end;
   justify-content: flex-start;
   position: relative;
   margin-bottom: 32px;            /* más espacio con los filtros */
@@ -41,8 +42,9 @@
 
 /* Título */
 .abmc-title {
+  height: 36px ;
   font-weight: 700;
-  font-size: 1.8rem;
+  font-size: 6vh;
   margin: 0;
   color: var(--text-light);
   position: relative;
@@ -50,14 +52,14 @@
 
 /* Línea amarilla institucional */
 .abmc-header::after {
-  content: "";
+  content: "<hr />";
   position: absolute;
-  bottom: -10px;
+  bottom: -20px;
   left: 0;
   width: 100%;
   height: 2px;
   background-color: var(--accent);
-  border-radius: 2px;
+  border-radius: .5px;
 }
 
 /* ====== FILTROS ====== */
@@ -68,6 +70,73 @@
   margin-top: 28px;               /* 👈 más aire respecto al header */
   margin-bottom: 1.5rem;
 }
+
+/* CUERDAS PAGE STYLES
+   -------------------- */
+
+/* Título alineado a la izquierda */
+.cuerdas-page .abmc-title {
+  text-align: left;
+}
+
+/* === Botones principales para todas las páginas === */
+.abmc-topbar .abmc-btn,
+.abmc-topbar button {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 10px 18px !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28) !important;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.abmc-topbar .abmc-btn:hover,
+.abmc-topbar button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.02);
+}
+
+/* === Botones de acción con ícono para todas las páginas === */
+.abmc-actions .abmc-btn-icon {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-radius: 10px !important;
+  padding: 8px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25) !important;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.abmc-actions .abmc-btn-icon:hover {
+  transform: translateY(-2px);
+  filter: brightness(0.98);
+}
+
+.abmc-actions .abmc-btn-icon:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* === Tabla: primera columna alineada === */
+.cuerdas-page .abmc-table th:first-child,
+.cuerdas-page .abmc-table td:first-child {
+  text-align: left !important;
+  padding-left: 18px !important;
+}
+
+/* === Responsivo === */
+@media (max-width: 480px) {
+  .cuerdas-page .abmc-table th:first-child,
+  .cuerdas-page .abmc-table td:first-child {
+    padding-left: 12px !important;
+  }
+}
+
 
 /* Topbar */
 .abmc-topbar {
@@ -117,7 +186,7 @@
 
 /* Mueve un poco el título "Acciones" hacia el centro */
 .abmc-table th:last-child {
-  text-align: center;
+  text-align: left;
   padding-right: 20px; /* 👈 separa del borde derecho */
 }
 
@@ -132,12 +201,11 @@
 /* === Prioridad total para botones de acciones === */
 .abmc-actions .abmc-btn-icon,
 .abmc-actions .abmc-btn-icon:hover,
-.abmc-actions .abmc-btn-icon svg,
 .abmc-actions .abmc-btn-icon svg path {
   opacity: 1 !important;
-  background-color: #ffc107 !important;
-  color: #202124 !important;
-  fill: #202124 !important;
+  background-color: var(--accent) !important;
+  color: #E8EAED !important;
+  fill: #E8EAED !important;
   stroke: none !important;
   border: none !important;
 }
@@ -147,16 +215,16 @@
   outline: none !important;
   border: none !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-  background-color: #ffc107; /* amarillo institucional */
-  color: #202124;
+  background-color: var(--accent); /* amarillo institucional */
+  color: #E8EAED;
   transition: all 0.2s ease-in-out;
 }
 
 /* Hover: aclara el fondo e ícono, sin borde */
 .abmc-actions .abmc-btn-icon:hover {
-  background-color: #ffd54f; /* más claro */
-  color: #3a3a3a; /* ícono un poco más claro */
-  filter: brightness(1.05);
+  background-color: var(--accent); /* mantener mismo amarillo */
+  color: #E8EAED; /* icono en blanco */
+  filter: brightness(0.98);
   transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
   outline: none !important;
@@ -166,13 +234,21 @@
 /* Click o "active": efecto de hundimiento */
 .abmc-actions .abmc-btn-icon:active {
   transform: translateY(1px) scale(0.98);
-  background-color: #e6ad00; /* tono más oscuro al presionar */
+  background-color: var(--accent); /* mantener mismo amarillo */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   outline: none !important;
   border: none !important;
 }
 
 /* Asegura que los iconos sigan el color del botón */
+.abmc-actions .abmc-btn-icon svg {
+  background: transparent !important;
+  padding: 0 !important;
+  width: 18px !important;
+  height: 18px !important;
+  display: block !important;
+}
+
 .abmc-actions .abmc-btn-icon svg path {
   fill: currentColor !important;
   stroke: none !important;
@@ -270,5 +346,10 @@
 /* Ajuste fino de filtros */
 .asistencia-header + .filtros {
   margin-top: 1.8rem;
+}
+
+/* === Unificar border-radius para todos los botones === */
+button, .abmc-btn, .abmc-btn-icon {
+  border-radius: 10px !important;
 }
 

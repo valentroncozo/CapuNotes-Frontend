@@ -4,10 +4,12 @@ import { useEffect, useMemo, useState } from 'react';
 import BackButton from '@/components/common/BackButton.jsx';
 import AudicionService from '@/services/audicionService.js';
 import preguntasService from '@/services/preguntasService.js';
-import Modal from '@/components/common/Modal.jsx'; // <-- uso del modal genérico existente
+import Modal from '@/components/common/Modal.jsx'; 
 import TrashIcon from '@/assets/TrashIcon.jsx';
 import EditIcon from '@/assets/EditIcon';
-
+import AddIcon from '@/assets/AddIcon';
+import RemoveIcon from '@/assets/RemoveIcon';
+import Swal from 'sweetalert2';
 
 const tipos = [
   { value: 'TEXTO', label: 'Texto' },
@@ -31,6 +33,7 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
   const [audicion, setAudicion] = useState(null);
   const [preguntas, setPreguntas] = useState([]);
   const [asignadas, setAsignadas] = useState(() => new Set());
+  // estado inicial asegurando `activa: true`
   const [nuevo, setNuevo] = useState({ valor: '', tipo: 'TEXTO', obligatoria: true, activa: true, opciones: [] });
 
   // nuevo estado agregado para el input de nueva opción en el topbar
@@ -65,14 +68,34 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
 
   const handleCreate = async () => {
     if (!nuevo.valor.trim()) return;
+
+    // Asegurar que `activa` sea boolean y por defecto true
+    const activa = nuevo.activa == null ? true : Boolean(nuevo.activa);
+
     // construir payload: backend espera lista de strings para opciones
-    const createPayload = { valor: nuevo.valor, tipo: nuevo.tipo, obligatoria: nuevo.obligatoria };
+    const createPayload = { 
+      valor: nuevo.valor, 
+      tipo: nuevo.tipo, 
+      obligatoria: Boolean(nuevo.obligatoria), 
+      activa: activa // <-- asegurar que se setea la propiedad aquí
+    };
+
     if (nuevo.tipo === 'OPCION' || nuevo.tipo === 'MULTIOPCION') {
-      createPayload.opciones = (nuevo.opciones || []).map(o => String(o?.valor ?? o));
+      createPayload.opciones = (nuevo.opciones || []).map(o => String(o?.valor ?? o)).filter(s => s !== '');
     }
+
+    // DEBUG: mostrar JSON exacto que se enviará
+    console.log('Creating pregunta with JSON payload:', JSON.stringify(createPayload));
+
     const saved = await preguntasService.create(createPayload);
-    setPreguntas(prev => [{ ...saved, opciones: Array.isArray(saved.opciones) ? saved.opciones.map(normalizeOption) : [] }, ...prev]);
-    setNuevo({ valor: '', tipo: 'TEXTO', obligatoria: true, opciones: [] });
+
+    setPreguntas(prev => [{ 
+      ...saved, 
+      opciones: Array.isArray(saved.opciones) ? saved.opciones.map(normalizeOption) : []
+    }, ...prev]);
+
+    // reset explícito conservando activa:true
+    setNuevo({ valor: '', tipo: 'TEXTO', activa: true, obligatoria: true, opciones: [] });
     setNuevaOpcion('');
   };
 
@@ -215,12 +238,35 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
 
   const handleAsignar = async (id) => {
     if (!audicion?.id) return;
+
+    if(String(audicion?.estado) !== 'BORRADOR') {
+      Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "No se pueden asignar preguntas a una audición que no está en estado Borrador.",
+              background: "#11103a",
+              color: "#E8EAED",
+              confirmButtonColor: "#7c83ff",
+            });
+      return;
+    }
     await preguntasService.asignarA_Audicion(audicion.id, [id]);
     setAsignadas(prev => new Set(prev).add(id));
   };
 
   const handleQuitar = async (id) => {
     if (!audicion?.id) return;
+    if(audicion?.estado !== 'BORRADOR') {
+      Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "No se pueden eliminar preguntas a una audición que no está en estado Borrador.",
+              background: "#11103a",
+              color: "#E8EAED",
+              confirmButtonColor: "#7c83ff",
+            });
+      return;
+    }
     await preguntasService.quitarDeAudicion(audicion.id, id);
     setAsignadas(prev => { const s = new Set(prev); s.delete(id); return s; });
   };
@@ -296,17 +342,17 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
 
                     <td>
                       <div className="abmc-actions">
-                        <button type="button" className="abmc-btn btn-secondary" onClick={() => {
+                        <button type="button" className="abmc-btn btn-primary" onClick={() => {
                           // abrir modal con copia de la pregunta
                           setEditing({ ...p, opciones: Array.isArray(p.opciones) ? [...p.opciones] : [] });
                           setEditOpcionInput('');
                           setIsEditing(true);
-                        }}><EditIcon /></button>
-                        <button type="button" className="abmc-btn abmc-btn-danger" onClick={() => handleDelete(p.id)}> <TrashIcon /></button>
+                        }}><EditIcon fill='var(--text-light)' /></button>
+                        <button type="button" className="abmc-btn abmc-btn-danger" onClick={() => handleDelete(p.id)}> <TrashIcon fill='var(--text-light)' /></button>
                         {isAsignada ? (
-                          <button type="button" className="abmc-btn abmc-btn-danger" title="Quitar del cuestionario" onClick={() => handleQuitar(p.id)}>-</button>
+                          <button type="button" className="abmc-btn abmc-btn-danger" title="Quitar del cuestionario" onClick={() => handleQuitar(p.id)}><RemoveIcon fill='var(--text-light)' /></button>
                         ) : (
-                          <button type="button" className="abmc-btn abmc-btn-primary" title="Añadir al cuestionario" onClick={() => handleAsignar(p.id)}>+</button>
+                          <button type="button" className="abmc-btn abmc-btn-primary" title="Añadir al cuestionario" onClick={() => handleAsignar(p.id)}><AddIcon fill='var(--text-light)' /></button>
                         )}
                       </div>
                     </td>

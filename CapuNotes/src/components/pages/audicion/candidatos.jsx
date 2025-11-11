@@ -6,7 +6,11 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import AudicionService from '@/services/audicionService.js';
 import ResultadosModal from '../audicion/resultados.jsx';
 import candidatosService from '@/services/candidatosService.js';
-import { InfoCircle as InfoIcon } from 'react-bootstrap-icons';
+import CheckIcon from '@/assets/CheckIcon.jsx';
+import BlockIcon from '@/assets/BlockIcon.jsx';
+import CloseIcon from '@/assets/CloseIcon.jsx';
+import EyeOnIcon from '@/assets/VisibilityOnIcon.jsx';
+import { formatDate } from '@/components/common/datetime.js';
 
 export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Coordinador)' }) {
 
@@ -61,7 +65,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Coord
         (cron || []).forEach(item => {
           const f = item?.turno?.fecha;
           if (!f) return;
-          const label = item?.turno?.diaString ? `${item.turno.diaString} — ${f}` : f;
+          const label = item?.turno?.diaString ? `${item.turno.diaString} — ${formatDate(f)}` : formatDate(f);
           if (!mapa.has(f)) mapa.set(f, { value: f, label });
         });
 
@@ -158,9 +162,10 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Coord
     const isNoResultado = !estado || estado === "pendiente" || estado === "sin";
     const isAceptado = estado === "aceptado" || estado === "aprobado";
     const isRechazado = estado === "rechazado";
+    const isCancelado = estado === "cancelada" || estado === "cancelado";
 
-    const color = isNoResultado ? "#444" : isAceptado ? "green" : isRechazado ? "red" : "#444";
-    const label = isNoResultado ? "Añadir" : isAceptado ? "✅" : "❌";
+    const color = isNoResultado ? "#444" : isAceptado ? "green" : isRechazado ? "red" : isCancelado ? "var(--text-light)" : null;
+    const label = isNoResultado ? "Añadir" : isAceptado ? <CheckIcon fill={color} /> : isRechazado ? <CloseIcon fill={color} /> : isCancelado ? <BlockIcon fill={color} /> : "Editar";
     const readOnly = !isNoResultado; // ✅ Solo lectura si ya hay resultado
 
     return (
@@ -271,7 +276,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Coord
                       onClick={() => navigate(`/inscripcion/coordinadores/${r.id}`)}
                       title="Ver inscripción"
                     >
-                      <InfoIcon size={18} />
+                      <EyeOnIcon width={20} height={20} fill="var(--text-light)" />
                     </button>
                   </td>
                 </tr>

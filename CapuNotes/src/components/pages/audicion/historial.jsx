@@ -7,6 +7,8 @@ import "@/styles/forms.css";
 import "@/styles/popup.css";
 import ResultadosModal from "./resultados.jsx";
 import { useNavigate } from "react-router-dom";
+import EyeOnIcon from "@/assets/VisibilityOnIcon.jsx";
+import AddIcon from "@/assets/AddIcon.jsx";
 
 export default function HistorialAudicionesPage() {
   const [rows, setRows] = useState([]);
@@ -204,7 +206,7 @@ export default function HistorialAudicionesPage() {
                         }
                         title="Ver detalles del resultado"
                       >
-                        Ver
+                      <EyeOnIcon />
                       </button>
                     </td>
 
@@ -214,7 +216,7 @@ export default function HistorialAudicionesPage() {
                         title="Abrir cuestionario de inscripción"
                         onClick={() => navigate(`/inscripcion/${r.inscripcion?.id || r.id}`)}
                       >
-                        +
+                        <AddIcon fill="var(--text-light)" />
                       </button>
                     </td>
                   </tr>
