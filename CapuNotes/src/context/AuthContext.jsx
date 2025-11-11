@@ -25,6 +25,7 @@ export function AuthProvider({ children }) {
   // centralizar almacenamiento y broadcasting entre pestañas
   const LOCAL_KEY = "capunotes_user";
   const initializedRef = useRef(false); // { changed code }
+  const refreshPromiseRef = useRef(null); // controlar refresh concurrente
 
   const setUserFromMe = (me, { broadcast = true } = {}) => {
     setUser(me || null);
