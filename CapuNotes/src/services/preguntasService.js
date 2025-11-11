@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { act } from 'react';
 
 const DEV_PROXY_BASE = '/api';
 const resolvedBaseURL = import.meta.env.DEV ? DEV_PROXY_BASE : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
@@ -38,7 +37,7 @@ const preguntasService = {
   },
 
   getFormulario: async (audicionId) => {
-    const r = await api.get(`/audiciones/${encodeURIComponent(audicionId)}/formulario`);
+    const r = await api.get(`/audiciones/${Number(audicionId)}/formulario`);
     return r.data;
   },
 

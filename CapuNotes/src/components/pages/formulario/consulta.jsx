@@ -117,7 +117,7 @@ export default function FormularioConsulta({ title = 'Consulta de Inscripción' 
           <BackButton />
           <h1 className='abmc-title'>{title}</h1>
         </header>
-        <hr className='divider' />
+
 
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center' }}>

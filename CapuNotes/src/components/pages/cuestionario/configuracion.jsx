@@ -4,10 +4,12 @@ import { useEffect, useMemo, useState } from 'react';
 import BackButton from '@/components/common/BackButton.jsx';
 import AudicionService from '@/services/audicionService.js';
 import preguntasService from '@/services/preguntasService.js';
-import Modal from '@/components/common/Modal.jsx'; // <-- uso del modal genérico existente
+import Modal from '@/components/common/Modal.jsx'; 
 import TrashIcon from '@/assets/TrashIcon.jsx';
 import EditIcon from '@/assets/EditIcon';
-
+import AddIcon from '@/assets/AddIcon';
+import RemoveIcon from '@/assets/RemoveIcon';
+import Swal from 'sweetalert2';
 
 const tipos = [
   { value: 'TEXTO', label: 'Texto' },
@@ -236,7 +238,8 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
 
   const handleAsignar = async (id) => {
     if (!audicion?.id) return;
-    if(!audicion?.estado !== 'BORRADOR') {
+
+    if(String(audicion?.estado) !== 'BORRADOR') {
       Swal.fire({
               icon: "error",
               title: "Error",
@@ -253,7 +256,7 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
 
   const handleQuitar = async (id) => {
     if (!audicion?.id) return;
-    if(!audicion?.estado !== 'BORRADOR') {
+    if(audicion?.estado !== 'BORRADOR') {
       Swal.fire({
               icon: "error",
               title: "Error",
@@ -339,17 +342,17 @@ export default function CuestionarioConfigPage({ title = 'Configuración de cues
 
                     <td>
                       <div className="abmc-actions">
-                        <button type="button" className="abmc-btn btn-secondary" onClick={() => {
+                        <button type="button" className="abmc-btn btn-primary" onClick={() => {
                           // abrir modal con copia de la pregunta
                           setEditing({ ...p, opciones: Array.isArray(p.opciones) ? [...p.opciones] : [] });
                           setEditOpcionInput('');
                           setIsEditing(true);
-                        }}><EditIcon /></button>
-                        <button type="button" className="abmc-btn abmc-btn-danger" onClick={() => handleDelete(p.id)}> <TrashIcon /></button>
+                        }}><EditIcon fill='var(--text-light)' /></button>
+                        <button type="button" className="abmc-btn abmc-btn-danger" onClick={() => handleDelete(p.id)}> <TrashIcon fill='var(--text-light)' /></button>
                         {isAsignada ? (
-                          <button type="button" className="abmc-btn abmc-btn-danger" title="Quitar del cuestionario" onClick={() => handleQuitar(p.id)}>-</button>
+                          <button type="button" className="abmc-btn abmc-btn-danger" title="Quitar del cuestionario" onClick={() => handleQuitar(p.id)}><RemoveIcon fill='var(--text-light)' /></button>
                         ) : (
-                          <button type="button" className="abmc-btn abmc-btn-primary" title="Añadir al cuestionario" onClick={() => handleAsignar(p.id)}>+</button>
+                          <button type="button" className="abmc-btn abmc-btn-primary" title="Añadir al cuestionario" onClick={() => handleAsignar(p.id)}><AddIcon fill='var(--text-light)' /></button>
                         )}
                       </div>
                     </td>

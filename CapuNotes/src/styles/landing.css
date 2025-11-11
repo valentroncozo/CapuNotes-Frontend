@@ -13,7 +13,7 @@
 }
 
 /* reset mínimo y box-sizing para evitar sorpresas */
-html, body, #root {
+html, body{
   height: 100%;
   width: 100%;
   margin: 0;
@@ -54,7 +54,7 @@ html, body, #root {
 /* Hide root scrollbars and use .landing-page as the scrolling container on desktop
    We use pointer: fine to avoid changing touch/mobile behaviour. */
 @media (pointer: fine) {
-  html, body, #root {
+  html, body {
     overflow: hidden;
   }
 

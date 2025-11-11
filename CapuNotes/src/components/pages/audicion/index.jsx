@@ -10,7 +10,7 @@ import TableABMC from '../../common/table.jsx';
 import BackButton from '../../common/BackButton.jsx';
 import TurnoService from '@/services/turnoServices.js';
 import AudicionService from '@/services/audicionService.js';
-import PreguntasService from '@/services/preguntasService.js'; // <-- nuevo import (ajusta la ruta si es necesario)
+import preguntasService from '@/services/preguntasService.js';
 import Swal from 'sweetalert2';
 
 const Audicion = ({ title = 'Audición' }) => {
@@ -19,7 +19,7 @@ const Audicion = ({ title = 'Audición' }) => {
     'Hora',
     'Cantidad de turnos',
     'Turnos disponibles',
-    'Acciones',
+    ''
   ];
 
   const navigate = useNavigate();
@@ -44,12 +44,76 @@ const Audicion = ({ title = 'Audición' }) => {
     const resumen = await TurnoService.listarResumenPorDia(audicionActual.id);
     const franjas = await TurnoService.listarFranjasHorarias(audicionActual.id);
 
-    const mapHoras = {};
-    (franjas || []).forEach((f) => {
-      if (f?.fecha) {
-        if (!mapHoras[f.fecha]) mapHoras[f.fecha] = [];
-        mapHoras[f.fecha].push(f.horaDesde || '');
+    console.log('resumen', resumen);
+    console.log('franjas', franjas);
+
+    // Normaliza tiempos simples a "HH:mm"
+    const normalizeHora = (h) => {
+      if (h === null || h === undefined) return null;
+      let s = String(h).trim();
+      const isoMatch = s.match(/T(\d{2}:\d{2}:\d{2})/);
+      if (isoMatch) s = isoMatch[1];
+      const timeMatch = s.match(/^(\d{1,2}):?(\d{2})(?::\d{2})?$/);
+      if (timeMatch) {
+        const hh = timeMatch[1].padStart(2, '0');
+        const mm = timeMatch[2].padStart(2, '0');
+        return `${hh}:${mm}`;
       }
+      const digits = s.replace(/\D/g, '');
+      if (digits.length === 3 || digits.length === 4) {
+        const hh = digits.slice(0, digits.length - 2).padStart(2, '0');
+        const mm = digits.slice(-2);
+        return `${hh}:${mm}`;
+      }
+      return null;
+    };
+
+    // Agrupar franjas por fecha guardando start/end normalizados
+    const mapFranjas = {};
+    (franjas || []).forEach((f) => {
+      if (!f?.fecha) return;
+      if (!mapFranjas[f.fecha]) mapFranjas[f.fecha] = [];
+      const startRaw =
+        f.horaDesde ??
+        f.hora_inicio ??
+        f.horaInicio ??
+        f.hora ??
+        f.start ??
+        f.inicio;
+      const endRaw =
+        f.horaHasta ??
+        f.hora_fin ??
+        f.horaFin ??
+        f.hora_hasta ??
+        f.end ??
+        f.fin;
+      const start = normalizeHora(startRaw);
+      const end = normalizeHora(endRaw);
+      mapFranjas[f.fecha].push({ start, end });
+    });
+
+    const toMinutes = (t) => {
+      if (!t) return null;
+      const [hh, mm] = t.split(':').map(Number);
+      return hh * 60 + mm;
+    };
+
+    // Para cada fecha, calcular earliest start y latest end (fallback si falta end)
+    const mapHoraRango = {};
+    Object.keys(mapFranjas).forEach((fecha) => {
+      const starts = mapFranjas[fecha].map((x) => x.start).filter(Boolean);
+      const ends = mapFranjas[fecha].map((x) => x.end).filter(Boolean);
+      const minStart =
+        starts.length > 0 ? starts.reduce((a, b) => (toMinutes(a) <= toMinutes(b) ? a : b)) : null;
+      const maxEnd =
+        ends.length > 0 ? ends.reduce((a, b) => (toMinutes(a) >= toMinutes(b) ? a : b)) : null;
+      // si no hay end, usar el start más tarde como fin (última franja)
+      const fallbackEnd =
+        !maxEnd && starts.length > 0 ? starts.reduce((a, b) => (toMinutes(a) >= toMinutes(b) ? a : b)) : null;
+      mapHoraRango[fecha] = {
+        inicio: minStart,
+        fin: maxEnd || fallbackEnd,
+      };
     });
 
     const parseLocalDate = (yyyyMmDd) => {
@@ -65,28 +129,48 @@ const Audicion = ({ title = 'Audición' }) => {
       )}/${d.getFullYear()}`;
     };
 
-    const rows = (resumen || []).map((r) => ({
-      fecha: r.fecha,
-      fechaFormateada: formatFecha(r.fecha),
-      hora: (mapHoras[r.fecha] || []).join(', ') || '-',
-      cantidadTurnos: r.cantidadTurnos,
-      turnosDisponibles: r.turnosDisponibles,
-    }));
+    const rows = (resumen || []).map((r) => {
+      const rango = mapHoraRango[r.fecha] || {};
+      const inicio = rango.inicio || '-';
+      const fin = rango.fin || '-';
+      const horaDisplay = inicio === '-' && fin === '-' ? '-' : `${inicio} - ${fin}`;
+      return {
+        fecha: r.fecha,
+        fechaFormateada: formatFecha(r.fecha),
+        hora: horaDisplay,
+        cantidadTurnos: r.cantidadTurnos,
+        turnosDisponibles: r.turnosDisponibles,
+      };
+    });
 
     setData(rows);
     setFilteredData(rows);
   };
 
-  useEffect(() => { load(); }, []);
-
   useEffect(() => {
-    const fetchData = async () => {
-      const encuesta = await preguntasService.getFormulario(perfil.audicionId);
-      setFormulario(encuesta);
-    };
-    fetchData();
-
+    // Solo lanzar la carga inicial de datos
+    load();
   }, []);
+
+  // Cargar formulario SOLO cuando audicion.id esté disponible
+  useEffect(() => {
+    if (!audicion?.id) return;
+    const fetchFormulario = async () => {
+      try {
+        const result = await preguntasService.getFormulario(audicion.id);
+        const arr = Array.isArray(result)
+          ? result
+          : Array.isArray(result?.preguntas)
+            ? result.preguntas
+            : [];
+        setFormulario(arr);
+      } catch (err) {
+        console.error('Error cargando formulario:', err);
+        setFormulario([]);
+      }
+    };
+    fetchFormulario();
+  }, [audicion]);
 
   const handleVerCronograma = async (row) => {
     const diaIso = row?.fecha;
@@ -143,7 +227,7 @@ const Audicion = ({ title = 'Audición' }) => {
       let formularioActual = formulario;
       if ((!Array.isArray(formularioActual) || formularioActual.length === 0) && audicion?.id) {
         try {
-          const result = await PreguntasService.getFormulario(audicion.id);
+          const result = await preguntasService.getFormulario(audicion.id);
           formularioActual = Array.isArray(result) ? result : Array.isArray(result?.preguntas) ? result.preguntas : [];
           setFormulario(formularioActual);
         } catch (err) {
@@ -246,7 +330,7 @@ const Audicion = ({ title = 'Audición' }) => {
           <button
             className="abmc-btn btn-primary"
             disabled={data.length > 0}
-            onClick={() => navigate('/audicion/agregar')}
+            onClick={() => navigate('audicion/agregar')}
           >
             <span
               className="material-symbols-outlined"

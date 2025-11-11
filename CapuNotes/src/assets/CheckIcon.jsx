@@ -1,5 +1,4 @@
-
-const AddIcon = (props) => (
+const CheckIcon = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={24}
@@ -7,7 +6,7 @@ const AddIcon = (props) => (
     viewBox="0 -960 960 960"
     {...props}
   >
-    <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
+    <path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z" />
   </svg>
 )
-export default AddIcon
+export default CheckIcon

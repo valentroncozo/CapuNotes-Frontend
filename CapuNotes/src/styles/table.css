@@ -2,8 +2,8 @@
 
 /* Tokens locales de tabla (si querés moverlos a tokens.css, avisa y los subimos) */
 :root {
-  --table-row: #1f1e46;
-  --table-row-alt: #24224f;
+  --table-row: var(--bg);
+  --table-row-alt: var(--bg);
   --table-row-hover: #2a285e;
 }
 
@@ -19,21 +19,25 @@
 
 /* Cabecera: usa token --card (antes #b3cdfa) */
 .abmc-thead th {
-  background: var(--card);
-  color: var(--text-dark);
+  background: var(--bg);
+  color: var(--text-light);
   font-weight: 700;
   padding: 12px 16px;
   text-align: left;
   border-radius: 0 !important;
+  border-bottom: 1px solid var(--accent);
   transition: background-color 0.2s ease;
 }
 .abmc-thead th:hover,
 .abmc-thead th:focus,
 .abmc-thead th:focus-within,
 .abmc-thead th:active {
-  background: var(--card) !important;
-  color: var(--text-dark) !important;
+  background: var(--table-row-hover) !important;
+  color: var(--text-light) !important;
 }
+
+
+
 
 /* Filas alternadas */
 .abmc-row { color: var(--text-light); background: var(--table-row); }

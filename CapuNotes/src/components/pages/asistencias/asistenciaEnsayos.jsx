@@ -5,6 +5,11 @@ import { asistenciasService } from "@/services/asistenciasService.js";
 import BackButton from "@/components/common/BackButton.jsx";
 import "@/styles/abmc.css";
 import "@/styles/table.css";
+import EyeOnIcon from "@/assets/VisibilityOnIcon";
+import MakerAsistIcon from "@/assets/MakerAsistIcon";
+import OpenAssistIcon from "@/assets/OpenAssistIcon";
+import CloseAssistIcon from "@/assets/CloseAssistIcon";
+
 
 export default function AsistenciaEnsayos() {
   const [rows, setRows] = useState([]);
@@ -224,14 +229,16 @@ export default function AsistenciaEnsayos() {
                     </span>
                   </td>
                   <td>{r.porcentajeAsistencia ?? 0}%</td>
-                  <td className="abmc-actions">
+                  <td className="abmc-actions" style={{justifyContent: 'space-between'}}>
                     <button
                       className="btn btn-amarillo"
                       onClick={() => navigate(`/asistencias/ensayos/${r.id}`)}
+                      title={r.estadoAsistencia === "CERRADA" ? 'Ver resumen' : 'Tomar asistencia'}
                     >
                       {r.estadoAsistencia === "CERRADA"
-                        ? "Ver resumen"
-                        : "Tomar asistencia"}
+                        ? <EyeOnIcon fill='var(--text-light)' />
+                        : <MakerAsistIcon fill='var(--text-light)'/>
+                      }
                     </button>
 
                     <button
@@ -239,12 +246,13 @@ export default function AsistenciaEnsayos() {
                       style={{ marginLeft: 8 }}
                       disabled={loadingId === r.id}
                       onClick={() => toggleAsistencia(r)}
+                      title={r.estadoAsistencia === "ABIERTA" ? 'Cerrar asistencia' : 'Reabrir asistencia'}
                     >
                       {loadingId === r.id
-                        ? "Procesando..."
+                        ? "..."
                         : r.estadoAsistencia === "ABIERTA"
-                          ? "Cerrar asistencia"
-                          : "Reabrir asistencia"}
+                          ? <CloseAssistIcon fill='var(--text-light)' />
+                          : <OpenAssistIcon fill='var(--text-light)' />}
                     </button>
                   </td>
                 </tr>

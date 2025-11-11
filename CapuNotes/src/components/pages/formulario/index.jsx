@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 import AudicionService from '@/services/audicionService.js';
 import inscripcionService from '@/services/incripcionService.js';
 
-const Formulario = ({title = 'Inscripcion a Audiciones CoroCapuchino'}) => {
+const Formulario = ({title = 'Inscripcion a Audiciones CoroCapuchinos'}) => {
     // Estados para datos dinámicos
     const [audicionId, setAudicionId] = useState(null);
     const [audicion, setAudicion] = useState(null);
@@ -240,7 +240,6 @@ const Formulario = ({title = 'Inscripcion a Audiciones CoroCapuchino'}) => {
                     <BackButton />
                     <h1 className='abmc-title'>{title}</h1>
                 </header>    
-                <hr className='divider'/>
                 
                 {loading ? (
                     <div style={{ padding: '2rem', textAlign: 'center' }}>

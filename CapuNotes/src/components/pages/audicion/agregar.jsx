@@ -181,7 +181,6 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
             <h1 className='abmc-title'>{title}</h1>
         </header>    
 
-        <hr className='divider' />
 
         <section className="content-form-audicion">
             
@@ -294,7 +293,7 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
         </button>
             </section>
 
-            <section className='abmc-topbar'>
+            <section className='footer-audicion'>
                 <button type="button" className="abmc-btn btn-secondary btn-dias" onClick={handlerCancelar}>
                     Cancelar
                 </button>
@@ -304,7 +303,7 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
                     onClick={handleGuardarBorrador}
                     disabled={isSaving}
                 >
-                {isSaving ? 'Guardando...' : 'Guardar Borrador'}
+                {isSaving ? 'Guardando...' : 'Guardar'}
                 </button>
 
             </section>

@@ -6,6 +6,7 @@ import BackButton from "../common/BackButton";
 import TrashIcon from "@/assets/TrashIcon";
 import EditIcon from "@/assets/EditIcon";
 import "@/styles/abmc.css";
+import AddIcon from "@/assets/AddIcon";
 
 // Alerta genérica para registros duplicados
 function showDuplicateAlert(uniqueBy) {
@@ -204,6 +205,8 @@ export default function EntityTableABMC({
   };
 
   const handleEditSave = async (updated) => {
+    // Antes: solo update. Ahora unificamos create/update según exista updated.id
+
     // 🔹 Validar duplicado (si aplica)
     if (uniqueBy && Array.isArray(items)) {
       const baseValue = updated?.[uniqueBy];
@@ -224,28 +227,56 @@ export default function EntityTableABMC({
       }
     }
 
-    try {
-      await service.update(updated);
-      await load();
-
-      // ✅ Aviso de éxito
+    // Validación extra para "área"
+    if (!updated.descripcion && entityName.toLowerCase() === "área") {
       Swal.fire({
-        icon: "success",
-        title: "Actualizado correctamente",
-        text: `${entityName} se actualizó con éxito.`,
+        icon: "warning",
+        title: "Falta completar",
+        text: "Debés ingresar una descripción para el área.",
         background: "#11103a",
         color: "#E8EAED",
         confirmButtonColor: "#7c83ff",
-        timer: 1500,
-        showConfirmButton: false,
       });
+      return;
+    }
+
+    try {
+      if (updated?.id) {
+        await service.update(updated);
+        Swal.fire({
+          icon: "success",
+          title: "Actualizado correctamente",
+          text: `${entityName} se actualizó con éxito.`,
+          background: "#11103a",
+          color: "#E8EAED",
+          confirmButtonColor: "#7c83ff",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } else {
+        await service.create(updated);
+        Swal.fire({
+          icon: "success",
+          title: "Creado correctamente",
+          text: `${entityName} se creó con éxito.`,
+          background: "#11103a",
+          color: "#E8EAED",
+          confirmButtonColor: "#7c83ff",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
+
+      await load();
+      setEditOpen(false);
+      setSelected(null);
     } catch (err) {
-      console.error("❌ Error al actualizar:", err);
+      console.error("❌ Error al guardar:", err);
 
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: err.response?.data || "No se pudo actualizar el registro.",
+        text: err.response?.data || "No se pudo guardar el registro.",
         background: "#11103a",
         color: "#E8EAED",
         confirmButtonColor: "#7c83ff",
@@ -284,73 +315,10 @@ export default function EntityTableABMC({
       <div className="abmc-card">
         <div className="abmc-header">
           {showBackButton && <BackButton />}
-          <h1 className="abmc-title" style={{ fontSize: "1.5rem" }}>{title}</h1>
+          <h1 className="abmc-title">{title}</h1>
         </div>
 
-        <form className="abmc-topbar" onSubmit={handleAgregar}>
-          {schema.map((f) =>
-            f.type === "select" ? (
-              <select
-                key={f.key}
-                name={f.key}
-                value={nuevo[f.key] || ""}
-                onChange={handleChangeNuevo}
-                className="abmc-select"
-                aria-label={f.label}
-              >
-                <option value="">{f.label}</option>
-                {(f.options || []).map((opt) => {
-                  const value = opt.value ?? opt;
-                  const label = opt.label ?? opt;
-                  return (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  );
-                })}
-              </select>
-            ) : f.type === "text" ? (
-              <input
-                key={f.key}
-                type={f.type || "text"}
-                name={f.key}
-                placeholder={f.label}
-                value={nuevo[f.key] || ""}
-                onChange={handleChangeNuevo}
-                className="abmc-input"
-                aria-label={f.label}
-              />
-            ) : f.type === "button" ? (
-              <button
-                key={f.key}
-                type="button"
-                onClick={f.handler}
-                className={`abmc-btn abmc-btn-${f.key}`}
-              >
-                {f.label}
-              </button>
-            ) : f.type === "submit" ? (
-              <button
-                key={f.key}
-                type="submit"
-                className="abmc-btn abmc-btn-primary"
-                aria-label="Agregar nuevo registro"
-              >
-                <span className="material-icons">+</span>
-              </button>
-            ) : f.type === "label" ? (
-              <label key={f.key} className="abmc-label">{f.label}</label>
-            ) : null
-          )}
-        </form>
 
-        {/* Subtítulos específicos para entidades */}
-        {entityName.toLowerCase() === "cuerda" && (
-          <h2 className="abmc-subtitle" style={{ fontSize: "1.5rem" }}>Cuerdas registradas</h2>
-        )}
-        {entityName.toLowerCase() === "área" && (
-          <h2 className="abmc-subtitle" style={{ fontSize: "1.5rem" }}>Áreas registradas</h2>
-        )}
 
         <div className="abmc-topbar" style={{ marginTop: 0 }}>
           <input
@@ -361,6 +329,16 @@ export default function EntityTableABMC({
             className="abmc-input"
             aria-label="Buscar por nombre"
           />
+          <button
+            type="button"
+            className="abmc-btn abmc-btn-primary"
+            onClick={() => {
+              setSelected({}); // entidad vacía => modo crear en el popup
+              setEditOpen(true);
+            }}
+          >
+            <AddIcon fill="var(--text-light)" />
+          </button>
         </div>
 
         <table className="abmc-table abmc-table-rect">
@@ -369,7 +347,7 @@ export default function EntityTableABMC({
               {columnas.map((c) => (
                 <th key={c}>{c}</th>
               ))}
-              <th>Acciones</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -426,7 +404,7 @@ export default function EntityTableABMC({
           entityName={entityName}
           schema={schema}
           entity={selected}
-          onSave={handleEditSave}
+          onSave={handleEditSave} /* ahora maneja create/update según updated.id */
         />
       )}
 

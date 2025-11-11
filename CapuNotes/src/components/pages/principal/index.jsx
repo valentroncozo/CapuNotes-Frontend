@@ -32,7 +32,7 @@ export default function Principal({ username }) {
 
           <div className="eventos-scroll">
             <div className="evento-card">
-              <h5>Peña</h5>
+              <h3><strong>Peña</strong></h3>
               <div className="evento-info">
                 <CalendarMonthIcon className="evento-icon" />
                 <p>Viernes 12/09</p>
@@ -48,7 +48,7 @@ export default function Principal({ username }) {
             </div>
 
             <div className="evento-card">
-              <h5>Concierto</h5>
+              <h3><strong>Concierto</strong></h3>
               <div className="evento-info">
                 <CalendarMonthIcon className="evento-icon" />
                 <p>Sábado 14/09</p>
@@ -64,7 +64,7 @@ export default function Principal({ username }) {
             </div>
 
             <div className="evento-card">
-              <h5>Ensayo</h5>
+              <h3><strong>Ensayo</strong></h3>
               <div className="evento-info">
                 <CalendarMonthIcon className="evento-icon" />
                 <p>Domingo 15/09</p>
@@ -94,12 +94,12 @@ export default function Principal({ username }) {
               style={{ cursor: 'pointer' }}
               aria-label="Ir a Asistencias"
             >
-              <AssignmentIcon className="tarea-icon" />
+              <AssignmentIcon className="tarea-icon" style={{fill:'var(--text-light)'}}/>
               <span>Asistencia</span>
             </div>
 
             <div
-              className="tarea-card tarea-activa"
+              className="tarea-card "
               role="button"
               tabIndex={0}
               onClick={navHandler('/eventos')}
@@ -107,12 +107,12 @@ export default function Principal({ username }) {
               style={{ cursor: 'pointer' }}
               aria-label="Ir a Eventos"
             >
-              <EventIcon className="tarea-icon" />
+              <EventIcon className="tarea-icon" style={{fill:'var(--text-light)'}}/>
               <span>Eventos</span>
             </div>
 
             <div className="tarea-card">
-              <LibraryMusicIcon className="tarea-icon" />
+              <LibraryMusicIcon className="tarea-icon" style={{fill:'var(--text-light)'}}/>
               <span>Actividades complementarias</span>
             </div>
 
@@ -125,7 +125,7 @@ export default function Principal({ username }) {
               style={{ cursor: 'pointer' }}
               aria-label="Ir a Audiciones"
             >
-              <MicIcon className="tarea-icon" />
+              <MicIcon className="tarea-icon" style={{fill:'var(--text-light)'}}/>
               <span>Audiciones</span>
             </div>
           </div>
