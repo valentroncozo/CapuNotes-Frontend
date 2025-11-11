@@ -22,8 +22,9 @@
 /* ====== HEADER ASISTENCIA A ENSAYOS ====== */
 .abmc-header {
   display: flex;
-  align-items: flex-start;        /* flecha y texto alineados arriba */
+  align-items: flex-end;        /* flecha y texto alineados arriba */
   gap: 16px;
+  align-content: flex-end;
   justify-content: flex-start;
   position: relative;
   margin-bottom: 32px;            /* más espacio con los filtros */
@@ -41,8 +42,9 @@
 
 /* Título */
 .abmc-title {
+  height: 36px ;
   font-weight: 700;
-  font-size: 1.8rem;
+  font-size: 6vh;
   margin: 0;
   color: var(--text-light);
   position: relative;
@@ -50,14 +52,14 @@
 
 /* Línea amarilla institucional */
 .abmc-header::after {
-  content: "";
+  content: "<hr />";
   position: absolute;
-  bottom: -10px;
+  bottom: -20px;
   left: 0;
   width: 100%;
   height: 2px;
   background-color: var(--accent);
-  border-radius: 2px;
+  border-radius: .5px;
 }
 
 /* ====== FILTROS ====== */
@@ -184,7 +186,7 @@
 
 /* Mueve un poco el título "Acciones" hacia el centro */
 .abmc-table th:last-child {
-  text-align: center;
+  text-align: left;
   padding-right: 20px; /* 👈 separa del borde derecho */
 }
 

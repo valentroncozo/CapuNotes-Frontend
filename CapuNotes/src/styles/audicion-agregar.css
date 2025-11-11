@@ -12,9 +12,11 @@
 }
 
 .divider {
+    opacity: 1;
+    height: .5px;
+    background-color: var(--accent);
     width: 100%;
     border: 1px solid var(--accent);
-    margin: 3.5rem 0rem;
 }
 
 .form-audicion {
@@ -46,7 +48,6 @@
 }
 
 
-
 .button-date-audicion {
     min-height: 64px;
     min-width: 174px;
@@ -76,5 +77,5 @@
 .btn-dias:hover {
     background-color: var(--accent) !important; 
     border: none !important;
-    color: var(--bg) !important;
+    color: var(--text-light) !important;
 }

@@ -57,6 +57,7 @@ export default function CuestionarioPreviewPage({ title = 'Visualización de Cue
           <button className="abmc-btn abmc-btn-primary" type="button" onClick={() => navigate('/cuestionario/configuracion')}>
             Seleccionar más preguntas
           </button>
+          
         </section>
       </div>
     </main>

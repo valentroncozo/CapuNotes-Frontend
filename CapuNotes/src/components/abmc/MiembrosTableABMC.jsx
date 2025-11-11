@@ -200,7 +200,7 @@ export default function MiembrosTableABMC({
               <th onClick={ordenarPorEstado} style={{ cursor: "pointer" }}>
                 Estado {ordenEstadoAscendente ? "▲" : "▼"}
               </th>
-              <th style={{ textAlign: "center" }}>Acciones</th>
+              <th style={{ textAlign: "center" }}></th>
             </tr>
           </thead>
 

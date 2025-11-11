@@ -85,7 +85,7 @@ textarea {
   height: 90px;
   min-width: 50%;
   max-width: 100%;
-  min-width: 260px;
+  min-width: 450px;
 }
 
 .form-row-cuerda-area .mitad .input-with-button {
@@ -109,9 +109,12 @@ textarea {
   gap: 8px;
 }
 
-.input-with-button select {
-  flex: 1;
+
+
+.input-with-button button {
+  max-width: 40px;
 }
+
 
 /* === BOTONES === */
 
@@ -121,7 +124,7 @@ textarea {
 button.abmc-btn[variant="warning"],
 button.abmc-btn.agregar-btn {
   background-color: var(--accent) !important;
-  color: var(--text-dark) !important;
+  color: var(--text-light) !important;
   border: none !important;
   border-radius: 8px;
   font-weight: 600;
@@ -135,6 +138,7 @@ button.abmc-btn.agregar-btn {
 button.abmc-btn[variant="warning"]:hover,
 button.abmc-btn.agregar-btn:hover {
   background-color: #ffca2c !important;
+  border: none;
   transform: translateY(-2px); /* efecto levantar */
 }
 
@@ -333,4 +337,10 @@ select.abmc-select:focus,
 .pantalla-miembros .abmc-card .form-row-miembros,
 .pantalla-miembros .abmc-card .form-row-cuerda-area {
   margin-bottom: 20px; /* Incrementar el margen para evitar agrupaciones visuales */
+}
+
+@media (width < 450px) {
+  .form-row-cuerda-area .mitad {
+    min-width: 100%;
+  }
 }
