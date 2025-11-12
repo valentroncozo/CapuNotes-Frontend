@@ -363,102 +363,88 @@ button,
   border-radius: 10px !important;
 }
 
-/* ====== GEOAPIFY AUTOCOMPLETE - ESTILO CAPUNOTES OPTIMIZADO ====== */
-.geoapify-wrapper {
-  width: 100%;
+/* ====== GEOAPIFY AUTOCOMPLETE - ESTILO CAPUNOTES FINAL ====== */
+.geoapify-autocomplete {
   position: relative;
-  z-index: 1;
+  width: 100%;
 }
 
-.geoapify-autocomplete-input,
-.geoapify-autocomplete-input input {
+/* Input principal */
+.geoapify-autocomplete input {
   width: 100%;
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius);
-  background-color: rgba(255, 255, 255, 0.05);
-  color: var(--text-light);
+  height: 42px; /* igual que otros inputs */
+  background-color: #0a0a2e; /* fondo igual */
+  color: #fff;
+  border: 1px solid #555; /* gris */
+  border-radius: 8px; /* mismo radio */
+  padding: 0 38px 0 12px; /* espacio para la X */
   font-family: var(--font-sans);
   font-size: 0.95rem;
   outline: none;
   box-shadow: none;
-  transition: all 0.2s ease-in-out;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.geoapify-autocomplete-input:hover,
-.geoapify-autocomplete-input input:hover,
-.geoapify-autocomplete-input:focus-within,
-.geoapify-autocomplete-input input:focus {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.35);
+/* Hover o focus → borde azul */
+.geoapify-autocomplete input:hover,
+.geoapify-autocomplete input:focus {
+  border-color: #3399ff; /* azul claro */
+  box-shadow: 0 0 4px rgba(51, 153, 255, 0.4);
 }
 
-/* Dropdown flotante */
+/* Placeholder */
+.geoapify-autocomplete input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Botón de limpiar (X) */
+.geoapify-autocomplete .geoapify-close-button {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  z-index: 2;
+  padding: 0;
+}
+
+.geoapify-autocomplete .geoapify-close-button:hover {
+  color: #fff;
+}
+
+/* Dropdown */
 .geoapify-autocomplete-items {
   position: absolute;
   top: 100%;
   left: 0;
-  width: 100%;
+  right: 0;
   margin-top: 4px;
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius);
-  color: var(--text-light);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  z-index: 9999;
-  backdrop-filter: blur(8px); /* sutil desenfoque elegante */
+  background-color: #0a0a2e;
+  border: 1px solid #555;
+  border-radius: 8px;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
 }
 
-/* Ítems del dropdown */
+/* Opción individual */
 .geoapify-autocomplete-item {
-  display: flex;
-  align-items: center;
-  gap: 4px; /* espacio equilibrado entre icono y texto */
   padding: 8px 12px;
+  color: #fff;
   cursor: pointer;
-  background-color: transparent;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.15s ease;
 }
 
 .geoapify-autocomplete-item:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius);
-  color: var(--accent);
+  background-color: #1c1c4a; /* azul más claro */
 }
 
-/* Ícono del item */
-.geoapify-autocomplete-item .geoapify-autocomplete-icon {
-  flex-shrink: 0;
-  opacity: 0.85;
-  filter: brightness(1.2);
-}
-
-/* Botón de limpiar dentro del input */
-.geoapify-autocomplete-input .geoapify-autocomplete-clear-button {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.geoapify-autocomplete-input .geoapify-autocomplete-clear-button svg {
-  width: 14px;
-  height: 14px;
-  color: #fff; /* fuerza el blanco */
-  fill: #fff; /* asegura que el relleno sea blanco */
-  stroke: #fff; /* asegura que el trazo sea blanco */
-  opacity: 0.85;
-  transition: opacity 0.2s ease-in-out;
-}
-
-.geoapify-autocomplete-input .geoapify-autocomplete-clear-button:hover svg {
-  opacity: 1;
+/* Texto resaltado en el dropdown */
+.geoapify-autocomplete-item strong {
+  color: #ffd700; /* dorado */
 }

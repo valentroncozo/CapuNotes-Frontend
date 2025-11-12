@@ -6,7 +6,6 @@ import {
   GeoapifyGeocoderAutocomplete,
   GeoapifyContext,
 } from '@geoapify/react-geocoder-autocomplete';
-import '@geoapify/geocoder-autocomplete/styles/minimal.css'; // 👈 Importá acá el CSS de Geoapify
 
 // 2️⃣ Importaciones de componentes internos
 import BackButton from '../../common/BackButton.jsx';
@@ -144,6 +143,11 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
         text: 'Debes ingresar tu fecha de nacimiento.',
         background: '#11103a',
         color: '#E8EAED',
+        confirmButtonText: 'Aceptar',
+        buttonsStyling: false, // Desactiva el estilo por defecto
+        customClass: {
+          confirmButton: 'abmc-btn btn-primary', // Tu clase personalizada
+        },
       });
       return;
     }
@@ -156,6 +160,11 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
         text: 'Por favor ingresa la fecha con formato dd/mm/aaaa.',
         background: '#11103a',
         color: '#E8EAED',
+        confirmButtonText: 'Aceptar',
+        buttonsStyling: false, // Desactiva el estilo por defecto
+        customClass: {
+          confirmButton: 'abmc-btn btn-primary', // Tu clase personalizada
+        },
       });
       return;
     }
@@ -171,6 +180,11 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
         text: 'La fecha de nacimiento no puede ser posterior al día de hoy.',
         background: '#11103a',
         color: '#E8EAED',
+        confirmButtonText: 'Aceptar',
+        buttonsStyling: false, // Desactiva el estilo por defecto
+        customClass: {
+          confirmButton: 'abmc-btn btn-primary', // Tu clase personalizada
+        },
       });
       return;
     }
@@ -185,6 +199,11 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
         text: 'Debes tener al menos 17 años para poder registrarte.',
         background: '#11103a',
         color: '#E8EAED',
+        confirmButtonText: 'Aceptar',
+        buttonsStyling: false, // Desactiva el estilo por defecto
+        customClass: {
+          confirmButton: 'abmc-btn btn-primary', // Tu clase personalizada
+        },
       });
       return;
     }
@@ -467,6 +486,7 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
                         placeholder=""
                         apiKey="27d4d3c8bf5147f3ae4cd2f98a44009a"
                         lang="es"
+                        className="geoapify-autocomplete"
                         countryCodes={['ar']}
                         debounceDelay={300}
                         // no usar "value" ni "onChange" porque Geoapify maneja internamente el texto
