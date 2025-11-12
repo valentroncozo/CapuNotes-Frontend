@@ -1,35 +1,35 @@
-import { useState, useEffect } from "react";
-import { Button, Form } from "react-bootstrap";
-import Swal from "sweetalert2";
-import { useNavigate, useLocation } from "react-router-dom";
-import "@/styles/miembros.css";
-import "@/styles/abmc.css";
-import BackButton from "@/components/common/BackButton.jsx";
-import { cuerdasService } from "@/services/cuerdasService.js";
-import { areasService } from "@/services/areasService.js";
-import { miembrosService } from "@/services/miembrosService.js";
+import { useState, useEffect } from 'react';
+import { Button, Form } from 'react-bootstrap';
+import Swal from 'sweetalert2';
+import { useNavigate, useLocation } from 'react-router-dom';
+import '@/styles/miembros.css';
+import '@/styles/abmc.css';
+import BackButton from '@/components/common/BackButton.jsx';
+import { cuerdasService } from '@/services/cuerdasService.js';
+import { areasService } from '@/services/areasService.js';
+import { miembrosService } from '@/services/miembrosService.js';
 
-export default function MiembrosEditar({ title = "Editar miembro" }) {
+export default function MiembrosEditar({ title = 'Editar miembro' }) {
   const navigate = useNavigate();
   const location = useLocation();
   const miembroInicial = location.state?.miembro;
 
   // 🟢 Estado inicial con los datos del miembro
   const [miembro, setMiembro] = useState(() => ({
-    nombre: miembroInicial?.nombre || "",
-    apellido: miembroInicial?.apellido || "",
+    nombre: miembroInicial?.nombre || '',
+    apellido: miembroInicial?.apellido || '',
     tipoDocumento:
-      miembroInicial?.id?.tipoDocumento || miembroInicial?.tipoDocumento || "",
+      miembroInicial?.id?.tipoDocumento || miembroInicial?.tipoDocumento || '',
     numeroDocumento:
-      miembroInicial?.id?.nroDocumento || miembroInicial?.numeroDocumento || "",
-    fechaNacimiento: miembroInicial?.fechaNacimiento || "",
-    telefono: miembroInicial?.nroTelefono || miembroInicial?.telefono || "",
-    correo: miembroInicial?.correo || "",
-    carreraProfesion: miembroInicial?.carreraProfesion || "",
-    lugarOrigen: miembroInicial?.lugarOrigen || "",
-    instrumentoMusical: miembroInicial?.instrumentoMusical || "",
-    cuerda: miembroInicial?.cuerda?.id || "",
-    area: miembroInicial?.area?.id || "",
+      miembroInicial?.id?.nroDocumento || miembroInicial?.numeroDocumento || '',
+    fechaNacimiento: miembroInicial?.fechaNacimiento || '',
+    telefono: miembroInicial?.nroTelefono || miembroInicial?.telefono || '',
+    correo: miembroInicial?.correo || '',
+    carreraProfesion: miembroInicial?.carreraProfesion || '',
+    lugarOrigen: miembroInicial?.lugarOrigen || '',
+    instrumentoMusical: miembroInicial?.instrumentoMusical || '',
+    cuerda: miembroInicial?.cuerda?.id || '',
+    area: miembroInicial?.area?.id || '',
   }));
 
   const [errores, setErrores] = useState({});
@@ -47,13 +47,13 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
         setCuerdasDisponibles(cuerdas);
         setAreasDisponibles(areas);
       } catch (error) {
-        console.error("Error cargando cuerdas o áreas:", error);
+        console.error('Error cargando cuerdas o áreas:', error);
         Swal.fire({
-          icon: "error",
-          title: "Error al cargar datos",
-          text: "No se pudieron cargar las cuerdas o áreas.",
-          background: "#11103a",
-          color: "#E8EAED",
+          icon: 'error',
+          title: 'Error al cargar datos',
+          text: 'No se pudieron cargar las cuerdas o áreas.',
+          background: '#11103a',
+          color: '#E8EAED',
         });
       }
     };
@@ -64,22 +64,22 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setMiembro((prev) => ({ ...prev, [name]: value }));
-    setErrores((prev) => ({ ...prev, [name]: "" }));
+    setErrores((prev) => ({ ...prev, [name]: '' }));
   };
 
   // 🔹 Validación
   const validarCampos = () => {
     const requeridos = [
-      "nombre",
-      "apellido",
-      "tipoDocumento",
-      "numeroDocumento",
-      "cuerda",
+      'nombre',
+      'apellido',
+      'tipoDocumento',
+      'numeroDocumento',
+      'cuerda',
     ];
     const nuevosErrores = {};
     requeridos.forEach((campo) => {
-      if (!miembro[campo] || String(miembro[campo]).trim() === "") {
-        nuevosErrores[campo] = "Campo obligatorio";
+      if (!miembro[campo] || String(miembro[campo]).trim() === '') {
+        nuevosErrores[campo] = 'Campo obligatorio';
       }
     });
     setErrores(nuevosErrores);
@@ -91,12 +91,12 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
     e.preventDefault();
     if (!validarCampos()) {
       Swal.fire({
-        icon: "warning",
-        title: "Campos incompletos",
-        text: "Por favor completá todos los campos obligatorios marcados en amarillo.",
-        background: "#11103a",
-        color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: 'Por favor completá todos los campos obligatorios marcados en amarillo.',
+        background: '#11103a',
+        color: '#E8EAED',
+        confirmButtonColor: '#7c83ff',
       });
       return;
     }
@@ -105,9 +105,9 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
       const payload = {
         id: {
           nroDocumento:
-            miembro.numeroDocumento || miembro.id?.nroDocumento || "",
+            miembro.numeroDocumento || miembro.id?.nroDocumento || '',
           tipoDocumento:
-            miembro.tipoDocumento || miembro.id?.tipoDocumento || "",
+            miembro.tipoDocumento || miembro.id?.tipoDocumento || '',
         },
         nombre: miembro.nombre,
         apellido: miembro.apellido,
@@ -125,24 +125,24 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
       await miembrosService.update(payload);
 
       Swal.fire({
-        icon: "success",
-        title: "Cambios guardados",
+        icon: 'success',
+        title: 'Cambios guardados',
         text: `Se actualizaron los datos de ${miembro.nombre}.`,
         timer: 1600,
         showConfirmButton: false,
-        background: "#11103a",
-        color: "#E8EAED",
+        background: '#11103a',
+        color: '#E8EAED',
       });
 
-      navigate("/miembros");
+      navigate('/miembros');
     } catch (error) {
-      console.error("Error actualizando miembro:", error);
+      console.error('Error actualizando miembro:', error);
       Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo actualizar el miembro.",
-        background: "#11103a",
-        color: "#E8EAED",
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo actualizar el miembro.',
+        background: '#11103a',
+        color: '#E8EAED',
       });
     }
   };
@@ -170,7 +170,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
               name="nombre"
               value={miembro.nombre}
               onChange={handleChange}
-              className={`abmc-input ${errores.nombre ? "error" : ""}`}
+              className={`abmc-input ${errores.nombre ? 'error' : ''}`}
             />
           </Form.Group>
 
@@ -183,7 +183,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
               name="apellido"
               value={miembro.apellido}
               onChange={handleChange}
-              className={`abmc-input ${errores.apellido ? "error" : ""}`}
+              className={`abmc-input ${errores.apellido ? 'error' : ''}`}
             />
           </Form.Group>
 
@@ -198,7 +198,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                 value={miembro.tipoDocumento}
                 onChange={handleChange}
                 className={`abmc-select visible-dropdown ${
-                  errores.tipoDocumento ? "error" : ""
+                  errores.tipoDocumento ? 'error' : ''
                 }`}
               >
                 <option value="">Seleccionar tipo</option>
@@ -217,7 +217,9 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                 name="numeroDocumento"
                 value={miembro.numeroDocumento}
                 onChange={handleChange}
-                className={`abmc-input ${errores.numeroDocumento ? "error" : ""}`}
+                className={`abmc-input ${
+                  errores.numeroDocumento ? 'error' : ''
+                }`}
               />
             </div>
           </div>
@@ -305,19 +307,19 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                   name="cuerda"
                   value={miembro.cuerda}
                   onChange={handleChange}
-                  className={`abmc-select ${errores.cuerda ? "error" : ""}`}
+                  className={`abmc-select ${errores.cuerda ? 'error' : ''}`}
                 >
                   <option value="">Seleccionar cuerda</option>
                   {cuerdasDisponibles.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.nombre || c.name || c.descripcion || "—"}
+                      {c.nombre || c.name || c.descripcion || '—'}
                     </option>
                   ))}
                 </select>
                 <Button
                   variant="warning"
                   className="abmc-btn"
-                  onClick={() => navigate("/cuerdas")}
+                  onClick={() => navigate('/cuerdas')}
                   type="button"
                 >
                   +
@@ -344,10 +346,18 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                 <Button
                   variant="warning"
                   className="abmc-btn"
-                  onClick={() => navigate("/areas")}
+                  onClick={() => navigate('/areas')}
                   type="button"
                 >
-                  +
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#e3e3e3"
+                  >
+                    <path d="M440-120v-320H120v-80h320v-320h80v320h320v80H520v320h-80Z" />
+                  </svg>
                 </Button>
               </div>
             </div>
@@ -358,7 +368,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
             <button
               type="button"
               className="abmc-btn abmc-btn-secondary"
-              onClick={() => navigate("/miembros")}
+              onClick={() => navigate('/miembros')}
             >
               Cancelar
             </button>
@@ -371,4 +381,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
     </main>
   );
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> f2a942bfa8de200d27f5441e66499cc82ba8fbf8
