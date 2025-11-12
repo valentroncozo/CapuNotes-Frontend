@@ -9,7 +9,9 @@ const api = axios.create({
         "Accept": "application/json",
         "Content-Type": "application/json"
     },
-    withCredentials: true // necesario para cookies/sesiones
+    withCredentials: true, // necesario para cookies/sesiones
+    xsrfCookieName: 'XSRF-TOKEN',
+    xsrfHeaderName: 'X-XSRF-TOKEN'
 });
 
 function handleError(err) {

@@ -1,5 +1,6 @@
 import AudicionService from '@/services/audicionService.js';
 import TurnoService from '@/services/turnoServices.js';
+import apiClient from '@/services/apiClient';
 
 const formatISO = (d) => {
   const y = d.getFullYear();
@@ -22,8 +23,8 @@ export const audicionesService = {
     const [turnos, inscripciones] = await Promise.all([
       TurnoService.listarPorAudicion(a.id),
       // EncuestaController devuelve inscripciones de la audición
-      fetch(`${import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080')}/encuesta/audicion/${a.id}/candidatos`, { headers: { Accept: 'application/json' }, credentials: 'include' })
-        .then(r => r.ok ? r.json() : [])
+      apiClient.get(`/api/encuesta/audicion/${a.id}/candidatos`)
+        .then(data => data || [])
         .catch(() => []),
     ]);
 

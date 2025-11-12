@@ -1,7 +1,7 @@
 // src/components/layout/AppShell.jsx
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import '@/styles/offcanvas.css';
+import { Outlet, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import "@/styles/offcanvas.css";
 
 // agregar import del contexto
 import { useAuth } from "@/context/AuthContext.jsx";
@@ -78,8 +78,11 @@ export default function AppShell({ onLogout }) {
   // usar logout del contexto
   const handleLogout = async () => {
     setOpen(false);
-    onLogout?.();
-    navigate('/login');
+    try {
+      await logout();
+    } finally {
+      navigate("/login");
+    }
   };
 
   return (

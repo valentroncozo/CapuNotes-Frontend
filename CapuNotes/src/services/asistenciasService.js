@@ -3,6 +3,13 @@ import axios from "axios";
 
 const API_URL = "/api/asistencias";
 
+const api = axios.create({
+  withCredentials: true,
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+  headers: { 'Content-Type': 'application/json' }
+});
+
 export const asistenciasService = {
   // =======================================================
   // 🔹 LISTAR ASISTENCIAS POR ENSAYO
@@ -12,7 +19,7 @@ export const asistenciasService = {
    */
   listPorEnsayo: async (idEnsayo, { cuerdaId = null, nombre = null } = {}) => {
     try {
-      const res = await axios.get(`${API_URL}/ensayo/${idEnsayo}`, {
+      const res = await api.get(`${API_URL}/ensayo/${idEnsayo}`, {
         params: { ...(cuerdaId ? { cuerdaId } : {}), ...(nombre ? { nombre } : {}) },
       });
       console.log("📡 Asistencias recibidas:", res.data);
@@ -36,7 +43,7 @@ export const asistenciasService = {
    */
   registrarAsistencia: async (idEnsayo, body) => {
     try {
-      const res = await axios.post(`${API_URL}/ensayo/${idEnsayo}`, body, {
+      const res = await api.post(`${API_URL}/ensayo/${idEnsayo}`, body, {
         headers: { "Content-Type": "application/json" },
       });
       console.log("✅ Asistencia registrada:", res.data);
@@ -61,7 +68,7 @@ export const asistenciasService = {
    */
   registrarAsistenciasMasivas: async (idEnsayo, body) => {
     try {
-      const res = await axios.post(`${API_URL}/ensayo/${idEnsayo}/masivo`, body, {
+      const res = await api.post(`${API_URL}/ensayo/${idEnsayo}/masivo`, body, {
         headers: { "Content-Type": "application/json" },
       });
       console.log("📤 Asistencias masivas enviadas:", res.data);
@@ -77,7 +84,7 @@ export const asistenciasService = {
   // =======================================================
   cerrarAsistencia: async (idEnsayo) => {
     try {
-      const res = await axios.patch(`${API_URL}/ensayo/${idEnsayo}/cerrar`);
+      const res = await api.patch(`${API_URL}/ensayo/${idEnsayo}/cerrar`);
       console.log("🔒 Asistencia cerrada:", res.data);
       return res.data;
     } catch (err) {
@@ -88,7 +95,7 @@ export const asistenciasService = {
 
   reabrirAsistencia: async (idEnsayo) => {
     try {
-      const res = await axios.patch(`${API_URL}/ensayo/${idEnsayo}/abrir`);
+      const res = await api.patch(`${API_URL}/ensayo/${idEnsayo}/abrir`);
       console.log("🔓 Asistencia reabierta:", res.data);
       return res.data;
     } catch (err) {
@@ -102,7 +109,7 @@ export const asistenciasService = {
   // =======================================================
   eliminarAsistenciasPorEnsayo: async (idEnsayo) => {
     try {
-      const res = await axios.delete(`${API_URL}/ensayo/${idEnsayo}`);
+      const res = await api.delete(`${API_URL}/ensayo/${idEnsayo}`);
       console.log("🗑️ Asistencias eliminadas del ensayo:", res.data);
       return res.data;
     } catch (err) {
