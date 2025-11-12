@@ -1,11 +1,14 @@
 import axios from 'axios';
 
-// En Vite usar import.meta.env para variables pblicas (VITE_*)
+// En Vite usar import.meta.env para variables pblicas (VITE_*)
 // En desarrollo usamos el proxy definido en vite.config.js ("/api" -> http://localhost:8080)
 const DEV_PROXY_BASE = '/api';
 const resolvedBaseURL = import.meta.env.DEV ? DEV_PROXY_BASE : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
 const api = axios.create({
   baseURL: resolvedBaseURL,
+  withCredentials: true,
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
   headers: { 'Content-Type': 'application/json' }
 });
 

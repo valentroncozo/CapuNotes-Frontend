@@ -107,12 +107,52 @@ export function AuthProvider({ children }) {
     async (username, password) => {
       setLoading(true);
       try {
-        await apiClient.post("/api/auth/login", { body: { username, password } });
-        const xsrf = getCookie("XSRF-TOKEN");
-        if (!xsrf) console.warn("XSRF-TOKEN no encontrada en document.cookie tras login.");
+        const loginResponse = await apiClient.post("/api/auth/login", { body: { username, password } });
+        
+        console.log("🍪 TODAS las cookies después del login:", document.cookie);
+        console.log("📦 Login response:", loginResponse);
+        
+        // Intentar obtener CSRF token desde la respuesta del login si viene en headers
+        // Algunos backends devuelven el token en un header custom
+        
+        // Forzar generación/lectura de CSRF token
+        let xsrf = getCookie("XSRF-TOKEN");
+        console.log("🔍 Buscando XSRF-TOKEN en cookies:", xsrf);
+        
+        if (!xsrf) {
+          console.warn("⚠️ XSRF-TOKEN no encontrada en cookies, llamando /api/auth/csrf...");
+          const csrfResponse = await apiClient.get("/api/auth/csrf");
+          console.log("📦 CSRF response:", csrfResponse);
+          console.log("🍪 Cookies después de /api/auth/csrf:", document.cookie);
+          xsrf = getCookie("XSRF-TOKEN");
+          
+          // Si TODAVÍA no está en cookies, intentar extraerla de la respuesta
+          if (!xsrf && csrfResponse && csrfResponse.token) {
+            xsrf = csrfResponse.token;
+            console.log("✅ XSRF-TOKEN obtenida desde respuesta de /api/auth/csrf:", xsrf);
+            // Guardar en localStorage como fallback
+            localStorage.setItem('XSRF-TOKEN', xsrf);
+          } else if (xsrf) {
+            console.log("✅ XSRF-TOKEN obtenida desde cookies después de /api/auth/csrf:", xsrf);
+            localStorage.setItem('XSRF-TOKEN', xsrf);
+          } else {
+            console.error("❌ XSRF-TOKEN no disponible ni en cookies ni en respuesta");
+          }
+        } else {
+          console.log("✅ XSRF-TOKEN presente en cookies después del login:", xsrf);
+          localStorage.setItem('XSRF-TOKEN', xsrf);
+        }
+        
         // obtener /me y setear estado (broadcast verdadero por defecto)
-        await getMe();
+        const meSuccess = await getMe();
         setLoading(false);
+        
+        if (!meSuccess) {
+          console.error("❌ Login exitoso pero getMe() falló - estado inconsistente");
+          throw new Error("Failed to load user data after login");
+        }
+        
+        console.log("✅ Login completo - usuario autenticado:", user);
         return true;
       } catch (err) {
         setLoading(false);

@@ -2,7 +2,13 @@ import axios from 'axios';
 
 const DEV_PROXY_BASE = '/api';
 const resolvedBaseURL = import.meta.env.DEV ? DEV_PROXY_BASE : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
-const api = axios.create({ baseURL: resolvedBaseURL, headers: { 'Content-Type': 'application/json' } });
+const api = axios.create({ 
+  baseURL: resolvedBaseURL, 
+  withCredentials: true,
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+  headers: { 'Content-Type': 'application/json' } 
+});
 
 const mapPreguntaToPayload = (p) => ({
   valor: p.valor,

@@ -8,6 +8,9 @@ const resolvedBaseURL = import.meta.env.DEV
 
 const api = axios.create({
   baseURL: resolvedBaseURL,
+  withCredentials: true,
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
   headers: { "Content-Type": "application/json" },
 });
 

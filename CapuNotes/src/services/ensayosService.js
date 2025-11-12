@@ -1,14 +1,12 @@
 // src/services/ensayosService.js
-import axios from "axios";
-
-const ENSAYOS_API_URL = "/api/ensayos";
+import apiClient from "./apiClient";
 
 export const ensayosService = {
   // Obtener todos los ensayos con estado y porcentaje
   list: async () => {
-    const res = await axios.get(ENSAYOS_API_URL);
-    console.log("📡 Ensayos recibidos del backend:", res.data);
-    return res.data.map((e) => ({
+    const data = await apiClient.get('/api/ensayos');  // → en dev: /api/ensayos → Vite proxy → http://localhost:8080/ensayos
+    console.log("📡 Ensayos recibidos del backend:", data);
+    return data.map((e) => ({
       id: e.id,
       nombre: e.nombre,
       descripcion: e.descripcion,
@@ -21,27 +19,26 @@ export const ensayosService = {
 
   // Obtener ensayo por id
   getById: async (id) => {
-    const res = await axios.get(`${ENSAYOS_API_URL}/${id}`);
-    return res.data;
+    return await apiClient.get(`/api/ensayos/${id}`);
   },
 
   // Crear nuevo ensayo
   create: async (data) => {
-    const res = await axios.post(ENSAYOS_API_URL, data);
-    console.log("✅ Ensayo creado:", res.data);
-    return res.data;
+    const result = await apiClient.post('/api/ensayos', { body: data });
+    console.log("✅ Ensayo creado:", result);
+    return result;
   },
 
   // Actualizar ensayo existente
   update: async (id, updated) => {
-    const res = await axios.patch(`${ENSAYOS_API_URL}/${id}`, updated);
-    console.log("✏️ Ensayo actualizado:", res.data);
-    return res.data;
+    const result = await apiClient.patch(`/api/ensayos/${id}`, { body: updated });
+    console.log("✏️ Ensayo actualizado:", result);
+    return result;
   },
 
   // Eliminar ensayo
   remove: async (id) => {
-    await axios.delete(`${ENSAYOS_API_URL}/${id}`);
+    await apiClient.delete(`/api/ensayos/${id}`);
     console.log(`🗑️ Ensayo eliminado: ${id}`);
   },
 };

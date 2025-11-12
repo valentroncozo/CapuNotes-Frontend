@@ -1,78 +1,62 @@
-import axios from 'axios';
-
-// En Vite las variables de entorno pblicas deben comenzar con VITE_
-// En desarrollo usamos el proxy definido en vite.config.js ("/api" -> http://localhost:8080)
-// para evitar problemas de CORS. En producción usamos VITE_API_BASE_URL si est disponible.
-const DEV_PROXY_BASE = '/api';
-const resolvedBaseURL = import.meta.env.DEV ? DEV_PROXY_BASE : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
-const api = axios.create({
-  baseURL: resolvedBaseURL,
-  headers: { 'Content-Type': 'application/json' }
-});
+import apiClient from './apiClient';
 
 const AudicionService = {
   crear: async (audicion) => {
     try {
-      const r = await api.post('/audiciones', audicion);
-      return r.data;
+      return await apiClient.post('/api/audiciones', { body: audicion });
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e.details || e.message;
     }
   },
 
   actualizar: async (audicion) => {
     try {
-      const r = await api.put('/audiciones', audicion);
-      return r.data;
+      return await apiClient.patch('/api/audiciones', { body: audicion });
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e.details || e.message;
     }
   },
 
   actualizarParcial: async (id, cambios) => {
     try {
-      const r = await api.patch(`/audiciones/${id}`, cambios);
-      return r.data;
+      return await apiClient.patch(`/api/audiciones/${id}`, { body: cambios });
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e.details || e.message;
     }
   },
 
   eliminar: async (id) => {
     try {
-      const r = await api.delete(`/audiciones/${id}`);
-      return r.status === 204;
+      await apiClient.delete(`/api/audiciones/${id}`);
+      return true;
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e.details || e.message;
     }
   },
 
   getById: async (id) => {
     try {
-      const r = await api.get(`/audiciones/${id}`);
-      return r.data;
+      return await apiClient.get(`/api/audiciones/${id}`);
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e.details || e.message;
     }
   },
 
   getAll: async () => {
     try {
-      const r = await api.get('/audiciones');
-      return r.data;
+      return await apiClient.get('/api/audiciones');
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e.details || e.message;
     }
   },
 
   getActual: async () => {
     try {
-      const r = await api.get('/audiciones/actual');
-      return r.data;
+      return await apiClient.get('/api/audiciones/actual');
     } catch (e) {
       // devolver null si 404 u otro mensaje del backend
-      if (e.response?.status === 404) return null;
-      throw e.response?.data || e.message;
+      if (e.status === 404) return null;
+      throw e.details || e.message;
     }
   },
 
@@ -83,28 +67,25 @@ const AudicionService = {
       if (dia != null) params.dia = dia;
       if (page != null) params.page = page;
       if (size != null) params.size = size;
-      const r = await api.get(`/audiciones/cronograma/${audicionId}`, { params });
-      return r.data;
+      return await apiClient.get(`/api/audiciones/cronograma/${audicionId}`, { params });
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e.details || e.message;
     }
   },
 
   getPerfilInscripcion: async (inscripcionId) => {
     try {
-      const r = await api.get(`/audiciones/cronograma/perfil/${inscripcionId}`);
-      return r.data;
+      return await apiClient.get(`/api/audiciones/cronograma/perfil/${inscripcionId}`);
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e.details || e.message;
     }
   },
 
   getAudicionesPorCandidato: async (tipoDocumento, nroDocumento) => {
     try {
-      const r = await api.get(`/audiciones/candidato/${encodeURIComponent(tipoDocumento)}/${encodeURIComponent(nroDocumento)}`);
-      return r.data;
+      return await apiClient.get(`/api/audiciones/candidato/${encodeURIComponent(tipoDocumento)}/${encodeURIComponent(nroDocumento)}`);
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e.details || e.message;
     }
   }
 

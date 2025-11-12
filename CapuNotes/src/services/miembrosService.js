@@ -3,12 +3,19 @@ import axios from "axios";
 
 const API_URL = "/api/miembros";
 
+const api = axios.create({
+  withCredentials: true,
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+  headers: { 'Content-Type': 'application/json' }
+});
+
 export const miembrosService = {
   // ===============================================================
   // 🔹 Obtener todos los miembros (normaliza los datos)
   // ===============================================================
   list: async () => {
-    const res = await axios.get(API_URL);
+    const res = await api.get(API_URL);
     const data = Array.isArray(res.data) ? res.data : [];
 
     console.log("📡 Miembros recibidos del backend:", data);
@@ -41,7 +48,7 @@ export const miembrosService = {
   // 🔹 Obtener miembro por ID compuesto
   // ===============================================================
   getById: async (nroDocumento, tipoDocumento = "DNI") => {
-    const res = await axios.get(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
+    const res = await api.get(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
     const m = res.data || {};
 
     return {
@@ -71,7 +78,7 @@ export const miembrosService = {
   // 🔹 Crear nuevo miembro
   // ===============================================================
   create: async (data) => {
-    const res = await axios.post(API_URL, data);
+    const res = await api.post(API_URL, data);
     console.log("✅ Miembro creado:", res.data);
     return res.data;
   },
@@ -80,7 +87,7 @@ export const miembrosService = {
   // 🔹 Actualizar miembro existente
   // ===============================================================
   update: async (data) => {
-    const res = await axios.patch(API_URL, data);
+    const res = await api.patch(API_URL, data);
     console.log("✏️ Miembro actualizado:", res.data);
     return res.data;
   },
@@ -89,7 +96,7 @@ export const miembrosService = {
   // 🔹 Dar de baja lógica (activo = false)
   // ===============================================================
   darDeBaja: async (nroDocumento, tipoDocumento = "DNI") => {
-    await axios.delete(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
+    await api.delete(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
     console.log(`⚠️ Miembro dado de baja: ${tipoDocumento} ${nroDocumento}`);
   },
 
@@ -97,7 +104,7 @@ export const miembrosService = {
   // 🔹 Reactivar miembro dado de baja
   // ===============================================================
   reactivar: async (nroDocumento, tipoDocumento = "DNI") => {
-    await axios.patch(`${API_URL}/${nroDocumento}/${tipoDocumento}/reactivar`);
+    await api.patch(`${API_URL}/${nroDocumento}/${tipoDocumento}/reactivar`);
     console.log(`🟢 Miembro reactivado: ${tipoDocumento} ${nroDocumento}`);
   },
 };

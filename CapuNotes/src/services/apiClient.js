@@ -9,7 +9,10 @@ export class ApiError extends Error {
 }
 
 // configuración base
-const BASE = 'http://localhost:8080';
+// TEMPORAL: Llamar directamente al backend sin proxy para debug
+// En desarrollo usa URL directa al backend
+// En producción usa variable de entorno o ruta absoluta
+const BASE = import.meta.env.DEV ? 'http://localhost:8080' : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
 const CSRF_COOKIE_NAME = 'XSRF-TOKEN';
 let CSRF_HEADER = 'X-XSRF-TOKEN'; // puedes cambiar con setCsrfHeaderName()
 
@@ -18,8 +21,27 @@ export function setCsrfHeaderName(name) {
 }
 
 export function getCookie(name) {
-  const m = document.cookie.split('; ').find(c => c.startsWith(name + '='));
-  return m ? decodeURIComponent(m.split('=').slice(1).join('=')) : null;
+  const cookies = document.cookie.split('; ');
+  console.log(`🔎 getCookie("${name}"):`, { 
+    buscando: name, 
+    cookiesDisponibles: cookies,
+    totalCookies: cookies.length,
+    documentCookie: document.cookie
+  });
+  const m = cookies.find(c => c.startsWith(name + '='));
+  let value = m ? decodeURIComponent(m.split('=').slice(1).join('=')) : null;
+  
+  // Fallback: si la cookie no está accesible desde document.cookie (problema cross-domain),
+  // intentar leerla desde localStorage
+  if (!value && name === 'XSRF-TOKEN') {
+    value = localStorage.getItem('XSRF-TOKEN');
+    if (value) {
+      console.log(`💾 getCookie("${name}") encontrado en localStorage:`, value);
+    }
+  }
+  
+  console.log(`🔎 getCookie("${name}") resultado:`, value);
+  return value;
 }
 
 export function csrfHeaders(additional = {}) {
@@ -37,6 +59,20 @@ function withTimeout(ms = 15000) {
 function buildUrl(path, params) {
   const p = String(path || '').trim();
   const pathWithSlash = p.startsWith('/') ? p : '/' + p;
+  
+  // Si BASE está vacío (desarrollo), usar ruta relativa directamente
+  if (!BASE) {
+    if (!params || Object.keys(params).length === 0) {
+      return pathWithSlash;
+    }
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) searchParams.set(k, String(v));
+    });
+    return `${pathWithSlash}?${searchParams.toString()}`;
+  }
+  
+  // Si BASE tiene valor (producción), construir URL completa
   const url = new URL(BASE.replace(/\/+$/, '') + pathWithSlash, window.location.href);
   if (params && typeof params === 'object') {
     Object.entries(params).forEach(([k, v]) => {
@@ -93,10 +129,24 @@ async function request(method, path, { params, body, headers = {}, timeoutMs } =
     const isLogin = path && (path.includes('/auth/login') || path.includes('/api/auth/login'));
     if (method && method.toUpperCase() !== 'GET' && !isLogin) {
       const xsrf = getCookie(CSRF_COOKIE_NAME);
-      if (xsrf) init.headers[CSRF_HEADER] = xsrf;
+      console.log('🔐 CSRF Debug:', {
+        path,
+        method,
+        cookieName: CSRF_COOKIE_NAME,
+        cookieValue: xsrf,
+        allCookies: document.cookie,
+        willAddHeader: !!xsrf
+      });
+      if (xsrf) {
+        init.headers[CSRF_HEADER] = xsrf;
+        console.log('✅ CSRF header agregado:', CSRF_HEADER, '=', xsrf);
+      } else {
+        console.warn('⚠️ Cookie CSRF no encontrada! Cookies disponibles:', document.cookie);
+      }
     }
 
     const url = buildUrl(path, params);
+    console.log('📤 Request:', { method, url, headers: init.headers });
     const res = await fetch(encodeURI(url), init);
     return await handleResponse(res);
   } catch (err) {

@@ -1,31 +1,28 @@
 // src/services/cuerdasService.js
-import axios from "axios";
+import apiClient from "./apiClient";
 
-const API_URL = "/api/cuerdas";
+const API_URL = '/cuerdas';
 
 export const cuerdasService = {
   list: async () => {
-    const res = await axios.get(API_URL);
-    console.log("📡 Datos recibidos de CUERDAS:", res.data);
-    return res.data;
+    const data = await apiClient.get(API_URL);
+    console.log("📡 Datos recibidos de CUERDAS:", data);
+    return data;
   },
 
   getById: async (id) => {
-    const res = await axios.get(`${API_URL}/${id}`);
-    return res.data;
+    return await apiClient.get(`${API_URL}/${id}`);
   },
 
   create: async (data) => {
-    const res = await axios.post(API_URL, data);
-    return res.data;
+    return await apiClient.post(API_URL, { body: data });
   },
 
   update: async (updated) => {
-    const res = await axios.put(`${API_URL}/${updated.id}`, updated);
-    return res.data;
+    return await apiClient.patch(`${API_URL}/${updated.id}`, { body: updated });
   },
 
   remove: async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
+    await apiClient.delete(`${API_URL}/${id}`);
   },
 };
