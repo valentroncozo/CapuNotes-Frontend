@@ -1,14 +1,26 @@
-import '@/styles/abmc.css';
-import '@/styles/formulario.css';
+// 1️⃣ Importaciones de librerías externas (React, dependencias NPM)
+import { useEffect, useState, useMemo } from 'react';
+import Swal from 'sweetalert2';
+import { InputMask } from '@react-input/mask';
+import {
+  GeoapifyGeocoderAutocomplete,
+  GeoapifyContext,
+} from '@geoapify/react-geocoder-autocomplete';
+import '@geoapify/geocoder-autocomplete/styles/minimal.css'; // 👈 Importá acá el CSS de Geoapify
+
+// 2️⃣ Importaciones de componentes internos
 import BackButton from '../../common/BackButton.jsx';
 import PreguntaTexto from './preguntas/preguntaTexto.jsx';
 import PreguntaOpcion from './preguntas/preguntaOpcion.jsx';
 import PreguntaMultiOpcion from './preguntas/preguntaMultiOpcion.jsx';
-import { useEffect, useState, useMemo } from 'react';
-import Swal from 'sweetalert2';
+
+// 3️⃣ Importaciones de servicios / lógica
 import AudicionService from '@/services/audicionService.js';
 import inscripcionService from '@/services/incripcionService.js';
-import { InputMask } from '@react-input/mask';
+
+// 4️⃣ Importaciones de tus estilos personalizados (DEBE IR AL FINAL)
+import '@/styles/abmc.css';
+import '@/styles/formulario.css';
 
 const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
   // Estados para datos dinámicos
@@ -337,309 +349,329 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
     </main>
   ) : (
     <main className="encuesta-container">
-      <div className="abmc-card">
-        <header className="abmc-header">
-          <BackButton />
-          <h1 className="abmc-title">{title}</h1>
-        </header>
+      <GeoapifyContext apiKey="27d4d3c8bf5147f3ae4cd2f98a44009a">
+        <div className="abmc-card">
+          <header className="abmc-header">
+            <BackButton />
+            <h1 className="abmc-title" style={{ marginBottom: '2rem' }}>
+              {title}
+            </h1>
+          </header>
 
-        {loading ? (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <p>Cargando formulario...</p>
-          </div>
-        ) : (
-          <form className="cuestionario-formulario">
-            <section className="container-candidato">
-              <h2>
-                Datos Personales <span>* Campos obligatorios</span>{' '}
-              </h2>
-              <div className="mitad">
-                <div className="form-group-miembro">
-                  <label>
-                    Nombre <span style={{ color: 'var(--accent)' }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="abmc-input"
-                    value={candidato.nombre}
-                    onChange={(e) =>
-                      setCandidato({ ...candidato, nombre: e.target.value })
-                    }
-                    required
-                  />
+          {loading ? (
+            <div style={{ padding: '2rem', textAlign: 'center' }}>
+              <p>Cargando formulario...</p>
+            </div>
+          ) : (
+            <form className="cuestionario-formulario">
+              <section className="container-candidato">
+                <h2>
+                  Datos Personales <span>* Campos obligatorios</span>{' '}
+                </h2>
+                <div className="mitad">
+                  <div className="form-group-miembro">
+                    <label>
+                      Nombre <span style={{ color: 'var(--accent)' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="abmc-input"
+                      value={candidato.nombre}
+                      onChange={(e) =>
+                        setCandidato({ ...candidato, nombre: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="form-group-miembro">
+                    <label>
+                      Apellido <span style={{ color: 'var(--accent)' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="abmc-input"
+                      value={candidato.apellido}
+                      onChange={(e) =>
+                        setCandidato({ ...candidato, apellido: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="form-group-miembro">
-                  <label>
-                    Apellido <span style={{ color: 'var(--accent)' }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="abmc-input"
-                    value={candidato.apellido}
-                    onChange={(e) =>
-                      setCandidato({ ...candidato, apellido: e.target.value })
-                    }
-                    required
-                  />
+                <div className="mitad">
+                  <div className="form-group-miembro">
+                    <label>
+                      Tipo de Documento{' '}
+                      <span style={{ color: 'var(--accent)' }}>*</span>
+                    </label>
+                    <select
+                      className="abmc-select"
+                      value={candidato.tipoDocumento}
+                      onChange={(e) =>
+                        setCandidato({
+                          ...candidato,
+                          tipoDocumento: e.target.value,
+                        })
+                      }
+                      required
+                    >
+                      <option value="">-</option>
+                      <option value="DNI">DNI</option>
+                      <option value="Pasaporte">Pasaporte</option>
+                    </select>
+                  </div>
+                  <div className="form-group-miembro">
+                    <label>
+                      Nro de Documento{' '}
+                      <span style={{ color: 'var(--accent)' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="abmc-input"
+                      value={candidato.nroDocumento}
+                      onChange={(e) =>
+                        setCandidato({
+                          ...candidato,
+                          nroDocumento: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="mitad">
-                <div className="form-group-miembro">
-                  <label>
-                    Tipo de Documento{' '}
-                    <span style={{ color: 'var(--accent)' }}>*</span>
-                  </label>
-                  <select
-                    className="abmc-select"
-                    value={candidato.tipoDocumento}
-                    onChange={(e) =>
-                      setCandidato({
-                        ...candidato,
-                        tipoDocumento: e.target.value,
-                      })
-                    }
-                    required
-                  >
-                    <option value="">-</option>
-                    <option value="DNI">DNI</option>
-                    <option value="Pasaporte">Pasaporte</option>
-                  </select>
-                </div>
-                <div className="form-group-miembro">
-                  <label>
-                    Nro de Documento{' '}
-                    <span style={{ color: 'var(--accent)' }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="abmc-input"
-                    value={candidato.nroDocumento}
-                    onChange={(e) =>
-                      setCandidato({
-                        ...candidato,
-                        nroDocumento: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-              </div>
-              <div className="mitad">
-                <div className="form-group-miembro">
-                  <label>
-                    Fecha de Nacimiento (dd/mm/aaaa){' '}
-                    <span style={{ color: 'var(--accent)' }}>*</span>
-                  </label>
+                <div className="mitad">
+                  <div className="form-group-miembro">
+                    <label>
+                      Fecha de Nacimiento (dd/mm/aaaa){' '}
+                      <span style={{ color: 'var(--accent)' }}>*</span>
+                    </label>
 
-                  <InputMask
-                    mask="99/99/9999"
-                    replacement={{ 9: /\d/ }}
-                    value={fechaNacimiento}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setFechaNacimiento(value);
-                      setCandidato({ ...candidato, fechaNacimiento: value });
-                    }}
-                    className="abmc-input"
-                    placeholder="dd/mm/aaaa"
-                    required
-                  />
-                </div>
-                <div className="form-group-miembro">
-                  <label>Lugar de Origen</label>
-                  <input
-                    type="text"
-                    className="abmc-input"
-                    value={candidato.lugar_origen}
-                    onChange={(e) =>
-                      setCandidato({
-                        ...candidato,
-                        lugar_origen: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-              </div>
-              <div className="mitad">
-                <div className="form-group-miembro">
-                  <label>
-                    Email <span style={{ color: 'var(--accent)' }}>*</span>
-                  </label>
-                  <input
-                    type="email"
-                    className="abmc-input"
-                    value={candidato.email}
-                    onChange={(e) =>
-                      setCandidato({ ...candidato, email: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="form-group-miembro">
-                  <label>
-                    Teléfono <span style={{ color: 'var(--accent)' }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="abmc-input"
-                    value={candidato.telefono}
-                    onChange={(e) =>
-                      setCandidato({ ...candidato, telefono: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-              </div>
-              <div className="mitad">
-                <div className="form-group-miembro">
-                  <label>Carrera/Profesión</label>
-                  <input
-                    type="text"
-                    className="abmc-input"
-                    value={candidato.carrera_profesion}
-                    onChange={(e) =>
-                      setCandidato({
-                        ...candidato,
-                        carrera_profesion: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div className="form-group-miembro">
-                  <label>¿Sabes tocar algún instrumento musical?</label>
-                  <input
-                    type="text"
-                    className="abmc-input"
-                    value={candidato.instrumento_musical}
-                    onChange={(e) =>
-                      setCandidato({
-                        ...candidato,
-                        instrumento_musical: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-              </div>
-              <div className="mitad">
-                <div className="form-group-miembro">
-                  <label>¿Conoces tu rango vocal?</label>
-                  <select
-                    className="abmc-input"
-                    value={candidato.cuerda}
-                    onChange={(e) =>
-                      setCandidato({ ...candidato, cuerda: e.target.value })
-                    }
-                  >
-                    <option value="">-</option>
-                    {cuerdas.map((cuerda) => (
-                      <option key={cuerda.id} value={cuerda.name}>
-                        {cuerda.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                    <InputMask
+                      mask="99/99/9999"
+                      replacement={{ 9: /\d/ }}
+                      value={fechaNacimiento}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setFechaNacimiento(value);
+                        setCandidato({ ...candidato, fechaNacimiento: value });
+                      }}
+                      className="abmc-input"
+                      placeholder="dd/mm/aaaa"
+                      required
+                    />
+                  </div>
+                  <div className="form-group-miembro">
+                    <label>Lugar de Origen</label>
+                    <div className="geoapify-wrapper">
+                      <GeoapifyGeocoderAutocomplete
+                        placeholder=""
+                        apiKey="27d4d3c8bf5147f3ae4cd2f98a44009a"
+                        lang="es"
+                        countryCodes={['ar']}
+                        debounceDelay={300}
+                        // no usar "value" ni "onChange" porque Geoapify maneja internamente el texto
+                        onPlaceSelect={(feature) => {
+                          console.log('Geoapify feature ->', feature);
+                          if (!feature?.properties) return;
 
-                <div className="form-group-miembro">
-                  <label>
-                    <strong>Canción</strong> que vas a interpretar en la
-                    audición <span style={{ color: 'var(--accent)' }}>*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="abmc-input"
-                    value={cancion}
-                    onChange={(e) => setCancion(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-            </section>
-            <hr className="divider" />
+                          const p = feature.properties;
+                          const formatted =
+                            p.formatted ||
+                            p.formatted_address ||
+                            [p.city || p.town || p.village, p.state, p.country]
+                              .filter(Boolean)
+                              .join(', ');
 
-            <section className="preguntas-container">
-              <h2>Preguntas</h2>
-              {preguntas.map((pregunta, index) =>
-                pregunta.tipo === 'TEXTO' ? (
-                  <PreguntaTexto
-                    key={pregunta.id}
-                    pregunta={pregunta}
-                    index={index}
-                    handleChange={handleChange}
-                  />
-                ) : pregunta.tipo === 'OPCION' ? (
-                  <PreguntaOpcion
-                    key={pregunta.id}
-                    pregunta={pregunta}
-                    index={index}
-                    respuestas={respuestas}
-                    handleChange={handleChange}
-                  />
-                ) : pregunta.tipo === 'MULTIOPCION' ? (
-                  <PreguntaMultiOpcion
-                    pregunta={pregunta}
-                    key={pregunta.id}
-                    index={index}
-                    respuestas={respuestas}
-                    handleChange={handleChange}
-                  />
-                ) : null
-              )}
-            </section>
-            <hr className="divider" />
-            <section className="container-turno">
-              <h2>Seleccionar Turno de Audición </h2>
-              <div className="mitad">
-                <div className="form-group-miembro">
-                  <label>
-                    Día de Audición{' '}
-                    <span style={{ color: 'var(--accent)' }}>*</span>
-                  </label>
-                  <select
-                    className="abmc-select"
-                    value={filterDia}
-                    onChange={(e) => setFilterDia(e.target.value)}
-                    required
-                  >
-                    <option value="">-</option>
-                    {dias.map((dia, index) => (
-                      <option key={index} value={dia}>
-                        {dia}
-                      </option>
-                    ))}
-                  </select>
+                          setCandidato({
+                            ...candidato,
+                            lugar_origen: formatted || '',
+                          });
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="form-group-miembro">
-                  <label>
-                    Horario de Audición{' '}
-                    <span style={{ color: 'var(--accent)' }}>*</span>
-                  </label>
-                  <select
-                    className="abmc-select"
-                    value={selectedTurnoId}
-                    onChange={(e) => setSelectedTurnoId(e.target.value)}
-                    required
-                  >
-                    <option value="">-</option>
-                    {availableTurnos.map((turno) => (
-                      <option key={turno.id} value={String(turno.id)}>
-                        {turno.diaString} - {turno.horaInicio}
-                      </option>
-                    ))}
-                  </select>
+                <div className="mitad">
+                  <div className="form-group-miembro">
+                    <label>
+                      Email <span style={{ color: 'var(--accent)' }}>*</span>
+                    </label>
+                    <input
+                      type="email"
+                      className="abmc-input"
+                      value={candidato.email}
+                      onChange={(e) =>
+                        setCandidato({ ...candidato, email: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="form-group-miembro">
+                    <label>
+                      Teléfono <span style={{ color: 'var(--accent)' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="abmc-input"
+                      value={candidato.telefono}
+                      onChange={(e) =>
+                        setCandidato({ ...candidato, telefono: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-            </section>
+                <div className="mitad">
+                  <div className="form-group-miembro">
+                    <label>Carrera/Profesión</label>
+                    <input
+                      type="text"
+                      className="abmc-input"
+                      value={candidato.carrera_profesion}
+                      onChange={(e) =>
+                        setCandidato({
+                          ...candidato,
+                          carrera_profesion: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="form-group-miembro">
+                    <label>¿Sabes tocar algún instrumento musical?</label>
+                    <input
+                      type="text"
+                      className="abmc-input"
+                      value={candidato.instrumento_musical}
+                      onChange={(e) =>
+                        setCandidato({
+                          ...candidato,
+                          instrumento_musical: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="mitad">
+                  <div className="form-group-miembro">
+                    <label>¿Conoces tu rango vocal?</label>
+                    <select
+                      className="abmc-input"
+                      value={candidato.cuerda}
+                      onChange={(e) =>
+                        setCandidato({ ...candidato, cuerda: e.target.value })
+                      }
+                    >
+                      <option value="">-</option>
+                      {cuerdas.map((cuerda) => (
+                        <option key={cuerda.id} value={cuerda.name}>
+                          {cuerda.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-            <button
-              type="button"
-              className="abmc-btn btn-primary"
-              onClick={handleSubmit}
-            >
-              Inscribir
-            </button>
-          </form>
-        )}
-      </div>
+                  <div className="form-group-miembro">
+                    <label>
+                      <strong>Canción</strong> que vas a interpretar en la
+                      audición <span style={{ color: 'var(--accent)' }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="abmc-input"
+                      value={cancion}
+                      onChange={(e) => setCancion(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+              </section>
+              <hr className="divider" />
+
+              <section className="preguntas-container">
+                <h2>Preguntas</h2>
+                {preguntas.map((pregunta, index) =>
+                  pregunta.tipo === 'TEXTO' ? (
+                    <PreguntaTexto
+                      key={pregunta.id}
+                      pregunta={pregunta}
+                      index={index}
+                      handleChange={handleChange}
+                    />
+                  ) : pregunta.tipo === 'OPCION' ? (
+                    <PreguntaOpcion
+                      key={pregunta.id}
+                      pregunta={pregunta}
+                      index={index}
+                      respuestas={respuestas}
+                      handleChange={handleChange}
+                    />
+                  ) : pregunta.tipo === 'MULTIOPCION' ? (
+                    <PreguntaMultiOpcion
+                      pregunta={pregunta}
+                      key={pregunta.id}
+                      index={index}
+                      respuestas={respuestas}
+                      handleChange={handleChange}
+                    />
+                  ) : null
+                )}
+              </section>
+              <hr className="divider" />
+              <section className="container-turno">
+                <h2>Seleccionar Turno de Audición </h2>
+                <div className="mitad">
+                  <div className="form-group-miembro">
+                    <label>
+                      Día de Audición{' '}
+                      <span style={{ color: 'var(--accent)' }}>*</span>
+                    </label>
+                    <select
+                      className="abmc-select"
+                      value={filterDia}
+                      onChange={(e) => setFilterDia(e.target.value)}
+                      required
+                    >
+                      <option value="">-</option>
+                      {dias.map((dia, index) => (
+                        <option key={index} value={dia}>
+                          {dia}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group-miembro">
+                    <label>
+                      Horario de Audición{' '}
+                      <span style={{ color: 'var(--accent)' }}>*</span>
+                    </label>
+                    <select
+                      className="abmc-select"
+                      value={selectedTurnoId}
+                      onChange={(e) => setSelectedTurnoId(e.target.value)}
+                      required
+                    >
+                      <option value="">-</option>
+                      {availableTurnos.map((turno) => (
+                        <option key={turno.id} value={String(turno.id)}>
+                          {turno.diaString} - {turno.horaInicio}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </section>
+
+              <button
+                type="button"
+                className="abmc-btn btn-primary"
+                onClick={handleSubmit}
+              >
+                Inscribir
+              </button>
+            </form>
+          )}
+        </div>
+      </GeoapifyContext>
     </main>
   );
 };
