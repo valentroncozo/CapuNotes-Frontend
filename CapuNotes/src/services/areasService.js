@@ -1,6 +1,7 @@
 // src/services/areasService.js
 import apiClient from "@/services/apiClient";
 
+
 const API_URL = "/areas";
 
 function handleApiError(err) {

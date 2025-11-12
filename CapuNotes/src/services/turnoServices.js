@@ -1,89 +1,72 @@
-import axios from 'axios';
-
-// En Vite usar import.meta.env para variables pblicas (VITE_*)
-// En desarrollo usamos el proxy definido en vite.config.js ("/api" -> http://localhost:8080)
-const DEV_PROXY_BASE = '/api';
-const resolvedBaseURL = import.meta.env.DEV ? DEV_PROXY_BASE : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
-const api = axios.create({
-  baseURL: resolvedBaseURL,
-  withCredentials: true,
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-  headers: { 'Content-Type': 'application/json' }
-});
+import apiClient from './apiClient';
 
 const TurnoService = {
   listarPorAudicion: async (audicionId) => {
     try {
-      const r = await api.get(`/turnos/audicion/${encodeURIComponent(audicionId)}`);
-      console.log('Turnos obtenidos:', r.data);
-      return r.data;
+  const data = await apiClient.get(`/turnos/audicion/${encodeURIComponent(audicionId)}`);
+      console.log('Turnos obtenidos:', data);
+      return data;
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e;
     }
   },
 
   listarDisponibles: async (audicionId) => {
     try {
-      const r = await api.get(`/turnos/audicion/${encodeURIComponent(audicionId)}/disponibles`);
-      return r.data;
+  return await apiClient.get(`/turnos/audicion/${encodeURIComponent(audicionId)}/disponibles`);
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e;
     }
   },
 
   listarResumenPorDia: async (audicionId) => {
     try {
-      const r = await api.get(`/turnos/audicion/${encodeURIComponent(audicionId)}/resumen-diario`);
-      return r.data;
+  return await apiClient.get(`/turnos/audicion/${encodeURIComponent(audicionId)}/resumen-diario`);
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e;
     }
   },
   
   listarFranjasHorarias: async (audicionId) => {
     try {
-      const r = await api.get(`/turnos/audicion/${encodeURIComponent(audicionId)}/generacion-requests`);
-      return r.data;
+  return await apiClient.get(`/turnos/audicion/${encodeURIComponent(audicionId)}/generacion-requests`);
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e;
     }
   },
 
   generarTurnos: async (audicionId, generarTurnosRequest) => {
     try {
-      const r = await api.post(`/turnos/audicion/${encodeURIComponent(audicionId)}`, generarTurnosRequest);
-      return r.data;
+  return await apiClient.post(`/turnos/audicion/${encodeURIComponent(audicionId)}`, { body: generarTurnosRequest });
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e;
     }
   },
 
   actualizarEstado: async (turnoId, nuevoEstado) => {
     try {
       // body expected: { estado: "DISPONIBLE" | "RESERVADO" | "CANCELADO" }
-      const r = await api.patch(`/turnos/${encodeURIComponent(turnoId)}/estado`, { estado: nuevoEstado });
-      return r.data;
+  return await apiClient.patch(`/turnos/${encodeURIComponent(turnoId)}/estado`, { body: { estado: nuevoEstado } });
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e;
     }
   },
 
   eliminar: async (turnoId) => {
     try {
-      const r = await api.delete(`/turnos/${encodeURIComponent(turnoId)}`);
-      return r.status === 204;
+  await apiClient.delete(`/turnos/${encodeURIComponent(turnoId)}`);
+      return true;
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e;
     }
   },
 
   eliminarTurnosPorAudicion: async (audicionId) => {
     try {
-      const r = await api.delete(`/turnos/audicion/${encodeURIComponent(audicionId)}`);
-      return r.status === 204;
+  await apiClient.delete(`/turnos/audicion/${encodeURIComponent(audicionId)}`);
+      return true;
     } catch (e) {
-      throw e.response?.data || e.message;
+      throw e;
     }
   }
 };

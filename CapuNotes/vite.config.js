@@ -10,6 +10,9 @@ export default defineConfig({
     },
   },
   server: {
+    // Proxy DESACTIVADO - Llamamos directamente al backend en http://localhost:8080
+    // con BASE = 'http://localhost:8080' en apiClient.js
+    /* 
     proxy: {
       // Proxy específico para rutas de autenticación (mantiene /api/auth)
       "/api/auth": {
@@ -65,5 +68,6 @@ export default defineConfig({
         },
       },
     },
+    */
   },
 });

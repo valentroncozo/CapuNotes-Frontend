@@ -1,39 +1,32 @@
 // src/services/fraternidadesService.js
-import axios from "axios";
+import apiClient from "./apiClient";
 
-const API_URL = "/api/fraternidades";
-
-const api = axios.create({
-  withCredentials: true,
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-  headers: { 'Content-Type': 'application/json' }
-});
+const API_URL = "/fraternidades";
 
 export const fraternidadesService = {
   // Listar fraternidades mapeando a { id, nombre }
   list: async () => {
-    const res = await api.get(API_URL);
-    return (res.data || []).map((f) => ({ id: f.id, nombre: f.name }));
+    const data = await apiClient.get(API_URL);
+    return (data || []).map((f) => ({ id: f.id, nombre: f.name }));
   },
 
   // Crear
   create: async (data) => {
     const payload = { name: data.nombre };
-    const res = await api.post(API_URL, payload);
-    return { id: res.data.id, nombre: res.data.name };
+    const result = await apiClient.post(API_URL, { body: payload });
+    return { id: result.id, nombre: result.name };
   },
 
   // Actualizar
   update: async (data) => {
     const payload = { name: data.nombre };
-    const res = await api.patch(`${API_URL}/${data.id}`, payload);
-    return { id: res.data.id, nombre: res.data.name };
+    const result = await apiClient.patch(`${API_URL}/${data.id}`, { body: payload });
+    return { id: result.id, nombre: result.name };
   },
 
   // Eliminar
   remove: async (id) => {
-    await api.delete(`${API_URL}/${id}`);
+    await apiClient.delete(`${API_URL}/${id}`);
   },
 };
 

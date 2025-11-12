@@ -1,174 +1,170 @@
 // src/services/apiClient.js
-export class ApiError extends Error {
-  constructor(message, { status = 0, details = null } = {}) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = status;
-    this.details = details;
-  }
-}
+import axios from 'axios';
 
-// configuración base
-// TEMPORAL: Llamar directamente al backend sin proxy para debug
-// En desarrollo usa URL directa al backend
-// En producción usa variable de entorno o ruta absoluta
-const BASE = import.meta.env.DEV ? 'http://localhost:8080' : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
-const CSRF_COOKIE_NAME = 'XSRF-TOKEN';
-let CSRF_HEADER = 'X-XSRF-TOKEN'; // puedes cambiar con setCsrfHeaderName()
+const isBrowser = typeof window !== 'undefined';
 
-export function setCsrfHeaderName(name) {
-  CSRF_HEADER = name;
-}
+// Crear instancia de axios con configuración base
+const axiosInstance = axios.create({
+  baseURL: import.meta.env.DEV
+    ? 'http://localhost:8080'
+    : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'),
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  timeout: 30000 // 30 segundos
+});
 
-export function getCookie(name) {
-  const cookies = document.cookie.split('; ');
-  console.log(`🔎 getCookie("${name}"):`, { 
-    buscando: name, 
-    cookiesDisponibles: cookies,
-    totalCookies: cookies.length,
-    documentCookie: document.cookie
-  });
-  const m = cookies.find(c => c.startsWith(name + '='));
-  let value = m ? decodeURIComponent(m.split('=').slice(1).join('=')) : null;
-  
-  // Fallback: si la cookie no está accesible desde document.cookie (problema cross-domain),
-  // intentar leerla desde localStorage
-  if (!value && name === 'XSRF-TOKEN') {
-    value = localStorage.getItem('XSRF-TOKEN');
-    if (value) {
-      console.log(`💾 getCookie("${name}") encontrado en localStorage:`, value);
-    }
-  }
-  
-  console.log(`🔎 getCookie("${name}") resultado:`, value);
-  return value;
-}
+const JSON_METHODS = new Set(['post', 'put', 'patch', 'delete']);
+const AUTH_ENDPOINTS = new Set([
+  '/auth/login',
+  '/auth/logout',
+  '/auth/refresh'
+]);
 
-export function csrfHeaders(additional = {}) {
-  const xsrf = getCookie(CSRF_COOKIE_NAME);
-  if (!xsrf) return { ...additional };
-  return { ...additional, [CSRF_HEADER]: xsrf };
-}
+let refreshPromise = null;
 
-function withTimeout(ms = 15000) {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), ms);
-  return { signal: controller.signal, clear: () => clearTimeout(id) };
-}
-
-function buildUrl(path, params) {
-  const p = String(path || '').trim();
-  const pathWithSlash = p.startsWith('/') ? p : '/' + p;
-  
-  // Si BASE está vacío (desarrollo), usar ruta relativa directamente
-  if (!BASE) {
-    if (!params || Object.keys(params).length === 0) {
-      return pathWithSlash;
-    }
-    const searchParams = new URLSearchParams();
-    Object.entries(params).forEach(([k, v]) => {
-      if (v !== undefined && v !== null) searchParams.set(k, String(v));
-    });
-    return `${pathWithSlash}?${searchParams.toString()}`;
-  }
-  
-  // Si BASE tiene valor (producción), construir URL completa
-  const url = new URL(BASE.replace(/\/+$/, '') + pathWithSlash, window.location.href);
-  if (params && typeof params === 'object') {
-    Object.entries(params).forEach(([k, v]) => {
-      if (v !== undefined && v !== null) url.searchParams.set(k, String(v));
-    });
-  }
-  return url.toString();
-}
-
-async function handleResponse(res) {
-  if (res.status === 204) return null;
-  const ct = res.headers.get('content-type') || '';
-  const text = await res.text().catch(() => null);
-  const data = text && ct.includes('application/json')
-    ? (() => { try { return JSON.parse(text); } catch { return text; } })()
-    : text;
-
-  if (!res.ok) {
-    // emitir eventos globales para que el AuthContext pueda manejar navegación/refresh
-    try {
-      if (res.status === 403) {
-        window.dispatchEvent(new CustomEvent('api-forbidden', { detail: { status: 403, body: data } }));
-      } else if (res.status === 401) {
-        window.dispatchEvent(new CustomEvent('api-unauthorized', { detail: { status: 401, body: data } }));
-      }
-    } catch (e) { /* ignore */ }
-
-    const msg =
-      (data && typeof data === 'object' && (data.message || data.error)) ||
-      `Request failed (${res.status})`;
-    throw new ApiError(msg, { status: res.status, details: { parsed: data, raw: text } });
-  }
-  return data;
-}
-
-async function request(method, path, { params, body, headers = {}, timeoutMs } = {}) {
-  const { signal, clear } = withTimeout(timeoutMs);
+const normalizePathname = (url) => {
+  if (!url) return '';
   try {
-    const isJson = body && typeof body === 'object' && !(body instanceof FormData);
-    const init = {
-      method,
-      signal,
-      headers: {
-        Accept: 'application/json',
-        ...(isJson ? { 'Content-Type': 'application/json' } : {}),
-        ...headers,
-      },
-      body: isJson ? JSON.stringify(body) : body,
-      credentials: 'include',
-    };
+    const fallbackBase = axiosInstance.defaults.baseURL || (isBrowser ? window.location.origin : 'http://localhost');
+    const parsed = new URL(url, fallbackBase);
+    return parsed.pathname;
+  } catch (_err) {
+    return url;
+  }
+};
 
-    // adjuntar CSRF header para mutaciones (no GET) excepto login
-    // el endpoint /api/auth/login está exento de CSRF en el backend
-    const isLogin = path && (path.includes('/auth/login') || path.includes('/api/auth/login'));
-    if (method && method.toUpperCase() !== 'GET' && !isLogin) {
-      const xsrf = getCookie(CSRF_COOKIE_NAME);
-      console.log('🔐 CSRF Debug:', {
-        path,
-        method,
-        cookieName: CSRF_COOKIE_NAME,
-        cookieValue: xsrf,
-        allCookies: document.cookie,
-        willAddHeader: !!xsrf
-      });
-      if (xsrf) {
-        init.headers[CSRF_HEADER] = xsrf;
-        console.log('✅ CSRF header agregado:', CSRF_HEADER, '=', xsrf);
-      } else {
-        console.warn('⚠️ Cookie CSRF no encontrada! Cookies disponibles:', document.cookie);
-      }
+const shouldAttemptRefresh = (config = {}) => {
+  if (!config) return false;
+  if (config.skipAuthRefresh) return false;
+  const pathname = normalizePathname(config.url);
+  if (!pathname) return false;
+  return !AUTH_ENDPOINTS.has(pathname);
+};
+
+const ensureRefreshed = async () => {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = axiosInstance.post('/auth/refresh', null, {
+    skipAuthRefresh: true
+  }).catch((err) => {
+    throw err;
+  }).finally(() => {
+    refreshPromise = null;
+  });
+
+  return refreshPromise;
+};
+
+// Interceptor de requests para logging y encabezados dinámicos
+axiosInstance.interceptors.request.use(
+  function onFulfilled(config) {
+    const method = (config && config.method ? config.method : 'get').toLowerCase();
+    const base = config && config.baseURL ? config.baseURL : '';
+    const targetUrl = config && config.url ? config.url : '';
+    console.log('📤 ' + method.toUpperCase() + ' ' + base + targetUrl);
+
+    if (!config.headers) config.headers = {};
+
+    // Garantizar Content-Type para requests JSON
+    const isFormData = config.data instanceof FormData;
+    if (JSON_METHODS.has(method) && !isFormData && !config.headers['Content-Type']) {
+      config.headers['Content-Type'] = 'application/json';
     }
 
-    const url = buildUrl(path, params);
-    console.log('📤 Request:', { method, url, headers: init.headers });
-    const res = await fetch(encodeURI(url), init);
-    return await handleResponse(res);
-  } catch (err) {
-    if (err.name === 'AbortError') throw new ApiError('Request timeout', { status: 0 });
-    if (err instanceof ApiError) throw err;
-    throw new ApiError(err?.message || 'Network error', { status: 0 });
-  } finally {
-    clear();
+    return config;
+  },
+  function onRejected(error) {
+    return Promise.reject(error);
   }
+);
+
+// Interceptor de responses (manejo de errores global)
+axiosInstance.interceptors.response.use(
+  function onFulfilled(response) {
+    const cfg = response && response.config ? response.config : {};
+    const method = (cfg.method || 'get').toUpperCase();
+    const url = cfg.url || '';
+    console.log('✅ ' + method + ' ' + url + ' - ' + response.status);
+
+    return response.data; // Devolver solo los datos
+  },
+  async function onRejected(error) {
+    const cfg = error && error.config ? error.config : {};
+    const method = cfg.method ? cfg.method.toUpperCase() : 'REQUEST';
+    const url = cfg.url || '';
+    const data = error && error.response ? error.response.data : undefined;
+    const message = data || error.message;
+    console.error('❌ Error en ' + method + ' ' + url + ':', message);
+
+    const status = error && error.response ? error.response.status : undefined;
+    const config = cfg;
+
+    if (status === 401 && config && !config._retry && shouldAttemptRefresh(config)) {
+      console.warn('⚠️ No autorizado - intentando refresh automático de sesión');
+      config._retry = true;
+
+      try {
+        await ensureRefreshed();
+      } catch (refreshErr) {
+        const refreshMsg = refreshErr && refreshErr.response ? refreshErr.response.data : refreshErr && refreshErr.message ? refreshErr.message : refreshErr;
+        console.error('❌ Refresh token falló:', refreshMsg);
+        throw error;
+      }
+
+      return axiosInstance(config);
+    }
+
+    throw error;
+  }
+);
+
+const isPlainObject = (value) => Object.prototype.toString.call(value) === '[object Object]';
+
+function extractDataAndConfig(options) {
+  if (options == null) {
+    return { data: undefined, config: {} };
+  }
+
+  if (!isPlainObject(options)) {
+    return { data: options, config: {} };
+  }
+
+  const { body, data, ...rest } = options;
+
+  if (body !== undefined) {
+    return { data: body, config: rest };
+  }
+
+  if (data !== undefined) {
+    return { data, config: rest };
+  }
+
+  return { data: undefined, config: rest };
 }
 
-// wrappers públicos
-export async function apiGet(path, opts = {}) { return request('GET', String(path).trim(), opts); }
-export async function apiPost(path, opts = {}) { return request('POST', String(path).trim(), opts); }
-export async function apiPatch(path, opts = {}) { return request('PATCH', String(path).trim(), opts); }
-export async function apiDelete(path, opts = {}) { return request('DELETE', String(path).trim(), opts); }
-
+// API pública simplificada
 export const apiClient = {
-  get: apiGet,
-  post: apiPost,
-  patch: apiPatch,
-  delete: apiDelete,
+  get: (url, config) => axiosInstance.get(url, config),
+  post: (url, options) => {
+    const { data, config } = extractDataAndConfig(options);
+    return axiosInstance.post(url, data, config);
+  },
+  put: (url, options) => {
+    const { data, config } = extractDataAndConfig(options);
+    return axiosInstance.put(url, data, config);
+  },
+  patch: (url, options) => {
+    const { data, config } = extractDataAndConfig(options);
+    return axiosInstance.patch(url, data, config);
+  },
+  delete: (url, options) => {
+    const { data, config } = extractDataAndConfig(options);
+    const finalConfig = data !== undefined ? { ...config, data } : config;
+    return axiosInstance.delete(url, finalConfig);
+  }
 };
 
 export default apiClient;

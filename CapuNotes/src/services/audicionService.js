@@ -3,7 +3,7 @@ import apiClient from './apiClient';
 const AudicionService = {
   crear: async (audicion) => {
     try {
-      return await apiClient.post('/api/audiciones', { body: audicion });
+      return await apiClient.post('/audiciones', { body: audicion });
     } catch (e) {
       throw e.details || e.message;
     }
@@ -11,7 +11,7 @@ const AudicionService = {
 
   actualizar: async (audicion) => {
     try {
-      return await apiClient.patch('/api/audiciones', { body: audicion });
+      return await apiClient.patch('/audiciones', { body: audicion });
     } catch (e) {
       throw e.details || e.message;
     }
@@ -19,7 +19,7 @@ const AudicionService = {
 
   actualizarParcial: async (id, cambios) => {
     try {
-      return await apiClient.patch(`/api/audiciones/${id}`, { body: cambios });
+      return await apiClient.patch(`/audiciones/${id}`, { body: cambios });
     } catch (e) {
       throw e.details || e.message;
     }
@@ -27,7 +27,7 @@ const AudicionService = {
 
   eliminar: async (id) => {
     try {
-      await apiClient.delete(`/api/audiciones/${id}`);
+      await apiClient.delete(`/audiciones/${id}`);
       return true;
     } catch (e) {
       throw e.details || e.message;
@@ -36,7 +36,7 @@ const AudicionService = {
 
   getById: async (id) => {
     try {
-      return await apiClient.get(`/api/audiciones/${id}`);
+      return await apiClient.get(`/audiciones/${id}`);
     } catch (e) {
       throw e.details || e.message;
     }
@@ -44,7 +44,7 @@ const AudicionService = {
 
   getAll: async () => {
     try {
-      return await apiClient.get('/api/audiciones');
+      return await apiClient.get('/audiciones');
     } catch (e) {
       throw e.details || e.message;
     }
@@ -52,7 +52,7 @@ const AudicionService = {
 
   getActual: async () => {
     try {
-      return await apiClient.get('/api/audiciones/actual');
+      return await apiClient.get('/audiciones/actual');
     } catch (e) {
       // devolver null si 404 u otro mensaje del backend
       if (e.status === 404) return null;
@@ -67,7 +67,7 @@ const AudicionService = {
       if (dia != null) params.dia = dia;
       if (page != null) params.page = page;
       if (size != null) params.size = size;
-      return await apiClient.get(`/api/audiciones/cronograma/${audicionId}`, { params });
+      return await apiClient.get(`/audiciones/cronograma/${audicionId}`, { params });
     } catch (e) {
       throw e.details || e.message;
     }
@@ -75,7 +75,7 @@ const AudicionService = {
 
   getPerfilInscripcion: async (inscripcionId) => {
     try {
-      return await apiClient.get(`/api/audiciones/cronograma/perfil/${inscripcionId}`);
+      return await apiClient.get(`/audiciones/cronograma/perfil/${inscripcionId}`);
     } catch (e) {
       throw e.details || e.message;
     }
@@ -83,7 +83,7 @@ const AudicionService = {
 
   getAudicionesPorCandidato: async (tipoDocumento, nroDocumento) => {
     try {
-      return await apiClient.get(`/api/audiciones/candidato/${encodeURIComponent(tipoDocumento)}/${encodeURIComponent(nroDocumento)}`);
+      return await apiClient.get(`/audiciones/candidato/${encodeURIComponent(tipoDocumento)}/${encodeURIComponent(nroDocumento)}`);
     } catch (e) {
       throw e.details || e.message;
     }

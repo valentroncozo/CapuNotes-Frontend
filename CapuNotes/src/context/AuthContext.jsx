@@ -1,7 +1,19 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiClient, csrfHeaders, getCookie } from "@/services/apiClient";
+import { apiClient } from "@/services/apiClient";
 import { postBroadcast, subscribeBroadcast, STORAGE_FALLBACK_KEY } from "@/utils/broadcast";
+
+const getCookie = (name) => {
+  if (typeof document === "undefined") return undefined;
+  const cookies = document.cookie ? document.cookie.split(";") : [];
+  for (const cookie of cookies) {
+    const [key, ...rest] = cookie.trim().split("=");
+    if (key === name) {
+      return rest.join("=");
+    }
+  }
+  return undefined;
+};
 
 // crear el contexto sin valor por defecto y validar su uso
 const AuthContext = createContext(undefined);
@@ -19,7 +31,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [permissions, setPermissions] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // { changed code }
   // centralizar almacenamiento y broadcasting entre pestañas
@@ -28,14 +40,17 @@ export function AuthProvider({ children }) {
   const refreshPromiseRef = useRef(null); // controlar refresh concurrente
 
   const setUserFromMe = (me, { broadcast = true } = {}) => {
-    setUser(me || null);
-    setPermissions((me && me.permissions) || []);
-    setIsAuthenticated(!!me);
+    const normalizedUser = me || null;
+    const nextPermissions = Array.isArray(normalizedUser?.permissions) ? normalizedUser.permissions : [];
 
-    if (me) {
-      try { localStorage.setItem(LOCAL_KEY, JSON.stringify(me)); } catch (e) { /* ignore */ }
+    setUser(normalizedUser);
+    setPermissions(nextPermissions);
+    setIsAuthenticated(!!normalizedUser);
+
+    if (normalizedUser) {
+      try { localStorage.setItem(LOCAL_KEY, JSON.stringify(normalizedUser)); } catch (e) { /* ignore */ }
       if (broadcast) {
-        postBroadcast({ type: "login", user: me });
+        postBroadcast({ type: "login", user: normalizedUser });
       }
     } else {
       try { localStorage.removeItem(LOCAL_KEY); } catch (e) { /* ignore */ }
@@ -43,6 +58,8 @@ export function AuthProvider({ children }) {
         postBroadcast({ type: "logout" });
       }
     }
+
+    return !!normalizedUser;
   };
 
   // intento de refresh centralizado con bloqueo
@@ -50,12 +67,12 @@ export function AuthProvider({ children }) {
     if (refreshPromiseRef.current) return refreshPromiseRef.current;
     const p = (async () => {
       try {
-        await apiClient.post("/api/auth/refresh", { headers: csrfHeaders() });
+        await apiClient.post("/api/auth/refresh");
         return true;
       } catch (e) {
         return false;
       } finally {
-        refreshPromiseRef.current = null;
+          refreshPromiseRef.current = null;
       }
     })();
     refreshPromiseRef.current = p;
@@ -64,12 +81,11 @@ export function AuthProvider({ children }) {
 
   const getMe = useCallback(async () => {
     try {
-      const data = await apiClient.get("/api/auth/me");
+  const data = await apiClient.get("/api/auth/me");
       console.log("getMe exitoso:", data);
-      setUserFromMe(data, { broadcast: false });
-      return true;
+      return setUserFromMe(data, { broadcast: false });
     } catch (err) {
-      const status = err?.response?.status ?? err?.status;
+        const status = err?.response?.status ?? err?.status;
       console.warn("getMe fallo:", { status, message: err?.message, response: err?.details ?? err?.response });
       // Si 401: intentar un refresh controlado y reintentar GET /me una vez
       if (status === 401) {
@@ -81,10 +97,9 @@ export function AuthProvider({ children }) {
         try {
           const data2 = await apiClient.get("/api/auth/me");
           console.log("getMe tras refresh exitoso:", data2);
-          setUserFromMe(data2, { broadcast: false });
-          return true;
+          return setUserFromMe(data2, { broadcast: false });
         } catch (err2) {
-          console.warn("getMe tras refresh fallo:", err2);
+            console.warn("getMe tras refresh fallo:", err2);
           return false;
         }
       }
@@ -95,7 +110,7 @@ export function AuthProvider({ children }) {
 
   const refresh = useCallback(async () => {
     try {
-      await apiClient.post("/api/auth/refresh", { headers: csrfHeaders() });
+  await apiClient.post("/api/auth/refresh");
       await getMe();
       return true;
     } catch (err) {
@@ -107,7 +122,7 @@ export function AuthProvider({ children }) {
     async (username, password) => {
       setLoading(true);
       try {
-        const loginResponse = await apiClient.post("/api/auth/login", { body: { username, password } });
+  const loginResponse = await apiClient.post("/api/auth/login", { body: { username, password } });
         
         console.log("🍪 TODAS las cookies después del login:", document.cookie);
         console.log("📦 Login response:", loginResponse);
@@ -120,27 +135,23 @@ export function AuthProvider({ children }) {
         console.log("🔍 Buscando XSRF-TOKEN en cookies:", xsrf);
         
         if (!xsrf) {
-          console.warn("⚠️ XSRF-TOKEN no encontrada en cookies, llamando /api/auth/csrf...");
-          const csrfResponse = await apiClient.get("/api/auth/csrf");
-          console.log("📦 CSRF response:", csrfResponse);
-          console.log("🍪 Cookies después de /api/auth/csrf:", document.cookie);
+            console.warn("⚠️ XSRF-TOKEN no encontrada en cookies, llamando /api/auth/csrf...");
+            const csrfResponse = await apiClient.get("/api/auth/csrf");
+            console.log("📦 CSRF response:", csrfResponse);
+            console.log("🍪 Cookies después de /api/auth/csrf:", document.cookie);
           xsrf = getCookie("XSRF-TOKEN");
           
           // Si TODAVÍA no está en cookies, intentar extraerla de la respuesta
           if (!xsrf && csrfResponse && csrfResponse.token) {
             xsrf = csrfResponse.token;
             console.log("✅ XSRF-TOKEN obtenida desde respuesta de /api/auth/csrf:", xsrf);
-            // Guardar en localStorage como fallback
-            localStorage.setItem('XSRF-TOKEN', xsrf);
           } else if (xsrf) {
             console.log("✅ XSRF-TOKEN obtenida desde cookies después de /api/auth/csrf:", xsrf);
-            localStorage.setItem('XSRF-TOKEN', xsrf);
           } else {
             console.error("❌ XSRF-TOKEN no disponible ni en cookies ni en respuesta");
           }
         } else {
           console.log("✅ XSRF-TOKEN presente en cookies después del login:", xsrf);
-          localStorage.setItem('XSRF-TOKEN', xsrf);
         }
         
         // obtener /me y setear estado (broadcast verdadero por defecto)
@@ -164,7 +175,7 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(async () => {
     try {
-      await apiClient.post("/api/auth/logout", { headers: csrfHeaders() });
+        await apiClient.post("/api/auth/logout");
     } catch (err) {
       // ignore errors contacting backend
     } finally {
@@ -175,42 +186,6 @@ export function AuthProvider({ children }) {
   }, []);
 
   // helper para reintentar una petición protegida tras refresh si recibe 401
-  const withAutoRefresh = useCallback(
-    async (fn) => {
-      try {
-        return await fn();
-      } catch (err) {
-        const status = err?.status ?? err?.response?.status;
-        if (status === 401) {
-          // intentar refresh una vez
-          const ok = await refresh();
-          if (!ok) {
-            // refresh falló -> limpiar estado y navegar a 401
-            await logout();
-            navigate("/401", { replace: true });
-            throw err;
-          }
-          // refresh OK -> reintentar la función original
-          return await fn();
-        }
-        if (status === 403) {
-          // sin permisos -> limpiar y navegar a 403
-          await logout();
-          navigate("/403", { replace: true });
-          throw err;
-        }
-        throw err;
-      }
-    },
-    [refresh, logout, navigate]
-  );
-
-  const fetchAreas = useCallback(async () => {
-    return await withAutoRefresh(async () => {
-      return await apiClient.get("/areas");
-    });
-  }, [withAutoRefresh]);
-
   // { changed code }
   // Inicializar desde localStorage y sincronizar entre pestañas
   useEffect(() => {
@@ -228,7 +203,11 @@ export function AuthProvider({ children }) {
 
     // validar con backend y actualizar estado real (no bloqueante)
     (async () => {
-      await getMe();
+      try {
+        await getMe();
+      } finally {
+        setLoading(false);
+      }
     })();
 
     // BroadcastChannel + fallback via storage (suscripción centralizada en utils)
@@ -275,7 +254,6 @@ export function AuthProvider({ children }) {
         logout,
         refresh,
         getMe,
-        fetchAreas,
       }}
     >
       {children}

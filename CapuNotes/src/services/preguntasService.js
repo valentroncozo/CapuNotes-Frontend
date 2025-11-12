@@ -1,14 +1,4 @@
-import axios from 'axios';
-
-const DEV_PROXY_BASE = '/api';
-const resolvedBaseURL = import.meta.env.DEV ? DEV_PROXY_BASE : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
-const api = axios.create({ 
-  baseURL: resolvedBaseURL, 
-  withCredentials: true,
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-  headers: { 'Content-Type': 'application/json' } 
-});
+import apiClient from './apiClient';
 
 const mapPreguntaToPayload = (p) => ({
   valor: p.valor,
@@ -20,35 +10,31 @@ const mapPreguntaToPayload = (p) => ({
 
 const preguntasService = {
   list: async () => {
-    const r = await api.get('/preguntas');
-    return r.data;
+  return await apiClient.get('/preguntas');
   },
 
   create: async (pregunta) => {
-    const r = await api.post('/preguntas', mapPreguntaToPayload(pregunta));
-    return r.data;
+  return await apiClient.post('/preguntas', { body: mapPreguntaToPayload(pregunta) });
   },
 
   update: async (id, pregunta) => {
-    const r = await api.patch(`/preguntas/${encodeURIComponent(id)}`, mapPreguntaToPayload(pregunta));
-    return r.data;
+  return await apiClient.patch(`/preguntas/${encodeURIComponent(id)}`, { body: mapPreguntaToPayload(pregunta) });
   },
 
   remove: async (id) => {
-    await api.delete(`/preguntas/${encodeURIComponent(id)}`);
+  await apiClient.delete(`/preguntas/${encodeURIComponent(id)}`);
   },
 
   asignarA_Audicion: async (audicionId, preguntasIds) => {
-    await api.post(`/preguntas/audicion/${encodeURIComponent(audicionId)}`, { preguntasIds });
+  await apiClient.post(`/preguntas/audicion/${encodeURIComponent(audicionId)}`, { body: { preguntasIds } });
   },
 
   getFormulario: async (audicionId) => {
-    const r = await api.get(`/audiciones/${Number(audicionId)}/formulario`);
-    return r.data;
+  return await apiClient.get(`/audiciones/${Number(audicionId)}/formulario`);
   },
 
   quitarDeAudicion: async (audicionId, preguntaId) => {
-    await api.delete(`/audiciones/${encodeURIComponent(audicionId)}/formulario/${encodeURIComponent(preguntaId)}`);
+  await apiClient.delete(`/audiciones/${encodeURIComponent(audicionId)}/formulario/${encodeURIComponent(preguntaId)}`);
   },
 };
 

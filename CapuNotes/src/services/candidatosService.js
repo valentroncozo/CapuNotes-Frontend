@@ -1,18 +1,5 @@
 // src/services/candidatosService.js
-import axios from "axios";
-
-const DEV_PROXY_BASE = "/api";
-const resolvedBaseURL = import.meta.env.DEV
-  ? DEV_PROXY_BASE
-  : import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
-
-const api = axios.create({
-  baseURL: resolvedBaseURL,
-  withCredentials: true,
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-  headers: { "Content-Type": "application/json" },
-});
+import apiClient from "./apiClient";
 
 export const candidatosService = {
   /**
@@ -21,11 +8,10 @@ export const candidatosService = {
    */
   list: async () => {
     try {
-      const response = await api.get("/candidatos");
-      return response.data;
+  return await apiClient.get("/candidatos");
     } catch (error) {
       console.error("❌ Error al listar candidatos:", error);
-      throw error.response?.data || error.message;
+      throw error;
     }
   },
 
@@ -36,11 +22,10 @@ export const candidatosService = {
    */
   getById: async (id) => {
     try {
-      const response = await api.get(`/candidatos/${id}`);
-      return response.data;
+  return await apiClient.get(`/candidatos/${id}`);
     } catch (error) {
       console.error("❌ Error al obtener candidato:", error);
-      throw error.response?.data || error.message;
+      throw error;
     }
   },
 
@@ -51,28 +36,25 @@ export const candidatosService = {
  * @returns {Promise<Object>} Inscripción actualizada
  */
   updateResultado: async (idInscripcion, data) => {
-  try {
-    const payload = {
-      resultado: (data.estado || "SIN").toUpperCase(),
-      observaciones: data.obs || "",
-      cuerda: { name: data.cuerda || "Tenor" },
-      cancion: data.cancion || undefined,
-    };
+    try {
+      const payload = {
+        resultado: (data.estado || "SIN").toUpperCase(),
+        observaciones: data.obs || "",
+        cuerda: { name: data.cuerda || "Tenor" },
+        cancion: data.cancion || undefined,
+      };
 
-    console.log("📤 PATCH /encuesta/audicion/inscripciones", idInscripcion, payload);
+      console.log("📤 PATCH /encuesta/audicion/inscripciones", idInscripcion, payload);
 
-    const response = await api.patch(
-      `/encuesta/audicion/inscripciones/${idInscripcion}`,
-      payload
-    );
-
-    return response.data;
-  } catch (error) {
-    console.error("❌ Error al actualizar resultado:", error);
-    throw error.response?.data || error.message;
-  }
-},
-
+      return await apiClient.patch(
+  `/encuesta/audicion/inscripciones/${idInscripcion}`,
+        { body: payload }
+      );
+    } catch (error) {
+      console.error("❌ Error al actualizar resultado:", error);
+      throw error;
+    }
+  },
 
   /**
    * Actualiza la cuerda de la inscripción de un candidato
@@ -82,11 +64,10 @@ export const candidatosService = {
    */
   updateInscripcionCuerda: async (id, cuerda) => {
     try {
-      const response = await api.patch(`/candidatos/${id}/cuerda`, { cuerda });
-      return response.data;
+  return await apiClient.patch(`/candidatos/${id}/cuerda`, { body: { cuerda } });
     } catch (error) {
       console.error("❌ Error al actualizar cuerda:", error);
-      throw error.response?.data || error.message;
+      throw error;
     }
   },
 
@@ -97,11 +78,10 @@ export const candidatosService = {
    */
   create: async (candidato) => {
     try {
-      const response = await api.post("/candidatos", candidato);
-      return response.data;
+  return await apiClient.post("/candidatos", { body: candidato });
     } catch (error) {
       console.error("❌ Error al crear candidato:", error);
-      throw error.response?.data || error.message;
+      throw error;
     }
   },
 
@@ -113,11 +93,10 @@ export const candidatosService = {
    */
   update: async (id, candidato) => {
     try {
-      const response = await api.put(`/candidatos/${id}`, candidato);
-      return response.data;
+  return await apiClient.put(`/candidatos/${id}`, { body: candidato });
     } catch (error) {
       console.error("❌ Error al actualizar candidato:", error);
-      throw error.response?.data || error.message;
+      throw error;
     }
   },
 
@@ -128,11 +107,11 @@ export const candidatosService = {
    */
   delete: async (id) => {
     try {
-      const response = await api.delete(`/candidatos/${id}`);
-      return response.status === 204;
+  await apiClient.delete(`/candidatos/${id}`);
+      return true;
     } catch (error) {
       console.error("❌ Error al eliminar candidato:", error);
-      throw error.response?.data || error.message;
+      throw error;
     }
   },
 
@@ -143,11 +122,10 @@ export const candidatosService = {
    */
   getByDia: async (dia) => {
     try {
-      const response = await api.get(`/candidatos/dia/${encodeURIComponent(dia)}`);
-      return response.data;
+  return await apiClient.get(`/candidatos/dia/${encodeURIComponent(dia)}`);
     } catch (error) {
       console.error("❌ Error al obtener candidatos por día:", error);
-      throw error.response?.data || error.message;
+      throw error;
     }
   },
 };

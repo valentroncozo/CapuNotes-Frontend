@@ -19,7 +19,7 @@ export const cuerdasService = {
   },
 
   update: async (updated) => {
-    return await apiClient.patch(`${API_URL}/${updated.id}`, { body: updated });
+    return await apiClient.put(`${API_URL}/${updated.id}`, { body: updated });
   },
 
   remove: async (id) => {

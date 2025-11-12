@@ -23,7 +23,7 @@ export const audicionesService = {
     const [turnos, inscripciones] = await Promise.all([
       TurnoService.listarPorAudicion(a.id),
       // EncuestaController devuelve inscripciones de la audición
-      apiClient.get(`/api/encuesta/audicion/${a.id}/candidatos`)
+  apiClient.get(`/encuesta/audicion/${a.id}/candidatos`)
         .then(data => data || [])
         .catch(() => []),
     ]);

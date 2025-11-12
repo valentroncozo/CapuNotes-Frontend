@@ -1,49 +1,42 @@
 // src/services/eventoService.js
-import axios from "axios";
+import apiClient from "./apiClient";
 
-const API_URL = "/api/eventos";
-
-const api = axios.create({
-  withCredentials: true,
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN',
-  headers: { 'Content-Type': 'application/json' }
-});
+const API_URL = "/eventos";
 
 export const eventoService = {
   // Listar todos los eventos (Ensayos + Presentaciones)
   list: async (filtros = {}) => {
-    const res = await api.get(API_URL, { params: filtros });
-    console.log("📡 Eventos recibidos:", res.data);
-    return res.data;
+    const params = new URLSearchParams(filtros);
+    const queryString = params.toString() ? `?${params.toString()}` : '';
+    const data = await apiClient.get(`${API_URL}${queryString}`);
+    console.log("📡 Eventos recibidos:", data);
+    return data;
   },
 
   // Obtener un evento por ID
   getById: async (id) => {
-    const res = await api.get(`${API_URL}/${id}`);
-    return res.data;
+    return await apiClient.get(`${API_URL}/${id}`);
   },
 
   //  Crear nuevo evento
   create: async (data) => {
-    const res = await api.post(API_URL, data);
-    console.log("✅ Evento creado:", res.data);
-    return res.data;
+    const result = await apiClient.post(API_URL, { body: data });
+    console.log("✅ Evento creado:", result);
+    return result;
   },
 
   // Editar un evento existente
   update: async (id, data) => {
-    const res = await api.patch(`${API_URL}/${id}`, data);
-    console.log("🛠️ Evento actualizado:", res.data);
-    return res.data;
+    const result = await apiClient.patch(`${API_URL}/${id}`, { body: data });
+    console.log("🛠️ Evento actualizado:", result);
+    return result;
   },
 
   //  Eliminar un evento (requiere tipoEvento en query param)
   remove: async (id, tipoEvento) => {
-    const res = await api.delete(`${API_URL}/${id}`, {
-      params: { tipoEvento },
-    });
-    console.log("🗑️ Evento eliminado:", res.data);
-    return res.data;
+    const queryString = tipoEvento ? `?tipoEvento=${tipoEvento}` : '';
+    const data = await apiClient.delete(`${API_URL}/${id}${queryString}`);
+    console.log("🗑️ Evento eliminado:", data);
+    return data;
   },
 };
