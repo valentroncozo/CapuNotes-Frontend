@@ -40,10 +40,8 @@ function GearIcon(props) {
 
 const MENU_ITEMS = [
   ['/asistencias', 'Asistencias'],
-  ['/audicion', 'Audiciones'],
   ['/canciones', 'Canciones'],
   ['/eventos', 'Eventos'],
-  ['/fraternidades', 'Fraternidades'],
   ['/usuarios-roles', 'Usuarios y roles'],
 ];
 
