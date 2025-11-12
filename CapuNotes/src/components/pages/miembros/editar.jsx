@@ -381,7 +381,3 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
     </main>
   );
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> f2a942bfa8de200d27f5441e66499cc82ba8fbf8
