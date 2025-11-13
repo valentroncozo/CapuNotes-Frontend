@@ -330,7 +330,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
             <div className="mitad">
               <label>Área</label>
               <div className="input-with-button">
-                <Form.Select
+                <select
                   name="area"
                   value={miembro.area}
                   onChange={handleChange}
@@ -342,22 +342,14 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
                       {a.nombre}
                     </option>
                   ))}
-                </Form.Select>
+                </select>
                 <Button
                   variant="warning"
                   className="abmc-btn"
                   onClick={() => navigate('/areas')}
                   type="button"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="#e3e3e3"
-                  >
-                    <path d="M440-120v-320H120v-80h320v-320h80v320h320v80H520v320h-80Z" />
-                  </svg>
+                  +
                 </Button>
               </div>
             </div>

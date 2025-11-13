@@ -14,6 +14,9 @@ export default function GenericEditPopup({
 }) {
   const [form, setForm] = useState({});
 
+  // 🔹 Detectar si estamos editando o creando
+  const isEditing = Boolean(entity && (entity.id || Object.keys(entity).length > 0));
+
   useEffect(() => {
     setForm(entity || {});
   }, [entity, isOpen]);
@@ -53,14 +56,14 @@ export default function GenericEditPopup({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Editar ${entityName}`}
+      title={isEditing ? `Editar ${entityName}` : `Agregar ${entityName}`}
       actions={
         <>
           <button className="btn btn-secondary" onClick={onClose}>
             Cancelar
           </button>
           <button className="btn btn-primary" onClick={handleSave}>
-            Guardar cambios
+            {isEditing ? "Guardar cambios" : "Crear"}
           </button>
         </>
       }

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import BackButton from '@/components/common/BackButton.jsx';
 import PopUpEventos from './popUpEventos.jsx';
 import ConfirmDeletePopup from './ConfirmDeletePopup.jsx';
 import '@/styles/eventos.css';
+import Swal from 'sweetalert2';
 import { eventoService } from '@/services/eventoService.js'; // 👈 corregido
 import '@/styles/abmc.css';
 const Eventos = () => {
@@ -10,6 +11,17 @@ const Eventos = () => {
   const [selectedEvento, setSelectedEvento] = useState(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [eventos, setEventos] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredEventos = useMemo(() => {
+    const q = String(searchTerm || '').trim().toLowerCase();
+    if (!q) return eventos || [];
+    return (eventos || []).filter((e) => {
+      const nombre = String(e.nombre || '').toLowerCase();
+      const lugar = String(e.lugar || '').toLowerCase();
+      return nombre.includes(q) || lugar.includes(q);
+    });
+  }, [eventos, searchTerm]);
 
   // 🔹 Cargar eventos al iniciar
   useEffect(() => {
@@ -35,23 +47,7 @@ const Eventos = () => {
     setSelectedEvento(null);
   };
 
-  // 🔹 Eliminar evento
-  const handleDeleteEvent = async () => {
-    try {
-      if (!selectedEvento) return;
-
-      await eventoService.remove(
-        selectedEvento.id,
-        selectedEvento.tipoEvento || selectedEvento.tipo
-      );
-
-      setEventos((prev) => prev.filter((e) => e.id !== selectedEvento.id));
-      setShowDeletePopup(false);
-      setSelectedEvento(null);
-    } catch (error) {
-      console.error('❌ Error al eliminar el evento:', error);
-    }
-  };
+  // Nota: la acción de eliminar se maneja desde ConfirmDeletePopup (onDeleted)
 
   return (
     <main className="eventos-container">
@@ -67,8 +63,10 @@ const Eventos = () => {
         <div className="eventos-search">
           <input
             type="text"
-            placeholder="Buscar por nombre o lugar"
+            placeholder="Buscar por nombre"
             className="eventos-search-input"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div className="eventos-profile">
             <button
@@ -90,7 +88,7 @@ const Eventos = () => {
 
         {/* 🔹 Listado de eventos */}
         <div className="eventos-grid">
-          {eventos.map((evento) => (
+          {filteredEventos.map((evento) => (
             <article key={evento.id} className="evento-card">
               <p>
                 <svg
@@ -118,15 +116,7 @@ const Eventos = () => {
                 {new Date(evento.fechaInicio).toLocaleDateString('es-ES')}
               </p>
               <p>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  height="24px"
-                  viewBox="0 -960 960 960"
-                  width="24px"
-                  fill="#2e2c2cff"
-                >
-                  <path d="M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-800q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80Zm0-360Zm112 168 56-56-128-128v-184h-80v216l152 152ZM224-866l56 56-170 170-56-56 170-170Zm512 0 170 170-56 56-170-170 56-56ZM480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720q-117 0-198.5 81.5T200-440q0 117 81.5 198.5T480-160Z" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-800q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80Zm0-360Zm112 168 56-56-128-128v-184h-80v216l152 152ZM224-866l56 56-170 170-56-56 170-170Zm512 0 170 170-56 56-170-170 56-56ZM480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720q-117 0-198.5 81.5T200-440q0 117 81.5 198.5T480-160Z"/></svg>
                 {evento.hora}
               </p>
               <p>
@@ -214,6 +204,21 @@ const Eventos = () => {
 
                 const data = await eventoService.list();
                 setEventos(data);
+
+                // Mostrar confirmación visual al usuario
+                Swal.fire({
+                  icon: 'success',
+                  title: popupMode === 'crear' ? 'Evento creado' : 'Evento actualizado',
+                  text:
+                    popupMode === 'crear'
+                      ? 'El evento se creó correctamente.'
+                      : 'Los cambios se guardaron correctamente.',
+                  timer: 1500,
+                  showConfirmButton: false,
+                  background: '#11103a',
+                  color: '#E8EAED',
+                });
+
                 handleClosePopup();
               } catch (error) {
                 console.error('❌ Error al guardar el evento:', error);
