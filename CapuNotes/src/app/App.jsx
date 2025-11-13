@@ -32,6 +32,8 @@ import FormularioConsultaCoordinacion from "@/components/pages/formulario/consul
 import Eventos from '@/components/pages/eventos/index.jsx';
 import Candidatos from "@/components/pages/audicion/candidatos.jsx";
 import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx";
+import ReporteAsistenciaMiembroAnualPage from "@/components/pages/reportes/ReporteAsistenciaMiembroAnualPage.jsx";
+
 
 // Estilos base (usar globals como fuente deFverdad)
 import '@/styles/globals.css';
@@ -96,6 +98,8 @@ function AppRoutes() {
         <Route path="/inscripcion/coordinadores/:id" element={<FormularioConsultaCoordinacion />} />
         <Route path="audicion/candidatos" element={<Candidatos />} />
         <Route path="candidatos-administracion" element={<CandidatosCoordinadores />} />
+        <Route path="/reportes/asistencias/miembro" element={<ReporteAsistenciaMiembroAnualPage />} />
+
       </Route>
      
 
