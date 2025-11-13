@@ -40,15 +40,6 @@
   transform: translateY(2px); /* microajuste óptico */
 }
 
-/* Título */
-.abmc-title {
-  height: 36px;
-  font-weight: 700;
-  font-size: 6vh;
-  margin: 0;
-  color: var(--text-light);
-  position: relative;
-}
 
 /* Línea amarilla institucional */
 .abmc-header::after {
