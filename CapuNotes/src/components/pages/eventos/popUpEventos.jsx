@@ -3,6 +3,7 @@ import '@/styles/globals.css';
 import '@/styles/popup.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { eventosService } from '@/services/eventoService.js';
 
 const PopUpEventos = ({
   modo = 'crear',
