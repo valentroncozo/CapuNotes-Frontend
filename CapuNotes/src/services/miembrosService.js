@@ -4,16 +4,18 @@ import axios from "axios";
 const API_URL = "/api/miembros";
 
 export const miembrosService = {
+
+  // === Alias seguro para no romper nada ===
+  getMiembros: async () => {
+    return await miembrosService.list();
+  },
   // ===============================================================
-  // 🔹 Obtener todos los miembros (normaliza los datos)
+  // Obtener todos los miembros
   // ===============================================================
   list: async () => {
     const res = await axios.get(API_URL);
     const data = Array.isArray(res.data) ? res.data : [];
 
-    console.log("📡 Miembros recibidos del backend:", data);
-
-    // 🔸 Normalización: aseguramos estructura uniforme
     return data.map((m) => ({
       id: {
         tipoDocumento:
@@ -38,7 +40,7 @@ export const miembrosService = {
   },
 
   // ===============================================================
-  // 🔹 Obtener miembro por ID compuesto
+  // Obtener miembro por ID compuesto
   // ===============================================================
   getById: async (nroDocumento, tipoDocumento = "DNI") => {
     const res = await axios.get(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
@@ -68,37 +70,36 @@ export const miembrosService = {
   },
 
   // ===============================================================
-  // 🔹 Crear nuevo miembro
+  // Crear nuevo miembro
   // ===============================================================
   create: async (data) => {
     const res = await axios.post(API_URL, data);
-    console.log("✅ Miembro creado:", res.data);
     return res.data;
   },
 
   // ===============================================================
-  // 🔹 Actualizar miembro existente
+  // Actualizar miembro existente (con cambio de documento)
   // ===============================================================
-  update: async (data) => {
-    const res = await axios.patch(API_URL, data);
-    console.log("✏️ Miembro actualizado:", res.data);
+  update: async (nroViejo, tipoViejo, data) => {
+    const res = await axios.put(
+      `${API_URL}/${nroViejo}/${tipoViejo}`,
+      data
+    );
     return res.data;
   },
 
   // ===============================================================
-  // 🔹 Dar de baja lógica (activo = false)
+  // Dar de baja lógica
   // ===============================================================
   darDeBaja: async (nroDocumento, tipoDocumento = "DNI") => {
     await axios.delete(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
-    console.log(`⚠️ Miembro dado de baja: ${tipoDocumento} ${nroDocumento}`);
   },
 
   // ===============================================================
-  // 🔹 Reactivar miembro dado de baja
+  // Reactivar miembro
   // ===============================================================
   reactivar: async (nroDocumento, tipoDocumento = "DNI") => {
     await axios.patch(`${API_URL}/${nroDocumento}/${tipoDocumento}/reactivar`);
-    console.log(`🟢 Miembro reactivado: ${tipoDocumento} ${nroDocumento}`);
   },
 };
 

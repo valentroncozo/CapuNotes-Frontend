@@ -14,7 +14,13 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
   const location = useLocation();
   const miembroInicial = location.state?.miembro;
 
-  // 🟢 Estado inicial con los datos del miembro
+  // Guardamos el documento viejo (ID original)
+  const docViejo = {
+    nro: miembroInicial?.id?.nroDocumento,
+    tipo: miembroInicial?.id?.tipoDocumento
+  };
+
+  // Estado inicial del formulario
   const [miembro, setMiembro] = useState(() => ({
     nombre: miembroInicial?.nombre || '',
     apellido: miembroInicial?.apellido || '',
@@ -36,7 +42,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
   const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
   const [areasDisponibles, setAreasDisponibles] = useState([]);
 
-  // 🔹 Cargar cuerdas y áreas
+  // Cargar cuerdas y áreas
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -60,14 +66,14 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
     fetchData();
   }, []);
 
-  // 🔹 Manejar cambios
+  // Manejo de cambios
   const handleChange = (e) => {
     const { name, value } = e.target;
     setMiembro((prev) => ({ ...prev, [name]: value }));
     setErrores((prev) => ({ ...prev, [name]: '' }));
   };
 
-  // 🔹 Validación
+  // Validación
   const validarCampos = () => {
     const requeridos = [
       'nombre',
@@ -86,7 +92,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  // 🔹 Enviar actualización
+  // Enviar actualización
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validarCampos()) {
@@ -104,10 +110,8 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
     try {
       const payload = {
         id: {
-          nroDocumento:
-            miembro.numeroDocumento || miembro.id?.nroDocumento || '',
-          tipoDocumento:
-            miembro.tipoDocumento || miembro.id?.tipoDocumento || '',
+          nroDocumento: miembro.numeroDocumento,
+          tipoDocumento: miembro.tipoDocumento,
         },
         nombre: miembro.nombre,
         apellido: miembro.apellido,
@@ -122,7 +126,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
         area: miembro.area ? { id: parseInt(miembro.area) } : null,
       };
 
-      await miembrosService.update(payload);
+      await miembrosService.update(docViejo.nro, docViejo.tipo, payload);
 
       Swal.fire({
         icon: 'success',
@@ -154,8 +158,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
           <BackButton />
           <h1 className="abmc-title">{title}</h1>
           <p className="aviso-obligatorios">
-            Los campos marcados con <span className="required">*</span> son
-            obligatorios.
+            Los campos marcados con <span className="required">*</span> son obligatorios.
           </p>
         </div>
 
@@ -197,9 +200,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
                 name="tipoDocumento"
                 value={miembro.tipoDocumento}
                 onChange={handleChange}
-                className={`abmc-select visible-dropdown ${
-                  errores.tipoDocumento ? 'error' : ''
-                }`}
+                className={`abmc-select visible-dropdown ${errores.tipoDocumento ? 'error' : ''}`}
               >
                 <option value="">Seleccionar tipo</option>
                 <option value="DNI">DNI</option>
@@ -217,9 +218,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
                 name="numeroDocumento"
                 value={miembro.numeroDocumento}
                 onChange={handleChange}
-                className={`abmc-input ${
-                  errores.numeroDocumento ? 'error' : ''
-                }`}
+                className={`abmc-input ${errores.numeroDocumento ? 'error' : ''}`}
               />
             </div>
           </div>
