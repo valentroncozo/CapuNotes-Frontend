@@ -4,10 +4,11 @@ import axios from 'axios';
 const API_URL = '/api/miembros';
 
 export const miembrosService = {
-  // === Alias seguro para no romper nada ===
+  // Alias
   getMiembros: async () => {
     return await miembrosService.list();
   },
+
   // ===============================================================
   // Obtener todos los miembros
   // ===============================================================
@@ -17,29 +18,27 @@ export const miembrosService = {
 
     return data.map((m) => ({
       id: {
-        tipoDocumento:
-          m.id?.tipoDocumento || m.tipoDocumento || m.tipo || 'DNI',
-        nroDocumento:
-          m.id?.nroDocumento || m.nroDocumento || m.numeroDocumento || null,
+        tipoDocumento: m.id?.tipoDocumento || 'DNI',
+        nroDocumento: m.id?.nroDocumento || null,
       },
       nombre: m.nombre || '',
       apellido: m.apellido || '',
-      correo: m.correo || m.email || '',
-      telefono: m.telefono || m.celular || '',
-      area: m.area?.name || m.area?.nombre || null,
+      correo: m.correo || '',
+      nroTelefono: m.nroTelefono || '',
+      carreraProfesion: m.carreraProfesion || '',
+      lugarOrigen: m.lugarOrigen || '',
+      instrumentoMusical: m.instrumentoMusical || '',
+      area: m.area?.nombre || null,
       cuerda: {
         id: m.cuerda?.id || null,
-        name: m.cuerda?.name || m.cuerda?.nombre || null,
+        name: m.cuerda?.nombre || null,
       },
-      activo:
-        m.activo !== undefined
-          ? m.activo
-          : m.estado === 'ACTIVO' || m.estado === true,
+      activo: m.activo ?? false,
     }));
   },
 
   // ===============================================================
-  // Obtener miembro por ID compuesto
+  // Obtener miembro por ID
   // ===============================================================
   getById: async (nroDocumento, tipoDocumento = 'DNI') => {
     const res = await axios.get(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
@@ -47,29 +46,27 @@ export const miembrosService = {
 
     return {
       id: {
-        tipoDocumento:
-          m.id?.tipoDocumento || m.tipoDocumento || m.tipo || 'DNI',
-        nroDocumento:
-          m.id?.nroDocumento || m.nroDocumento || m.numeroDocumento || null,
+        tipoDocumento: m.id?.tipoDocumento || 'DNI',
+        nroDocumento: m.id?.nroDocumento || null,
       },
       nombre: m.nombre || '',
       apellido: m.apellido || '',
       correo: m.correo || '',
-      telefono: m.telefono || '',
-      area: m.area?.name || m.area?.nombre || null,
+      nroTelefono: m.nroTelefono || '',
+      carreraProfesion: m.carreraProfesion || '',
+      lugarOrigen: m.lugarOrigen || '',
+      instrumentoMusical: m.instrumentoMusical || '',
+      area: m.area?.nombre || null,
       cuerda: {
         id: m.cuerda?.id || null,
-        name: m.cuerda?.name || m.cuerda?.nombre || null,
+        name: m.cuerda?.nombre || null,
       },
-      activo:
-        m.activo !== undefined
-          ? m.activo
-          : m.estado === 'ACTIVO' || m.estado === true,
+      activo: m.activo ?? false,
     };
   },
 
   // ===============================================================
-  // Crear nuevo miembro
+  // Crear miembro
   // ===============================================================
   create: async (data) => {
     const res = await axios.post(API_URL, data);
@@ -77,7 +74,7 @@ export const miembrosService = {
   },
 
   // ===============================================================
-  // Actualizar miembro existente (con cambio de documento)
+  // Actualizar miembro (PUT — si cambia DNI)
   // ===============================================================
   update: async (nroViejo, tipoViejo, data) => {
     const res = await axios.put(`${API_URL}/${nroViejo}/${tipoViejo}`, data);
@@ -85,14 +82,14 @@ export const miembrosService = {
   },
 
   // ===============================================================
-  // Dar de baja lógica
+  // Baja lógica
   // ===============================================================
   darDeBaja: async (nroDocumento, tipoDocumento = 'DNI') => {
     await axios.delete(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
   },
 
   // ===============================================================
-  // Reactivar miembro
+  // Reactivar
   // ===============================================================
   reactivar: async (nroDocumento, tipoDocumento = 'DNI') => {
     await axios.patch(`${API_URL}/${nroDocumento}/${tipoDocumento}/reactivar`);
