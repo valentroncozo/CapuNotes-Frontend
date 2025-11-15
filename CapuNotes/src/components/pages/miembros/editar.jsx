@@ -3,7 +3,7 @@ import {
   GeoapifyContext,
 } from '@geoapify/react-geocoder-autocomplete';
 import '@geoapify/geocoder-autocomplete/styles/minimal.css';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -15,7 +15,29 @@ import { areasService } from '@/services/areasService.js';
 import { miembrosService } from '@/services/miembrosService.js';
 import { InputMask } from '@react-input/mask';
 
-// ---- VALIDAR FECHA dd/mm/aaaa IGUAL QUE index.jsx ----
+/* ============================================================
+   NORMALIZAR FECHA PARA EDITAR
+   ============================================================ */
+
+// yyyy-MM-dd → dd/MM/yyyy
+const formatearFechaVisual = (fecha) => {
+  if (!fecha) return '';
+  if (fecha.includes('/')) return fecha; // ya viene formateada
+
+  const [yyyy, mm, dd] = fecha.split('-');
+  return `${dd}/${mm}/${yyyy}`;
+};
+
+// dd/MM/yyyy → yyyy-MM-dd
+const normalizarFechaBackend = (fecha) => {
+  if (!fecha || fecha.length !== 10) return null;
+  const [dd, mm, yyyy] = fecha.split('/');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+/* ============================================================
+   VALIDAR EDAD
+   ============================================================ */
 function validarEdadDDMMAAAA(fecha) {
   if (!fecha.includes('/')) return false;
 
@@ -51,22 +73,23 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
   const location = useLocation();
   const miembroInicial = location.state?.miembro;
 
-  // Guardamos el documento viejo (ID original)
+  // Documento original
   const docViejo = {
     nro: miembroInicial?.id?.nroDocumento,
     tipo: miembroInicial?.id?.tipoDocumento,
+    tipo: miembroInicial?.id?.tipoDocumento,
   };
 
-  // Estado inicial del formulario
+  /* ============================================================
+     ESTADO INICIAL DEL FORMULARIO
+     ============================================================ */
   const [miembro, setMiembro] = useState(() => ({
     nombre: miembroInicial?.nombre || '',
     apellido: miembroInicial?.apellido || '',
-    tipoDocumento:
-      miembroInicial?.id?.tipoDocumento || miembroInicial?.tipoDocumento || '',
-    numeroDocumento:
-      miembroInicial?.id?.nroDocumento || miembroInicial?.numeroDocumento || '',
-    fechaNacimiento: miembroInicial?.fechaNacimiento || '',
-    telefono: miembroInicial?.nroTelefono || miembroInicial?.telefono || '',
+    tipoDocumento: miembroInicial?.id?.tipoDocumento || '',
+    numeroDocumento: miembroInicial?.id?.nroDocumento || '',
+    fechaNacimiento: formatearFechaVisual(miembroInicial?.fechaNacimiento),
+    telefono: miembroInicial?.nroTelefono || '',
     correo: miembroInicial?.correo || '',
     carreraProfesion: miembroInicial?.carreraProfesion || '',
     lugarOrigen: miembroInicial?.lugarOrigen || '',
@@ -79,7 +102,9 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
   const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
   const [areasDisponibles, setAreasDisponibles] = useState([]);
 
-  // Cargar cuerdas y áreas
+  /* ============================================================
+     CARGAR CUERDAS Y ÁREAS
+     ============================================================ */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -87,30 +112,28 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
           cuerdasService.list(),
           areasService.list(),
         ]);
+
         setCuerdasDisponibles(cuerdas);
         setAreasDisponibles(areas);
       } catch (error) {
         console.error('Error cargando cuerdas o áreas:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al cargar datos',
-          text: 'No se pudieron cargar las cuerdas o áreas.',
-          background: '#11103a',
-          color: '#E8EAED',
-        });
       }
     };
     fetchData();
   }, []);
 
-  // Manejo de cambios
+  /* ============================================================
+     MANEJO CAMBIOS
+     ============================================================ */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setMiembro((prev) => ({ ...prev, [name]: value }));
     setErrores((prev) => ({ ...prev, [name]: '' }));
   };
 
-  // Validación
+  /* ============================================================
+     VALIDACIÓN
+     ============================================================ */
   const validarCampos = () => {
     const requeridos = [
       'nombre',
@@ -119,27 +142,29 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
       'numeroDocumento',
       'cuerda',
     ];
+
     const nuevosErrores = {};
     requeridos.forEach((campo) => {
-      if (!miembro[campo] || String(miembro[campo]).trim() === '') {
+      if (!miembro[campo] || miembro[campo].toString().trim() === '') {
         nuevosErrores[campo] = 'Campo obligatorio';
       }
     });
+
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  // Enviar actualización
+  /* ============================================================
+     SUBMIT
+     ============================================================ */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validarCampos()) {
       Swal.fire({
         icon: 'warning',
         title: 'Campos incompletos',
-        text: 'Por favor completá todos los campos obligatorios marcados en amarillo.',
         background: '#11103a',
         color: '#E8EAED',
-        confirmButtonColor: '#7c83ff',
       });
       return;
     }
@@ -153,7 +178,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
         },
         nombre: miembro.nombre,
         apellido: miembro.apellido,
-        fechaNacimiento: fechaBackend,
+        fechaNacimiento: normalizarFechaBackend(miembro.fechaNacimiento),
         nroTelefono: miembro.telefono || null,
         correo: miembro.correo || null,
         carreraProfesion: miembro.carreraProfesion || null,
@@ -169,11 +194,10 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
       Swal.fire({
         icon: 'success',
         title: 'Cambios guardados',
-        text: `Se actualizaron los datos de ${miembro.nombre}.`,
-        timer: 1600,
-        showConfirmButton: false,
         background: '#11103a',
         color: '#E8EAED',
+        timer: 1500,
+        showConfirmButton: false,
       });
 
       navigate('/miembros');
@@ -181,32 +205,29 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
       console.error('Error actualizando miembro:', error);
       Swal.fire({
         icon: 'error',
-        title: 'Error',
-        text: 'No se pudo actualizar el miembro.',
+        title: 'Error al actualizar',
+        text: 'Revisá los datos.',
         background: '#11103a',
         color: '#E8EAED',
       });
     }
   };
 
+  /* ============================================================
+     RENDER DEL FORMULARIO
+     ============================================================ */
   return (
     <main className="pantalla-miembros">
       <div className="abmc-card">
         <div className="abmc-header">
           <BackButton />
           <h1 className="abmc-title">{title}</h1>
-          <p className="aviso-obligatorios">
-            Los campos marcados con <span className="required">*</span> son
-            obligatorios.
-          </p>
         </div>
 
         <Form onSubmit={handleSubmit} className="abmc-topbar">
-          {/* Nombre y Apellido */}
+          {/* === Nombre === */}
           <Form.Group className="form-group-miembro">
-            <label>
-              Nombre <span className="required">*</span>
-            </label>
+            <label>Nombre *</label>
             <Form.Control
               type="text"
               name="nombre"
@@ -216,10 +237,9 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
             />
           </Form.Group>
 
+          {/* === Apellido === */}
           <Form.Group className="form-group-miembro">
-            <label>
-              Apellido <span className="required">*</span>
-            </label>
+            <label>Apellido *</label>
             <Form.Control
               type="text"
               name="apellido"
@@ -229,21 +249,19 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
             />
           </Form.Group>
 
-          {/* Tipo y número de documento */}
+          {/* === Documento === */}
           <div className="form-row-miembros">
             <div className="mitad">
-              <label>
-                Tipo de Documento <span className="required">*</span>
-              </label>
+              <label>Tipo Documento *</label>
               <Form.Select
                 name="tipoDocumento"
                 value={miembro.tipoDocumento}
                 onChange={handleChange}
-                className={`abmc-select visible-dropdown ${
+                className={`abmc-select ${
                   errores.tipoDocumento ? 'error' : ''
                 }`}
               >
-                <option value="">Seleccionar tipo</option>
+                <option value="">Seleccionar</option>
                 <option value="DNI">DNI</option>
                 <option value="Pasaporte">Pasaporte</option>
                 <option value="Libreta Cívica">Libreta Cívica</option>
@@ -251,9 +269,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
             </div>
 
             <div className="mitad">
-              <label>
-                Número de Documento <span className="required">*</span>
-              </label>
+              <label>Número Documento *</label>
               <Form.Control
                 type="text"
                 name="numeroDocumento"
@@ -266,83 +282,57 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
             </div>
           </div>
 
-          {/* Fecha nacimiento y lugar origen */}
+          {/* === Fecha nacimiento === */}
           <div className="form-row-miembros">
             <div className="mitad">
-              <label>Fecha de Nacimiento</label>
+              <label>Fecha Nacimiento</label>
+              <InputMask
+                mask="DD/DD/DDDD"
+                replacement={{ D: /\d/ }}
+                value={miembro.fechaNacimiento}
+                placeholder="dd/mm/aaaa"
+                className="abmc-input"
+                onChange={(e) => {
+                  const fecha = e.target.value;
+                  setMiembro((prev) => ({ ...prev, fechaNacimiento: fecha }));
 
-              <div className="abmc-input-wrapper">
-                <InputMask
-                  mask="DD/DD/DDDD"
-                  replacement={{
-                    D: /\d/,
-                    // cada D solo permite dígitos
-                  }}
-                  value={miembro.fechaNacimiento}
-                  placeholder="dd/mm/aaaa"
-                  className="abmc-input"
-                  onChange={(e) => {
-                    const fecha = e.target.value;
-
-                    setMiembro((prev) => ({
-                      ...prev,
-                      fechaNacimiento: fecha,
-                    }));
-
-                    // solo validar cuando está completo:
-                    if (fecha.length === 10) {
-                      if (!validarEdadDDMMAAAA(fecha)) {
-                        Swal.fire({
-                          icon: 'warning',
-                          title: 'Edad no válida',
-                          text: 'El miembro debe tener al menos 17 años.',
-                          confirmButtonText: 'Aceptar',
-                          customClass: {
-                            confirmButton: 'abmc-btn btn-primary',
-                          },
-                          buttonsStyling: false,
-                          background: '#11103a',
-                          color: '#E8EAED',
-                        });
-
-                        setMiembro((prev) => ({
-                          ...prev,
-                          fechaNacimiento: '',
-                        }));
-                      }
-                    }
-                  }}
-                />
-              </div>
+                  if (fecha.length === 10 && !validarEdadDDMMAAAA(fecha)) {
+                    Swal.fire({
+                      icon: 'warning',
+                      title: 'Edad no válida',
+                      text: 'Debe ser mayor de 17',
+                      background: '#11103a',
+                      color: '#E8EAED',
+                    });
+                    setMiembro((prev) => ({ ...prev, fechaNacimiento: '' }));
+                  }
+                }}
+              />
             </div>
 
+            {/* === Lugar origen === */}
             <div className="mitad">
-              <label>Lugar de Origen</label>
+              <label>Lugar Origen</label>
               <GeoapifyContext apiKey="27d4d3c8bf5147f3ae4cd2f98a44009a">
                 <GeoapifyGeocoderAutocomplete
                   placeholder="Ej: Córdoba, Argentina"
-                  value={miembro.lugarOrigen}
                   type="city"
-                  lang="es"
-                  limit={8}
-                  debounceDelay={200}
+                  value={miembro.lugarOrigen}
                   onChange={(value) => {
                     setMiembro((prev) => ({
                       ...prev,
                       lugarOrigen: value?.formatted || '',
                     }));
                   }}
-                  onSuggestionChange={(value) => {
-                    if (!value) return;
-                    setLugarOrigenInput(value.formatted);
-                  }}
+                  lang="es"
+                  limit={8}
                   className="abmc-input geoapify-wrapper"
                 />
               </GeoapifyContext>
             </div>
           </div>
 
-          {/* Teléfono y Correo */}
+          {/* === Teléfono y correo === */}
           <div className="form-row-miembros">
             <div className="mitad">
               <label>Teléfono</label>
@@ -354,6 +344,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
                 className="abmc-input"
               />
             </div>
+
             <div className="mitad">
               <label>Correo</label>
               <Form.Control
@@ -366,7 +357,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
             </div>
           </div>
 
-          {/* Profesión e Instrumento */}
+          {/* === Profesión y instrumento === */}
           <div className="form-row-miembros">
             <div className="mitad">
               <label>Carrera / Profesión</label>
@@ -378,6 +369,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
                 className="abmc-input"
               />
             </div>
+
             <div className="mitad">
               <label>Instrumento Musical</label>
               <Form.Control
@@ -390,82 +382,43 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
             </div>
           </div>
 
-          {/* Cuerda y Área */}
+          {/* === Cuerda y área === */}
           <div className="form-row-cuerda-area">
             <div className="mitad">
-              <label>
-                Cuerda <span className="required">*</span>
-              </label>
-              <div className="input-with-button">
-                <select
-                  name="cuerda"
-                  value={miembro.cuerda}
-                  onChange={handleChange}
-                  className={`abmc-select ${errores.cuerda ? 'error' : ''}`}
-                >
-                  <option value="">Seleccionar cuerda</option>
-                  {cuerdasDisponibles.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.nombre || c.name || c.descripcion || '—'}
-                    </option>
-                  ))}
-                </select>
-                <Button
-                  variant="warning"
-                  className="abmc-btn"
-                  onClick={() => navigate('/cuerdas')}
-                  type="button"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="#e3e3e3"
-                  >
-                    <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
-                  </svg>
-                </Button>
-              </div>
+              <label>Cuerda *</label>
+              <select
+                name="cuerda"
+                value={miembro.cuerda}
+                onChange={handleChange}
+                className={`abmc-select ${errores.cuerda ? 'error' : ''}`}
+              >
+                <option value="">Seleccionar cuerda</option>
+                {cuerdasDisponibles.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nombre || c.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="mitad">
               <label>Área</label>
-              <div className="input-with-button">
-                <select
-                  name="area"
-                  value={miembro.area}
-                  onChange={handleChange}
-                  className="abmc-select"
-                >
-                  <option value="">Seleccionar área</option>
-                  {areasDisponibles.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.nombre}
-                    </option>
-                  ))}
-                </select>
-                <Button
-                  variant="warning"
-                  className="abmc-btn"
-                  onClick={() => navigate('/areas')}
-                  type="button"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="#e3e3e3"
-                  >
-                    <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
-                  </svg>
-                </Button>
-              </div>
+              <select
+                name="area"
+                value={miembro.area}
+                onChange={handleChange}
+                className="abmc-select"
+              >
+                <option value="">Seleccionar área</option>
+                {areasDisponibles.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.nombre}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          {/* Botones */}
           <div className="acciones-form-miembro derecha">
             <button
               type="button"

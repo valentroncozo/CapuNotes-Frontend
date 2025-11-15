@@ -35,16 +35,12 @@ function validarEdadDDMMAAAA(fecha) {
   return edad >= 17;
 }
 
-function convertirDDMMYYYYaMMDDYYYY(fecha) {
-  if (!fecha) return null;
-  const partes = fecha.split('/'); // [dd, mm, yyyy]
-
-  if (partes.length !== 3) return null;
-
-  const [dd, mm, yyyy] = partes;
-
-  return `${mm}/${dd}/${yyyy}`;
-}
+// 👉 Normalizador de fecha para enviar al backend como yyyy-MM-dd
+const normalizarFecha = (fecha) => {
+  if (!fecha || fecha.length !== 10) return null;
+  const [dd, mm, yyyy] = fecha.split('/');
+  return `${yyyy}-${mm}-${dd}`;
+};
 
 export default function MiembrosAgregar({ title = 'Registro de miembro' }) {
   const navigate = useNavigate();
@@ -144,7 +140,7 @@ export default function MiembrosAgregar({ title = 'Registro de miembro' }) {
         },
         nombre: miembro.nombre,
         apellido: miembro.apellido,
-        fechaNacimiento: fechaBackend,
+        fechaNacimiento: normalizarFecha(miembro.fechaNacimiento),
         nroTelefono: miembro.telefono || null,
         correo: miembro.correo || null,
         carreraProfesion: miembro.carreraProfesion || null,
@@ -271,7 +267,6 @@ export default function MiembrosAgregar({ title = 'Registro de miembro' }) {
                   mask="DD/DD/DDDD"
                   replacement={{
                     D: /\d/,
-                    // cada D solo permite dígitos
                   }}
                   value={miembro.fechaNacimiento}
                   placeholder="dd/mm/aaaa"
@@ -284,7 +279,6 @@ export default function MiembrosAgregar({ title = 'Registro de miembro' }) {
                       fechaNacimiento: fecha,
                     }));
 
-                    // solo validar cuando está completo:
                     if (fecha.length === 10) {
                       if (!validarEdadDDMMAAAA(fecha)) {
                         Swal.fire({
