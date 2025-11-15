@@ -38,6 +38,7 @@ export function AuthProvider({ children }) {
   const LOCAL_KEY = "capunotes_user";
   const initializedRef = useRef(false); // { changed code }
   const refreshPromiseRef = useRef(null); // controlar refresh concurrente
+  const csrfProbeDisabledRef = useRef(false); // evita reintentos ruidosos si /csrf no existe
 
   const setUserFromMe = (me, { broadcast = true } = {}) => {
     const normalizedUser = me || null;
@@ -135,9 +136,10 @@ export function AuthProvider({ children }) {
         console.log("🔍 Buscando XSRF-TOKEN en cookies:", xsrf);
         
         if (!xsrf) {
+          if (!csrfProbeDisabledRef.current) {
             console.warn("⚠️ XSRF-TOKEN no encontrada en cookies, llamando /api/auth/csrf...");
             try {
-              const csrfResponse = await apiClient.get("/api/auth/csrf");
+              const csrfResponse = await apiClient.get("/api/auth/csrf", { suppressErrorLog: true });
               console.log("📦 CSRF response:", csrfResponse);
               console.log("🍪 Cookies después de /api/auth/csrf:", document.cookie);
               xsrf = getCookie("XSRF-TOKEN");
@@ -152,10 +154,14 @@ export function AuthProvider({ children }) {
                 console.error("❌ XSRF-TOKEN no disponible ni en cookies ni en respuesta");
               }
             } catch (csrfErr) {
+              csrfProbeDisabledRef.current = true;
               const status = csrfErr?.response?.status;
-              console.error("❌ Error obteniendo /api/auth/csrf", { status, message: csrfErr?.message });
+              console.warn("⚠️ /api/auth/csrf no disponible, omitiendo futuros intentos", { status, message: csrfErr?.message });
               // continuar con el flujo: algunos backends no exponen este endpoint
             }
+          } else {
+            console.warn("⚠️ Saltando llamada a /api/auth/csrf porque fue marcada como indisponible en intentos previos");
+          }
         } else {
           console.log("✅ XSRF-TOKEN presente en cookies después del login:", xsrf);
         }

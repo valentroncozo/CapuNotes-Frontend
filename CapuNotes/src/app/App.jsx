@@ -8,33 +8,35 @@ import AppShell from '@/components/layout/AppShell.jsx';
 
 
 // Pages
-import Login from "@/components/pages/login/index.jsx";
-import Principal from "@/components/pages/principal/index.jsx";
-import Cuerdas from "@/components/pages/cuerdas/index.jsx";
-import Areas from "@/components/pages/areas/index.jsx";
-import Miembros from "@/components/pages/miembros/index.jsx";
-import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx";
-import MiembrosEditar from "@/components/pages/miembros/editar.jsx";
-import Audicion from "@/components/pages/audicion/index.jsx";
-import AudicionEditar from "@/components/pages/audicion/editar.jsx";
-import AudicionAgregar from "@/components/pages/audicion/agregar.jsx";
-import CuestionarioConfig from '@/components/pages/cuestionario/configuracion.jsx';
-import CuestionarioPreview from '@/components/pages/cuestionario/preview.jsx';
-import AsistenciaEnsayos from '@/components/pages/asistencias/asistenciaEnsayos.jsx';
-import AsistenciaEnsayosDetalle from '@/components/pages/asistencias/asistenciaEnsayosDetalle.jsx';
-import HistorialAudiciones from "@/components/pages/audicion/historial.jsx";
-import Formulario from "@/components/pages/formulario/index.jsx";
-import FormularioConsulta from "@/components/pages/formulario/consulta.jsx";
-import FormularioConsultaCoordinacion from "@/components/pages/formulario/consultaCoordinacion.jsx";
-import Eventos from '@/components/pages/eventos/index.jsx';
-import Candidatos from "@/components/pages/audicion/candidatos.jsx";
-import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx";
-import ReporteAsistenciaMiembroAnualPage from "@/components/pages/reportes/ReporteAsistenciaMiembroAnualPage.jsx";
-import ReportesPage from "@/components/pages/reportes/ReportesPage.jsx";
+import Login from "@/components/pages/login/index.jsx"; // PUBLIC
+import Principal from "@/components/pages/principal/index.jsx"; // PROTECTED (cualquier logeado)
+import Cuerdas from "@/components/pages/cuerdas/index.jsx"; // x view:Cuerdas
+import Areas from "@/components/pages/areas/index.jsx"; // x view:Areas
+import Miembros from "@/components/pages/miembros/index.jsx"; // x view:Miembros view:elimianr:Miembros
+import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx"; // x view:crear:Miembros
+import MiembrosEditar from "@/components/pages/miembros/editar.jsx"; // x  view:editar:Miembros
+import Audicion from "@/components/pages/audicion/index.jsx";  // x view:Audicion
+import AudicionEditar from "@/components/pages/audicion/editar.jsx"; // x view:editar:Audicion
+import AudicionAgregar from "@/components/pages/audicion/agregar.jsx"; // x view:crear:Audicion
+import CuestionarioConfig from '@/components/pages/cuestionario/configuracion.jsx'; // x view:Preguntas
+import CuestionarioPreview from '@/components/pages/cuestionario/preview.jsx'; // x view:VistaCuestionario
+import HistorialAudiciones from "@/components/pages/audicion/historial.jsx"; // x view:HistorialAudiciones
+import Formulario from "@/components/pages/formulario/index.jsx"; // PUBLIC
+import FormularioConsulta from "@/components/pages/formulario/consulta.jsx"; // x view:Inscripcion
+import FormularioConsultaCoordinacion from "@/components/pages/formulario/consultaCoordinacion.jsx"; //x  view:InscripcionCoordinador
+import Candidatos from "@/components/pages/audicion/candidatos.jsx"; // x view:CandidatosTurnos
+import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx"; // x view:CandidatoEvaluación
 
-import Error401 from "../components/pages/errors/Error401";
-import Error403 from "../components/pages/errors/Error403";
-import LandingPage from "../components/pages/landing";
+import Eventos from '@/components/pages/eventos/index.jsx'; // x view:Eventos
+import AsistenciaEnsayosDetalle from '@/components/pages/asistencias/asistenciaEnsayosDetalle.jsx'; // x view:Asistencias
+import AsistenciaEnsayos from '@/components/pages/asistencias/asistenciaEnsayos.jsx'; // x view:Asistencias
+import ReporteAsistenciaMiembroAnualPage from "@/components/pages/reportes/ReporteAsistenciaMiembroAnualPage.jsx"; // x view:ReporteAsistencia
+import ReportesPage from "@/components/pages/reportes/ReportesPage.jsx"; // x view:ReportesAsistencia
+
+
+import Error401 from "../components/pages/errors/Error401"; //public
+import Error403 from "../components/pages/errors/Error403"; //public
+import LandingPage from "../components/pages/landing"; //public
 
 
 // Estilos base (usar globals como fuente deFverdad)

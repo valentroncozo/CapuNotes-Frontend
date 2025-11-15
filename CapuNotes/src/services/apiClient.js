@@ -97,7 +97,9 @@ axiosInstance.interceptors.response.use(
     const url = cfg.url || '';
     const data = error && error.response ? error.response.data : undefined;
     const message = data || error.message;
-    console.error('❌ Error en ' + method + ' ' + url + ':', message);
+    if (!cfg?.suppressErrorLog) {
+      console.error('❌ Error en ' + method + ' ' + url + ':', message);
+    }
 
     const status = error && error.response ? error.response.status : undefined;
     const config = cfg;

@@ -54,6 +54,6 @@ export const eventoService = {
   pendientes: async () => {
     const res = await apiClient.get(`${API_URL}/pendientes`);
     console.log('📡 Eventos pendientes recibidos:', res.data);
-    return res.data;
+    return res;
   },
 };
