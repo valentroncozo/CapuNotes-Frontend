@@ -1,10 +1,7 @@
 // src/components/layout/AppShell.jsx
-import { Outlet, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import "@/styles/offcanvas.css";
-
-// agregar import del contexto
-import { useAuth } from "@/context/AuthContext.jsx";
+import { Outlet, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import '@/styles/offcanvas.css';
 
 /* Ícono de cierre (X) */
 function CloseIcon(props) {
@@ -42,12 +39,10 @@ function GearIcon(props) {
 }
 
 const MENU_ITEMS = [
-  ["/asistencias", "Asistencias"],
-  ["/audicion", "Audiciones"],
-  ["/canciones", "Canciones"],
-  ["/eventos", "Eventos"],
-  ["/fraternidades", "Fraternidades"],
-  ["/usuarios-roles", "Usuarios y roles"],
+  ['/asistencias', 'Asistencias'],
+  ['/canciones', 'Canciones'],
+  ['/eventos', 'Eventos'],
+  ['/usuarios-roles', 'Usuarios y roles'],
 ];
 
 export default function AppShell({ onLogout }) {
@@ -57,9 +52,6 @@ export default function AppShell({ onLogout }) {
   const [audOpen, setAudOpen] = useState(false);
   const [gearOpen, setGearOpen] = useState(false);
 
-  // obtener logout desde contexto
-  const { logout } = useAuth();
-
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Escape') setOpen(false);
@@ -68,21 +60,19 @@ export default function AppShell({ onLogout }) {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  useEffect(() => { if (!open) setGearOpen(false); }, [open]);
+  useEffect(() => {
+    if (!open) setGearOpen(false);
+  }, [open]);
 
   const handleNavigate = (to) => {
     setOpen(false);
     navigate(to);
   };
 
-  // usar logout del contexto
-  const handleLogout = async () => {
+  const handleLogout = () => {
     setOpen(false);
-    try {
-      await logout();
-    } finally {
-      navigate("/login");
-    }
+    onLogout?.();
+    navigate('/login');
   };
 
   return (
@@ -163,7 +153,7 @@ export default function AppShell({ onLogout }) {
         />
       )}
 
-      <div style={{ height: '36px' }} />
+      <div style={{ height: '56px' }} />
       <Outlet />
     </>
   );
@@ -233,12 +223,14 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
 
       <div className="appshell-accordion-outer">
         <button
-          className={`appshell-accordion-trigger ${audOpen ? "open" : ""}`}
+          className={`appshell-accordion-trigger ${audOpen ? 'open' : ''}`}
           onClick={() => setAudOpen((v) => !v)}
           aria-expanded={audOpen}
         >
           Audiciones
-          <span className="appshell-accordion-caret">{audOpen ? "▴" : "▾"}</span>
+          <span className="appshell-accordion-caret">
+            {audOpen ? '▴' : '▾'}
+          </span>
         </button>
 
         {audOpen && (
@@ -246,35 +238,50 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
             <a
               href="/audicion"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/audicion"); }}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/audicion');
+              }}
             >
               Audición
             </a>
             <a
               href="/candidatos"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("audicion/candidatos"); }}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('audicion/candidatos');
+              }}
             >
               Candidatos
             </a>
             <a
               href="/candidatos-coordinadores"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/candidatos-administracion"); }}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/candidatos-administracion');
+              }}
             >
               Candidatos (Administración)
             </a>
             <a
               href="/candidatos/historial"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/historial"); }}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/audicion/historial');
+              }}
             >
               Historial Candidatos
             </a>
             <a
               href="/cuestionario/configuracion"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/cuestionario/configuracion"); }}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/cuestionario/configuracion');
+              }}
             >
               Configurar Cuestionario
             </a>
