@@ -370,9 +370,3 @@ export default function AsistenciaEnsayosDetalle() {
     </main>
   );
 }
-
-/* CSS */
-/* Add this to the CSS file */
-.attendance-btn.selected.white-text {
-  color: white; /* Ensure the text remains white when selected */
-}
