@@ -27,7 +27,7 @@ export default function Principal({ username }) {
   useEffect(() => {
     const fetchEventos = async () => {
       try {
-        const data = await eventoService.list();
+        const data = await eventoService.listPendientes();
         setEventos(data || []);
       } catch (error) {
         console.error('Error cargando eventos en principal:', error);

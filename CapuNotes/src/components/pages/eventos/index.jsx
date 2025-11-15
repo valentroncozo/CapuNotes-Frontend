@@ -27,7 +27,7 @@ const Eventos = () => {
   useEffect(() => {
     const fetchEventos = async () => {
       try {
-        const data = await eventoService.list();
+        const data = await eventoService.listPendientes();
         setEventos(data);
       } catch (error) {
         console.error('❌ Error al obtener eventos:', error);
@@ -202,7 +202,7 @@ const Eventos = () => {
                   await eventoService.update(selectedEvento.id, nuevoEvento);
                 }
 
-                const data = await eventoService.list();
+                const data = await eventoService.listPendientes();
                 setEventos(data);
 
                 // Mostrar confirmación visual al usuario
