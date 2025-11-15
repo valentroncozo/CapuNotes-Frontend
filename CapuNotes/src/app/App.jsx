@@ -36,6 +36,7 @@ import ReporteAsistenciaMiembroAnualPage from "@/components/pages/reportes/Repor
 import CategoriasCanciones from "@/components/pages/categorias-canciones/index.jsx";
 import TiemposLiturgicos from "@/components/pages/tiempos-liturgicos/index.jsx";
 import Canciones from "@/components/pages/canciones/index.jsx";
+import Repertorios from "@/components/pages/repertorios/index.jsx";
 
 // Estilos base (usar globals como fuente deFverdad)
 import "@/styles/globals.css";
@@ -90,6 +91,7 @@ function AppRoutes() {
         <Route path="categorias-canciones" element={<CategoriasCanciones />} />
         <Route path="tiempos-liturgicos" element={<TiemposLiturgicos />} />
         <Route path="canciones" element={<Canciones />} />
+        <Route path="repertorios" element={<Repertorios />} />
         <Route
           path="cuestionario/configuracion"
           element={<CuestionarioConfig />}
