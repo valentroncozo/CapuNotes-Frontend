@@ -69,6 +69,7 @@ export default function MiembrosTableABMC({
 
   // 🔎 Filtros combinados
   const miembrosFiltrados = listaMiembros.filter((m) => {
+    console.log('Filtrando miembro:', m);
     const matchTexto =
       !filtroTexto ||
       (m.nombre || '').toLowerCase().includes(filtroTexto.toLowerCase()) ||

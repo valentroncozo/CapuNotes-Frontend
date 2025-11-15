@@ -28,7 +28,7 @@ export const miembrosService = {
       area: m.area?.name || m.area?.nombre || null,
       cuerda: {
         id: m.cuerda?.id || null,
-        nombre: m.cuerda?.name || m.cuerda?.nombre || null,
+        name: m.cuerda?.name || m.cuerda?.nombre || null,
       },
       activo:
         m.activo !== undefined
@@ -58,7 +58,7 @@ export const miembrosService = {
       area: m.area?.name || m.area?.nombre || null,
       cuerda: {
         id: m.cuerda?.id || null,
-        nombre: m.cuerda?.name || m.cuerda?.nombre || null,
+        name: m.cuerda?.name || m.cuerda?.nombre || null,
       },
       activo:
         m.activo !== undefined
