@@ -3,7 +3,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Eye, PlusCircle, Trash } from "react-bootstrap-icons";
 import Swal from "sweetalert2";
 
-import CancionDetalleModal from "@/components/pages/canciones/CancionDetalleModal";
+import CancionModal from "@/components/pages/canciones/CancionModal";
 import "@/styles/repertorios.css";
 
 const EMPTY_FILTERS = {
@@ -164,10 +164,10 @@ export default function RepertorioEditor({
     }
 
     const confirm = await Swal.fire({
-      title: mode === "create" ? "Crear repertorio" : "Actualizar repertorio",
+      title: mode === "create" ? "Agregar repertorio" : "Actualizar repertorio",
       text:
         mode === "create"
-          ? "Se guardará el nuevo repertorio con las canciones seleccionadas."
+          ? "Se agregará el nuevo repertorio con las canciones seleccionadas."
           : "Se actualizará el repertorio y su orden de canciones.",
       icon: "question",
       showCancelButton: true,
@@ -409,16 +409,19 @@ export default function RepertorioEditor({
             onClick={handleSave}
             disabled={isSubmitting}
           >
-            {mode === "create" ? "Crear repertorio" : "Guardar cambios"}
+            {mode === "create" ? "Agregar repertorio" : "Guardar cambios"}
           </button>
         </div>
       </section>
       </DragDropContext>
 
-      <CancionDetalleModal
+      <CancionModal
         isOpen={Boolean(detalleCancion)}
         onClose={() => setDetalleCancion(null)}
-        cancion={detalleCancion}
+        mode="view"
+        initialData={detalleCancion}
+        categorias={categorias}
+        tiempos={tiempos}
       />
     </>
   );

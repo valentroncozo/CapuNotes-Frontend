@@ -284,7 +284,7 @@ export default function EntityABMCSimple({
           </button>
         </div>
 
-        <table className="abmc-table abmc-table-rect">
+        <table className="abmc-table abmc-table-rect abmc-table--aligned">
           <thead className="abmc-thead">
             <tr>
               {visibleFields.map((f) => (
@@ -348,7 +348,7 @@ export default function EntityABMCSimple({
         {inactiveItems.length > 0 && (
           <section style={{ marginTop: "2rem" }}>
             <h3>Registros inactivos</h3>
-            <table className="abmc-table abmc-table-rect">
+            <table className="abmc-table abmc-table-rect abmc-table--aligned">
               <thead className="abmc-thead">
                 <tr>
                   {visibleFields.map((f) => (

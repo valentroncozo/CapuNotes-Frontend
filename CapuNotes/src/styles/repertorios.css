@@ -283,7 +283,7 @@
 /* Botón secundario aislado para repertorios */
 .repertorio-footer .abmc-btn.abmc-btn-secondary {
   background-color: #9aa0a6 !important;
-  color: #11103a !important;
+  color: #ffffff !important;
   border: none !important;
 }
 
@@ -298,5 +298,5 @@
   border-radius: 12px;
   cursor: pointer;
   background-color: #9aa0a6 !important;
-  color: #11103a !important;
+  color: #ffffff !important;
 }

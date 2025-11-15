@@ -10,7 +10,7 @@ export default function CancionModal({
   onClose,
   mode = "create",
   initialData,
-  onSubmit,
+  onSubmit = () => {},
   categorias = [],
   tiempos = [],
 }) {
@@ -20,10 +20,11 @@ export default function CancionModal({
   const [selectedCategorias, setSelectedCategorias] = useState([]);
   const [selectedTiempos, setSelectedTiempos] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isViewMode = mode === "view";
 
   useEffect(() => {
     if (!isOpen) return;
-    if (mode === "edit" && initialData) {
+    if ((mode === "edit" || mode === "view") && initialData) {
       setTitulo(initialData.titulo || "");
       setLetra(initialData.letra || "");
       setArregloUrl(initialData.arregloUrl || "");
@@ -39,6 +40,7 @@ export default function CancionModal({
   }, [initialData, isOpen, mode]);
 
   const toggleCategoria = (id) => {
+    if (isViewMode) return;
     setSelectedCategorias((prev) => {
       if (prev.includes(id)) {
         return prev.filter((item) => item !== id);
@@ -48,6 +50,7 @@ export default function CancionModal({
   };
 
   const toggleTiempo = (id) => {
+    if (isViewMode) return;
     setSelectedTiempos((prev) => {
       if (prev.includes(id)) {
         return prev.filter((item) => item !== id);
@@ -57,6 +60,7 @@ export default function CancionModal({
   };
 
   const handleSave = async () => {
+    if (isViewMode) return;
     if (!titulo.trim()) {
       Swal.fire({
         icon: "warning",
@@ -81,10 +85,10 @@ export default function CancionModal({
     }
 
     const confirm = await Swal.fire({
-      title: mode === "create" ? "Crear canción" : "Actualizar canción",
+      title: mode === "create" ? "Agregar canción" : "Actualizar canción",
       text:
         mode === "create"
-          ? "Se guardará la nueva canción con los datos ingresados."
+          ? "Se agregará la nueva canción con los datos ingresados."
           : "Se actualizarán los datos de la canción.",
       icon: "question",
       showCancelButton: true,
@@ -113,29 +117,46 @@ export default function CancionModal({
     }
   };
 
+  const modalTitle =
+    mode === "create"
+      ? "Agregar canción"
+      : mode === "edit"
+      ? "Editar canción"
+      : "Visualizar canción";
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={mode === "create" ? "Nueva canción" : "Editar canción"}
+      title={modalTitle}
       actions={
-        <>
-          <button
-            type="button"
-            className="abmc-btn abmc-btn-secondary"
-            onClick={onClose}
-          >
-            Cancelar
-          </button>
+        isViewMode ? (
           <button
             type="button"
             className="abmc-btn abmc-btn-primary"
-            onClick={handleSave}
-            disabled={isSubmitting}
+            onClick={onClose}
           >
-            {mode === "create" ? "Crear" : "Guardar"}
+            Cerrar
           </button>
-        </>
+        ) : (
+          <>
+            <button
+              type="button"
+              className="abmc-btn abmc-btn-secondary"
+              onClick={onClose}
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className="abmc-btn abmc-btn-primary"
+              onClick={handleSave}
+              disabled={isSubmitting}
+            >
+              {mode === "create" ? "Agregar" : "Guardar"}
+            </button>
+          </>
+        )
       }
     >
       <div className="cancion-modal-body">
@@ -147,6 +168,7 @@ export default function CancionModal({
               className="abmc-input"
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
+              readOnly={isViewMode}
               placeholder="Título de la canción"
             />
           </div>
@@ -157,6 +179,7 @@ export default function CancionModal({
               className="abmc-input"
               value={letra}
               onChange={(e) => setLetra(e.target.value)}
+              readOnly={isViewMode}
               placeholder="Escribí la letra o pegala aquí"
             />
           </div>
@@ -167,6 +190,7 @@ export default function CancionModal({
               className="abmc-input"
               value={arregloUrl}
               onChange={(e) => setArregloUrl(e.target.value)}
+              readOnly={isViewMode}
               placeholder="https://"
             />
           </div>
@@ -181,6 +205,7 @@ export default function CancionModal({
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleCategoria(cat.id)}
+                      disabled={isViewMode}
                     />
                     {cat.nombre}
                   </label>
@@ -199,6 +224,7 @@ export default function CancionModal({
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleTiempo(tiempo.id)}
+                      disabled={isViewMode}
                     />
                     {tiempo.nombre}
                   </label>

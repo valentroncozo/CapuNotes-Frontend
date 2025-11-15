@@ -294,7 +294,7 @@ export default function RepertoriosPage() {
           <button
             type="button"
             className="abmc-btn abmc-btn-primary"
-            title="Nuevo repertorio"
+            title="Agregar repertorio"
             onClick={handleCreate}
           >
             <AddIcon width={20} height={20} fill="#fff" />
@@ -302,7 +302,7 @@ export default function RepertoriosPage() {
         </div>
 
         <div className="table-wrapper">
-          <table className="abmc-table abmc-table-rect">
+          <table className="abmc-table abmc-table-rect abmc-table--aligned">
             <thead className="abmc-thead">
               <tr>
                 <th>

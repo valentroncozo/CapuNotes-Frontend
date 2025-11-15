@@ -45,38 +45,57 @@ function previewResultadoIcon(value) {
   );
 }
 
-export default function ResultadosModal({ row, onClose, onSave }) {
+export default function ResultadosModal({ row, onClose, onSave, mode = "edit" }) {
   const initialEstado = String(row?.resultado?.estado || "sin").toLowerCase();
   const initialObs = row?.resultado?.obs || "";
   const [estado, setEstado] = useState(initialEstado);
   const [obs, setObs] = useState(initialObs);
+  const isViewMode = mode === "view";
 
   return (
     <Modal
       isOpen={true}
       onClose={onClose}
-      title="Editar resultado"
-      actions={(
-        <>
-          <button className="btn btn-secondary" onClick={onClose}>
-            Cancelar
+      title={isViewMode ? "Visualizar resultado" : "Editar resultado"}
+      actions={
+        isViewMode ? (
+          <button className="btn btn-primary" onClick={onClose}>
+            Cerrar
           </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              onSave?.(estado, obs);
-            }}
-          >
-            Guardar
-          </button>
-        </>
-      )}
+        ) : (
+          <>
+            <button className="btn btn-secondary" onClick={onClose}>
+              Cancelar
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                onSave?.(estado, obs);
+              }}
+            >
+              Guardar
+            </button>
+          </>
+        )
+      }
     >
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 12 }}>
-        {previewResultadoIcon(estado)}
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          alignItems: "center",
+          marginBottom: 12,
+        }}
+      >
+        {!isViewMode && previewResultadoIcon(estado)}
         <div style={{ flex: 1 }}>
           <label style={{ display: "block", marginBottom: 6 }}>Estado</label>
-          <select className="input" value={estado} onChange={(e) => setEstado(e.target.value)}>
+          <select
+            className="input"
+            value={estado}
+            onChange={(e) => setEstado(e.target.value)}
+            disabled={isViewMode}
+          >
             {RESULT_OPTS.map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
@@ -88,7 +107,13 @@ export default function ResultadosModal({ row, onClose, onSave }) {
 
       <div className="field">
         <label>Observaciones</label>
-        <textarea className="input" rows={4} value={obs} onChange={(e) => setObs(e.target.value)} />
+        <textarea
+          className="input"
+          rows={4}
+          value={obs}
+          onChange={(e) => setObs(e.target.value)}
+          readOnly={isViewMode}
+        />
       </div>
     </Modal>
   );

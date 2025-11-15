@@ -4,7 +4,6 @@ import Swal from "sweetalert2";
 
 import BackButton from "@/components/common/BackButton";
 import CancionModal from "./CancionModal";
-import CancionDetalleModal from "./CancionDetalleModal";
 import { cancionesService } from "@/services/cancionesService";
 import { categoriasCancionesService } from "@/services/categoriasCancionesService";
 import { tiemposLiturgicosService } from "@/services/tiemposLiturgicosService";
@@ -22,8 +21,37 @@ export default function CancionesPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("create");
   const [selectedCancion, setSelectedCancion] = useState(null);
-  const [detailOpen, setDetailOpen] = useState(false);
-  const [detailCancion, setDetailCancion] = useState(null);
+
+  const mapNamesToIds = (names, catalog) => {
+    if (!Array.isArray(names) || !names.length) return [];
+    const normalized = names
+      .filter(Boolean)
+      .map((name) => String(name).toLowerCase());
+    return catalog
+      .filter((item) =>
+        normalized.includes(String(item.nombre || "").toLowerCase())
+      )
+      .map((item) => item.id);
+  };
+
+  const normalizeCancion = (cancion) => {
+    if (!cancion) return null;
+    const categoriasIds =
+      Array.isArray(cancion.categoriaIds) && cancion.categoriaIds.length
+        ? cancion.categoriaIds
+        : mapNamesToIds(cancion.categoriasNombres, categorias);
+    const tiemposIds =
+      Array.isArray(cancion.tiempoLiturgicoIds) &&
+      cancion.tiempoLiturgicoIds.length
+        ? cancion.tiempoLiturgicoIds
+        : mapNamesToIds(cancion.tiemposLiturgicosNombres, tiempos);
+
+    return {
+      ...cancion,
+      categoriaIds: categoriasIds,
+      tiempoLiturgicoIds: tiemposIds,
+    };
+  };
 
   const loadCanciones = async () => {
     try {
@@ -97,7 +125,7 @@ export default function CancionesPage() {
 
   const openModal = (mode, cancion = null) => {
     setModalMode(mode);
-    setSelectedCancion(cancion);
+    setSelectedCancion(mode === "create" ? null : normalizeCancion(cancion));
     setModalOpen(true);
   };
 
@@ -112,7 +140,7 @@ export default function CancionesPage() {
         await cancionesService.create(payload);
         Swal.fire({
           icon: "success",
-          title: "Canción creada",
+          title: "Canción agregada",
           background: "#11103a",
           color: "#E8EAED",
           confirmButtonColor: "#7c83ff",
@@ -229,16 +257,6 @@ export default function CancionesPage() {
     }
   };
 
-  const openDetail = (cancion) => {
-    setDetailCancion(cancion);
-    setDetailOpen(true);
-  };
-
-  const detailClose = () => {
-    setDetailOpen(false);
-    setDetailCancion(null);
-  };
-
   const toastEmpty = !isLoading && filteredCanciones.length === 0;
 
   const formatList = (list) => {
@@ -266,7 +284,7 @@ export default function CancionesPage() {
           <button
             type="button"
             className="abmc-btn abmc-btn-primary"
-            title="Nueva canción"
+            title="Agregar canción"
             onClick={() => openModal("create")}
           >
             <AddIcon width={20} height={20} fill="#fff" />
@@ -274,7 +292,7 @@ export default function CancionesPage() {
         </div>
 
         <div className="abmc-table-wrapper">
-          <table className="abmc-table abmc-table-rect">
+          <table className="abmc-table abmc-table-rect abmc-table--aligned">
             <thead className="abmc-thead">
               <tr>
                 <th>Título</th>
@@ -312,7 +330,7 @@ export default function CancionesPage() {
                         type="button"
                         className="abmc-btn abmc-btn-icon"
                         title="Ver canción"
-                        onClick={() => openDetail(cancion)}
+                        onClick={() => openModal("view", cancion)}
                       >
                         <Eye />
                       </button>
@@ -358,12 +376,6 @@ export default function CancionesPage() {
         onSubmit={handleModalSubmit}
         categorias={categorias}
         tiempos={tiempos}
-      />
-
-      <CancionDetalleModal
-        isOpen={detailOpen}
-        onClose={detailClose}
-        cancion={detailCancion}
       />
     </main>
   );

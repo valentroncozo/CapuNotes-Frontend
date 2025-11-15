@@ -199,7 +199,7 @@ textarea.input::placeholder {
 /* compatibilidad botones ABMC dentro de modales */
 .pop-footer .abmc-btn.abmc-btn-secondary {
   background-color: #9e9e9e !important;
-  color: #11103a !important;
+  color: #ffffff !important;
   border: none !important;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -268,4 +268,19 @@ select[name='tipoEvento']:focus {
   width: 100%;
   max-height: 65vh;     /* 🔥 límite de altura visible */
   overflow-y: auto;     /* 🔥 habilita scroll interno */
+}
+
+/* Estados de solo lectura: sin flecha ni cursor de select */
+.input:disabled,
+textarea.input:disabled {
+  cursor: default;
+  color: rgba(232, 234, 237, 0.85);
+}
+
+select.input:disabled {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none;
+  padding-right: 12px;
 }

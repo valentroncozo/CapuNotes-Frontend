@@ -84,7 +84,7 @@ export default function RepertorioFormPage({ mode = "create" }) {
         await repertoriosService.create(payload);
         Swal.fire({
           icon: "success",
-          title: "Repertorio creado",
+          title: "Repertorio agregado",
           background: "#11103a",
           color: "#E8EAED",
           confirmButtonColor: "#7c83ff",
@@ -112,7 +112,7 @@ export default function RepertorioFormPage({ mode = "create" }) {
         <div className="abmc-header">
           <BackButton />
           <h1 className="abmc-title">
-            {isEdit ? "Editar repertorio" : "Nuevo repertorio"}
+            {isEdit ? "Editar repertorio" : "Agregar repertorio"}
           </h1>
         </div>
 
