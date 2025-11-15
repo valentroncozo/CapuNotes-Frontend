@@ -68,13 +68,12 @@
   /* Firefox color */
   .eventos-scroll { scrollbar-color: rgba(0,0,0,0.28) rgba(0,0,0,0.06); }
 
-  .evento-card {
-    min-width: 220px;
-  }
 }
 
 .evento-card {
   min-width: 220px !important;
+  transition: none !important;
+  box-shadow: none !important;
   background: rgba(255,255,255,.05);
   border: 1px solid rgba(255,255,255,.12);
   border-radius: var(--radius);
@@ -100,12 +99,12 @@
   opacity: .95;
 }
 
-.evento-icon {
-  width: 20px;
-  height: 20px;
-  flex: 0 0 20px;
-  color: var(--card);
+
+.evento-card:hover {
+  transform: none !important;
+  box-shadow: none !important;
 }
+
 
 /* ====== Sección de tareas ====== */
 .tareas-grid {
@@ -150,7 +149,7 @@
 
 .tarea-card:hover {
   z-index: 10;
-  border: 1px solid var(--text-light);
+  border: 1px solid var(--accent);
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,.45);
 }
