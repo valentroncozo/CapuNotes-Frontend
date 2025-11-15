@@ -1,184 +1,253 @@
-/* ===========================
-   CONTENEDOR PRINCIPAL
-=========================== */
-.reporte-miembro-page {
+.pm-container {
+  padding: 20px;
+  color: white;
+}
+
+.pm-filtros {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+.pm-input {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #11103a;
+  border: 1px solid #333;
+  color: white;
+}
+
+.pm-titulo {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  color: #DE9205;
+}
+
+.pm-top {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.pm-card {
+  background: #11103a;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.2);
+}
+
+.pm-torta {
+  flex: 1 1 380px;
+}
+
+
+.pm-small {
+  background: #AFD1F0 !important;   /* celeste pastel */
+  color: #202124 !important;        /* texto gris oscuro */
+  border: none;
+}
+
+.pm-small h5 {
+  margin: 0;
+  padding: 0;
+  color: #202124 !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.pm-small p {
+  margin: 4px 0 0;
+  color: #202124 !important;
+  font-weight: 700;
+  font-size: 1.6rem;
+}
+
+.pm-metricas {
+  flex: 1 1 350px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.pm-small {
+  background: #AFD1F0 !important;   /* celeste */
+  color: #202124 !important;        /* texto gris oscuro */
+  border: none;
+  text-align: center;               /* 🔥 CENTRA TODO */
   display: flex;
   flex-direction: column;
-  padding: 32px;
-  background-color: #0f1036;
-  color: #fff;
-  min-height: 100vh;
-  font-family: var(--font);
+  justify-content: center;
+  align-items: center;              /* 🔥 CENTRA VERTICAL Y HORIZONTAL */
+  padding: 14px 0;
 }
 
-/* ===========================
-   HEADER
-=========================== */
-.reporte-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  position: relative;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-}
-
-.titulo-reporte {
-  font-weight: 700;
-  font-size: 1.8rem;
-  color: #ffc107;
+.pm-small h5 {
   margin: 0;
+  padding: 0;
+  color: #202124 !important;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
-.subtitulo {
-  color: #fff;
-  font-weight: 400;
-  font-size: 1.1rem;
-  margin-top: 0.3rem;
+.pm-small p {
+  margin: 6px 0 0;
+  color: #202124 !important;
+  font-weight: 700;
+  font-size: 1.6rem;
 }
 
-/* Línea amarilla institucional */
-.reporte-header::after {
-  content: "";
+
+.pm-linea {
+  margin-top: 25px;
+}
+
+.autocomplete-container {
+  position: relative;
+}
+
+.autocomplete-list {
   position: absolute;
-  bottom: -10px;
+  top: 38px;
   left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: #ffc107;
-  border-radius: 2px;
+  width: 260px;
+  background: #0F1320;
+  border: 1px solid #333;
+  border-radius: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+  z-index: 50;
+  box-shadow: 0 0 5px rgba(0,0,0,0.4);
 }
 
-/* ===========================
-   FILTROS (select + año)
-=========================== */
-.filtros-reporte {
+.autocomplete-item {
+  padding: 8px 10px;
+  cursor: pointer;
+  color: white;
+}
+
+.autocomplete-item:hover {
+  background-color: #1c2130;
+}
+
+/* Contenedor de filtros */
+.reportes-filtros {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 25px;
 }
 
-.label-filtro {
-  font-weight: 500;
-  font-size: 0.95rem;
-  color: #fff;
+/* Igualito al estilo de Participación General */
+.filtro-item {
+  position: relative;
 }
 
-.select-miembro,
-.input-anio {
-  background-color: #11103a;
-  border: 2px solid #afd1f0; /* 💙 Celeste CapuNotes */
-  color: #fff;
-  border-radius: 8px;
-  padding: 0.4rem 0.8rem;
-  font-family: var(--font);
+.filtro-input {
+  background-color: #0F1122;
+  border: 1px solid #2a2d40;
+  color: #dcddeb;
+  padding: 10px 14px;
+  border-radius: 10px;
   font-size: 0.95rem;
+  width: 230px;
+}
+
+.filtro-input:focus {
   outline: none;
-  transition: all 0.3s ease;
+  border-color: #DE9205;
 }
 
-.select-miembro option {
-  background-color: #0f1036;
-  color: #fff;
+/* --- AUTOCOMPLETE --- */
+
+/* El contenedor debe respetar el estilo del input */
+.autocomplete-container {
+  position: relative;
+  width: 260px;
 }
 
-.btn-filtrar {
-  background-color: #ffc107;
-  border: none;
-  color: #000;
-  font-weight: 600;
-  border-radius: 8px;
-  padding: 0.4rem 1.2rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-filtrar:hover {
-  background-color: #ffcf40;
-}
-
-/* ===========================
-   CARDS DE MÉTRICAS
-=========================== */
-.metricas-row {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.metrica-card {
-  min-width: 150px;
+/* El dropdown debe ser del mismo estilo que los inputs */
+.autocomplete-list {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  width: 100%;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
   border-radius: 12px;
-  text-align: center;
-  padding: 1rem 1.2rem;
-  font-weight: 600;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  padding: 6px 0;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
-.metrica-card h6 {
+/* Ítems del dropdown */
+.autocomplete-item {
+  padding: 10px 14px;
+  color: var(--text-light);
+  cursor: pointer;
   font-size: 0.9rem;
-  margin-bottom: 0.2rem;
-  opacity: 0.9;
 }
 
-.metrica-card p {
-  font-size: 1.4rem;
-  font-weight: 700;
+.autocomplete-item:hover {
+  background: rgba(255,255,255,.15);
+}
+/* Contenedor */
+.reportes-filtros {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-/* Colores institucionales */
-.metrica-card.cuerda {
-  background-color: #ffc107; /* Amarillo */
-  color: #000;
+/* ------------------ AUTOCOMPLETE ------------------ */
+
+.autocomplete-container {
+  position: relative;
+  width: 260px;
 }
 
-.metrica-card.asistencia,
-.metrica-card.continuidad {
-  background-color: #afd1f0; /* 💙 Celeste CapuNotes */
-  color: #000;
+.dropdown-wrapper {
+  position: relative;
 }
 
-.metrica-card.faltas {
-  background-color: #ffc107; /* Amarillo institucional */
-  color: #000;
+.dropdown-input {
+  width: 100%;
+  padding-right: 34px !important; /* espacio para la flecha */
 }
 
-/* ===========================
-   GRAFICOS
-=========================== */
-.graficos-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  gap: 1.5rem;
-  margin-top: 2rem;
+/* Flecha ▼ */
+.dropdown-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-light);
+  font-size: 0.8rem;
+  opacity: 0.7;
 }
 
-.card {
-  background-color: #11103a;
-  border-radius: 20px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+/* Lista */
+.autocomplete-list {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .15);
+  border-radius: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
-.texto-torta,
-.texto-linea {
-  color: #fff;
-  font-weight: 500;
-  text-align: center;
-  margin-top: 0.5rem;
-  font-size: 0.95rem;
+.autocomplete-item {
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  cursor: pointer;
 }
 
-/* ===========================
-   ESTADOS
-=========================== */
-.reporte-loading,
-.reporte-error {
-  text-align: center;
-  color: #ffc107;
-  margin-top: 3rem;
-  font-size: 1.1rem;
+.autocomplete-item:hover {
+  background: rgba(255, 255, 255, .15);
 }

@@ -96,7 +96,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
   const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
   const [areasDisponibles, setAreasDisponibles] = useState([]);
 
-  // 🔹 Cargar cuerdas y áreas
+  // Cargar cuerdas y áreas
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -120,14 +120,14 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
     fetchData();
   }, []);
 
-  // 🔹 Manejar cambios
+  // Manejo de cambios
   const handleChange = (e) => {
     const { name, value } = e.target;
     setMiembro((prev) => ({ ...prev, [name]: value }));
     setErrores((prev) => ({ ...prev, [name]: '' }));
   };
 
-  // 🔹 Validación
+  // Validación
   const validarCampos = () => {
     const requeridos = [
       'nombre',
@@ -146,7 +146,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  // 🔹 Enviar actualización
+  // Enviar actualización
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validarCampos()) {
@@ -164,10 +164,8 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
     try {
       const payload = {
         id: {
-          nroDocumento:
-            miembro.numeroDocumento || miembro.id?.nroDocumento || '',
-          tipoDocumento:
-            miembro.tipoDocumento || miembro.id?.tipoDocumento || '',
+          nroDocumento: miembro.numeroDocumento,
+          tipoDocumento: miembro.tipoDocumento,
         },
         nombre: miembro.nombre,
         apellido: miembro.apellido,
@@ -182,7 +180,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
         area: miembro.area ? { id: parseInt(miembro.area) } : null,
       };
 
-      await miembrosService.update(payload);
+      await miembrosService.update(docViejo.nro, docViejo.tipo, payload);
 
       Swal.fire({
         icon: 'success',

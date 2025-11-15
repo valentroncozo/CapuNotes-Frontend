@@ -29,8 +29,20 @@
 }
 
 .eventos-scroll {
-  display: grid;
-  gap: .75rem;
+  overflow-x: auto;
+  display: flex;
+  height: auto; /* container height fixed, images keep their sizes */
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  padding: 1rem;
+  justify-content: flex-start;
+  background: transparent; /* decorative cut handled by CutActivityContainer */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  align-items: center;
+  align-content: center;
+  width: 100%;
 }
 
 @media (min-width: 560px) {
@@ -49,9 +61,14 @@
     background: rgba(255,255,255,.25);
     border-radius: var(--radius);
   }
+
+  .evento-card {
+    min-width: 220px;
+  }
 }
 
 .evento-card {
+  min-width: 220px !important;
   background: rgba(255,255,255,.05);
   border: 1px solid rgba(255,255,255,.12);
   border-radius: var(--radius);
