@@ -88,6 +88,7 @@
   filter: brightness(1.02);
 }
 
+
 /* === Botones de acción con ícono para todas las páginas === */
 .abmc-actions .abmc-btn-icon {
   background: var(--accent) !important;
