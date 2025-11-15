@@ -42,7 +42,12 @@ export function AuthProvider({ children }) {
 
   const setUserFromMe = (me, { broadcast = true } = {}) => {
     const normalizedUser = me || null;
-    const nextPermissions = Array.isArray(normalizedUser?.permissions) ? normalizedUser.permissions : [];
+    const rawPermissions =
+      (Array.isArray(normalizedUser?.permissions) && normalizedUser.permissions) ||
+      (Array.isArray(normalizedUser?.permissions_list) && normalizedUser.permissions_list) ||
+      (Array.isArray(normalizedUser?.authorities) && normalizedUser.authorities) ||
+      [];
+    const nextPermissions = rawPermissions;
 
     setUser(normalizedUser);
     setPermissions(nextPermissions);

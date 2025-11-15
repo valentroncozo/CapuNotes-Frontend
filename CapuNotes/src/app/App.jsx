@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 // agregar imports faltantes desde react-router-dom y useAuth desde el contexto
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/context/AuthContext.jsx";
+import { PROTECTED_VIEWS, normalizePermission } from "@/config/permissions.js";
 
 import AppShell from '@/components/layout/AppShell.jsx';
 
@@ -12,7 +13,7 @@ import Login from "@/components/pages/login/index.jsx"; // PUBLIC
 import Principal from "@/components/pages/principal/index.jsx"; // PROTECTED (cualquier logeado)
 import Cuerdas from "@/components/pages/cuerdas/index.jsx"; // x view:Cuerdas
 import Areas from "@/components/pages/areas/index.jsx"; // x view:Areas
-import Miembros from "@/components/pages/miembros/index.jsx"; // x view:Miembros view:elimianr:Miembros
+import Miembros from "@/components/pages/miembros/index.jsx"; // x view:Miembros view:eliminar:Miembros
 import MiembrosAgregar from "@/components/pages/miembros/agregar.jsx"; // x view:crear:Miembros
 import MiembrosEditar from "@/components/pages/miembros/editar.jsx"; // x  view:editar:Miembros
 import Audicion from "@/components/pages/audicion/index.jsx";  // x view:Audicion
@@ -41,6 +42,44 @@ import LandingPage from "../components/pages/landing"; //public
 
 // Estilos base (usar globals como fuente deFverdad)
 import '@/styles/globals.css';
+
+const ROUTE_COMPONENTS = {
+  Cuerdas,
+  Areas,
+  Miembros,
+  MiembrosAgregar,
+  MiembrosEditar,
+  Audicion,
+  AudicionEditar,
+  AudicionAgregar,
+  CuestionarioConfig,
+  CuestionarioPreview,
+  HistorialAudiciones,
+  FormularioConsulta,
+  FormularioConsultaCoordinacion,
+  Candidatos,
+  CandidatosCoordinadores,
+  Eventos,
+  AsistenciaEnsayos,
+  AsistenciaEnsayosDetalle,
+  ReportesPage,
+  ReporteAsistenciaMiembroAnualPage,
+};
+
+const hasPermission = (permissionList = [], required) => {
+  if (!required) return true;
+  const goal = normalizePermission(required);
+  return permissionList.some((perm) => normalizePermission(perm) === goal);
+};
+
+function PermissionGate({ permission, children }) {
+  const { permissions = [], loading } = useAuth();
+  if (loading) return null;
+  if (!hasPermission(permissions, permission)) {
+    return <Navigate to="/403" replace />;
+  }
+  return children;
+}
 
 
 function ProtectedRoute({ children }) {
@@ -86,32 +125,21 @@ function AppRoutes() {
       >
         <Route index element={<Navigate to="/principal" replace />} />
         <Route path="principal" element={<Principal username={username} />} />
-        <Route path="miembros" element={<Miembros />} />
-        <Route path="miembros/agregar" element={<MiembrosAgregar />} />
-        <Route path="miembros/editar" element={<MiembrosEditar />} />
-        <Route path="cuerdas" element={<Cuerdas />} />
-        <Route path="areas" element={<Areas />} />
-        <Route path="cuestionario/configuracion" element={<CuestionarioConfig />} />
-        <Route path="cuestionario/preview" element={<CuestionarioPreview />} />
-        <Route path="asistencias" element={<AsistenciaEnsayos />} />
-        <Route path="asistencias/ensayos/:idEnsayo" element={<AsistenciaEnsayosDetalle />} />
-        <Route path="eventos" element={<Eventos />} />
-        <Route path="audicion" element={<Audicion />} />
-        <Route path="audicion/agregar" element={<AudicionAgregar />} />
-        <Route path="audicion/editar" element={<AudicionEditar />} />
-        <Route path="audicion/historial" element={<HistorialAudiciones />} />
-        <Route path="/inscripcion/:id" element={<FormularioConsulta />} />
-        <Route path="/inscripcion/coordinadores/:id" element={<FormularioConsultaCoordinacion />} />
-        <Route path="audicion/candidatos" element={<Candidatos />} />
-        <Route path="candidatos-administracion" element={<CandidatosCoordinadores />} />
-        <Route path="reportes" element={<ReportesPage />} />
-        <Route
-          path="/reportes/miembro/:tipoDocumento/:nroDocumento"
-          element={<ReporteAsistenciaMiembroAnualPage/>}
-        />
-
-
-        <Route path="/reportes/asistencias/miembro" element={<ReporteAsistenciaMiembroAnualPage />} />
+        {PROTECTED_VIEWS.map((view) => {
+          const Component = ROUTE_COMPONENTS[view.componentKey];
+          if (!Component) return null;
+          return (
+            <Route
+              key={view.key}
+              path={view.path}
+              element={
+                <PermissionGate permission={view.permission}>
+                  <Component />
+                </PermissionGate>
+              }
+            />
+          );
+        })}
 
       </Route>
 

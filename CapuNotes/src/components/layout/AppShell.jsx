@@ -1,10 +1,12 @@
 // src/components/layout/AppShell.jsx
 import { Outlet, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import "@/styles/offcanvas.css";
 
 // agregar import del contexto
 import { useAuth } from "@/context/AuthContext.jsx";
+import { MENU_SECTIONS, PROTECTED_VIEWS, normalizePermission } from "@/config/permissions.js";
+import LogOutIcon from "@/assets/LogOutIcon";
 
 /* Ícono de cierre (X) */
 function CloseIcon(props) {
@@ -41,12 +43,7 @@ function GearIcon(props) {
   );
 }
 
-const MENU_ITEMS = [
-  ['/asistencias', 'Asistencias'],
-  ['/canciones', 'Canciones'],
-  ['/eventos', 'Eventos'],
-  ['/usuarios-roles', 'Usuarios y roles'],
-];
+const toAbsolutePath = (path) => (path.startsWith('/') ? path : `/${path}`);
 
 export default function AppShell({ onLogout }) {
   const navigate = useNavigate();
@@ -56,7 +53,36 @@ export default function AppShell({ onLogout }) {
   const [gearOpen, setGearOpen] = useState(false);
 
   // obtener logout desde contexto
-  const { logout } = useAuth();
+  const { logout, permissions = [] } = useAuth();
+
+  const permissionsSet = useMemo(() => {
+    return new Set((permissions || []).map(normalizePermission));
+  }, [permissions]);
+
+  const canAccess = useCallback(
+    (required) => {
+      if (!required || (Array.isArray(required) && required.length === 0)) return true;
+      const list = Array.isArray(required) ? required : [required];
+      return list.some((perm) => permissionsSet.has(normalizePermission(perm)));
+    },
+    [permissionsSet]
+  );
+
+  const sections = useMemo(() => {
+    const itemsBySection = PROTECTED_VIEWS.reduce((acc, view) => {
+      if (!view.section || view.showInMenu === false) return acc;
+      if (!canAccess(view.permission)) return acc;
+      const list = acc.get(view.section) || [];
+      list.push({ to: toAbsolutePath(view.path), label: view.label });
+      acc.set(view.section, list);
+      return acc;
+    }, new Map());
+
+    return MENU_SECTIONS.map((section) => ({
+      ...section,
+      items: itemsBySection.get(section.key) || [],
+    })).filter((section) => section.items.length > 0);
+  }, [canAccess]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -116,7 +142,7 @@ export default function AppShell({ onLogout }) {
                 setGearOpen((v) => !v);
               }}
             >
-              <GearIcon />
+              <LogOutIcon fill="var(--text-light)" />
             </button>
 
             {gearOpen && (
@@ -148,6 +174,7 @@ export default function AppShell({ onLogout }) {
             setOrgOpen={setOrgOpen}
             audOpen={audOpen}
             setAudOpen={setAudOpen}
+            sections={sections}
             onNavigate={handleNavigate}
           />
         </div>
@@ -169,7 +196,7 @@ export default function AppShell({ onLogout }) {
   );
 }
 
-function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
+function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate, sections = [] }) {
   return (
     <div className="appshell-menu">
       <a
@@ -183,135 +210,60 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         Inicio
       </a>
 
-      <div className="appshell-accordion-outer">
-        <button
-          className={`appshell-accordion-trigger ${orgOpen ? 'open' : ''}`}
-          onClick={() => setOrgOpen((v) => !v)}
-          aria-expanded={orgOpen}
-        >
-          Organización del Coro
-          <span className="appshell-accordion-caret">
-            {orgOpen ? '▴' : '▾'}
-          </span>
-        </button>
+      {sections.map((section) => {
+        if (section.type === 'accordion') {
+          const isOrg = section.key === 'org';
+          const isAud = section.key === 'aud';
+          const open = isOrg ? orgOpen : audOpen;
+          const toggle = isOrg ? setOrgOpen : setAudOpen;
+          return (
+            <div key={section.key} className="appshell-accordion-outer">
+              <button
+                className={`appshell-accordion-trigger ${open ? 'open' : ''}`}
+                onClick={() => toggle((v) => !v)}
+                aria-expanded={open}
+              >
+                {section.label}
+                <span className="appshell-accordion-caret">
+                  {open ? '▴' : '▾'}
+                </span>
+              </button>
 
-        {orgOpen && (
-          <div className="appshell-accordion-content">
-            <a
-              href="/cuerdas"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/cuerdas');
-              }}
-            >
-              Cuerdas
-            </a>
-            <a
-              href="/areas"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/areas');
-              }}
-            >
-              Áreas
-            </a>
-            <a
-              href="/miembros"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/miembros');
-              }}
-            >
-              Miembros
-            </a>
-          </div>
-        )}
-      </div>
+              {open && (
+                <div className="appshell-accordion-content">
+                  {section.items.map((item) => (
+                    <a
+                      key={item.to}
+                      href={item.to}
+                      className="nav-link"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onNavigate(item.to);
+                      }}
+                    >
+                      {item.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        }
 
-      <div className="appshell-accordion-outer">
-        <button
-          className={`appshell-accordion-trigger ${audOpen ? 'open' : ''}`}
-          onClick={() => setAudOpen((v) => !v)}
-          aria-expanded={audOpen}
-        >
-          Audiciones
-          <span className="appshell-accordion-caret">
-            {audOpen ? '▴' : '▾'}
-          </span>
-        </button>
-
-        {audOpen && (
-          <div className="appshell-accordion-content">
-            <a
-              href="/audicion"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/audicion');
-              }}
-            >
-              Audición
-            </a>
-            <a
-              href="/candidatos"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('audicion/candidatos');
-              }}
-            >
-              Candidatos
-            </a>
-            <a
-              href="/candidatos-coordinadores"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/candidatos-administracion');
-              }}
-            >
-              Candidatos (Administración)
-            </a>
-            <a
-              href="/candidatos/historial"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/audicion/historial');
-              }}
-            >
-              Historial Candidatos
-            </a>
-            <a
-              href="/cuestionario/configuracion"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/cuestionario/configuracion');
-              }}
-            >
-              Configurar Cuestionario
-            </a>
-          </div>
-        )}
-      </div>
-
-      {MENU_ITEMS.map(([to, label]) => (
-        <a
-          key={to}
-          href={to}
-          onClick={(e) => {
-            e.preventDefault();
-            onNavigate(to);
-          }}
-          className="nav-link"
-        >
-          {label}
-        </a>
-      ))}
+        return section.items.map((item) => (
+          <a
+            key={item.to}
+            href={item.to}
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate(item.to);
+            }}
+            className="nav-link"
+          >
+            {item.label}
+          </a>
+        ));
+      })}
     </div>
   );
 }
