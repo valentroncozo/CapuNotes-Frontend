@@ -302,9 +302,35 @@ export default function CuestionarioConfigPage({
   };
 
   const handleDelete = async (id) => {
+    // confirmación previa a la eliminación
+    const confirm = await Swal.fire({
+      title: '¿Eliminar pregunta?',
+      text: 'Esta acción eliminará la pregunta permanentemente. ¿Querés continuar?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Aceptar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#ffc107',
+      reverseButtons: true,
+      background: '#11103a',
+      color: '#E8EAED',
+    });
+
+    if (!confirm.isConfirmed) return;
+
     try {
       await callDeleteService(id);
       setPreguntas((prev) => prev.filter((x) => x.id !== id));
+      // feedback breve al usuario
+      Swal.fire({
+        icon: 'success',
+        title: 'Eliminado',
+        text: 'La pregunta se eliminó correctamente.',
+        timer: 1200,
+        showConfirmButton: false,
+        background: '#11103a',
+        color: '#E8EAED',
+      });
     } catch (err) {
       console.error('Error eliminando pregunta:', err);
       if (err?.response) {
@@ -328,6 +354,17 @@ export default function CuestionarioConfigPage({
         );
         return;
       }
+
+      // mostrar error al usuario con botón Aceptar
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err?.response?.data || 'No se pudo eliminar la pregunta.',
+        background: '#11103a',
+        color: '#E8EAED',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#ffc107',
+      });
     }
   };
 
@@ -338,10 +375,11 @@ export default function CuestionarioConfigPage({
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'No se pueden asignar preguntas a una audición que no está en estado Borrador.',
+        text: 'No existe audicion cargada para asignar pregunta.',
         background: '#11103a',
         color: '#E8EAED',
-        confirmButtonColor: '#7c83ff',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#ffc107',
       });
       return;
     }
@@ -358,7 +396,8 @@ export default function CuestionarioConfigPage({
         text: 'No se pueden eliminar preguntas a una audición que no está en estado Borrador.',
         background: '#11103a',
         color: '#E8EAED',
-        confirmButtonColor: '#7c83ff',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#ffc107',
       });
       return;
     }
@@ -387,7 +426,6 @@ export default function CuestionarioConfigPage({
         <header className="abmc-header">
           <BackButton />
           <h1 className="abmc-title">{title}</h1>
-          <hr className="divisor-amarillo" />
         </header>
 
         <div className="abmc-topbar">
@@ -437,7 +475,7 @@ export default function CuestionarioConfigPage({
                 type="button"
                 onClick={handleAddOpcion}
               >
-                Agregar opción
+                +
               </button>
             </div>
           ) : null}
@@ -459,51 +497,21 @@ export default function CuestionarioConfigPage({
                 return (
                   <tr key={p.id ?? `row-${idx}`} className="abmc-row">
                     <td>
-                      <input
-                        className="abmc-input"
-                        value={p.valor || ''}
-                        onChange={(e) =>
-                          setPreguntas((prev) =>
-                            prev.map((x) =>
-                              x.id === p.id
-                                ? { ...x, valor: e.target.value }
-                                : x
-                            )
-                          )
-                        }
-                      />
+                      <div className="abmc-text">{p.valor || ''}</div>
                     </td>
                     <td>
-                      <select
-                        className="abmc-select"
-                        value={p.tipo}
-                        onChange={(e) =>
-                          setPreguntas((prev) =>
-                            prev.map((x) =>
-                              x.id === p.id ? { ...x, tipo: e.target.value } : x
-                            )
-                          )
-                        }
-                      >
-                        {tipos.map((t) => (
-                          <option key={t.value} value={t.value}>
-                            {t.label}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="abmc-text">
+                        {(tipos.find((t) => t.value === p.tipo) || {}).label ||
+                          p.tipo}
+                      </div>
                     </td>
                     <td>
                       {(p.opciones || []).length > 0 ? (
-                        <select className="abmc-select">
-                          {(p.opciones || []).map((o, i) => {
-                            const val = opcionToString(o);
-                            return (
-                              <option key={`${val}-${i}`} value={val}>
-                                {val}
-                              </option>
-                            );
-                          })}
-                        </select>
+                        <div className="abmc-text">
+                          {(p.opciones || []).map((o) => opcionToString(o)).join(
+                            ', '
+                          )}
+                        </div>
                       ) : (
                         <span style={{ color: '#888' }}>—</span>
                       )}
@@ -577,7 +585,7 @@ export default function CuestionarioConfigPage({
             <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
               <input
                 className="abmc-input"
-                style={{ flex: 1 }}
+                style={{ flex: 2, minWidth: 0 }}
                 value={editing.valor || ''}
                 onChange={(e) =>
                   setEditing((prev) => ({ ...prev, valor: e.target.value }))
@@ -585,6 +593,7 @@ export default function CuestionarioConfigPage({
               />
               <select
                 className="abmc-select"
+                style={{ flex: '0 0 160px', width: 160, minWidth: 0 }}
                 value={editing.tipo}
                 onChange={(e) =>
                   setEditing((prev) => ({ ...prev, tipo: e.target.value }))
@@ -656,8 +665,10 @@ export default function CuestionarioConfigPage({
                       setEditOpcionInput('');
                     }}
                   >
-                    Agregar opción
-                  </button>
+                  <span class="material-symbols-outlined">
+                  add
+                  </span>
+                    </button>
                 </div>
               )}
             </div>
@@ -671,7 +682,7 @@ export default function CuestionarioConfigPage({
               }}
             >
               <button
-                className="abmc-btn"
+                className="abmc-btn btn-cancelar"
                 type="button"
                 onClick={() => {
                   setIsEditing(false);
