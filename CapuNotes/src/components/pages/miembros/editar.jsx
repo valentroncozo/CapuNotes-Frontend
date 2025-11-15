@@ -1,4 +1,9 @@
-import { useState, useEffect } from 'react';
+import {
+  GeoapifyGeocoderAutocomplete,
+  GeoapifyContext,
+} from '@geoapify/react-geocoder-autocomplete';
+import '@geoapify/geocoder-autocomplete/styles/minimal.css';
+import { useState, useEffect, useRef } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -13,8 +18,14 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
   const navigate = useNavigate();
   const location = useLocation();
   const miembroInicial = location.state?.miembro;
+  const [lugarOrigenInput, setLugarOrigenInput] = useState(
+    miembroInicial?.lugarOrigen || ''
+  );
 
-  // 🟢 Estado inicial con los datos del miembro
+  // 🟢 Referencia para Geoapify
+  const apiKey = 'T27d4d3c8bf5147f3ae4cd2f98a44009a'; // tu misma key
+
+  // 🟢 Estado inicial
   const [miembro, setMiembro] = useState(() => ({
     nombre: miembroInicial?.nombre || '',
     apellido: miembroInicial?.apellido || '',
@@ -236,15 +247,30 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
                 className="abmc-input"
               />
             </div>
+
             <div className="mitad">
               <label>Lugar de Origen</label>
-              <Form.Control
-                type="text"
-                name="lugarOrigen"
-                value={miembro.lugarOrigen}
-                onChange={handleChange}
-                className="abmc-input"
-              />
+              <GeoapifyContext apiKey="27d4d3c8bf5147f3ae4cd2f98a44009a">
+                <GeoapifyGeocoderAutocomplete
+                  placeholder="Ej: Córdoba, Argentina"
+                  value={miembro.lugarOrigen}
+                  type="city"
+                  lang="es"
+                  limit={8}
+                  debounceDelay={200}
+                  onChange={(value) => {
+                    setMiembro((prev) => ({
+                      ...prev,
+                      lugarOrigen: value?.formatted || '',
+                    }));
+                  }}
+                  onSuggestionChange={(value) => {
+                    if (!value) return;
+                    setLugarOrigenInput(value.formatted);
+                  }}
+                  className="abmc-input geoapify-wrapper"
+                />
+              </GeoapifyContext>
             </div>
           </div>
 
