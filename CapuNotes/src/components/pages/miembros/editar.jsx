@@ -77,7 +77,6 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
   const docViejo = {
     nro: miembroInicial?.id?.nroDocumento,
     tipo: miembroInicial?.id?.tipoDocumento,
-    tipo: miembroInicial?.id?.tipoDocumento,
   };
 
   /* ============================================================

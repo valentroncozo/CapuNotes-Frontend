@@ -274,6 +274,16 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
       return;
     }
 
+    // 🔄 Convertir dd/mm/aaaa → mm/dd/aaaa para el backend
+    let fechaNacimientoBackend = null;
+
+    if (candidato.fechaNacimiento) {
+      const [dd, mm, yyyy] = candidato.fechaNacimiento.split('/');
+      if (dd && mm && yyyy) {
+        fechaNacimientoBackend = `${mm}/${dd}/${yyyy}`;
+      }
+    }
+
     // validar preguntas obligatorias
     const requiredPreguntas = preguntas.filter((p) => p.obligatoria);
     const missingPreguntas = [];
@@ -313,7 +323,10 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
     }
 
     const payload = {
-      candidato,
+      candidato: {
+        ...candidato,
+        fechaNacimiento: fechaNacimientoBackend, // 👈 FECHA YA FORMATEADA
+      },
       respuestas,
       turnoId: Number(selectedTurnoId),
       cancion,
