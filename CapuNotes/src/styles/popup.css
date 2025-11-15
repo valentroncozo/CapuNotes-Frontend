@@ -253,3 +253,10 @@ select[name='tipoEvento']:focus {
   border-color: var(--card);
   box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25);
 }
+
+.pop-body {
+  padding: 18px;
+  width: 100%;
+  max-height: 65vh;     /* 🔥 límite de altura visible */
+  overflow-y: auto;     /* 🔥 habilita scroll interno */
+}

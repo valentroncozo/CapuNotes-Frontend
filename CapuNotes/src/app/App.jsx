@@ -26,13 +26,14 @@ import CuestionarioPreview from '@/components/pages/cuestionario/preview.jsx';
 import AsistenciaEnsayos from '@/components/pages/asistencias/asistenciaEnsayos.jsx';
 import AsistenciaEnsayosDetalle from '@/components/pages/asistencias/asistenciaEnsayosDetalle.jsx';
 import HistorialAudiciones from "@/components/pages/audicion/historial.jsx";
-import Formulario from "@/components/pages/formulario/index.jsx"; 
+import Formulario from "@/components/pages/formulario/index.jsx";
 import FormularioConsulta from "@/components/pages/formulario/consulta.jsx";
 import FormularioConsultaCoordinacion from "@/components/pages/formulario/consultaCoordinacion.jsx";
 import Eventos from '@/components/pages/eventos/index.jsx';
 import Candidatos from "@/components/pages/audicion/candidatos.jsx";
 import CandidatosCoordinadores from "@/components/pages/candidatos_coordinadores/index.jsx";
 import ReporteAsistenciaMiembroAnualPage from "@/components/pages/reportes/ReporteAsistenciaMiembroAnualPage.jsx";
+import ReportesPage from "@/components/pages/reportes/ReportesPage.jsx";
 
 
 // Estilos base (usar globals como fuente deFverdad)
@@ -98,15 +99,22 @@ function AppRoutes() {
         <Route path="/inscripcion/coordinadores/:id" element={<FormularioConsultaCoordinacion />} />
         <Route path="audicion/candidatos" element={<Candidatos />} />
         <Route path="candidatos-administracion" element={<CandidatosCoordinadores />} />
+        <Route path="reportes" element={<ReportesPage />} />
+        <Route
+          path="/reportes/miembro/:tipoDocumento/:nroDocumento"
+          element={<ReporteAsistenciaMiembroAnualPage/>}
+        />
+
+
         <Route path="/reportes/asistencias/miembro" element={<ReporteAsistenciaMiembroAnualPage />} />
 
       </Route>
-     
+
 
       <Route path="*" element={<Navigate to="/principal" replace />} />
-      <Route path="/formulario" element={<Formulario />} /> 
+      <Route path="/formulario" element={<Formulario />} />
 
-      <Route path="landing" element={< LandingPage/>} />
+      <Route path="landing" element={< LandingPage />} />
     </Routes>
   );
 }

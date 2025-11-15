@@ -1,0 +1,43 @@
+.reportes-tabs {
+  display: flex;
+  gap: 20px;
+  padding-bottom: 2px;    /* antes 5px */
+  margin-top: 6px;        /* NUEVO: acerca las tabs al título */
+  margin-bottom: 5px;     /* antes 20px */
+}
+
+
+.tab {
+  background: transparent;
+  border: none;
+  color: #ccc;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  position: relative;
+  transition: 0.2s;
+}
+
+.tab:hover {
+  color: white;
+}
+
+.tab.activa {
+  color: #DE9205;
+}
+
+.tab.activa::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;           /* antes -6px */
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #DE9205;
+  border-radius: 4px;
+}
+
+.reportes-contenido {
+  margin-top: 10px;       /* opcional: antes 20px */
+}
+
