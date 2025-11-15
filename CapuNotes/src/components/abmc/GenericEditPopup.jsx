@@ -63,7 +63,7 @@ export default function GenericEditPopup({
             Cancelar
           </button>
           <button className="btn btn-primary" onClick={handleSave}>
-            {isEditing ? "Guardar cambios" : "Crear"}
+            {isEditing ? "Guardar cambios" : "Agregar"}
           </button>
         </>
       }

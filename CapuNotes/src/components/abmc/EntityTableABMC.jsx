@@ -124,21 +124,35 @@ export default function EntityTableABMC({
     }
 
     try {
-      await service.create(nuevo);
+      const created = await service.create(nuevo);
       await load();
       setNuevo({});
 
-      // ✅ Aviso de éxito
-      Swal.fire({
-        icon: "success",
-        title: "Creado correctamente",
-        text: `${entityName} se creó con éxito.`,
-        background: "#11103a",
-        color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
-        timer: 1500,
-        showConfirmButton: false,
-      });
+      // ✅ Aviso de éxito — si es 'cuerda' mostramos mensaje detallado con el nombre
+      if (String(entityName).toLowerCase() === "cuerda") {
+        const nombre = created?.name || nuevo?.name || "(sin nombre)";
+        Swal.fire({
+          icon: "success",
+          title: "Creado correctamente",
+          text: `La cuerda "${nombre}" ha sido creada con éxito.`,
+          background: "#11103a",
+          color: "#E8EAED",
+          confirmButtonColor: "#7c83ff",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } else {
+        Swal.fire({
+          icon: "success",
+          title: "Creado correctamente",
+          text: `${entityName} se creó con éxito.`,
+          background: "#11103a",
+          color: "#E8EAED",
+          confirmButtonColor: "#7c83ff",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
     } catch (err) {
       console.error("❌ Error al crear:", err);
       Swal.fire({
@@ -242,29 +256,57 @@ export default function EntityTableABMC({
 
     try {
       if (updated?.id) {
-        await service.update(updated);
-        Swal.fire({
-          icon: "success",
-          title: "Actualizado correctamente",
-          text: `${entityName} se actualizó con éxito.`,
-          background: "#11103a",
-          color: "#E8EAED",
-          confirmButtonColor: "#7c83ff",
-          timer: 1500,
-          showConfirmButton: false,
-        });
+        const saved = await service.update(updated);
+        if (String(entityName).toLowerCase() === "cuerda") {
+          const nombre = saved?.name || updated?.name || "(sin nombre)";
+          Swal.fire({
+            icon: "success",
+            title: "Actualizado correctamente",
+            text: `La cuerda "${nombre}" ha sido modificada con éxito.`,
+            background: "#11103a",
+            color: "#E8EAED",
+            confirmButtonColor: "#7c83ff",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        } else {
+          Swal.fire({
+            icon: "success",
+            title: "Actualizado correctamente",
+            text: `${entityName} se actualizó con éxito.`,
+            background: "#11103a",
+            color: "#E8EAED",
+            confirmButtonColor: "#7c83ff",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        }
       } else {
-        await service.create(updated);
-        Swal.fire({
-          icon: "success",
-          title: "Creado correctamente",
-          text: `${entityName} se creó con éxito.`,
-          background: "#11103a",
-          color: "#E8EAED",
-          confirmButtonColor: "#7c83ff",
-          timer: 1500,
-          showConfirmButton: false,
-        });
+        const created = await service.create(updated);
+        if (String(entityName).toLowerCase() === "cuerda") {
+          const nombre = created?.name || updated?.name || "(sin nombre)";
+          Swal.fire({
+            icon: "success",
+            title: "Creado correctamente",
+            text: `La cuerda "${nombre}" ha sido creada con éxito.`,
+            background: "#11103a",
+            color: "#E8EAED",
+            confirmButtonColor: "#7c83ff",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        } else {
+          Swal.fire({
+            icon: "success",
+            title: "Creado correctamente",
+            text: `${entityName} se creó con éxito.`,
+            background: "#11103a",
+            color: "#E8EAED",
+            confirmButtonColor: "#7c83ff",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        }
       }
 
       await load();
