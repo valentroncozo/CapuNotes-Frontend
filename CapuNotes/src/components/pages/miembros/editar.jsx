@@ -35,6 +35,17 @@ function validarEdadDDMMAAAA(fecha) {
   return edad >= 17;
 }
 
+function convertirDDMMYYYYaMMDDYYYY(fecha) {
+  if (!fecha) return null;
+  const partes = fecha.split('/'); // [dd, mm, yyyy]
+
+  if (partes.length !== 3) return null;
+
+  const [dd, mm, yyyy] = partes;
+
+  return `${mm}/${dd}/${yyyy}`;
+}
+
 export default function MiembrosEditar({ title = 'Editar miembro' }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,7 +54,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
   // Guardamos el documento viejo (ID original)
   const docViejo = {
     nro: miembroInicial?.id?.nroDocumento,
-    tipo: miembroInicial?.id?.tipoDocumento
+    tipo: miembroInicial?.id?.tipoDocumento,
   };
 
   // Estado inicial del formulario
@@ -134,6 +145,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
     }
 
     try {
+      const fechaBackend = convertirDDMMYYYYaMMDDYYYY(miembro.fechaNacimiento);
       const payload = {
         id: {
           nroDocumento: miembro.numeroDocumento,
@@ -141,7 +153,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
         },
         nombre: miembro.nombre,
         apellido: miembro.apellido,
-        fechaNacimiento: miembro.fechaNacimiento || null,
+        fechaNacimiento: fechaBackend,
         nroTelefono: miembro.telefono || null,
         correo: miembro.correo || null,
         carreraProfesion: miembro.carreraProfesion || null,

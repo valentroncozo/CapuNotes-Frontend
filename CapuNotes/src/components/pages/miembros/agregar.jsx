@@ -35,6 +35,17 @@ function validarEdadDDMMAAAA(fecha) {
   return edad >= 17;
 }
 
+function convertirDDMMYYYYaMMDDYYYY(fecha) {
+  if (!fecha) return null;
+  const partes = fecha.split('/'); // [dd, mm, yyyy]
+
+  if (partes.length !== 3) return null;
+
+  const [dd, mm, yyyy] = partes;
+
+  return `${mm}/${dd}/${yyyy}`;
+}
+
 export default function MiembrosAgregar({ title = 'Registro de miembro' }) {
   const navigate = useNavigate();
 
@@ -125,6 +136,7 @@ export default function MiembrosAgregar({ title = 'Registro de miembro' }) {
     }
 
     try {
+      const fechaBackend = convertirDDMMYYYYaMMDDYYYY(miembro.fechaNacimiento);
       const payload = {
         id: {
           nroDocumento: miembro.numeroDocumento,
@@ -132,7 +144,7 @@ export default function MiembrosAgregar({ title = 'Registro de miembro' }) {
         },
         nombre: miembro.nombre,
         apellido: miembro.apellido,
-        fechaNacimiento: miembro.fechaNacimiento || null,
+        fechaNacimiento: fechaBackend,
         nroTelefono: miembro.telefono || null,
         correo: miembro.correo || null,
         carreraProfesion: miembro.carreraProfesion || null,
