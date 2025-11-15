@@ -45,14 +45,14 @@ export const eventoService = {
     if (tipoEvento) options.params = { tipoEvento };
 
     console.log('🗑️ Eliminando evento — URL:', url, 'params:', options.params);
-    const res = await axios.delete(url, options);
-    console.log("🗑️ Evento eliminado:", res.data);
-    return res.data;
+    const res = await apiClient.delete(url, options);
+    console.log("🗑️ Evento eliminado:", res);
+    return res;
   },
 
   // Listar eventos pendientes (ensayos + presentaciones pendientes)
   pendientes: async () => {
-    const res = await axios.get(`${API_URL}/pendientes`);
+    const res = await apiClient.get(`${API_URL}/pendientes`);
     console.log('📡 Eventos pendientes recibidos:', res.data);
     return res.data;
   },
