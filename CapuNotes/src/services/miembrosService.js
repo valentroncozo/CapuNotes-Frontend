@@ -4,7 +4,6 @@ import apiClient from "./apiClient";
 const API_URL = "/miembros";
 
 export const miembrosService = {
-
   // === Alias seguro para no romper nada ===
   getMiembros: async () => {
     return await miembrosService.list();
@@ -22,14 +21,14 @@ export const miembrosService = {
     return list.map((m) => ({
       id: {
         tipoDocumento:
-          m.id?.tipoDocumento || m.tipoDocumento || m.tipo || "DNI",
+          m.id?.tipoDocumento || m.tipoDocumento || m.tipo || 'DNI',
         nroDocumento:
           m.id?.nroDocumento || m.nroDocumento || m.numeroDocumento || null,
       },
-      nombre: m.nombre || "",
-      apellido: m.apellido || "",
-      correo: m.correo || m.email || "",
-      telefono: m.telefono || m.celular || "",
+      nombre: m.nombre || '',
+      apellido: m.apellido || '',
+      correo: m.correo || m.email || '',
+      telefono: m.telefono || m.celular || '',
       area: m.area?.name || m.area?.nombre || null,
       cuerda: {
         id: m.cuerda?.id || null,
@@ -38,7 +37,7 @@ export const miembrosService = {
       activo:
         m.activo !== undefined
           ? m.activo
-          : m.estado === "ACTIVO" || m.estado === true,
+          : m.estado === 'ACTIVO' || m.estado === true,
     }));
   },
 
@@ -51,14 +50,14 @@ export const miembrosService = {
     return {
       id: {
         tipoDocumento:
-          m.id?.tipoDocumento || m.tipoDocumento || m.tipo || "DNI",
+          m.id?.tipoDocumento || m.tipoDocumento || m.tipo || 'DNI',
         nroDocumento:
           m.id?.nroDocumento || m.nroDocumento || m.numeroDocumento || null,
       },
-      nombre: m.nombre || "",
-      apellido: m.apellido || "",
-      correo: m.correo || "",
-      telefono: m.telefono || "",
+      nombre: m.nombre || '',
+      apellido: m.apellido || '',
+      correo: m.correo || '',
+      telefono: m.telefono || '',
       area: m.area?.name || m.area?.nombre || null,
       cuerda: {
         id: m.cuerda?.id || null,
@@ -67,7 +66,7 @@ export const miembrosService = {
       activo:
         m.activo !== undefined
           ? m.activo
-          : m.estado === "ACTIVO" || m.estado === true,
+          : m.estado === 'ACTIVO' || m.estado === true,
     };
   },
 
@@ -107,4 +106,3 @@ export const miembrosService = {
 };
 
 export default miembrosService;
-
