@@ -14,7 +14,9 @@ const Eventos = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredEventos = useMemo(() => {
-    const q = String(searchTerm || '').trim().toLowerCase();
+    const q = String(searchTerm || '')
+      .trim()
+      .toLowerCase();
     if (!q) return eventos || [];
     return (eventos || []).filter((e) => {
       const nombre = String(e.nombre || '').toLowerCase();
@@ -45,6 +47,13 @@ const Eventos = () => {
   const handleClosePopup = () => {
     setPopupMode(null);
     setSelectedEvento(null);
+  };
+
+  // Función para manejar la eliminación del evento
+  const handleDeleteEvento = (id) => {
+    setEventos((prevEventos) =>
+      prevEventos.filter((evento) => evento.id !== id)
+    );
   };
 
   // Nota: la acción de eliminar se maneja desde ConfirmDeletePopup (onDeleted)
@@ -116,7 +125,15 @@ const Eventos = () => {
                 {new Date(evento.fechaInicio).toLocaleDateString('es-ES')}
               </p>
               <p>
-                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#1f1f1f"><path d="M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-800q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80Zm0-360Zm112 168 56-56-128-128v-184h-80v216l152 152ZM224-866l56 56-170 170-56-56 170-170Zm512 0 170 170-56 56-170-170 56-56ZM480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720q-117 0-198.5 81.5T200-440q0 117 81.5 198.5T480-160Z"/></svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 -960 960 960"
+                  width="24px"
+                  fill="#1f1f1f"
+                >
+                  <path d="M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-800q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80Zm0-360Zm112 168 56-56-128-128v-184h-80v216l152 152ZM224-866l56 56-170 170-56-56 170-170Zm512 0 170 170-56 56-170-170 56-56ZM480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720q-117 0-198.5 81.5T200-440q0 117 81.5 198.5T480-160Z" />
+                </svg>
                 {evento.hora}
               </p>
               <p>
@@ -174,9 +191,7 @@ const Eventos = () => {
           <ConfirmDeletePopup
             evento={selectedEvento}
             onClose={() => setShowDeletePopup(false)}
-            onDeleted={(id) =>
-              setEventos((prev) => prev.filter((e) => e.id !== id))
-            }
+            onDeleted={handleDeleteEvento} // Actualiza el estado al eliminar
           />
         )}
 
@@ -208,7 +223,10 @@ const Eventos = () => {
                 // Mostrar confirmación visual al usuario
                 Swal.fire({
                   icon: 'success',
-                  title: popupMode === 'crear' ? 'Evento creado' : 'Evento actualizado',
+                  title:
+                    popupMode === 'crear'
+                      ? 'Evento creado'
+                      : 'Evento actualizado',
                   text:
                     popupMode === 'crear'
                       ? 'El evento se creó correctamente.'
