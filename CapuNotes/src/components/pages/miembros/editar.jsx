@@ -39,14 +39,21 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
   const navigate = useNavigate();
   const location = useLocation();
   const miembroInicial = location.state?.miembro;
-  const [lugarOrigenInput, setLugarOrigenInput] = useState(
-    miembroInicial?.lugarOrigen || ''
-  );
 
+<<<<<<< HEAD
   // 🟢 Referencia para Geoapify
   const apiKey = 'T27d4d3c8bf5147f3ae4cd2f98a44009a'; // tu misma key
 
   // 🟢 Estado inicial
+=======
+  // Guardamos el documento viejo (ID original)
+  const docViejo = {
+    nro: miembroInicial?.id?.nroDocumento,
+    tipo: miembroInicial?.id?.tipoDocumento
+  };
+
+  // Estado inicial del formulario
+>>>>>>> 88c711ecd1054bbfd22ce458d8dab066e640a0ae
   const [miembro, setMiembro] = useState(() => ({
     nombre: miembroInicial?.nombre || '',
     apellido: miembroInicial?.apellido || '',

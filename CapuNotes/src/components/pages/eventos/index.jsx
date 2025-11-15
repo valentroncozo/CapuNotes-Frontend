@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import BackButton from '@/components/common/BackButton.jsx';
 import PopUpEventos from './popUpEventos.jsx';
-import ConfirmDeletePopup from './ConfirmDeletePopup.jsx';
+import ConfirmDeletePopup from './ConfirmDeletePopUp.jsx';
 import '@/styles/eventos.css';
 import Swal from 'sweetalert2';
 import { eventoService } from '@/services/eventoService.js'; // 👈 corregido
 import '@/styles/abmc.css';
+
+
 const Eventos = () => {
   const [popupMode, setPopupMode] = useState(null);
   const [selectedEvento, setSelectedEvento] = useState(null);
@@ -29,7 +31,7 @@ const Eventos = () => {
   useEffect(() => {
     const fetchEventos = async () => {
       try {
-        const data = await eventoService.list();
+        const data = await eventoService.pendientes();
         setEventos(data);
       } catch (error) {
         console.error('❌ Error al obtener eventos:', error);

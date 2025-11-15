@@ -71,4 +71,3 @@ const ConfirmDeletePopup = ({ evento, onClose, onDeleted }) => {
 };
 
 export default ConfirmDeletePopup;
-

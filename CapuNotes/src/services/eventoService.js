@@ -33,10 +33,20 @@ export const eventoService = {
 
   //  Eliminar un evento (requiere tipoEvento en query param)
   remove: async (id, tipoEvento) => {
-    const res = await axios.delete(`${API_URL}/${id}`, {
-      params: { tipoEvento },
-    });
+    const url = `${API_URL}/${id}`;
+    const options = {};
+    if (tipoEvento) options.params = { tipoEvento };
+
+    console.log('🗑️ Eliminando evento — URL:', url, 'params:', options.params);
+    const res = await axios.delete(url, options);
     console.log("🗑️ Evento eliminado:", res.data);
+    return res.data;
+  },
+
+  // Listar eventos pendientes (ensayos + presentaciones pendientes)
+  pendientes: async () => {
+    const res = await axios.get(`${API_URL}/pendientes`);
+    console.log('📡 Eventos pendientes recibidos:', res.data);
     return res.data;
   },
 };
