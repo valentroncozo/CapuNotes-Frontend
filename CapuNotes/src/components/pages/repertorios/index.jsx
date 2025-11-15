@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { Eye, PencilSquare, Trash, CheckCircleFill } from "react-bootstrap-icons";
+import { Eye, CheckCircleFill } from "react-bootstrap-icons";
 
 import BackButton from "@/components/common/BackButton";
-import RepertorioModal from "./RepertorioModal";
 import RepertorioDetalleModal from "./RepertorioDetalleModal";
-import RepertorioStarIcon from "@/components/icons/RepertorioStarIcon";
+import StarIcon from "@/assets/StarIcon";
+import AddIcon from "@/assets/AddIcon";
+import EditIcon from "@/assets/EditIcon";
+import TrashIcon from "@/assets/TrashIcon";
 import { repertoriosService } from "@/services/repertoriosService";
 import { formatDate } from "@/components/common/datetime";
 
@@ -21,18 +23,12 @@ const sortCompare = {
 };
 
 export default function RepertoriosPage() {
+  const navigate = useNavigate();
   const [repertorios, setRepertorios] = useState([]);
-  const [catalogoCanciones, setCatalogoCanciones] = useState([]);
-  const [categorias, setCategorias] = useState([]);
-  const [tiempos, setTiempos] = useState([]);
   const [filtroTexto, setFiltroTexto] = useState("");
   const [sortField, setSortField] = useState("nombre");
   const [sortAsc, setSortAsc] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState("create");
-  const [editingRepertorio, setEditingRepertorio] = useState(null);
 
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailRepertorio, setDetailRepertorio] = useState(null);
@@ -54,43 +50,11 @@ export default function RepertoriosPage() {
     }
   };
 
-  const fetchCatalogos = async () => {
-    try {
-      const [cancionesRes, tiemposRes, categoriasRes] = await Promise.all([
-        axios.get("/api/canciones"),
-        axios.get("/api/tiempos-liturgicos"),
-        axios.get("/api/categorias-canciones"),
-      ]);
-
-      setCatalogoCanciones(Array.isArray(cancionesRes.data) ? cancionesRes.data : []);
-      setTiempos(
-        (Array.isArray(tiemposRes.data) ? tiemposRes.data : []).filter(
-          (tiempo) => tiempo.activo !== false
-        )
-      );
-      setCategorias(
-        (Array.isArray(categoriasRes.data) ? categoriasRes.data : []).filter(
-          (cat) => cat.activo !== false
-        )
-      );
-    } catch (error) {
-      console.error("❌ Error al cargar catálogos:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error al cargar catálogos",
-        text: error?.response?.data || "No se pudieron cargar los datos auxiliares.",
-        background: "#11103a",
-        color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
-      });
-    }
-  };
-
   useEffect(() => {
     const load = async () => {
       setIsLoading(true);
       try {
-        await Promise.all([fetchRepertorios(), fetchCatalogos()]);
+        await fetchRepertorios();
       } finally {
         setIsLoading(false);
       }
@@ -119,59 +83,12 @@ export default function RepertoriosPage() {
     return ordered;
   }, [filtroTexto, repertorios, sortField, sortAsc]);
 
-  const resetModal = () => {
-    setModalOpen(false);
-    setEditingRepertorio(null);
-  };
-
   const handleCreate = () => {
-    setModalMode("create");
-    setEditingRepertorio(null);
-    setModalOpen(true);
+    navigate("/repertorios/nuevo");
   };
 
   const handleEdit = (repertorio) => {
-    setModalMode("edit");
-    setEditingRepertorio(repertorio);
-    setModalOpen(true);
-  };
-
-  const handleModalSubmit = async (mode, payload) => {
-    try {
-      const action =
-        mode === "create"
-          ? repertoriosService.create(payload)
-          : repertoriosService.update(editingRepertorio?.id, payload);
-
-      await action;
-      await fetchRepertorios();
-      resetModal();
-
-      Swal.fire({
-        icon: "success",
-        title: "Repertorio guardado",
-        text:
-          mode === "create"
-            ? "Se creó el repertorio correctamente."
-            : "El repertorio fue actualizado.",
-        background: "#11103a",
-        color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-    } catch (error) {
-      console.error("❌ Error al guardar repertorio:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error?.response?.data || "No se pudo guardar el repertorio.",
-        background: "#11103a",
-        color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
-      });
-      return;
-    }
+    navigate(`/repertorios/${repertorio.id}/editar`);
   };
 
   const handleDelete = async (repertorio) => {
@@ -310,16 +227,15 @@ export default function RepertoriosPage() {
         <td>{formatDate(repo.fechaCreacion)}</td>
         <td>{formatDate(repo.fechaUltimoEnsayo) || "—"}</td>
         <td>{repo.cantidadCanciones ?? repo.canciones?.length ?? "—"}</td>
-        <td>
+        <td className="abmc-actions">
           <button
             type="button"
             className="abmc-btn abmc-btn-icon"
+            title={repo.favorito ? "Quitar de favoritos" : "Marcar como favorito"}
             onClick={() => handleToggleFavorito(repo)}
           >
-            <RepertorioStarIcon filled={repo.favorito} className="text-warning" />
+            <StarIcon filled={repo.favorito} color={repo.favorito ? "#ffffff" : "#E8EAED"} />
           </button>
-        </td>
-        <td className="abmc-actions">
           <button
             type="button"
             className="abmc-btn abmc-btn-icon"
@@ -334,7 +250,7 @@ export default function RepertoriosPage() {
             title="Editar"
             onClick={() => handleEdit(repo)}
           >
-            <PencilSquare size={18} />
+            <EditIcon width={18} height={18} />
           </button>
           <button
             type="button"
@@ -342,7 +258,7 @@ export default function RepertoriosPage() {
             title="Eliminar"
             onClick={() => handleDelete(repo)}
           >
-            <Trash size={18} />
+            <TrashIcon width={18} height={18} />
           </button>
           {!repo.activo && (
             <button
@@ -378,37 +294,37 @@ export default function RepertoriosPage() {
           <button
             type="button"
             className="abmc-btn abmc-btn-primary"
+            title="Nuevo repertorio"
             onClick={handleCreate}
           >
-            + Nuevo repertorio
+            <AddIcon width={20} height={20} fill="#fff" />
           </button>
         </div>
 
         <div className="table-wrapper">
-          <table className="abmc-table">
-            <thead>
+          <table className="abmc-table abmc-table-rect">
+            <thead className="abmc-thead">
               <tr>
                 <th>
-                  <button type="button" onClick={() => handleSort("nombre")}>
+                  <button type="button" className="abmc-sort-btn" onClick={() => handleSort("nombre")}>
                     Nombre {renderSortIndicator("nombre")}
                   </button>
                 </th>
                 <th>
-                  <button type="button" onClick={() => handleSort("fechaCreacion")}>
+                  <button type="button" className="abmc-sort-btn" onClick={() => handleSort("fechaCreacion")}>
                     Fecha creación {renderSortIndicator("fechaCreacion")}
                   </button>
                 </th>
                 <th>
-                  <button type="button" onClick={() => handleSort("fechaUltimoEnsayo")}>
+                  <button type="button" className="abmc-sort-btn" onClick={() => handleSort("fechaUltimoEnsayo")}>
                     Último ensayo {renderSortIndicator("fechaUltimoEnsayo")}
                   </button>
                 </th>
                 <th>
-                  <button type="button" onClick={() => handleSort("cantidadCanciones")}>
+                  <button type="button" className="abmc-sort-btn" onClick={() => handleSort("cantidadCanciones")}>
                     Cantidad canciones {renderSortIndicator("cantidadCanciones")}
                   </button>
                 </th>
-                <th>Favorito</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -416,17 +332,6 @@ export default function RepertoriosPage() {
           </table>
         </div>
       </div>
-
-      <RepertorioModal
-        isOpen={modalOpen}
-        onClose={resetModal}
-        onSubmit={handleModalSubmit}
-        mode={modalMode}
-        initialData={editingRepertorio}
-        availableSongs={catalogoCanciones}
-        categorias={categorias}
-        tiempos={tiempos}
-      />
 
       <RepertorioDetalleModal
         isOpen={detailOpen}

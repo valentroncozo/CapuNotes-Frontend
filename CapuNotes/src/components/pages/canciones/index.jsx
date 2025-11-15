@@ -1,10 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  Eye,
-  PencilSquare,
-  Trash,
-  CheckCircleFill,
-} from "react-bootstrap-icons";
+import { Eye, CheckCircleFill } from "react-bootstrap-icons";
 import Swal from "sweetalert2";
 
 import BackButton from "@/components/common/BackButton";
@@ -13,6 +8,9 @@ import CancionDetalleModal from "./CancionDetalleModal";
 import { cancionesService } from "@/services/cancionesService";
 import { categoriasCancionesService } from "@/services/categoriasCancionesService";
 import { tiemposLiturgicosService } from "@/services/tiemposLiturgicosService";
+import AddIcon from "@/assets/AddIcon";
+import EditIcon from "@/assets/EditIcon";
+import TrashIcon from "@/assets/TrashIcon";
 import "@/styles/abmc.css";
 
 export default function CancionesPage() {
@@ -268,9 +266,10 @@ export default function CancionesPage() {
           <button
             type="button"
             className="abmc-btn abmc-btn-primary"
+            title="Nueva canción"
             onClick={() => openModal("create")}
           >
-            + Nueva canción
+            <AddIcon width={20} height={20} fill="#fff" />
           </button>
         </div>
 
@@ -281,8 +280,7 @@ export default function CancionesPage() {
                 <th>Título</th>
                 <th>Categorías</th>
                 <th>Tiempos litúrgicos</th>
-                <th>Activo</th>
-                <th></th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -309,7 +307,6 @@ export default function CancionesPage() {
                     <td>{cancion.titulo || "—"}</td>
                     <td>{formatList(cancion.categoriasNombres)}</td>
                     <td>{formatList(cancion.tiemposLiturgicosNombres)}</td>
-                    <td>{cancion.activo ? "Activo" : "Inactivo"}</td>
                     <td className="abmc-actions">
                       <button
                         type="button"
@@ -325,7 +322,7 @@ export default function CancionesPage() {
                         title="Editar canción"
                         onClick={() => openModal("edit", cancion)}
                       >
-                        <PencilSquare />
+                        <EditIcon width={18} height={18} />
                       </button>
                       <button
                         type="button"
@@ -333,7 +330,7 @@ export default function CancionesPage() {
                         title="Eliminar canción"
                         onClick={() => confirmDelete(cancion)}
                       >
-                        <Trash />
+                        <TrashIcon width={18} height={18} />
                       </button>
                       {!cancion.activo && (
                         <button

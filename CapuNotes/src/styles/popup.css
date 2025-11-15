@@ -195,6 +195,15 @@ textarea.input::placeholder {
 .pop-footer .btn-secondary:active {
   filter: brightness(0.9);
 }
+
+/* compatibilidad botones ABMC dentro de modales */
+.pop-footer .abmc-btn.abmc-btn-secondary {
+  background-color: #9e9e9e !important;
+  color: #11103a !important;
+  border: none !important;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
 /* Quitar borde azul que rodea los botones del modal */
 .pop-footer .btn,
 .pop-footer .btn:focus,

@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
 import Modal from "@/components/common/Modal";
 import "@/styles/abmc.css";
+import "@/styles/canciones.css";
 
 export default function CancionModal({
   isOpen,
@@ -18,7 +19,6 @@ export default function CancionModal({
   const [arregloUrl, setArregloUrl] = useState("");
   const [selectedCategorias, setSelectedCategorias] = useState([]);
   const [selectedTiempos, setSelectedTiempos] = useState([]);
-  const [previewOpen, setPreviewOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -36,7 +36,6 @@ export default function CancionModal({
       setSelectedCategorias([]);
       setSelectedTiempos([]);
     }
-    setPreviewOpen(false);
   }, [initialData, isOpen, mode]);
 
   const toggleCategoria = (id) => {
@@ -56,8 +55,6 @@ export default function CancionModal({
       return [...prev, id];
     });
   };
-
-  const textoPreview = useMemo(() => letra || "", [letra]);
 
   const handleSave = async () => {
     if (!titulo.trim()) {
@@ -117,32 +114,32 @@ export default function CancionModal({
   };
 
   return (
-    <>
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-        title={mode === "create" ? "Nueva canción" : "Editar canción"}
-        actions={
-          <>
-            <button
-              type="button"
-              className="abmc-btn abmc-btn-secondary"
-              onClick={onClose}
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              className="abmc-btn abmc-btn-primary"
-              onClick={handleSave}
-              disabled={isSubmitting}
-            >
-              {mode === "create" ? "Crear" : "Guardar"}
-            </button>
-          </>
-        }
-      >
-        <div className="form-grid">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={mode === "create" ? "Nueva canción" : "Editar canción"}
+      actions={
+        <>
+          <button
+            type="button"
+            className="abmc-btn abmc-btn-secondary"
+            onClick={onClose}
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            className="abmc-btn abmc-btn-primary"
+            onClick={handleSave}
+            disabled={isSubmitting}
+          >
+            {mode === "create" ? "Crear" : "Guardar"}
+          </button>
+        </>
+      }
+    >
+      <div className="cancion-modal-body">
+        <div className="cancion-modal-scroll form-grid">
           <div className="field">
             <label htmlFor="titulo">Título</label>
             <input
@@ -158,7 +155,6 @@ export default function CancionModal({
             <textarea
               id="letra"
               className="abmc-input"
-              rows="5"
               value={letra}
               onChange={(e) => setLetra(e.target.value)}
               placeholder="Escribí la letra o pegala aquí"
@@ -176,26 +172,11 @@ export default function CancionModal({
           </div>
           <div className="field">
             <label>Categorías</label>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "0.5rem",
-                padding: "0.25rem 0",
-              }}
-            >
+            <div className="cancion-pill-list">
               {categorias.map((cat) => {
                 const checked = selectedCategorias.includes(cat.id);
                 return (
-                  <label
-                    key={`cat-${cat.id}`}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.25rem",
-                      fontSize: "0.9rem",
-                    }}
-                  >
+                  <label key={`cat-${cat.id}`}>
                     <input
                       type="checkbox"
                       checked={checked}
@@ -209,26 +190,11 @@ export default function CancionModal({
           </div>
           <div className="field">
             <label>Tiempos litúrgicos</label>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "0.5rem",
-                padding: "0.25rem 0",
-              }}
-            >
+            <div className="cancion-pill-list">
               {tiempos.map((tiempo) => {
                 const checked = selectedTiempos.includes(tiempo.id);
                 return (
-                  <label
-                    key={`tiempo-${tiempo.id}`}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.25rem",
-                      fontSize: "0.9rem",
-                    }}
-                  >
+                  <label key={`tiempo-${tiempo.id}`}>
                     <input
                       type="checkbox"
                       checked={checked}
@@ -240,47 +206,7 @@ export default function CancionModal({
               })}
             </div>
           </div>
-          <div className="field">
-            <button
-              type="button"
-              className="abmc-btn abmc-btn-secondary"
-              onClick={() => setPreviewOpen(true)}
-            >
-              Vista previa de letra
-            </button>
-          </div>
         </div>
-      </Modal>
-
-      <LetraPreviewModal
-        isOpen={previewOpen}
-        onClose={() => setPreviewOpen(false)}
-        letra={textoPreview}
-      />
-    </>
-  );
-}
-
-function LetraPreviewModal({ isOpen, onClose, letra }) {
-  return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Vista previa de la letra"
-      actions={
-        <>
-          <button
-            type="button"
-            className="abmc-btn abmc-btn-primary"
-            onClick={onClose}
-          >
-            Cerrar
-          </button>
-        </>
-      }
-    >
-      <div style={{ whiteSpace: "pre-line", minHeight: "120px" }}>
-        {letra || "No hay letra definida para previsualizar."}
       </div>
     </Modal>
   );
