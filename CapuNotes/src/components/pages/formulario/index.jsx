@@ -1,4 +1,3 @@
-// 1️⃣ Importaciones de librerías externas (React, dependencias NPM)
 import { useEffect, useState, useMemo } from 'react';
 import Swal from 'sweetalert2';
 import { InputMask } from '@react-input/mask';

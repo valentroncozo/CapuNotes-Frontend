@@ -13,32 +13,18 @@ import BackButton from '@/components/common/BackButton.jsx';
 import { cuerdasService } from '@/services/cuerdasService.js';
 import { areasService } from '@/services/areasService.js';
 import { miembrosService } from '@/services/miembrosService.js';
+import { InputMask } from '@react-input/mask';
 
-// ---- FUNCIONES PARA FORMATO DE FECHA ----
+// ---- VALIDAR FECHA dd/mm/aaaa IGUAL QUE index.jsx ----
+function validarEdadDDMMAAAA(fecha) {
+  if (!fecha.includes('/')) return false;
 
-// Convierte "dd/mm/yyyy" → "yyyy-mm-dd" (formato ISO del input type=date)
-const convertirAISO = (fecha) => {
-  if (!fecha || !fecha.includes('/')) return fecha;
   const [dia, mes, anio] = fecha.split('/');
-  return `${anio}-${mes}-${dia}`;
-};
-
-// Convierte "yyyy-mm-dd" → "dd/mm/yyyy" (formato para guardar y mostrar)
-const convertirAFormatoUsuario = (fechaISO) => {
-  if (!fechaISO || !fechaISO.includes('-')) return fechaISO;
-  const [anio, mes, dia] = fechaISO.split('-');
-  return `${dia}/${mes}/${anio}`;
-};
-
-// ---- VALIDAR EDAD ----
-const validarEdad = (fechaISO) => {
-  if (!fechaISO) return true;
-
-  const [anio, mes, dia] = fechaISO.split('-');
   const nacimiento = new Date(anio, mes - 1, dia);
   const hoy = new Date();
 
   let edad = hoy.getFullYear() - nacimiento.getFullYear();
+
   const cumpleEsteAño =
     hoy.getMonth() > nacimiento.getMonth() ||
     (hoy.getMonth() === nacimiento.getMonth() &&
@@ -46,22 +32,8 @@ const validarEdad = (fechaISO) => {
 
   if (!cumpleEsteAño) edad -= 1;
 
-  if (edad < 17) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Edad no válida',
-      text: 'El miembro debe tener al menos 17 años.',
-      confirmButtonText: 'Aceptar',
-      customClass: { confirmButton: 'abmc-btn btn-primary' },
-      buttonsStyling: false,
-      background: '#11103a',
-      color: '#E8EAED',
-    });
-    return false;
-  }
-
-  return true;
-};
+  return edad >= 17;
+}
 
 export default function MiembrosEditar({ title = 'Editar miembro' }) {
   const navigate = useNavigate();
@@ -286,13 +258,50 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
           <div className="form-row-miembros">
             <div className="mitad">
               <label>Fecha de Nacimiento</label>
-              <Form.Control
-                type="date"
-                name="fechaNacimiento"
-                value={miembro.fechaNacimiento}
-                onChange={handleChange}
-                className="abmc-input"
-              />
+
+              <div className="abmc-input-wrapper">
+                <InputMask
+                  mask="DD/DD/DDDD"
+                  replacement={{
+                    D: /\d/,
+                    // cada D solo permite dígitos
+                  }}
+                  value={miembro.fechaNacimiento}
+                  placeholder="dd/mm/aaaa"
+                  className="abmc-input"
+                  onChange={(e) => {
+                    const fecha = e.target.value;
+
+                    setMiembro((prev) => ({
+                      ...prev,
+                      fechaNacimiento: fecha,
+                    }));
+
+                    // solo validar cuando está completo:
+                    if (fecha.length === 10) {
+                      if (!validarEdadDDMMAAAA(fecha)) {
+                        Swal.fire({
+                          icon: 'warning',
+                          title: 'Edad no válida',
+                          text: 'El miembro debe tener al menos 17 años.',
+                          confirmButtonText: 'Aceptar',
+                          customClass: {
+                            confirmButton: 'abmc-btn btn-primary',
+                          },
+                          buttonsStyling: false,
+                          background: '#11103a',
+                          color: '#E8EAED',
+                        });
+
+                        setMiembro((prev) => ({
+                          ...prev,
+                          fechaNacimiento: '',
+                        }));
+                      }
+                    }
+                  }}
+                />
+              </div>
             </div>
 
             <div className="mitad">
