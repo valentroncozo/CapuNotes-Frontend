@@ -1,36 +1,42 @@
-import { useState, useEffect } from "react";
-import { Button, Container, Form } from "react-bootstrap";
-import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
-import "@/styles/miembros.css";
-import "@/styles/abmc.css";
-import BackButton from "@/components/common/BackButton.jsx";
-import { cuerdasService } from "@/services/cuerdasService.js";
-import { areasService } from "@/services/areasService.js";
-import { miembrosService } from "@/services/miembrosService.js";
+import {
+  GeoapifyGeocoderAutocomplete,
+  GeoapifyContext,
+} from '@geoapify/react-geocoder-autocomplete';
+import '@geoapify/geocoder-autocomplete/styles/minimal.css';
+import { useState, useEffect } from 'react';
+import { Button, Container, Form } from 'react-bootstrap';
+import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+import '@/styles/miembros.css';
+import '@/styles/abmc.css';
+import BackButton from '@/components/common/BackButton.jsx';
+import { cuerdasService } from '@/services/cuerdasService.js';
+import { areasService } from '@/services/areasService.js';
+import { miembrosService } from '@/services/miembrosService.js';
 
-export default function MiembrosAgregar({ title = "Registro de miembro" }) {
+export default function MiembrosAgregar({ title = 'Registro de miembro' }) {
   const navigate = useNavigate();
 
   const empty = {
-    nombre: "",
-    apellido: "",
-    tipoDocumento: "",
-    numeroDocumento: "",
-    fechaNacimiento: "",
-    telefono: "",
-    correo: "",
-    carreraProfesion: "",
-    lugarOrigen: "",
-    instrumentoMusical: "",
-    cuerda: "",
-    area: "",
+    nombre: '',
+    apellido: '',
+    tipoDocumento: '',
+    numeroDocumento: '',
+    fechaNacimiento: '',
+    telefono: '',
+    correo: '',
+    carreraProfesion: '',
+    lugarOrigen: '',
+    instrumentoMusical: '',
+    cuerda: '',
+    area: '',
   };
 
   const [miembro, setMiembro] = useState(empty);
   const [errores, setErrores] = useState({});
   const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
   const [areasDisponibles, setAreasDisponibles] = useState([]);
+  const [lugarOrigenInput, setLugarOrigenInput] = useState('');
 
   // 🔹 Cargar cuerdas y áreas
   useEffect(() => {
@@ -43,13 +49,13 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
         setCuerdasDisponibles(cuerdas);
         setAreasDisponibles(areas);
       } catch (error) {
-        console.error("Error cargando cuerdas o áreas:", error);
+        console.error('Error cargando cuerdas o áreas:', error);
         Swal.fire({
-          icon: "error",
-          title: "Error al cargar datos",
-          text: "No se pudieron cargar las cuerdas o áreas.",
-          background: "#11103a",
-          color: "#E8EAED",
+          icon: 'error',
+          title: 'Error al cargar datos',
+          text: 'No se pudieron cargar las cuerdas o áreas.',
+          background: '#11103a',
+          color: '#E8EAED',
         });
       }
     };
@@ -60,22 +66,22 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setMiembro((prev) => ({ ...prev, [name]: value }));
-    setErrores((prev) => ({ ...prev, [name]: "" }));
+    setErrores((prev) => ({ ...prev, [name]: '' }));
   };
 
   // 🔹 Validación antes de enviar
   const validarCampos = () => {
     const camposRequeridos = [
-      "nombre",
-      "apellido",
-      "tipoDocumento",
-      "numeroDocumento",
-      "cuerda",
+      'nombre',
+      'apellido',
+      'tipoDocumento',
+      'numeroDocumento',
+      'cuerda',
     ];
     const nuevosErrores = {};
     camposRequeridos.forEach((campo) => {
-      if (!miembro[campo] || String(miembro[campo]).trim() === "") {
-        nuevosErrores[campo] = "Campo obligatorio";
+      if (!miembro[campo] || String(miembro[campo]).trim() === '') {
+        nuevosErrores[campo] = 'Campo obligatorio';
       }
     });
     setErrores(nuevosErrores);
@@ -87,12 +93,12 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
     e.preventDefault();
     if (!validarCampos()) {
       Swal.fire({
-        icon: "warning",
-        title: "Campos incompletos",
-        text: "Por favor completá todos los campos obligatorios marcados en amarillo.",
-        background: "#11103a",
-        color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: 'Por favor completá todos los campos obligatorios marcados en amarillo.',
+        background: '#11103a',
+        color: '#E8EAED',
+        confirmButtonColor: '#7c83ff',
       });
       return;
     }
@@ -119,25 +125,25 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
       await miembrosService.create(payload);
 
       Swal.fire({
-        icon: "success",
-        title: "Miembro registrado",
+        icon: 'success',
+        title: 'Miembro registrado',
         text: `Se registró ${miembro.nombre} correctamente.`,
         timer: 1600,
         showConfirmButton: false,
-        background: "#11103a",
-        color: "#E8EAED",
+        background: '#11103a',
+        color: '#E8EAED',
       });
 
       setMiembro(empty);
-      navigate("/miembros");
+      navigate('/miembros');
     } catch (error) {
-      console.error("Error registrando miembro:", error);
+      console.error('Error registrando miembro:', error);
       Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo registrar el miembro. Verificá los datos.",
-        background: "#11103a",
-        color: "#E8EAED",
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo registrar el miembro. Verificá los datos.',
+        background: '#11103a',
+        color: '#E8EAED',
       });
     }
   };
@@ -148,7 +154,10 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
         <div className="abmc-header">
           <BackButton />
           <h1 className="abmc-title">{title}</h1>
-          <p className="aviso-obligatorios">Los campos marcados con <span className="required">*</span> son obligatorios.</p>
+          <p className="aviso-obligatorios">
+            Los campos marcados con <span className="required">*</span> son
+            obligatorios.
+          </p>
         </div>
 
         <Form onSubmit={handleSubmit} className="abmc-topbar">
@@ -163,7 +172,7 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
               placeholder="Ej: Juan"
               value={miembro.nombre}
               onChange={handleChange}
-              className={`abmc-input ${errores.nombre ? "error" : ""}`}
+              className={`abmc-input ${errores.nombre ? 'error' : ''}`}
             />
           </Form.Group>
 
@@ -178,7 +187,7 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
               placeholder="Ej: Pérez"
               value={miembro.apellido}
               onChange={handleChange}
-              className={`abmc-input ${errores.apellido ? "error" : ""}`}
+              className={`abmc-input ${errores.apellido ? 'error' : ''}`}
             />
           </Form.Group>
 
@@ -192,8 +201,10 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
                 name="tipoDocumento"
                 value={miembro.tipoDocumento}
                 onChange={handleChange}
-                className={`abmc-select visible-dropdown ${errores.tipoDocumento ? "error" : ""}`}>
-
+                className={`abmc-select visible-dropdown ${
+                  errores.tipoDocumento ? 'error' : ''
+                }`}
+              >
                 <option value="">Seleccionar tipo</option>
                 <option value="DNI">DNI</option>
                 <option value="Pasaporte">Pasaporte</option>
@@ -211,7 +222,9 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
                 placeholder="Ej: 40123456"
                 value={miembro.numeroDocumento}
                 onChange={handleChange}
-                className={`abmc-input ${errores.numeroDocumento ? "error" : ""}`}
+                className={`abmc-input ${
+                  errores.numeroDocumento ? 'error' : ''
+                }`}
               />
             </div>
           </div>
@@ -231,14 +244,29 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
 
             <div className="mitad">
               <label>Lugar de Origen</label>
-              <Form.Control
-                type="text"
-                name="lugarOrigen"
-                placeholder="Ej: Córdoba"
-                value={miembro.lugarOrigen}
-                onChange={handleChange}
-                className="abmc-input"
-              />
+
+              <GeoapifyContext apiKey="27d4d3c8bf5147f3ae4cd2f98a44009a">
+                <GeoapifyGeocoderAutocomplete
+                  placeholder="Ej: Córdoba, Argentina"
+                  value={miembro.lugarOrigen}
+                  type="city"
+                  lang="es"
+                  limit={8}
+                  onChange={(value) => {
+                    if (value) {
+                      setMiembro((prev) => ({
+                        ...prev,
+                        lugarOrigen: value.formatted,
+                      }));
+                    }
+                  }}
+                  onSuggestionChange={(value) => {
+                    if (!value) return;
+                    setLugarOrigenInput(value.formatted);
+                  }}
+                  className="abmc-input geoapify-wrapper"
+                />
+              </GeoapifyContext>
             </div>
           </div>
 
@@ -296,7 +324,6 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
             </div>
           </div>
 
-
           {/* Cuerda y Área */}
           <div className="form-row-cuerda-area">
             <div className="mitad">
@@ -308,12 +335,12 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
                   name="cuerda"
                   value={miembro.cuerda}
                   onChange={handleChange}
-                  className={`abmc-select ${errores.cuerda ? "error" : ""}`}
+                  className={`abmc-select ${errores.cuerda ? 'error' : ''}`}
                 >
                   <option value="">Seleccionar cuerda</option>
                   {cuerdasDisponibles.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.nombre || c.name || c.descripcion || "—"}
+                      {c.nombre || c.name || c.descripcion || '—'}
                     </option>
                   ))}
                 </select>
@@ -321,15 +348,22 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
                 <Button
                   variant="warning"
                   className="abmc-btn"
-                  onClick={() => navigate("/cuerdas")}
+                  onClick={() => navigate('/cuerdas')}
                   title="Gestionar cuerdas"
                   type="button"
                 >
-                  +
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#e3e3e3"
+                  >
+                    <path d="M440-120v-320H120v-80h320v-320h80v320h320v80H520v320h-80Z" />
+                  </svg>
                 </Button>
               </div>
             </div>
-
 
             <div className="mitad">
               <label>Área</label>
@@ -351,7 +385,7 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
                 <Button
                   variant="warning"
                   className="abmc-btn"
-                  onClick={() => navigate("/areas")}
+                  onClick={() => navigate('/areas')}
                   title="Gestionar áreas"
                   type="button"
                 >
@@ -366,19 +400,16 @@ export default function MiembrosAgregar({ title = "Registro de miembro" }) {
             <button
               type="button"
               className="abmc-btn abmc-btn-secondary"
-              onClick={() => navigate("/miembros")}
+              onClick={() => navigate('/miembros')}
             >
               Cancelar
             </button>
-            <button
-              type="submit"
-              className="abmc-btn abmc-btn-primary"
-            >
+            <button type="submit" className="abmc-btn abmc-btn-primary">
               Agregar miembro
             </button>
           </div>
         </Form>
-      </div >
-    </main >
+      </div>
+    </main>
   );
 }
