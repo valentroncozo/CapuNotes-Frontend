@@ -136,20 +136,26 @@ export function AuthProvider({ children }) {
         
         if (!xsrf) {
             console.warn("⚠️ XSRF-TOKEN no encontrada en cookies, llamando /api/auth/csrf...");
-            const csrfResponse = await apiClient.get("/api/auth/csrf");
-            console.log("📦 CSRF response:", csrfResponse);
-            console.log("🍪 Cookies después de /api/auth/csrf:", document.cookie);
-          xsrf = getCookie("XSRF-TOKEN");
-          
-          // Si TODAVÍA no está en cookies, intentar extraerla de la respuesta
-          if (!xsrf && csrfResponse && csrfResponse.token) {
-            xsrf = csrfResponse.token;
-            console.log("✅ XSRF-TOKEN obtenida desde respuesta de /api/auth/csrf:", xsrf);
-          } else if (xsrf) {
-            console.log("✅ XSRF-TOKEN obtenida desde cookies después de /api/auth/csrf:", xsrf);
-          } else {
-            console.error("❌ XSRF-TOKEN no disponible ni en cookies ni en respuesta");
-          }
+            try {
+              const csrfResponse = await apiClient.get("/api/auth/csrf");
+              console.log("📦 CSRF response:", csrfResponse);
+              console.log("🍪 Cookies después de /api/auth/csrf:", document.cookie);
+              xsrf = getCookie("XSRF-TOKEN");
+
+              // Si TODAVÍA no está en cookies, intentar extraerla de la respuesta
+              if (!xsrf && csrfResponse && csrfResponse.token) {
+                xsrf = csrfResponse.token;
+                console.log("✅ XSRF-TOKEN obtenida desde respuesta de /api/auth/csrf:", xsrf);
+              } else if (xsrf) {
+                console.log("✅ XSRF-TOKEN obtenida desde cookies después de /api/auth/csrf:", xsrf);
+              } else {
+                console.error("❌ XSRF-TOKEN no disponible ni en cookies ni en respuesta");
+              }
+            } catch (csrfErr) {
+              const status = csrfErr?.response?.status;
+              console.error("❌ Error obteniendo /api/auth/csrf", { status, message: csrfErr?.message });
+              // continuar con el flujo: algunos backends no exponen este endpoint
+            }
         } else {
           console.log("✅ XSRF-TOKEN presente en cookies después del login:", xsrf);
         }

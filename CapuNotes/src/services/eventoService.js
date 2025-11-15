@@ -14,9 +14,9 @@ export const eventoService = {
   },
   // Listar pendientes
   listPendientes: async (filtros = {}) => {
-    const res = await axios.get(`${API_URL}/pendientes`, { params: filtros });
-    console.log("📡 Eventos recibidos:", res.data);
-    return res.data;
+    const data = await apiClient.get(`${API_URL}/pendientes`, { params: filtros });
+    console.log("📡 Eventos recibidos:", data);
+    return data;
   },
 
   // Obtener un evento por ID
