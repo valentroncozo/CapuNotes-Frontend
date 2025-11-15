@@ -38,12 +38,13 @@ function GearIcon(props) {
   );
 }
 
-const MENU_ITEMS = [
+const MENU_MAIN = [
   ['/asistencias', 'Asistencias'],
   ['/canciones', 'Canciones'],
   ['/eventos', 'Eventos'],
-  ['/usuarios-roles', 'Usuarios y roles'],
 ];
+
+const MENU_USERS = ['/usuarios-roles', 'Usuarios y roles'];
 
 export default function AppShell({ onLogout }) {
   const navigate = useNavigate();
@@ -173,53 +174,19 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         Inicio
       </a>
 
-      <div className="appshell-accordion-outer">
-        <button
-          className={`appshell-accordion-trigger ${orgOpen ? 'open' : ''}`}
-          onClick={() => setOrgOpen((v) => !v)}
-          aria-expanded={orgOpen}
+      {MENU_MAIN.map(([to, label]) => (
+        <a
+          key={to}
+          href={to}
+          onClick={(e) => {
+            e.preventDefault();
+            onNavigate(to);
+          }}
+          className="nav-link"
         >
-          Organización del Coro
-          <span className="appshell-accordion-caret">
-            {orgOpen ? '▴' : '▾'}
-          </span>
-        </button>
-
-        {orgOpen && (
-          <div className="appshell-accordion-content">
-            <a
-              href="/cuerdas"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/cuerdas');
-              }}
-            >
-              Cuerdas
-            </a>
-            <a
-              href="/areas"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/areas');
-              }}
-            >
-              Áreas
-            </a>
-            <a
-              href="/miembros"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/miembros');
-              }}
-            >
-              Miembros
-            </a>
-          </div>
-        )}
-      </div>
+          {label}
+        </a>
+      ))}
 
       <div className="appshell-accordion-outer">
         <button
@@ -289,19 +256,64 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         )}
       </div>
 
-      {MENU_ITEMS.map(([to, label]) => (
-        <a
-          key={to}
-          href={to}
-          onClick={(e) => {
-            e.preventDefault();
-            onNavigate(to);
-          }}
-          className="nav-link"
+      <div className="appshell-accordion-outer">
+        <button
+          className={`appshell-accordion-trigger ${orgOpen ? 'open' : ''}`}
+          onClick={() => setOrgOpen((v) => !v)}
+          aria-expanded={orgOpen}
         >
-          {label}
-        </a>
-      ))}
+          Organización del Coro
+          <span className="appshell-accordion-caret">
+            {orgOpen ? '▴' : '▾'}
+          </span>
+        </button>
+
+        {orgOpen && (
+          <div className="appshell-accordion-content">
+            <a
+              href="/cuerdas"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/cuerdas');
+              }}
+            >
+              Cuerdas
+            </a>
+            <a
+              href="/areas"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/areas');
+              }}
+            >
+              Áreas
+            </a>
+            <a
+              href="/miembros"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/miembros');
+              }}
+            >
+              Miembros
+            </a>
+          </div>
+        )}
+      </div>
+
+      <a
+        href={MENU_USERS[0]}
+        onClick={(e) => {
+          e.preventDefault();
+          onNavigate(MENU_USERS[0]);
+        }}
+        className="nav-link"
+      >
+        {MENU_USERS[1]}
+      </a>
     </div>
   );
 }
