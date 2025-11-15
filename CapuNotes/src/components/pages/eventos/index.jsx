@@ -219,7 +219,7 @@ const Eventos = () => {
                   await eventoService.update(selectedEvento.id, nuevoEvento);
                 }
 
-                const data = await eventoService.list();
+                const data = await eventoService.listPendientes();
                 setEventos(data);
 
                 // Mostrar confirmación visual al usuario
