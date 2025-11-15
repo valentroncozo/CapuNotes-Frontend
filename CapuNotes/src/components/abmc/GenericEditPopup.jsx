@@ -95,6 +95,18 @@ export default function GenericEditPopup({
                     );
                   })}
                 </select>
+              ) : f.type === "textarea" || f.key === "descripcion" ? (
+                <textarea
+                  id={`field-${f.key}`}
+                  name={f.key}
+                  className="input"
+                  value={form[f.key] || ""}
+                  onChange={onChange}
+                  maxLength={f.max}
+                  placeholder={f.label}
+                  rows={5}
+                  style={{ width: "100%", minHeight: 120, resize: "vertical" }}
+                />
               ) : (
                 <input
                   id={`field-${f.key}`}

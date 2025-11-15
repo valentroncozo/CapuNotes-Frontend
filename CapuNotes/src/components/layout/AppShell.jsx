@@ -1,7 +1,10 @@
 // src/components/layout/AppShell.jsx
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import '@/styles/offcanvas.css';
+import { Outlet, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import "@/styles/offcanvas.css";
+
+// agregar import del contexto
+import { useAuth } from "@/context/AuthContext.jsx";
 
 /* Ícono de cierre (X) */
 function CloseIcon(props) {
@@ -38,13 +41,14 @@ function GearIcon(props) {
   );
 }
 
-const MENU_MAIN = [
-  ['/asistencias', 'Asistencias'],
-  ['/canciones', 'Canciones'],
-  ['/eventos', 'Eventos'],
+const MENU_ITEMS = [
+  ["/asistencias", "Asistencias"],
+  ["/audicion", "Audiciones"],
+  ["/canciones", "Canciones"],
+  ["/eventos", "Eventos"],
+  ["/fraternidades", "Fraternidades"],
+  ["/usuarios-roles", "Usuarios y roles"],
 ];
-
-const MENU_USERS = ['/usuarios-roles', 'Usuarios y roles'];
 
 export default function AppShell({ onLogout }) {
   const navigate = useNavigate();
@@ -52,6 +56,9 @@ export default function AppShell({ onLogout }) {
   const [orgOpen, setOrgOpen] = useState(false);
   const [audOpen, setAudOpen] = useState(false);
   const [gearOpen, setGearOpen] = useState(false);
+
+  // obtener logout desde contexto
+  const { logout } = useAuth();
 
   useEffect(() => {
     const onKey = (e) => {
@@ -61,19 +68,21 @@ export default function AppShell({ onLogout }) {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  useEffect(() => {
-    if (!open) setGearOpen(false);
-  }, [open]);
+  useEffect(() => { if (!open) setGearOpen(false); }, [open]);
 
   const handleNavigate = (to) => {
     setOpen(false);
     navigate(to);
   };
 
-  const handleLogout = () => {
+  // usar logout del contexto
+  const handleLogout = async () => {
     setOpen(false);
-    onLogout?.();
-    navigate('/login');
+    try {
+      await logout();
+    } finally {
+      navigate("/login");
+    }
   };
 
   return (
@@ -174,88 +183,6 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         Inicio
       </a>
 
-      {MENU_MAIN.map(([to, label]) => (
-        <a
-          key={to}
-          href={to}
-          onClick={(e) => {
-            e.preventDefault();
-            onNavigate(to);
-          }}
-          className="nav-link"
-        >
-          {label}
-        </a>
-      ))}
-
-      <div className="appshell-accordion-outer">
-        <button
-          className={`appshell-accordion-trigger ${audOpen ? 'open' : ''}`}
-          onClick={() => setAudOpen((v) => !v)}
-          aria-expanded={audOpen}
-        >
-          Audiciones
-          <span className="appshell-accordion-caret">
-            {audOpen ? '▴' : '▾'}
-          </span>
-        </button>
-
-        {audOpen && (
-          <div className="appshell-accordion-content">
-            <a
-              href="/audicion"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/audicion');
-              }}
-            >
-              Audición
-            </a>
-            <a
-              href="/candidatos"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('audicion/candidatos');
-              }}
-            >
-              Candidatos
-            </a>
-            <a
-              href="/candidatos-coordinadores"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/candidatos-administracion');
-              }}
-            >
-              Candidatos (Administración)
-            </a>
-            <a
-              href="/candidatos/historial"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/audicion/historial');
-              }}
-            >
-              Historial Candidatos
-            </a>
-            <a
-              href="/cuestionario/configuracion"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/cuestionario/configuracion');
-              }}
-            >
-              Configurar Cuestionario
-            </a>
-          </div>
-        )}
-      </div>
-
       <div className="appshell-accordion-outer">
         <button
           className={`appshell-accordion-trigger ${orgOpen ? 'open' : ''}`}
@@ -304,16 +231,70 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
         )}
       </div>
 
-      <a
-        href={MENU_USERS[0]}
-        onClick={(e) => {
-          e.preventDefault();
-          onNavigate(MENU_USERS[0]);
-        }}
-        className="nav-link"
-      >
-        {MENU_USERS[1]}
-      </a>
+      <div className="appshell-accordion-outer">
+        <button
+          className={`appshell-accordion-trigger ${audOpen ? "open" : ""}`}
+          onClick={() => setAudOpen((v) => !v)}
+          aria-expanded={audOpen}
+        >
+          Audiciones
+          <span className="appshell-accordion-caret">{audOpen ? "▴" : "▾"}</span>
+        </button>
+
+        {audOpen && (
+          <div className="appshell-accordion-content">
+            <a
+              href="/audicion"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/audicion"); }}
+            >
+              Audición
+            </a>
+            <a
+              href="/candidatos"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("audicion/candidatos"); }}
+            >
+              Candidatos
+            </a>
+            <a
+              href="/candidatos-coordinadores"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/candidatos-administracion"); }}
+            >
+              Candidatos (Administración)
+            </a>
+            <a
+              href="/candidatos/historial"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/historial"); }}
+            >
+              Historial Candidatos
+            </a>
+            <a
+              href="/cuestionario/configuracion"
+              className="nav-link"
+              onClick={(e) => { e.preventDefault(); onNavigate("/cuestionario/configuracion"); }}
+            >
+              Configurar Cuestionario
+            </a>
+          </div>
+        )}
+      </div>
+
+      {MENU_ITEMS.map(([to, label]) => (
+        <a
+          key={to}
+          href={to}
+          onClick={(e) => {
+            e.preventDefault();
+            onNavigate(to);
+          }}
+          className="nav-link"
+        >
+          {label}
+        </a>
+      ))}
     </div>
   );
 }
