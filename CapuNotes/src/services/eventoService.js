@@ -12,6 +12,12 @@ export const eventoService = {
     console.log("📡 Eventos recibidos:", data);
     return data;
   },
+  // Listar pendientes
+  listPendientes: async (filtros = {}) => {
+    const res = await axios.get(`${API_URL}/pendientes`, { params: filtros });
+    console.log("📡 Eventos recibidos:", res.data);
+    return res.data;
+  },
 
   // Obtener un evento por ID
   getById: async (id) => {
@@ -39,4 +45,6 @@ export const eventoService = {
     console.log("🗑️ Evento eliminado:", data);
     return data;
   },
+
+  
 };

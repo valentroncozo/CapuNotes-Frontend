@@ -5,56 +5,69 @@ import "@/styles/popup.css";
 import { eventoService } from "@/services/eventoService.js"; // 👈 corregido
 
 const ConfirmDeletePopup = ({ evento, onClose, onDeleted }) => {
-  const handleConfirm = async () => {
-    try {
-      await eventoService.remove(evento.id, evento.tipoEvento);
+  // Al montarse, mostramos SweetAlert en lugar de un popup manual
+  React.useEffect(() => {
+    let mounted = true;
 
-      Swal.fire({
-        icon: "success",
-        title: "Evento cancelado",
-        text: `El evento "${evento.nombre || "sin nombre"}" fue cancelado correctamente.`,
-        timer: 1600,
-        showConfirmButton: false,
-        background: "#11103a",
-        color: "#E8EAED",
+    const doConfirm = async () => {
+      const res = await Swal.fire({
+        title: `¿Cancelar evento "${evento?.nombre || 'sin nombre'}"?`,
+        text: 'Esta acción cancelará el evento y no se puede deshacer.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ffc107',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, cancelar',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true,
+        background: '#11103a',
+        color: '#E8EAED',
       });
 
-      onDeleted?.(evento.id);
-      onClose();
-    } catch (error) {
-      console.error("❌ Error al cancelar evento:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo cancelar el evento.",
-        background: "#11103a",
-        color: "#E8EAED",
-      });
-    }
-  };
+      if (!mounted) return;
 
-  return (
-    <div className="popup-overlay">
-      <div className="popup-container">
-        <header className="abmc-header">
-          <div className="abmc-title">
-            <h1>¿Estás seguro de cancelar este evento?</h1>
-          </div>
-        </header>
+      if (!res.isConfirmed) {
+        onClose?.();
+        return;
+      }
 
-        <hr className="divisor-amarillo" />
+      try {
+        await eventoService.remove(evento.id, evento.tipoEvento);
 
-        <div className="popup-actions">
-          <button type="button" className="btn-primary" onClick={onClose}>
-            Cancelar
-          </button>
-          <button type="button" className="btn-primary" onClick={handleConfirm}>
-            Aceptar
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+        await Swal.fire({
+          icon: 'success',
+          title: 'Evento cancelado',
+          text: `El evento "${evento?.nombre || 'sin nombre'}" fue cancelado correctamente.`,
+          timer: 1400,
+          showConfirmButton: false,
+          background: '#11103a',
+          color: '#E8EAED',
+        });
+
+        onDeleted?.(evento.id);
+        onClose?.();
+      } catch (error) {
+        console.error('❌ Error al cancelar evento:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error?.response?.data || 'No se pudo cancelar el evento.',
+          background: '#11103a',
+          color: '#E8EAED',
+        });
+        onClose?.();
+      }
+    };
+
+    doConfirm();
+
+    return () => {
+      mounted = false;
+    };
+  }, [evento, onClose, onDeleted]);
+
+  // No renderizamos markup propio; SweetAlert se encarga del UI
+  return null;
 };
 
 export default ConfirmDeletePopup;

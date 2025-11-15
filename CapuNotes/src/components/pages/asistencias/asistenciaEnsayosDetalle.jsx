@@ -113,7 +113,7 @@ export default function AsistenciaEnsayosDetalle() {
   }, [idEnsayo]);
 
   // ============================================================
-  // 🔹 Filtros
+  //  Filtros
   // ============================================================
   const cuerdaOptions = useMemo(() => {
     return [{ id: "todas", name: "Todas las cuerdas" }, ...cuerdas];
@@ -122,7 +122,7 @@ export default function AsistenciaEnsayosDetalle() {
   const filteredMembers = useMemo(() => {
     const name = filterName.trim().toLowerCase();
     return members.filter((m) => {
-      // 🎵 Filtrar por cuerda (por id)
+      // Filtrar por cuerda (por id)
       if (filterCuerda !== "todas" && m.cuerdaId?.toString() !== filterCuerda) {
         return false;
       }
@@ -133,7 +133,7 @@ export default function AsistenciaEnsayosDetalle() {
   }, [members, filterName, filterCuerda]);
 
   // ============================================================
-  // 🔹 Cambiar estado local de asistencia
+  // Cambiar estado local de asistencia
   // ============================================================
   const handleSetAsistencia = (uid, value) => {
     if (ensayoInfo.estadoAsistencia === "CERRADA") return;
@@ -143,7 +143,7 @@ export default function AsistenciaEnsayosDetalle() {
   };
 
   // ============================================================
-  // 🔹 Guardar (y opcionalmente cerrar)
+  // Guardar (y opcionalmente cerrar)
   // ============================================================
   const handleGuardar = async (cerrar = false) => {
     setSaving(true);
@@ -190,7 +190,7 @@ export default function AsistenciaEnsayosDetalle() {
   };
 
   // ============================================================
-  // 🔹 Render
+  //  Render
   // ============================================================
   if (loading) return <Loader />;
 
@@ -243,7 +243,7 @@ export default function AsistenciaEnsayosDetalle() {
             style={{
               backgroundColor:
                 ensayoInfo.estadoAsistencia === "CERRADA"
-                  ? "#D32F2F"
+                  ? "#FF6B6B"
                   : ensayoInfo.estadoAsistencia === "ABIERTA"
                     ? "#1FA453"
                     : "#b6b4b4ff",

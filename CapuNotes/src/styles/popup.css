@@ -211,6 +211,25 @@ textarea.input::placeholder {
   padding: 0 18px;
 }
 
+/* Evitar doble línea en los popups: desactivar el pseudo-elemento global
+   solo cuando el header está dentro de un popup. Mantener el <hr>
+   .divisor-amarillo> como la única línea. */
+.popup-container .abmc-header::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Reducir el espacio entre título y la línea dentro de popups */
+.popup-container .abmc-header {
+  margin-bottom: 6px !important;
+}
+
+.popup-container .abmc-title h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: translateY(2px);
+}
+
 /* Ajustes estéticos opcionales */
 .divisor-amarillo {
   margin: 0;
@@ -233,4 +252,11 @@ select[name='tipoEvento'] option {
 select[name='tipoEvento']:focus {
   border-color: var(--card);
   box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25);
+}
+
+.pop-body {
+  padding: 18px;
+  width: 100%;
+  max-height: 65vh;     /* 🔥 límite de altura visible */
+  overflow-y: auto;     /* 🔥 habilita scroll interno */
 }

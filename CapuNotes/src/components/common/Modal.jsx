@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import "@/styles/popup.css";
 
-export default function Modal({ isOpen, onClose, title, children, actions }) {
+export default function Modal({ isOpen, onClose, title, children, actions, className }) {
   const dialogRef = useRef(null);
   const onCloseRef = useRef(onClose);
 
@@ -29,13 +29,14 @@ export default function Modal({ isOpen, onClose, title, children, actions }) {
   return (
     <div className="pop-backdrop" onMouseDown={onBackdrop}>
       <div
-        className="pop-dialog"
+        className={`pop-dialog ${className || ""}`}   // ⭐ acá añadimos className
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
         tabIndex={-1}
         ref={dialogRef}
       >
+
         <header className="pop-header">
           <h3 id="modal-title" className="pop-title">{title}</h3>
           <button className="icon-btn" aria-label="Cerrar" onClick={onClose}>✕</button>

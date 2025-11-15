@@ -22,7 +22,7 @@ export default function AsistenciaEnsayos() {
   const navigate = useNavigate();
 
   // ===============================================================
-  // 🔹 Cargar lista de ensayos
+  // Cargar lista de ensayos
   // ===============================================================
   useEffect(() => {
     const fetchEnsayos = async () => {
@@ -46,7 +46,7 @@ export default function AsistenciaEnsayos() {
           };
         });
 
-        // 🔹 Ordenar: próximos primero (por fecha), luego pasados
+        // Ordenar: próximos primero (por fecha), luego pasados
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
 
@@ -77,7 +77,7 @@ export default function AsistenciaEnsayos() {
   }, []);
 
   // ===============================================================
-  // 🔹 Filtrar por mes / año / estado
+  // Filtrar por mes / año / estado
   // ===============================================================
   const filtered = useMemo(() => {
     return rows.filter((r) => {
@@ -98,7 +98,7 @@ export default function AsistenciaEnsayos() {
   }, [rows, filters]);
 
   // ===============================================================
-  // 🔹 Cambiar estado de asistencia (cerrar / reabrir)
+  // Cambiar estado de asistencia (cerrar / reabrir)
   // ===============================================================
   const toggleAsistencia = async (ensayo) => {
     if (loadingId === ensayo.id) return;
@@ -128,7 +128,7 @@ export default function AsistenciaEnsayos() {
   };
 
   // ===============================================================
-  // 🔹 Render
+  // Render
   // ===============================================================
   return (
     <main className="abmc-page">

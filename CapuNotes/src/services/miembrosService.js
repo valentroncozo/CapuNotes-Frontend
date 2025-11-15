@@ -4,8 +4,13 @@ import apiClient from "./apiClient";
 const API_URL = "/miembros";
 
 export const miembrosService = {
+
+  // === Alias seguro para no romper nada ===
+  getMiembros: async () => {
+    return await miembrosService.list();
+  },
   // ===============================================================
-  // 🔹 Obtener todos los miembros (normaliza los datos)
+  // Obtener todos los miembros
   // ===============================================================
   list: async () => {                                             
     const data = await apiClient.get(API_URL);
@@ -28,7 +33,7 @@ export const miembrosService = {
       area: m.area?.name || m.area?.nombre || null,
       cuerda: {
         id: m.cuerda?.id || null,
-        nombre: m.cuerda?.name || m.cuerda?.nombre || null,
+        name: m.cuerda?.name || m.cuerda?.nombre || null,
       },
       activo:
         m.activo !== undefined
@@ -38,7 +43,7 @@ export const miembrosService = {
   },
 
   // ===============================================================
-  // 🔹 Obtener miembro por ID compuesto
+  // Obtener miembro por ID compuesto
   // ===============================================================
   getById: async (nroDocumento, tipoDocumento = "DNI") => {
     const m = await apiClient.get(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
@@ -57,7 +62,7 @@ export const miembrosService = {
       area: m.area?.name || m.area?.nombre || null,
       cuerda: {
         id: m.cuerda?.id || null,
-        nombre: m.cuerda?.name || m.cuerda?.nombre || null,
+        name: m.cuerda?.name || m.cuerda?.nombre || null,
       },
       activo:
         m.activo !== undefined
@@ -67,7 +72,7 @@ export const miembrosService = {
   },
 
   // ===============================================================
-  // 🔹 Crear nuevo miembro
+  // Crear nuevo miembro
   // ===============================================================
   create: async (data) => {
     const result = await apiClient.post(API_URL, { body: data });
@@ -76,7 +81,7 @@ export const miembrosService = {
   },
 
   // ===============================================================
-  // 🔹 Actualizar miembro existente
+  // Actualizar miembro existente (con cambio de documento)
   // ===============================================================
   update: async (data) => {
     const result = await apiClient.patch(API_URL, { body: data });
@@ -85,7 +90,7 @@ export const miembrosService = {
   },
 
   // ===============================================================
-  // 🔹 Dar de baja lógica (activo = false)
+  // Dar de baja lógica
   // ===============================================================
   darDeBaja: async (nroDocumento, tipoDocumento = "DNI") => {
     await apiClient.delete(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
@@ -93,7 +98,7 @@ export const miembrosService = {
   },
 
   // ===============================================================
-  // 🔹 Reactivar miembro dado de baja
+  // Reactivar miembro
   // ===============================================================
   reactivar: async (nroDocumento, tipoDocumento = "DNI") => {
     await apiClient.patch(`${API_URL}/${nroDocumento}/${tipoDocumento}/reactivar`);

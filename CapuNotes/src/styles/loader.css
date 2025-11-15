@@ -28,15 +28,16 @@
 
 @keyframes colorFade {
   0% {
-    filter: drop-shadow(0 0 10px #4061d0);
+    filter: drop-shadow(0 0 4px rgba(64, 97, 208, 0.25));
   }
   50% {
-    filter: drop-shadow(0 0 16px #5c8df0);
+    filter: drop-shadow(0 0 6px rgba(92, 141, 240, 0.25));
   }
   100% {
-    filter: drop-shadow(0 0 10px #4061d0);
+    filter: drop-shadow(0 0 4px rgba(64, 97, 208, 0.25));
   }
 }
+
 
 .loader-text {
   font-size: 1.1rem;

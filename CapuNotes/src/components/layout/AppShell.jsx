@@ -42,12 +42,10 @@ function GearIcon(props) {
 }
 
 const MENU_ITEMS = [
-  ["/asistencias", "Asistencias"],
-  ["/audicion", "Audiciones"],
-  ["/canciones", "Canciones"],
-  ["/eventos", "Eventos"],
-  ["/fraternidades", "Fraternidades"],
-  ["/usuarios-roles", "Usuarios y roles"],
+  ['/asistencias', 'Asistencias'],
+  ['/canciones', 'Canciones'],
+  ['/eventos', 'Eventos'],
+  ['/usuarios-roles', 'Usuarios y roles'],
 ];
 
 export default function AppShell({ onLogout }) {
@@ -68,7 +66,9 @@ export default function AppShell({ onLogout }) {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  useEffect(() => { if (!open) setGearOpen(false); }, [open]);
+  useEffect(() => {
+    if (!open) setGearOpen(false);
+  }, [open]);
 
   const handleNavigate = (to) => {
     setOpen(false);
@@ -233,12 +233,14 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
 
       <div className="appshell-accordion-outer">
         <button
-          className={`appshell-accordion-trigger ${audOpen ? "open" : ""}`}
+          className={`appshell-accordion-trigger ${audOpen ? 'open' : ''}`}
           onClick={() => setAudOpen((v) => !v)}
           aria-expanded={audOpen}
         >
           Audiciones
-          <span className="appshell-accordion-caret">{audOpen ? "▴" : "▾"}</span>
+          <span className="appshell-accordion-caret">
+            {audOpen ? '▴' : '▾'}
+          </span>
         </button>
 
         {audOpen && (
@@ -246,35 +248,50 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
             <a
               href="/audicion"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/audicion"); }}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/audicion');
+              }}
             >
               Audición
             </a>
             <a
               href="/candidatos"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("audicion/candidatos"); }}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('audicion/candidatos');
+              }}
             >
               Candidatos
             </a>
             <a
               href="/candidatos-coordinadores"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/candidatos-administracion"); }}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/candidatos-administracion');
+              }}
             >
               Candidatos (Administración)
             </a>
             <a
               href="/candidatos/historial"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/audicion/historial"); }}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/audicion/historial');
+              }}
             >
               Historial Candidatos
             </a>
             <a
               href="/cuestionario/configuracion"
               className="nav-link"
-              onClick={(e) => { e.preventDefault(); onNavigate("/cuestionario/configuracion"); }}
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/cuestionario/configuracion');
+              }}
             >
               Configurar Cuestionario
             </a>

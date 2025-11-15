@@ -1,0 +1,33 @@
+/* ============================================================
+   POPUP EXCLUSIVO: Reporte Participación
+   ============================================================ */
+
+.pop-dialog.popup-participacion {
+  width: min(780px, 96vw);      /* más ancho que el normal */
+  max-height: 92vh;             /* popup más grande */
+}
+
+.pop-dialog.popup-participacion .pop-body {
+  max-height: 78vh;             /* más alto el área scrolleable */
+  overflow-y: auto;             /* scroll interno */
+  padding: 22px;
+}
+
+/* Secciones de gráficos */
+.popup-participacion .grafico-section {
+  margin-bottom: 28px;
+}
+
+.popup-participacion .grafico-section h4 {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.popup-participacion .grafico-desc {
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  opacity: 0.85;
+}

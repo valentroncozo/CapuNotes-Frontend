@@ -29,8 +29,20 @@
 }
 
 .eventos-scroll {
-  display: grid;
-  gap: .75rem;
+  overflow-x: auto;
+  display: flex;
+  height: auto; /* container height fixed, images keep their sizes */
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 1rem;
+  padding: 1rem;
+  justify-content: flex-start;
+  background: transparent; /* decorative cut handled by CutActivityContainer */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  align-items: center;
+  align-content: center;
+  width: 100%;
 }
 
 @media (min-width: 560px) {
@@ -49,9 +61,14 @@
     background: rgba(255,255,255,.25);
     border-radius: var(--radius);
   }
+
+  .evento-card {
+    min-width: 220px;
+  }
 }
 
 .evento-card {
+  min-width: 220px !important;
   background: rgba(255,255,255,.05);
   border: 1px solid rgba(255,255,255,.12);
   border-radius: var(--radius);
@@ -91,9 +108,22 @@
   gap: .75rem;
 }
 
-@media (min-width: 640px) {
+/* Alineamos la rejilla de tareas con las cards de eventos en pantallas anchas */
+@media (min-width: 560px) {
   .tareas-grid {
-    grid-template-columns: repeat(4, minmax(140px, 1fr));
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(220px, 1fr);
+    overflow-x: auto;
+    gap: 1rem;
+    padding-bottom: .25rem;
+  }
+  .tareas-grid::-webkit-scrollbar {
+    height: 8px;
+  }
+  .tareas-grid::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,.12);
+    border-radius: var(--radius);
   }
 }
 
@@ -103,7 +133,7 @@
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: .9rem;
-  min-height: 90px;
+  min-height: 130px; /* igual altura que las event cards para mejor alineación */
   display: grid;
   place-items: center;
   gap: .35rem;

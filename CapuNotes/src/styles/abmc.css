@@ -22,12 +22,12 @@
 /* ====== HEADER ASISTENCIA A ENSAYOS ====== */
 .abmc-header {
   display: flex;
-  align-items: flex-end;        /* flecha y texto alineados arriba */
+  align-items: flex-end; /* flecha y texto alineados arriba */
   gap: 16px;
   align-content: flex-end;
   justify-content: flex-start;
   position: relative;
-  margin-bottom: 32px;            /* más espacio con los filtros */
+  margin-bottom: 32px; /* más espacio con los filtros */
 }
 
 /* Flecha back */
@@ -36,30 +36,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -4px;               /* 👈 la sube un poco, alineación perfecta con la A */
-  transform: translateY(2px);     /* microajuste óptico */
+  margin-top: -4px; /* 👈 la sube un poco, alineación perfecta con la A */
+  transform: translateY(2px); /* microajuste óptico */
 }
 
-/* Título */
-.abmc-title {
-  height: 36px ;
-  font-weight: 700;
-  font-size: 6vh;
-  margin: 0;
-  color: var(--text-light);
-  position: relative;
-}
 
 /* Línea amarilla institucional */
 .abmc-header::after {
-  content: "<hr />";
+  content: '<hr />';
   position: absolute;
   bottom: -20px;
   left: 0;
   width: 100%;
   height: 2px;
   background-color: var(--accent);
-  border-radius: .5px;
+  border-radius: 0.5px;
 }
 
 /* ====== FILTROS ====== */
@@ -67,7 +58,7 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin-top: 28px;               /* 👈 más aire respecto al header */
+  margin-top: 28px; /* 👈 más aire respecto al header */
   margin-bottom: 1.5rem;
 }
 
@@ -137,7 +128,6 @@
   }
 }
 
-
 /* Topbar */
 .abmc-topbar {
   display: flex;
@@ -152,7 +142,7 @@
   width: 90%;
   display: flex;
   gap: 0.8rem;
-  flex-direction: row;       /* fix */
+  flex-direction: row; /* fix */
   flex-wrap: wrap;
 }
 
@@ -161,17 +151,21 @@
 }
 
 .form-group-agregar .abmc-select {
-  flex:3;
+  flex: 3;
 }
-.form-group-agregar label { width: 100%; }
-.form-group-agregar .abmc-select { flex:3; }
+.form-group-agregar label {
+  width: 100%;
+}
+.form-group-agregar .abmc-select {
+  flex: 3;
+}
 
 .form-group-agregar-acciones {
   width: 90%;
   padding-top: calc(24px + 0.8rem);
   display: flex;
   gap: 0.8rem;
-  flex-direction: row;       /* fix */
+  flex-direction: row; /* fix */
   flex-wrap: wrap;
 }
 
@@ -204,8 +198,8 @@
 .abmc-actions .abmc-btn-icon svg path {
   opacity: 1 !important;
   background-color: var(--accent) !important;
-  color: #E8EAED !important;
-  fill: #E8EAED !important;
+  color: #e8eaed !important;
+  fill: #e8eaed !important;
   stroke: none !important;
   border: none !important;
 }
@@ -216,14 +210,14 @@
   border: none !important;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
   background-color: var(--accent); /* amarillo institucional */
-  color: #E8EAED;
+  color: #e8eaed;
   transition: all 0.2s ease-in-out;
 }
 
 /* Hover: aclara el fondo e ícono, sin borde */
 .abmc-actions .abmc-btn-icon:hover {
   background-color: var(--accent); /* mantener mismo amarillo */
-  color: #E8EAED; /* icono en blanco */
+  color: #e8eaed; /* icono en blanco */
   filter: brightness(0.98);
   transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
@@ -265,9 +259,9 @@
   height: 44px !important;
   padding: 0 12px;
   line-height: 1.4;
-  border: 1px solid rgba(255,255,255,.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius);
-  background-color: rgba(255,255,255,.05);
+  background-color: rgba(255, 255, 255, 0.05);
   color: var(--text-light);
 }
 
@@ -287,7 +281,12 @@
 
 /* ====== FILTROS OSCUROS CON ESTILO CAPUNOTES (MATCH INPUT) ====== */
 .filtros select.abmc-input {
-  background-color: rgba(255, 255, 255, 0.05); /* igual que el input de búsqueda */
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.05
+  ); /* igual que el input de búsqueda */
   border: 1px solid rgba(255, 255, 255, 0.2); /* tenue y elegante */
   color: var(--text-light);
   border-radius: 10px;
@@ -315,7 +314,7 @@
 }
 
 /* 🔹 Placeholder ("Mes", "Año", "Estado") */
-.filtros select.abmc-input option[value=""] {
+.filtros select.abmc-input option[value=''] {
   color: #bbb;
 }
 /* ====== ESTILOS ESPECÍFICOS DE ASISTENCIAS ====== */
@@ -349,7 +348,94 @@
 }
 
 /* === Unificar border-radius para todos los botones === */
-button, .abmc-btn, .abmc-btn-icon {
+button,
+.abmc-btn,
+.abmc-btn-icon {
   border-radius: 10px !important;
 }
 
+/* ====== GEOAPIFY AUTOCOMPLETE - ESTILO CAPUNOTES FINAL ====== */
+.geoapify-autocomplete {
+  position: relative;
+  width: 100%;
+}
+
+/* Input principal */
+.geoapify-autocomplete input {
+  width: 100%;
+  height: 42px; /* igual que otros inputs */
+  background-color: #0a0a2e; /* fondo igual */
+  color: #fff;
+  border: 1px solid #555; /* gris */
+  border-radius: 8px; /* mismo radio */
+  padding: 0 38px 0 12px; /* espacio para la X */
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  outline: none;
+  box-shadow: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Hover o focus → borde azul */
+.geoapify-autocomplete input:hover,
+.geoapify-autocomplete input:focus {
+  border-color: #3399ff; /* azul claro */
+  box-shadow: 0 0 4px rgba(51, 153, 255, 0.4);
+}
+
+/* Placeholder */
+.geoapify-autocomplete input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Botón de limpiar (X) */
+.geoapify-autocomplete .geoapify-close-button {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  z-index: 2;
+  padding: 0;
+}
+
+.geoapify-autocomplete .geoapify-close-button:hover {
+  color: #fff;
+}
+
+/* Dropdown */
+.geoapify-autocomplete-items {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background-color: #0a0a2e;
+  border: 1px solid #555;
+  border-radius: 8px;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+}
+
+/* Opción individual */
+.geoapify-autocomplete-item {
+  padding: 8px 12px;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.geoapify-autocomplete-item:hover {
+  background-color: #1c1c4a; /* azul más claro */
+}
+
+/* Texto resaltado en el dropdown */
+.geoapify-autocomplete-item strong {
+  color: #ffd700; /* dorado */
+}

@@ -1,42 +1,48 @@
-import { useState, useEffect } from "react";
-import { Button, Form } from "react-bootstrap";
-import Swal from "sweetalert2";
-import { useNavigate, useLocation } from "react-router-dom";
-import "@/styles/miembros.css";
-import "@/styles/abmc.css";
-import BackButton from "@/components/common/BackButton.jsx";
-import { cuerdasService } from "@/services/cuerdasService.js";
-import { areasService } from "@/services/areasService.js";
-import { miembrosService } from "@/services/miembrosService.js";
+import { useState, useEffect } from 'react';
+import { Button, Form } from 'react-bootstrap';
+import Swal from 'sweetalert2';
+import { useNavigate, useLocation } from 'react-router-dom';
+import '@/styles/miembros.css';
+import '@/styles/abmc.css';
+import BackButton from '@/components/common/BackButton.jsx';
+import { cuerdasService } from '@/services/cuerdasService.js';
+import { areasService } from '@/services/areasService.js';
+import { miembrosService } from '@/services/miembrosService.js';
 
-export default function MiembrosEditar({ title = "Editar miembro" }) {
+export default function MiembrosEditar({ title = 'Editar miembro' }) {
   const navigate = useNavigate();
   const location = useLocation();
   const miembroInicial = location.state?.miembro;
 
-  // 🟢 Estado inicial con los datos del miembro
+  // Guardamos el documento viejo (ID original)
+  const docViejo = {
+    nro: miembroInicial?.id?.nroDocumento,
+    tipo: miembroInicial?.id?.tipoDocumento
+  };
+
+  // Estado inicial del formulario
   const [miembro, setMiembro] = useState(() => ({
-    nombre: miembroInicial?.nombre || "",
-    apellido: miembroInicial?.apellido || "",
+    nombre: miembroInicial?.nombre || '',
+    apellido: miembroInicial?.apellido || '',
     tipoDocumento:
-      miembroInicial?.id?.tipoDocumento || miembroInicial?.tipoDocumento || "",
+      miembroInicial?.id?.tipoDocumento || miembroInicial?.tipoDocumento || '',
     numeroDocumento:
-      miembroInicial?.id?.nroDocumento || miembroInicial?.numeroDocumento || "",
-    fechaNacimiento: miembroInicial?.fechaNacimiento || "",
-    telefono: miembroInicial?.nroTelefono || miembroInicial?.telefono || "",
-    correo: miembroInicial?.correo || "",
-    carreraProfesion: miembroInicial?.carreraProfesion || "",
-    lugarOrigen: miembroInicial?.lugarOrigen || "",
-    instrumentoMusical: miembroInicial?.instrumentoMusical || "",
-    cuerda: miembroInicial?.cuerda?.id || "",
-    area: miembroInicial?.area?.id || "",
+      miembroInicial?.id?.nroDocumento || miembroInicial?.numeroDocumento || '',
+    fechaNacimiento: miembroInicial?.fechaNacimiento || '',
+    telefono: miembroInicial?.nroTelefono || miembroInicial?.telefono || '',
+    correo: miembroInicial?.correo || '',
+    carreraProfesion: miembroInicial?.carreraProfesion || '',
+    lugarOrigen: miembroInicial?.lugarOrigen || '',
+    instrumentoMusical: miembroInicial?.instrumentoMusical || '',
+    cuerda: miembroInicial?.cuerda?.id || '',
+    area: miembroInicial?.area?.id || '',
   }));
 
   const [errores, setErrores] = useState({});
   const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
   const [areasDisponibles, setAreasDisponibles] = useState([]);
 
-  // 🔹 Cargar cuerdas y áreas
+  // Cargar cuerdas y áreas
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -47,56 +53,56 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
         setCuerdasDisponibles(cuerdas);
         setAreasDisponibles(areas);
       } catch (error) {
-        console.error("Error cargando cuerdas o áreas:", error);
+        console.error('Error cargando cuerdas o áreas:', error);
         Swal.fire({
-          icon: "error",
-          title: "Error al cargar datos",
-          text: "No se pudieron cargar las cuerdas o áreas.",
-          background: "#11103a",
-          color: "#E8EAED",
+          icon: 'error',
+          title: 'Error al cargar datos',
+          text: 'No se pudieron cargar las cuerdas o áreas.',
+          background: '#11103a',
+          color: '#E8EAED',
         });
       }
     };
     fetchData();
   }, []);
 
-  // 🔹 Manejar cambios
+  // Manejo de cambios
   const handleChange = (e) => {
     const { name, value } = e.target;
     setMiembro((prev) => ({ ...prev, [name]: value }));
-    setErrores((prev) => ({ ...prev, [name]: "" }));
+    setErrores((prev) => ({ ...prev, [name]: '' }));
   };
 
-  // 🔹 Validación
+  // Validación
   const validarCampos = () => {
     const requeridos = [
-      "nombre",
-      "apellido",
-      "tipoDocumento",
-      "numeroDocumento",
-      "cuerda",
+      'nombre',
+      'apellido',
+      'tipoDocumento',
+      'numeroDocumento',
+      'cuerda',
     ];
     const nuevosErrores = {};
     requeridos.forEach((campo) => {
-      if (!miembro[campo] || String(miembro[campo]).trim() === "") {
-        nuevosErrores[campo] = "Campo obligatorio";
+      if (!miembro[campo] || String(miembro[campo]).trim() === '') {
+        nuevosErrores[campo] = 'Campo obligatorio';
       }
     });
     setErrores(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  // 🔹 Enviar actualización
+  // Enviar actualización
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validarCampos()) {
       Swal.fire({
-        icon: "warning",
-        title: "Campos incompletos",
-        text: "Por favor completá todos los campos obligatorios marcados en amarillo.",
-        background: "#11103a",
-        color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: 'Por favor completá todos los campos obligatorios marcados en amarillo.',
+        background: '#11103a',
+        color: '#E8EAED',
+        confirmButtonColor: '#7c83ff',
       });
       return;
     }
@@ -104,10 +110,8 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
     try {
       const payload = {
         id: {
-          nroDocumento:
-            miembro.numeroDocumento || miembro.id?.nroDocumento || "",
-          tipoDocumento:
-            miembro.tipoDocumento || miembro.id?.tipoDocumento || "",
+          nroDocumento: miembro.numeroDocumento,
+          tipoDocumento: miembro.tipoDocumento,
         },
         nombre: miembro.nombre,
         apellido: miembro.apellido,
@@ -122,27 +126,27 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
         area: miembro.area ? { id: parseInt(miembro.area) } : null,
       };
 
-      await miembrosService.update(payload);
+      await miembrosService.update(docViejo.nro, docViejo.tipo, payload);
 
       Swal.fire({
-        icon: "success",
-        title: "Cambios guardados",
+        icon: 'success',
+        title: 'Cambios guardados',
         text: `Se actualizaron los datos de ${miembro.nombre}.`,
         timer: 1600,
         showConfirmButton: false,
-        background: "#11103a",
-        color: "#E8EAED",
+        background: '#11103a',
+        color: '#E8EAED',
       });
 
-      navigate("/miembros");
+      navigate('/miembros');
     } catch (error) {
-      console.error("Error actualizando miembro:", error);
+      console.error('Error actualizando miembro:', error);
       Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo actualizar el miembro.",
-        background: "#11103a",
-        color: "#E8EAED",
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo actualizar el miembro.',
+        background: '#11103a',
+        color: '#E8EAED',
       });
     }
   };
@@ -154,8 +158,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
           <BackButton />
           <h1 className="abmc-title">{title}</h1>
           <p className="aviso-obligatorios">
-            Los campos marcados con <span className="required">*</span> son
-            obligatorios.
+            Los campos marcados con <span className="required">*</span> son obligatorios.
           </p>
         </div>
 
@@ -170,7 +173,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
               name="nombre"
               value={miembro.nombre}
               onChange={handleChange}
-              className={`abmc-input ${errores.nombre ? "error" : ""}`}
+              className={`abmc-input ${errores.nombre ? 'error' : ''}`}
             />
           </Form.Group>
 
@@ -183,7 +186,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
               name="apellido"
               value={miembro.apellido}
               onChange={handleChange}
-              className={`abmc-input ${errores.apellido ? "error" : ""}`}
+              className={`abmc-input ${errores.apellido ? 'error' : ''}`}
             />
           </Form.Group>
 
@@ -197,9 +200,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                 name="tipoDocumento"
                 value={miembro.tipoDocumento}
                 onChange={handleChange}
-                className={`abmc-select visible-dropdown ${
-                  errores.tipoDocumento ? "error" : ""
-                }`}
+                className={`abmc-select visible-dropdown ${errores.tipoDocumento ? 'error' : ''}`}
               >
                 <option value="">Seleccionar tipo</option>
                 <option value="DNI">DNI</option>
@@ -217,7 +218,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                 name="numeroDocumento"
                 value={miembro.numeroDocumento}
                 onChange={handleChange}
-                className={`abmc-input ${errores.numeroDocumento ? "error" : ""}`}
+                className={`abmc-input ${errores.numeroDocumento ? 'error' : ''}`}
               />
             </div>
           </div>
@@ -305,19 +306,19 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                   name="cuerda"
                   value={miembro.cuerda}
                   onChange={handleChange}
-                  className={`abmc-select ${errores.cuerda ? "error" : ""}`}
+                  className={`abmc-select ${errores.cuerda ? 'error' : ''}`}
                 >
                   <option value="">Seleccionar cuerda</option>
                   {cuerdasDisponibles.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.nombre || c.name || c.descripcion || "—"}
+                      {c.nombre || c.name || c.descripcion || '—'}
                     </option>
                   ))}
                 </select>
                 <Button
                   variant="warning"
                   className="abmc-btn"
-                  onClick={() => navigate("/cuerdas")}
+                  onClick={() => navigate('/cuerdas')}
                   type="button"
                 >
                   +
@@ -328,7 +329,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
             <div className="mitad">
               <label>Área</label>
               <div className="input-with-button">
-                <Form.Select
+                <select
                   name="area"
                   value={miembro.area}
                   onChange={handleChange}
@@ -340,11 +341,11 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                       {a.nombre}
                     </option>
                   ))}
-                </Form.Select>
+                </select>
                 <Button
                   variant="warning"
                   className="abmc-btn"
-                  onClick={() => navigate("/areas")}
+                  onClick={() => navigate('/areas')}
                   type="button"
                 >
                   +
@@ -358,7 +359,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
             <button
               type="button"
               className="abmc-btn abmc-btn-secondary"
-              onClick={() => navigate("/miembros")}
+              onClick={() => navigate('/miembros')}
             >
               Cancelar
             </button>
@@ -371,5 +372,3 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
     </main>
   );
 }
-
-
