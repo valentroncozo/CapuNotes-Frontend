@@ -78,3 +78,13 @@
   .abmc-row td:nth-child(3) { display: none; }
   .abmc-row th:nth-child(3) { display: none; }
 }
+
+.td-nombre-clickable {
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.td-nombre-clickable:hover {
+  color: var(--accent);
+  text-decoration: none;
+}

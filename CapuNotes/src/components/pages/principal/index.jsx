@@ -37,6 +37,22 @@ export default function Principal({ username }) {
     fetchEventos();
   }, []);
 
+  useEffect(() => {
+      const el = document.querySelector('.eventos-scroll');
+      if (!el) return;
+      const onWheel = (e) => {
+          // only handle vertical wheel to translate into horizontal scroll
+          if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+          e.preventDefault();
+          el.scrollLeft += e.deltaY;
+      };
+      el.addEventListener('wheel', onWheel, { passive: false });
+      return () => el.removeEventListener('wheel', onWheel);
+  }, []);
+
+
+
+
   // Ordenar eventos por fecha de inicio (asc) y preparar listado de próximos
   const upcomingEventos = (eventos || [])
     .filter((e) => e) // evita nulos
@@ -49,7 +65,8 @@ export default function Principal({ username }) {
 
   return (
     <div className="principal-container">
-      <div className="home-container">
+
+      <div className="abmc-card">
         <WelcomeCard title={`Bienvenido, ${username}!`} />
         <hr className="divisor-amarillo" />
 
@@ -59,7 +76,7 @@ export default function Principal({ username }) {
 
           <div className="eventos-scroll">
             {upcomingEventos && upcomingEventos.length > 0 ? (
-              upcomingEventos.slice(0, 3).map((evento) => (
+              upcomingEventos.slice(0, 5).map((evento) => (
                 <div className="evento-card" key={evento.id}>
                   <h3>
                     <strong>{evento.nombre}</strong>
