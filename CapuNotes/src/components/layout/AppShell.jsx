@@ -163,7 +163,7 @@ export default function AppShell({ onLogout }) {
         />
       )}
 
-      <div style={{ height: '56px' }} />
+      <div style={{ height: '36px' }} />
       <Outlet />
     </>
   );
