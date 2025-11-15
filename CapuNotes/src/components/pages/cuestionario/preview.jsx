@@ -68,7 +68,6 @@ export default function CuestionarioPreviewPage({
         <header className="abmc-header">
           <BackButton />
           <h1 className="abmc-title">{title}</h1>
-          <hr className="divisor-amarillo" />
         </header>
 
         <section className="cuest-section">
