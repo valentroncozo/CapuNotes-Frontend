@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import BackButton from '../common/BackButton';
 import { Button, Badge } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import PopUpVerMiembro from '../pages/miembros/PopUpVerMiembro.jsx';
+
 import {
   PencilFill,
   XCircleFill,
@@ -26,8 +29,13 @@ export default function MiembrosTableABMC({
   const [filtroTexto, setFiltroTexto] = useState('');
   const [filtroCuerda, setFiltroCuerda] = useState('');
   const [ordenEstadoAscendente, setOrdenEstadoAscendente] = useState(true);
+  const location = useLocation();
+  const [mostrarVer, setMostrarVer] = useState(false);
+  const [miembroSeleccionado, setMiembroSeleccionado] = useState(null);
 
-  // 🔹 Cargar miembros y cuerdas desde el backend
+
+
+  //  Cargar miembros y cuerdas desde el backend
   const load = async () => {
     try {
       const [miembrosData, cuerdasData, areasData] = await Promise.all([
@@ -65,9 +73,9 @@ export default function MiembrosTableABMC({
 
   useEffect(() => {
     load();
-  }, []);
+  }, [location.state?.recargar]);
 
-  // 🔎 Filtros combinados
+  // Filtros combinados
   const miembrosFiltrados = listaMiembros.filter((m) => {
     console.log('Filtrando miembro:', m);
     const matchTexto =
@@ -82,7 +90,7 @@ export default function MiembrosTableABMC({
     return matchTexto && matchCuerda;
   });
 
-  // 🟡 Cambiar estado (dar de baja / reactivar)
+  // Cambiar estado (dar de baja / reactivar)
   const handleCambiarEstado = async (miembro) => {
     const activo = miembro.activo;
     const accion = activo ? 'dar de baja' : 'reactivar';
@@ -123,9 +131,8 @@ export default function MiembrosTableABMC({
       Swal.fire({
         icon: 'success',
         title: activo ? 'Miembro dado de baja' : 'Miembro reactivado',
-        text: `${miembro.nombre} ${miembro.apellido} ahora está ${
-          activo ? 'inactivo' : 'activo'
-        }.`,
+        text: `${miembro.nombre} ${miembro.apellido} ahora está ${activo ? 'inactivo' : 'activo'
+          }.`,
         background: '#11103a',
         color: '#E8EAED',
         confirmButtonColor: '#ffc107',
@@ -217,6 +224,7 @@ export default function MiembrosTableABMC({
               <th onClick={ordenarPorEstado} style={{ cursor: 'pointer' }}>
                 Estado {ordenEstadoAscendente ? '▲' : '▼'}
               </th>
+              <th>Acciones</th>
               <th style={{ textAlign: 'center' }}></th>
             </tr>
           </thead>
@@ -252,13 +260,51 @@ export default function MiembrosTableABMC({
                   </td>
                   <td>
                     <Badge
-                      bg={m.activo ? 'success' : 'secondary'}
-                      style={{ fontSize: '0.9rem' }}
+                      bg={m.activo ? "success" : "secondary"}
+                      style={{
+                        fontSize: "1rem",
+                        padding: "4px 12px",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        lineHeight: "1",          // evita que se estire hacia abajo
+                        height: "24px",           // igual para todos
+                        borderRadius: "8px",      // más estética
+                      }}
                     >
-                      {m.activo ? 'Activo' : 'Inactivo'}
+                      {m.activo ? "Activo" : "Inactivo"}
                     </Badge>
                   </td>
+
+
                   <td className="abmc-actions">
+
+                    <Button
+                      className="btn-accion"
+                      variant="info"
+                      onClick={() => {
+                        navigate('/miembros/editar', {
+                          state: { miembro: m, soloVer: true }
+                        });
+                      }}
+                      title="Ver"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        height="24px"
+                        viewBox="0 -960 960 960"
+                        width="24px"
+                        fill="#e3e3e3"
+                      >
+                        <path d="M480-360q63 0 106.5-43.5T630-510q0-63-43.5-106.5T480-660q-63 0-106.5 
+    43.5T330-510q0 63 43.5 106.5T480-360Zm0-80q-29 0-49.5-20.5T410-510q0-29 
+    20.5-49.5T480-580q29 0 49.5 20.5T550-510q0 29-20.5 49.5T480-440Zm0 
+    200q-141 0-259-78T40-510q47-114 165-192t259-78q141 0 259 
+    78t165 192q-47 114-165 192T480-240Z"/>
+                      </svg>
+                    </Button>
+
+
                     <Button
                       className="btn-accion"
                       variant="warning"
@@ -318,6 +364,14 @@ export default function MiembrosTableABMC({
           </tbody>
         </table>
       </div>
+
+      <PopUpVerMiembro
+        isOpen={mostrarVer}
+        onClose={() => setMostrarVer(false)}
+        miembro={miembroSeleccionado}
+      />
+
+
     </main>
   );
 }

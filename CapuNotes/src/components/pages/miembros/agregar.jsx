@@ -3,6 +3,7 @@ import {
   GeoapifyContext,
 } from '@geoapify/react-geocoder-autocomplete';
 import '@geoapify/geocoder-autocomplete/styles/minimal.css';
+import "@/styles/libreriaGeo.css";
 import { useState, useEffect } from 'react';
 import { Button, Container, Form } from 'react-bootstrap';
 import Swal from 'sweetalert2';
@@ -326,7 +327,7 @@ export default function MiembrosAgregar({ title = 'Registro de miembro' }) {
                     if (!value) return;
                     setLugarOrigenInput(value.formatted);
                   }}
-                  className="abmc-input geoapify-wrapper"
+                  className="geoapify-wrapper"
                 />
               </GeoapifyContext>
             </div>

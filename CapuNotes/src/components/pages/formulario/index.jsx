@@ -6,19 +6,20 @@ import {
   GeoapifyContext,
 } from '@geoapify/react-geocoder-autocomplete';
 
-// 2️⃣ Importaciones de componentes internos
+//Importaciones de componentes internos
 import BackButton from '../../common/BackButton.jsx';
 import PreguntaTexto from './preguntas/preguntaTexto.jsx';
 import PreguntaOpcion from './preguntas/preguntaOpcion.jsx';
 import PreguntaMultiOpcion from './preguntas/preguntaMultiOpcion.jsx';
 
-// 3️⃣ Importaciones de servicios / lógica
+//Importaciones de servicios / lógica
 import AudicionService from '@/services/audicionService.js';
 import inscripcionService from '@/services/incripcionService.js';
 
-// 4️⃣ Importaciones de tus estilos personalizados (DEBE IR AL FINAL)
+//Importaciones de tus estilos personalizados 
 import '@/styles/abmc.css';
 import '@/styles/formulario.css';
+import '@/styles/libreriaGeo.css';
 
 const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
   // Estados para datos dinámicos
@@ -478,19 +479,21 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
                       required
                     />
                   </div>
+                  {/* === Lugar de Origen === */}
                   <div className="form-group-miembro">
                     <label>Lugar de Origen</label>
+
                     <div className="geoapify-wrapper">
                       <GeoapifyGeocoderAutocomplete
-                        placeholder=""
+                        placeholder="Ej: Córdoba, Argentina"
                         apiKey="27d4d3c8bf5147f3ae4cd2f98a44009a"
                         lang="es"
                         className="geoapify-autocomplete"
                         countryCodes={['ar']}
                         debounceDelay={300}
-                        // no usar "value" ni "onChange" porque Geoapify maneja internamente el texto
+
+                        /* NO usar value/onChange */
                         onPlaceSelect={(feature) => {
-                          console.log('Geoapify feature ->', feature);
                           if (!feature?.properties) return;
 
                           const p = feature.properties;
@@ -501,14 +504,15 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
                               .filter(Boolean)
                               .join(', ');
 
-                          setCandidato({
-                            ...candidato,
+                          setCandidato((prev) => ({
+                            ...prev,
                             lugar_origen: formatted || '',
-                          });
+                          }));
                         }}
                       />
                     </div>
                   </div>
+
                 </div>
                 <div className="mitad">
                   <div className="form-group-miembro">
