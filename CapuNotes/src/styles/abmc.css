@@ -352,3 +352,17 @@ button,
 .abmc-btn-icon {
   border-radius: 10px !important;
 }
+
+.input-with-button .abmc-btn {
+  width: 44px;
+  height: 44px;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-with-button .abmc-btn svg {
+  width: 22px;
+  height: 22px;
+}

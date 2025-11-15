@@ -355,7 +355,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
                     width="24px"
                     fill="#e3e3e3"
                   >
-                    <path d="M440-120v-320H120v-80h320v-320h80v320h320v80H520v320h-80Z" />
+                    <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
                   </svg>
                 </Button>
               </div>
@@ -383,7 +383,15 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
                   onClick={() => navigate('/areas')}
                   type="button"
                 >
-                  +
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#e3e3e3"
+                  >
+                    <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
+                  </svg>
                 </Button>
               </div>
             </div>
