@@ -5,7 +5,7 @@ import {
   GeoapifyGeocoderAutocomplete,
   GeoapifyContext,
 } from '@geoapify/react-geocoder-autocomplete';
-
+import { formatearFechaDdMmAIso } from '@/components/common/datetime.js';
 // 2️⃣ Importaciones de componentes internos
 import BackButton from '../../common/BackButton.jsx';
 import PreguntaTexto from './preguntas/preguntaTexto.jsx';
@@ -19,6 +19,7 @@ import inscripcionService from '@/services/incripcionService.js';
 // 4️⃣ Importaciones de tus estilos personalizados (DEBE IR AL FINAL)
 import '@/styles/abmc.css';
 import '@/styles/formulario.css';
+import { ca } from 'date-fns/locale';
 
 const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
   // Estados para datos dinámicos
@@ -41,9 +42,11 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
     telefono: '',
     cuerda: '',
     carrera_profesion: '',
-    lugar_origen: '',
+        lugar_origen: '', // Se mantiene para sincronizar con Geoapify
     instrumento_musical: '',
   });
+  // Estado controlado para el input de lugar de origen
+  const [lugarOrigenInput, setLugarOrigenInput] = useState('');
 
   // estado para filtrar turnos por día y seleccionar turno
   const [filterDia, setFilterDia] = useState('');
@@ -240,6 +243,8 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
       missingFields.push('Email');
     if (!candidato.telefono || String(candidato.telefono).trim() === '')
       missingFields.push('Teléfono');
+    if (!candidato.lugar_origen || String(candidato.lugar_origen).trim() === '')
+      missingFields.push('Lugar de origen');
 
     if (missingFields.length > 0) {
       Swal.fire({
@@ -471,7 +476,7 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
                       onChange={(e) => {
                         const value = e.target.value;
                         setFechaNacimiento(value);
-                        setCandidato({ ...candidato, fechaNacimiento: value });
+                        setCandidato({ ...candidato, fechaNacimiento:  formatearFechaDdMmAIso(value) });
                       }}
                       className="abmc-input"
                       placeholder="dd/mm/aaaa"
@@ -480,34 +485,12 @@ const Formulario = ({ title = 'Inscripcion a Audiciones CoroCapuchinos' }) => {
                   </div>
                   <div className="form-group-miembro">
                     <label>Lugar de Origen</label>
-                    <div className="geoapify-wrapper">
-                      <GeoapifyGeocoderAutocomplete
-                        placeholder=""
-                        apiKey="27d4d3c8bf5147f3ae4cd2f98a44009a"
-                        lang="es"
-                        className="geoapify-autocomplete"
-                        countryCodes={['ar']}
-                        debounceDelay={300}
-                        // no usar "value" ni "onChange" porque Geoapify maneja internamente el texto
-                        onPlaceSelect={(feature) => {
-                          console.log('Geoapify feature ->', feature);
-                          if (!feature?.properties) return;
-
-                          const p = feature.properties;
-                          const formatted =
-                            p.formatted ||
-                            p.formatted_address ||
-                            [p.city || p.town || p.village, p.state, p.country]
-                              .filter(Boolean)
-                              .join(', ');
-
-                          setCandidato({
-                            ...candidato,
-                            lugar_origen: formatted || '',
-                          });
-                        }}
-                      />
-                    </div>
+                      <input
+                      type="text"
+                      className="abmc-input"
+                      value={candidato.lugar_origen}
+                      onChange={(e) => setCandidato({ ...candidato, lugar_origen: e.target.value })}
+                    />
                   </div>
                 </div>
                 <div className="mitad">
