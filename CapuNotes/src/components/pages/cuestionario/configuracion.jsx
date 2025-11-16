@@ -53,10 +53,14 @@ export default function CuestionarioConfigPage({
   // nuevo estado agregado para el input de nueva opción en el topbar
   const [nuevaOpcion, setNuevaOpcion] = useState('');
 
+  // errores inline
+  const [topErrorMsg, setTopErrorMsg] = useState('');
+
   // estados para edición en modal
   const [isEditing, setIsEditing] = useState(false);
   const [editing, setEditing] = useState(null);
   const [editOpcionInput, setEditOpcionInput] = useState('');
+  const [editErrorMsg, setEditErrorMsg] = useState('');
 
   const assignedIds = useMemo(() => new Set(asignadas), [asignadas]);
 
@@ -101,9 +105,18 @@ export default function CuestionarioConfigPage({
     };
 
     if (nuevo.tipo === 'OPCION' || nuevo.tipo === 'MULTIOPCION') {
-      createPayload.opciones = (nuevo.opciones || [])
-        .map((o) => String(o?.valor ?? o))
-        .filter((s) => s !== '');
+      const opts = (nuevo.opciones || []).map((o) => String(o?.valor ?? o));
+      // validations: at least one option, no empty strings
+      if (opts.length === 0) {
+        setTopErrorMsg('Debés agregar al menos una opción.');
+        return;
+      }
+      if (opts.some((s) => !s.trim())) {
+        setTopErrorMsg('Las opciones no pueden estar vacías.');
+        return;
+      }
+
+      createPayload.opciones = opts.filter((s) => s !== '');
     }
 
     // DEBUG: mostrar JSON exacto que se enviará
@@ -133,6 +146,7 @@ export default function CuestionarioConfigPage({
       opciones: [],
     });
     setNuevaOpcion('');
+    setTopErrorMsg('');
   };
 
   const handleUpdate = async (p) => {
@@ -418,7 +432,9 @@ export default function CuestionarioConfigPage({
       opciones: [...(prev.opciones || []), { valor: op }],
     }));
     setNuevaOpcion('');
+    setTopErrorMsg('');
   };
+
 
   return (
     <main className="abmc-page">
@@ -433,12 +449,18 @@ export default function CuestionarioConfigPage({
             className="abmc-input"
             placeholder="Nueva pregunta"
             value={nuevo.valor}
-            onChange={(e) => setNuevo({ ...nuevo, valor: e.target.value })}
+            onChange={(e) => {
+              setNuevo({ ...nuevo, valor: e.target.value });
+              setTopErrorMsg('');
+            }}
           />
           <select
             className="abmc-select"
             value={nuevo.tipo}
-            onChange={(e) => setNuevo({ ...nuevo, tipo: e.target.value })}
+            onChange={(e) => {
+              setNuevo({ ...nuevo, tipo: e.target.value });
+              setTopErrorMsg('');
+            }}
           >
             {tipos.map((t) => (
               <option key={t.value} value={t.value}>
@@ -477,6 +499,22 @@ export default function CuestionarioConfigPage({
               >
                 +
               </button>
+            </div>
+          ) : null}
+          {topErrorMsg ? (
+            <div
+              style={{
+                background: 'rgba(255, 87, 34, 0.15)',
+                border: '1px solid #ff5722',
+                color: '#ff7043',
+                padding: '8px 10px',
+                borderRadius: '8px',
+                marginLeft: 12,
+                marginTop: 8,
+                fontSize: '.9rem',
+              }}
+            >
+              {topErrorMsg}
             </div>
           ) : null}
         </div>
@@ -531,6 +569,7 @@ export default function CuestionarioConfigPage({
                                 : [],
                             });
                             setEditOpcionInput('');
+                            setEditErrorMsg('');
                             setIsEditing(true);
                           }}
                         >
@@ -595,9 +634,10 @@ export default function CuestionarioConfigPage({
                 className="abmc-select"
                 style={{ flex: '0 0 160px', width: 160, minWidth: 0 }}
                 value={editing.tipo}
-                onChange={(e) =>
-                  setEditing((prev) => ({ ...prev, tipo: e.target.value }))
-                }
+                onChange={(e) => {
+                  setEditing((prev) => ({ ...prev, tipo: e.target.value }));
+                  setEditErrorMsg('');
+                }}
               >
                 {tipos.map((t) => (
                   <option key={t.value} value={t.value}>
@@ -663,6 +703,7 @@ export default function CuestionarioConfigPage({
                         opciones: [...(prev.opciones || []), { valor: v }],
                       }));
                       setEditOpcionInput('');
+                      setEditErrorMsg('');
                     }}
                   >
                   <span class="material-symbols-outlined">
@@ -672,6 +713,22 @@ export default function CuestionarioConfigPage({
                 </div>
               )}
             </div>
+
+            {editErrorMsg ? (
+              <div
+                style={{
+                  background: 'rgba(255, 87, 34, 0.15)',
+                  border: '1px solid #ff5722',
+                  color: '#ff7043',
+                  padding: '8px 10px',
+                  borderRadius: '8px',
+                  marginBottom: 10,
+                  fontSize: '.9rem',
+                }}
+              >
+                {editErrorMsg}
+              </div>
+            ) : null}
 
             <div
               style={{
@@ -696,6 +753,19 @@ export default function CuestionarioConfigPage({
                 type="button"
                 onClick={async () => {
                   if (!editing.valor || !editing.valor.trim()) return;
+                  // Validación inline para preguntas con opciones
+                  if (editing.tipo === 'OPCION' || editing.tipo === 'MULTIOPCION') {
+                    const lista = editing.opciones ?? [];
+                    if (lista.length === 0) {
+                      setEditErrorMsg('Debés agregar al menos una opción.');
+                      return;
+                    }
+                    if (lista.some((op) => !String(op?.valor ?? op).trim())) {
+                      setEditErrorMsg('Las opciones no pueden estar vacías.');
+                      return;
+                    }
+                  }
+                  setEditErrorMsg('');
                   try {
                     await handleUpdate(editing);
                     setIsEditing(false);
