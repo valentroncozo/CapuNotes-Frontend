@@ -4,9 +4,17 @@ import Swal from 'sweetalert2';
 import HorarioInputs from './HorarioInputs';
 import '@/styles/turnos.css';
 
-const TurnoSection = ({ index, day, dias, setDias, data = { dias: {} }, setData }) => {
+const crearFranjaVacia = (overrides = {}) => ({
+    horaDesde: '',
+    horaHasta: '',
+    duracion: '',
+    esOriginal: false,
+    ...overrides,
+});
+
+const TurnoSection = ({ index, day, dias, setDias, data = { dias: {} }, setData, esPublicada = false }) => {
     const key = day;
-    const initial = (data.dias && data.dias[key]) ? data.dias[key] : [{ horaDesde: '', horaHasta: '', duracion: '' }];
+    const initial = (data.dias && data.dias[key]) ? data.dias[key] : [crearFranjaVacia()];
 
     const [franjas, setFranjas] = useState(initial);
 
@@ -15,6 +23,8 @@ const TurnoSection = ({ index, day, dias, setDias, data = { dias: {} }, setData 
         const external = (data.dias && data.dias[key]) ? data.dias[key] : [];
         if (external.length > 0) {
             setFranjas(external);
+        } else {
+            setFranjas([crearFranjaVacia()]);
         }
     }, [data, key]);
 
@@ -54,10 +64,24 @@ const TurnoSection = ({ index, day, dias, setDias, data = { dias: {} }, setData 
             return;
         }
 
-        setFranjas(prev => [...prev, { horaDesde: '', horaHasta: '', duracion: '' }]);
+        setFranjas(prev => [...prev, crearFranjaVacia()]);
     };
 
     const eliminarFranja = (franjaIndex) => {
+        const franjaObjetivo = franjas[franjaIndex];
+        const esFranjaOriginal = Boolean(franjaObjetivo?.esOriginal);
+
+        if (esPublicada && esFranjaOriginal) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Audición publicada',
+                text: 'No podés eliminar franjas originales cuando la audición ya está publicada.',
+                background: '#11103a',
+                color: '#E8EAED'
+            });
+            return;
+        }
+
         const nextFranjas = franjas.filter((_, i) => i !== franjaIndex);
         setFranjas(nextFranjas);
 
@@ -79,7 +103,14 @@ const TurnoSection = ({ index, day, dias, setDias, data = { dias: {} }, setData 
 
             <form className="content-horarios">
                 {franjas.map((f, i) => (
-                    <HorarioInputs key={i} index={i} value={f} onChange={actualizarFranja} onRemove={eliminarFranja} />
+                    <HorarioInputs
+                        key={i}
+                        index={i}
+                        value={f}
+                        onChange={actualizarFranja}
+                        onRemove={eliminarFranja}
+                        allowRemove={!esPublicada || !Boolean(f?.esOriginal)}
+                    />
                 ))}
 
                 <button type="button" className="abmc-btn btn-primary" onClick={agregarFranja}>
