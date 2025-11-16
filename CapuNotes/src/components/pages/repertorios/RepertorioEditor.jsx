@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 
 import CancionModal from "@/components/pages/canciones/CancionModal";
 import "@/styles/repertorios.css";
+import { normalizeText } from "@/utils/text";
 
 const EMPTY_FILTERS = {
   texto: "",
@@ -61,7 +62,7 @@ export default function RepertorioEditor({
   );
 
   const filteredAvailable = useMemo(() => {
-    const texto = filters.texto.trim().toLowerCase();
+    const texto = normalizeText(filters.texto).trim();
     const categoriaId = filters.categoria ? Number(filters.categoria) : null;
     const tiempoId = filters.tiempo ? Number(filters.tiempo) : null;
 
@@ -70,7 +71,7 @@ export default function RepertorioEditor({
       .filter((song) => !selectedIds.includes(Number(song.id)))
       .filter((song) => {
         if (!texto) return true;
-        return song.titulo?.toLowerCase().includes(texto);
+        return normalizeText(song.titulo).includes(texto);
       })
       .filter((song) => {
         if (!categoriaId) return true;

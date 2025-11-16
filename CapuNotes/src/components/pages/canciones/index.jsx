@@ -11,6 +11,7 @@ import AddIcon from "@/assets/AddIcon";
 import EditIcon from "@/assets/EditIcon";
 import TrashIcon from "@/assets/TrashIcon";
 import "@/styles/abmc.css";
+import { normalizeText } from "@/utils/text";
 
 export default function CancionesPage() {
   const [canciones, setCanciones] = useState([]);
@@ -104,22 +105,21 @@ export default function CancionesPage() {
   }, []);
 
   const filteredCanciones = useMemo(() => {
-    const q = (searchTerm || "").toLowerCase().trim();
+    const q = normalizeText(searchTerm).trim();
     if (!q) return canciones;
     return canciones.filter((cancion) => {
-      const titulo = String(cancion.titulo || "").toLowerCase();
-      const cat = (Array.isArray(cancion.categoriasNombres)
-        ? cancion.categoriasNombres.join(" ")
-        : cancion.categoriasNombres || ""
-      )
-        .toLowerCase();
-      const tiemposText = (Array.isArray(cancion.tiemposLiturgicosNombres)
-        ? cancion.tiemposLiturgicosNombres.join(" ")
-        : cancion.tiemposLiturgicosNombres || ""
-      ).toLowerCase();
-      return (
-        titulo.includes(q) || cat.includes(q) || tiemposText.includes(q)
+      const titulo = normalizeText(cancion.titulo);
+      const cat = normalizeText(
+        Array.isArray(cancion.categoriasNombres)
+          ? cancion.categoriasNombres.join(" ")
+          : cancion.categoriasNombres || ""
       );
+      const tiemposText = normalizeText(
+        Array.isArray(cancion.tiemposLiturgicosNombres)
+          ? cancion.tiemposLiturgicosNombres.join(" ")
+          : cancion.tiemposLiturgicosNombres || ""
+      );
+      return titulo.includes(q) || cat.includes(q) || tiemposText.includes(q);
     });
   }, [canciones, searchTerm]);
 

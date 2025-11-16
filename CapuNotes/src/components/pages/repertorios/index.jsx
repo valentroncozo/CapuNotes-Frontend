@@ -14,6 +14,7 @@ import { formatDate } from "@/components/common/datetime";
 
 import "@/styles/abmc.css";
 import "@/styles/repertorios.css";
+import { normalizeText } from "@/utils/text";
 
 const sortCompare = {
   nombre: (a, b) => (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" }),
@@ -72,15 +73,18 @@ export default function RepertoriosPage() {
   };
 
   const sortedRepertorios = useMemo(() => {
+    const query = normalizeText(filtroTexto).trim();
     const base = repertorios.filter((repo) =>
-      repo.nombre?.toLowerCase().includes(filtroTexto.toLowerCase())
+      normalizeText(repo.nombre).includes(query)
     );
-    const compare = sortCompare[sortField];
-    const ordered = [...base].sort((a, b) => {
-      const result = compare ? compare(a, b) : 0;
+    const compare = sortCompare[sortField] || (() => 0);
+    const comparator = (a, b) => {
+      const result = compare(a, b);
       return sortAsc ? result : -result;
-    });
-    return ordered;
+    };
+    const favoritos = base.filter((repo) => repo.favorito);
+    const noFavoritos = base.filter((repo) => !repo.favorito);
+    return [...favoritos.sort(comparator), ...noFavoritos.sort(comparator)];
   }, [filtroTexto, repertorios, sortField, sortAsc]);
 
   const handleCreate = () => {
