@@ -62,15 +62,16 @@ export default function AsistenciaEnsayosDetalle() {
 
         const asistenciaMap = new Map();
         asistenciasData.forEach((a) => {
-          const nombre = (a.nombreMiembro || "").trim().toLowerCase();
-          const apellido = (a.apellidoMiembro || "").trim().toLowerCase();
-          asistenciaMap.set(`${nombre}-${apellido}`, a.estado);
+          const tipo = a?.miembro?.id?.tipoDocumento || a?.miembro?.tipoDocumento || "DNI";
+          const nro = a?.miembro?.id?.nroDocumento || a?.miembro?.nroDocumento || a?.nroDocumento || "";
+          const key = `${tipo}-${nro}`;
+          asistenciaMap.set(key, a.estado);
         });
 
         const mappedMembers = miembrosData.map((m, i) => {
-          const nombre = (m.nombre || "").trim().toLowerCase();
-          const apellido = (m.apellido || "").trim().toLowerCase();
-          const clave = `${nombre}-${apellido}`;
+          const tipo = m?.id?.tipoDocumento || "DNI";
+          const nro = m?.id?.nroDocumento || m?.nroDocumento || "";
+          const clave = `${tipo}-${nro}`;
           const estadoBackend = asistenciaMap.get(clave);
 
           const estado =
@@ -79,11 +80,11 @@ export default function AsistenciaEnsayosDetalle() {
               : estadoBackend || "AUSENTE";
 
           const asistenciaLocal =
-            Object.entries(ESTADOS_MAP).find(([k, v]) => v === estado)?.[0] ||
+            Object.entries(ESTADOS_MAP).find(([, v]) => v === estado)?.[0] ||
             "no";
 
           return {
-            uid: `${nombre}-${apellido}-${i}`,
+            uid: `${tipo}-${nro}-${i}`,
             id: m.id,
             nombre: `${m.nombre || ""} ${m.apellido || ""}`.trim(),
             cuerdaId: m.cuerda?.id || null,

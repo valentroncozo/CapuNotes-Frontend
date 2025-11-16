@@ -57,6 +57,7 @@ export default function CuestionarioConfigPage({
   const [isEditing, setIsEditing] = useState(false);
   const [editing, setEditing] = useState(null);
   const [editOpcionInput, setEditOpcionInput] = useState('');
+  const [modalError, setModalError] = useState('');
 
   const assignedIds = useMemo(() => new Set(asignadas), [asignadas]);
 
@@ -85,6 +86,10 @@ export default function CuestionarioConfigPage({
   useEffect(() => {
     load();
   }, []);
+
+  useEffect(() => {
+    setModalError('');
+  }, [editing, isEditing]);
 
   const handleCreate = async () => {
     if (!nuevo.valor.trim()) return;
@@ -673,44 +678,67 @@ export default function CuestionarioConfigPage({
               )}
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                gap: 8,
-                justifyContent: 'flex-end',
-                marginTop: 12,
-              }}
-            >
-              <button
-                className="abmc-btn btn-cancelar"
-                type="button"
-                onClick={() => {
-                  setIsEditing(false);
-                  setEditing(null);
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                className="abmc-btn abmc-btn-primary"
-                type="button"
-                onClick={async () => {
-                  if (!editing.valor || !editing.valor.trim()) return;
-                  try {
-                    await handleUpdate(editing);
+            <div style={{ display: 'flex', gap: 8, flexDirection: 'column', marginTop: 12 }}>
+              {modalError && (
+                <div style={{ width: '100%', marginBottom: 8 }}>
+                  <p style={{
+                    background: 'rgba(255,87,34,0.12)',
+                    border: '1px solid #ff5722',
+                    color: '#ff7043',
+                    padding: '8px 10px',
+                    borderRadius: '8px',
+                    margin: 0,
+                    fontSize: '0.95rem'
+                  }}>{modalError}</p>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button
+                  className="abmc-btn btn-cancelar"
+                  type="button"
+                  onClick={() => {
                     setIsEditing(false);
                     setEditing(null);
-                  } catch (err) {
-                    console.error('No se pudo guardar la pregunta:', err);
-                    // Mensaje simple al usuario (puedes usar Swal si lo importas)
-                    alert(
-                      'Error al guardar la pregunta. Revisa la consola para más detalles.'
-                    );
-                  }
-                }}
-              >
-                Guardar
-              </button>
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="abmc-btn abmc-btn-primary"
+                  type="button"
+                  onClick={async () => {
+                    if (!editing.valor || !editing.valor.trim()) return;
+
+                    // validación inline para preguntas con opciones
+                    if (editing.tipo === 'OPCION' || editing.tipo === 'MULTIOPCION') {
+                      const lista = Array.isArray(editing.opciones) ? editing.opciones : [];
+                      const vals = lista.map(o => String(o?.valor ?? o).trim()).filter(s => s !== '');
+                      if (vals.length === 0) {
+                        setModalError('Debés agregar al menos una opción.');
+                        return;
+                      }
+                      if (vals.some(v => v.length === 0)) {
+                        setModalError('Las opciones no pueden estar vacías.');
+                        return;
+                      }
+                    }
+
+                    try {
+                      await handleUpdate(editing);
+                      setModalError('');
+                      setIsEditing(false);
+                      setEditing(null);
+                    } catch (err) {
+                      console.error('No se pudo guardar la pregunta:', err);
+                      const msg = err?.response?.data || 'Error al guardar la pregunta. Revisa la consola para más detalles.';
+                      setModalError(msg);
+                    }
+                  }}
+                >
+                  Guardar
+                </button>
+              </div>
             </div>
           </Modal>
         ) : null}
