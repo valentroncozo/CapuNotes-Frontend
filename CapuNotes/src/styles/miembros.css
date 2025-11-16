@@ -386,3 +386,17 @@ select.abmc-select:focus,
   opacity: 1 !important;
 }
 
+.aviso-obligatorios.alineado-derecha {
+  text-align: right;        /* A la derecha */
+  margin-top: 8px;          /* Aire debajo de la línea amarilla */
+  margin-bottom: 15px;      /* Aire antes del formulario */
+  padding-right: 4px;       /* Un pequeño margen visual */
+  color: var(--text-light);
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+.required {
+  color: var(--accent) !important;
+  font-weight: bold;
+}
+

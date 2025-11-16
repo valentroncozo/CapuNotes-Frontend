@@ -376,3 +376,13 @@ button,
 .geoapify-autocomplete-items .geoapify-autocomplete-item * {
   color: #000 !important;
 }
+
+/* === Botón Cancelar gris, que gane a .abmc-topbar button === */
+.abmc-topbar .abmc-btn.abmc-btn-secondary {
+  background-color: #6c757d !important;   /* gris */
+  color: white !important;
+}
+
+.abmc-topbar .abmc-btn.abmc-btn-secondary:hover {
+  background-color: #9e9e9e !important;   /* gris oscuro */
+}
