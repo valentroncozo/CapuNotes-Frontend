@@ -31,6 +31,7 @@ export default function EntityTableABMC({
 }) {
   const [items, setItems] = useState([]);
   const [nuevo, setNuevo] = useState({});
+  const [nuevoError, setNuevoError] = useState("");
   const [filtro, setFiltro] = useState("");
   const [editOpen, setEditOpen] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -67,6 +68,7 @@ export default function EntityTableABMC({
   const handleChangeNuevo = (e) => {
     const { name, value } = e.target;
     setNuevo((prev) => ({ ...prev, [name]: value }));
+    if (nuevoError) setNuevoError("");
   };
 
   const missingRequiredLabels = (obj) => {
@@ -112,14 +114,8 @@ export default function EntityTableABMC({
 
     // ⚠️ Validación extra solo para ÁREA (si falta descripción)
     if (entityName.toLowerCase() === "área" && !nuevo.descripcion?.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Falta completar",
-        text: "Debés ingresar una descripción para el área.",
-        background: "#11103a",
-        color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
-      });
+      // mostrar mensaje inline sobre la barra de creación
+      setNuevoError("Debés ingresar una descripción para el área.");
       return;
     }
 
@@ -153,6 +149,7 @@ export default function EntityTableABMC({
           showConfirmButton: false,
         });
       }
+      setNuevoError("");
     } catch (err) {
       console.error("❌ Error al crear:", err);
       Swal.fire({
@@ -241,17 +238,9 @@ export default function EntityTableABMC({
       }
     }
 
-    // Validación extra para "área"
+    // Validación extra para "área": devolver false para indicar bloqueo (el popup mostrará el error inline)
     if (!updated.descripcion && entityName.toLowerCase() === "área") {
-      Swal.fire({
-        icon: "warning",
-        title: "Falta completar",
-        text: "Debés ingresar una descripción para el área.",
-        background: "#11103a",
-        color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
-      });
-      return;
+      return false;
     }
 
     try {
@@ -363,6 +352,19 @@ export default function EntityTableABMC({
 
 
         <div className="abmc-topbar" style={{ marginTop: 0 }}>
+          {nuevoError && (
+            <div style={{ padding: '0 12px', width: '100%' }}>
+              <p style={{
+                background: 'rgba(255,193,7,0.12)',
+                border: '1px solid #ffc107',
+                color: '#ffc107',
+                padding: '8px 10px',
+                borderRadius: '8px',
+                margin: '0 0 8px 0',
+                fontSize: '0.9rem'
+              }}>{nuevoError}</p>
+            </div>
+          )}
           <input
             type="text"
             placeholder="Buscar por nombre"
