@@ -34,7 +34,7 @@ export default function RepertorioDetalleModal({ isOpen, onClose, repertorio }) 
         <div className="field">
           <label>Favorito</label>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
-            <StarIcon filled={repertorio.favorito} color={repertorio.favorito ? "#fff" : "#ffc107"} />
+            <StarIcon filled={repertorio.favorito} color={repertorio.favorito ? "#fff" : "#DE9205"} />
             <span>{repertorio.favorito ? "Sí" : "No"}</span>
           </div>
         </div>

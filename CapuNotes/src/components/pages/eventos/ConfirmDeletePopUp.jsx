@@ -15,7 +15,7 @@ const ConfirmDeletePopup = ({ evento, onClose, onDeleted }) => {
         text: 'Esta acción cancelará el evento y no se puede deshacer.',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#ffc107',
+        confirmButtonColor: '#DE9205',
         cancelButtonColor: '#6c757d',
         confirmButtonText: 'Sí, cancelar',
         cancelButtonText: 'Cancelar',

@@ -23,7 +23,7 @@
 }
 
 .tab.activa {
-  color: #DE9205;
+  color: ##DE9205;
 }
 
 .tab.activa::after {
@@ -33,7 +33,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background-color: #DE9205;
+  background-color: ##DE9205;
   border-radius: 4px;
 }
 

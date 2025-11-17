@@ -270,7 +270,7 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
               marginLeft: 'auto', 
               padding: '4px 12px', 
               borderRadius: '4px', 
-              backgroundColor: esPublicada ? '#28a745' : '#ffc107',
+              backgroundColor: esPublicada ? '#28a745' : '#DE9205',
               color: esPublicada ? 'white' : 'black',
               fontSize: '14px',
               fontWeight: 'bold'

@@ -92,7 +92,7 @@ export default function CancionModal({
           : "Se actualizarán los datos de la canción.",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: "#ffc107",
+      confirmButtonColor: "#DE9205",
       cancelButtonColor: "#6c757d",
       confirmButtonText: "Sí, guardar",
       cancelButtonText: "Cancelar",

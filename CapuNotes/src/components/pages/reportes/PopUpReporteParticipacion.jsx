@@ -56,7 +56,7 @@ export default function PopUpReporteParticipacion({
 
     const titulo = `Participación de ${miembro?.apellido || ""}${miembro?.nombre ? ", " + miembro.nombre : ""}`;
 
-    const COLORS = ["#AFD1F0", "#DE9205", "#FF6B6B"];
+    const COLORS = ["#AFD1F0", "##DE9205", "#FF6B6B"];
 
     const dataTorta = data
         ? [
@@ -110,7 +110,7 @@ export default function PopUpReporteParticipacion({
                                 <XAxis dataKey="fecha" />
                                 <YAxis />
                                 <Tooltip />
-                                <Line type="monotone" dataKey="continuidad" stroke="#DE9205" strokeWidth={3} dot />
+                                <Line type="monotone" dataKey="continuidad" stroke="##DE9205" strokeWidth={3} dot />
                             </LineChart>
                         </ResponsiveContainer>
                     </div>

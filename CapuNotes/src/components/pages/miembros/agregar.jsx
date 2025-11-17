@@ -485,7 +485,7 @@ export default function MiembrosAgregar() {
                   text: "Ese nombre de cuerda ya está registrado.",
                   background: "#11103a",
                   color: "#E8EAED",
-                  confirmButtonColor: "#ffc107",
+                  confirmButtonColor: "#DE9205",
                 });
               }
 
@@ -496,7 +496,7 @@ export default function MiembrosAgregar() {
                 text: "No se pudo crear la cuerda.",
                 background: "#11103a",
                 color: "#E8EAED",
-                confirmButtonColor: "#ffc107",
+                confirmButtonColor: "#DE9205",
               });
             }
           }}
@@ -522,7 +522,7 @@ export default function MiembrosAgregar() {
                   text: "Debés completar nombre y descripción.",
                   background: "#11103a",
                   color: "#E8EAED",
-                  confirmButtonColor: "#ffc107",
+                  confirmButtonColor: "#DE9205",
                 });
               }
 
@@ -555,7 +555,7 @@ export default function MiembrosAgregar() {
                   text: "Ya existe un área con ese nombre.",
                   background: "#11103a",
                   color: "#E8EAED",
-                  confirmButtonColor: "#ffc107",
+                  confirmButtonColor: "#DE9205",
                 });
               }
 
@@ -565,7 +565,7 @@ export default function MiembrosAgregar() {
                 text: "No se pudo crear el área.",
                 background: "#11103a",
                 color: "#E8EAED",
-                confirmButtonColor: "#ffc107",
+                confirmButtonColor: "#DE9205",
               });
             }
           }}
