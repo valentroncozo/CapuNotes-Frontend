@@ -156,6 +156,18 @@
   background-color: ffc107;
 }
 
+.evento-btn.repertorios {
+  background-color: #2d6cdf;
+}
+
+.evento-btn.repertorios.activo {
+  background-color: #ffc107;
+}
+
+.evento-btn.repertorios:hover {
+  background-color: #5843c4;
+}
+
 /* ===========================
    POPUP EVENTOS (sin scroll y ajustable)
 =========================== */
@@ -182,6 +194,84 @@
   flex-direction: column;
   justify-content: space-between;
   animation: popupFadeIn 0.25s ease;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.popup-actions .btn-secondary {
+  background-color: #b3b3b3 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 18px;
+  padding: 12px 28px;
+  font-weight: 600;
+}
+
+.popup-actions .btn-secondary:hover {
+  filter: brightness(0.95);
+}
+
+.popup-actions .btn-primary {
+  border-radius: 18px;
+  padding: 12px 28px;
+  font-weight: 600;
+}
+
+.btn-secondary {
+  background-color: #3b3b5c;
+  color: #e3e3e3;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 24px;
+}
+
+.btn-secondary:hover {
+  background-color: #4c4c70;
+}
+
+.lista-simple {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lista-simple li {
+  margin-bottom: 8px;
+}
+
+.lista-simple label {
+  display: flex;
+  gap: 8px;
+  font-size: 0.95rem;
+  align-items: center;
+}
+
+.lista-simple input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
+.repertorios-crear select {
+  min-height: 120px;
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+
+.texto-suave {
+  font-size: 0.85rem;
+  color: #bbb;
+  margin-bottom: 0.75rem;
 }
 
 /* Animación de aparición suave */
