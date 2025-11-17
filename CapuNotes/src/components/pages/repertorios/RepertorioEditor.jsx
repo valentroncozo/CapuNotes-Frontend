@@ -172,7 +172,7 @@ export default function RepertorioEditor({
           : "Se actualizará el repertorio y su orden de canciones.",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: "#ffc107",
+      confirmButtonColor: "#DE9205",
       cancelButtonColor: "#6c757d",
       confirmButtonText: "Sí, guardar",
       cancelButtonText: "Cancelar",

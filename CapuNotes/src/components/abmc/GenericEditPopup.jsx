@@ -96,7 +96,7 @@ export default function GenericEditPopup({
     >
       {errorMsg && (
         <div style={{ padding: '0 18px', marginBottom: 8 }}>
-          <p style={{ color: '#ffc107', fontSize: '0.95rem', margin: 0 }}>{errorMsg}</p>
+          <p style={{ color: '#DE9205', fontSize: '0.95rem', margin: 0 }}>{errorMsg}</p>
         </div>
       )}
       <div className="form-grid">

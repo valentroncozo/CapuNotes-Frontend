@@ -180,7 +180,7 @@ export default function CancionesPage() {
       text: "Esta acción marca la canción como inactiva.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#ffc107",
+      confirmButtonColor: "#DE9205",
       cancelButtonColor: "#6c757d",
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
