@@ -23,7 +23,7 @@ export const PROTECTED_VIEWS = [
   { key: 'repertorios', label: 'Repertorios', path: 'repertorios', permission: 'view:repertorios', section: 'can', componentKey: 'Repertorios' },
   { key: 'repertorios-agregar', label: 'Repertorios Agregar', path: '"repertorios/nuevo', permission: 'view:repertorios', showInMenu: false, section: 'can', componentKey: 'RepertorioFormPage', mode:"create" },
   { key: 'repertorios-editar', label: 'Repertorios Editar', path: '"repertorios/:id/editar', permission: 'view:repertorios', showInMenu: false, section: 'can', componentKey: 'RepertorioFormPage', mode:"edit" },
-  { key: 'repertorios-lectura', label: 'Repertorios Leer', path: '"repertorios/lectura', permission: 'view:repertorios', showInMenu: false, section: 'can', componentKey: 'RepertorioFormPage', mode:"edit" },
+  { key: 'repertorios-lectura', label: 'Repertorios Leer', path: '"repertorios/lectura', permission: 'view:repertorios', showInMenu: false, section: 'can', componentKey: 'RepertorioLecturaPage' },
   
   { key: 'categorias-canciones', label: 'Categorías', path: 'categorias-canciones', permission: 'view:CategoriasCanciones', section: 'can', componentKey: 'CategoriasCanciones' },
   { key: 'tiempos-liturgicos', label: 'Tiempos Litúrgicos', path: 'tiempos-liturgicos', permission: 'view:TiemposLiturgicos', section: 'can', componentKey: 'TiemposLiturgicos' },

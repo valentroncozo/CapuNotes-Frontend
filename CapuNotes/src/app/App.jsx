@@ -40,8 +40,10 @@ import FraternidadFormPage from "@/components/pages/fraternidades/FraternidadFor
 import CategoriasCanciones from "@/components/pages/categorias-canciones/index.jsx";
 import TiemposLiturgicos from "@/components/pages/tiempos-liturgicos/index.jsx";
 import Canciones from "@/components/pages/canciones/index.jsx";
+
 import Repertorios from "@/components/pages/repertorios/index.jsx";
 import RepertorioFormPage from "@/components/pages/repertorios/RepertorioFormPage.jsx";
+import RepertorioLecturaPage from "@/components/pages/repertorios/RepertorioLecturaPage.jsx";
 
 import Error401 from "../components/pages/errors/Error401"; //public
 import Error403 from "../components/pages/errors/Error403"; //public
@@ -79,6 +81,7 @@ const ROUTE_COMPONENTS = {
   Canciones,
   Repertorios,
   RepertorioFormPage,
+  RepertorioLecturaPage
 };
 
 const hasPermission = (permissionList = [], required) => {
