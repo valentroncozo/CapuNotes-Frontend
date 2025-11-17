@@ -32,14 +32,13 @@ export const audicionesService = {
     (inscripciones || []).forEach((i) => { if (i?.turno?.id) byTurnoId.set(i.turno.id, i); });
 
     const rows = (turnos || []).filter(t => {
-      const d = new Date(t.fechaHoraInicio);
-      return formatISO(d) === String(dia);
+      const fechaTurno = t.fechaHoraInicio.slice(0, 10); // YYYY-MM-DD
+      return fechaTurno === dia;
     }).map(t => {
       const insc = byTurnoId.get(t.id);
       const cand = insc?.candidato;
-      const d = new Date(t.fechaHoraInicio);
-      const hh = String(d.getHours()).padStart(2, '0');
-      const mm = String(d.getMinutes()).padStart(2, '0');
+      const [, horaParte] = t.fechaHoraInicio.split("T");
+      const [hh, mm] = horaParte.split(":");
       return {
         id: t.id,
         hora: `${hh}:${mm}`,

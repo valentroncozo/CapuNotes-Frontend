@@ -440,6 +440,18 @@ export default function CuestionarioConfigPage({
     setTopErrorMsg('');
   };
 
+  // Helper para abrir el modal de edición — separamos la lógica para facilitar debug
+  const openEdit = (p) => {
+    console.log('Opening edit modal for pregunta:', p?.id ?? p?.valor ?? '<sin id>');
+    setEditing({
+      ...p,
+      opciones: Array.isArray(p.opciones) ? [...p.opciones] : [],
+    });
+    setEditOpcionInput('');
+    setModalError('');
+    setIsEditing(true);
+  };
+
 
   return (
     <main className="abmc-page">
@@ -565,18 +577,7 @@ export default function CuestionarioConfigPage({
                         <button
                           type="button"
                           className="abmc-btn btn-primary"
-                          onClick={() => {
-                            // abrir modal con copia de la pregunta
-                            setEditing({
-                              ...p,
-                              opciones: Array.isArray(p.opciones)
-                                ? [...p.opciones]
-                                : [],
-                            });
-                            setEditOpcionInput('');
-                            setEditErrorMsg('');
-                            setIsEditing(true);
-                          }}
+                          onClick={() => openEdit(p)}
                         >
                           <EditIcon fill="var(--text-light)" />
                         </button>
@@ -641,7 +642,7 @@ export default function CuestionarioConfigPage({
                 value={editing.tipo}
                 onChange={(e) => {
                   setEditing((prev) => ({ ...prev, tipo: e.target.value }));
-                  setEditErrorMsg('');
+                  setModalError('');
                 }}
               >
                 {tipos.map((t) => (
@@ -708,7 +709,7 @@ export default function CuestionarioConfigPage({
                         opciones: [...(prev.opciones || []), { valor: v }],
                       }));
                       setEditOpcionInput('');
-                      setEditErrorMsg('');
+                      setModalError('');
                     }}
                   >
                   <span class="material-symbols-outlined">
@@ -719,7 +720,7 @@ export default function CuestionarioConfigPage({
               )}
             </div>
 
-            {editErrorMsg ? (
+            {modalError ? (
               <div
                 style={{
                   background: 'rgba(255, 87, 34, 0.15)',
@@ -731,7 +732,7 @@ export default function CuestionarioConfigPage({
                   fontSize: '.9rem',
                 }}
               >
-                {editErrorMsg}
+                {modalError}
               </div>
             ) : null}
 

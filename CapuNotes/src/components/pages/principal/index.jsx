@@ -7,10 +7,24 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import EventIcon from '@mui/icons-material/Event';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import MicIcon from '@mui/icons-material/Mic';
-import '@/styles/principal.css';
-import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { eventoService } from '@/services/eventoService.js';
+import "@/styles/principal.css";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { eventoService } from "@/services/eventoService.js";
+import QrGridIcon from "@/assets/QrGridIcon";
+import PdfBoxIcon from "@/assets/PdfBoxIcon";
+import Modal from "@/components/common/Modal";
+import Swal from "sweetalert2";
+
+const parseEventDate = (evento) => {
+  if (!evento?.fechaInicio) return null;
+  const dt = new Date(evento.fechaInicio);
+  if (evento.hora) {
+    const [h, m, s] = evento.hora.split(":").map(Number);
+    dt.setHours(h ?? 0, m ?? 0, s ?? 0, 0);
+  }
+  return dt;
+};
 
 export default function Principal({ username }) {
   const navigate = useNavigate();
@@ -23,6 +37,7 @@ export default function Principal({ username }) {
   };
 
   const [eventos, setEventos] = useState([]);
+  const [qrOpen, setQrOpen] = useState(false);
 
   useEffect(() => {
     const fetchEventos = async () => {
@@ -55,13 +70,78 @@ export default function Principal({ username }) {
 
   // Ordenar eventos por fecha de inicio (asc) y preparar listado de próximos
   const upcomingEventos = (eventos || [])
-    .filter((e) => e) // evita nulos
-    .slice() // copia para no mutar estado
+    .filter((e) => e)
+    .slice()
     .sort((a, b) => {
       const da = a?.fechaInicio ? new Date(a.fechaInicio) : new Date(0);
       const db = b?.fechaInicio ? new Date(b.fechaInicio) : new Date(0);
       return da - db;
     });
+
+  const nextEvento = useMemo(() => {
+    const now = new Date();
+    return (
+      upcomingEventos.find((evento) => {
+        const dt = parseEventDate(evento);
+        return dt && dt.getTime() > now.getTime();
+      }) || null
+    );
+  }, [upcomingEventos]);
+
+  const lecturaUrl = nextEvento
+    ? `${window.location.origin}/repertorios/lectura?eventoId=${nextEvento.id}`
+    : "";
+
+  const qrImgSrc = lecturaUrl
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(
+        lecturaUrl
+      )}`
+    : "";
+
+  const showSinEvento = () => {
+    Swal.fire({
+      icon: "info",
+      title: "Sin eventos próximos",
+      text: "Programá un evento para generar su repertorio.",
+      background: "#11103a",
+      color: "#E8EAED",
+    });
+  };
+
+  const handleQrClick = () => {
+    if (!nextEvento) {
+      showSinEvento();
+      return;
+    }
+    setQrOpen(true);
+  };
+
+  const handlePdfClick = () => {
+    if (!nextEvento) {
+      showSinEvento();
+      return;
+    }
+    Swal.fire({
+      icon: "question",
+      title: "Descargar repertorio",
+      text: `¿Está seguro que desea descargar el repertorio de ${nextEvento.nombre}?`,
+      showCancelButton: true,
+      confirmButtonText: "Confirmar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#ffc107",
+      cancelButtonColor: "#6c757d",
+      reverseButtons: true,
+      background: "#11103a",
+      color: "#E8EAED",
+    }).then((res) => {
+      if (res.isConfirmed) {
+        const url = `${lecturaUrl}${
+          lecturaUrl.includes("?") ? "&" : "?"
+        }print=1`;
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+    });
+  };
 
   return (
     <div className="principal-container">
@@ -72,7 +152,27 @@ export default function Principal({ username }) {
 
         {/* Próximos eventos */}
         <section className="eventos-section">
-          <h4 className="section-title">Tus próximos eventos</h4>
+          <div className="eventos-header">
+            <h4 className="section-title">Tus próximos eventos</h4>
+            <div className="eventos-actions">
+              <button
+                type="button"
+                className="abmc-btn abmc-btn-icon"
+                onClick={handleQrClick}
+                aria-label="Ver código QR del repertorio móvil"
+              >
+                <QrGridIcon width={28} height={28} />
+              </button>
+              <button
+                type="button"
+                className="abmc-btn abmc-btn-icon"
+                onClick={handlePdfClick}
+                aria-label="Descargar PDF del repertorio"
+              >
+                <PdfBoxIcon width={28} height={28} />
+              </button>
+            </div>
+          </div>
 
           <div className="eventos-scroll">
             {upcomingEventos && upcomingEventos.length > 0 ? (
@@ -179,6 +279,36 @@ export default function Principal({ username }) {
           </div>
         </section>
       </div>
+      {qrOpen && (
+        <Modal
+          isOpen={qrOpen}
+          onClose={() => setQrOpen(false)}
+          title="Repertorios del próximo evento"
+        >
+          <div className="qr-modal-content">
+            {qrImgSrc && (
+              <img
+                src={qrImgSrc}
+                alt="Código QR del repertorio"
+                width={220}
+                height={220}
+              />
+            )}
+            <p style={{ fontSize: ".95rem" }}>
+              Escaneá este código o compartí el enlace para leer las letras en el
+              celular.
+            </p>
+            <a
+              className="qr-modal-link"
+              href={lecturaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {lecturaUrl}
+            </a>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

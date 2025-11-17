@@ -79,7 +79,7 @@ export default function AsistenciaEnsayosDetalle() {
               : estadoBackend || 'AUSENTE';
 
           const asistenciaLocal =
-            Object.entries(ESTADOS_MAP).find(([k, v]) => v === estado)?.[0] ||
+            Object.entries(ESTADOS_MAP).find(([, v]) => v === estado)?.[0] ||
             'no';
 
           return {
@@ -277,6 +277,8 @@ export default function AsistenciaEnsayosDetalle() {
               console.log('Cuerda seleccionada:', e.target.value); // Depuración
               setFilterCuerda(e.target.value);
             }}
+            disabled={isCerrada}
+            style={{ minWidth: 220 }}
           >
             {cuerdaOptions.map((c) => (
               <option key={c.id} value={c.id.toString()}>
@@ -286,7 +288,6 @@ export default function AsistenciaEnsayosDetalle() {
           </select>
         </div>
 
-        {/* 🔸 Tabla */}
         <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
             <tr className="abmc-row">
