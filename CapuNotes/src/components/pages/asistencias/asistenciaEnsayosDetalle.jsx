@@ -83,7 +83,7 @@ export default function AsistenciaEnsayosDetalle() {
             'no';
 
           return {
-            uid: `${tipo}-${nro}-${i}`,
+            uid: `${nombre}-${apellido}-${i}`,
             id: m.id,
             nombre: `${m.nombre || ''} ${m.apellido || ''}`.trim(),
             cuerdaId: m.cuerda?.id || null,
