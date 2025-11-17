@@ -88,6 +88,7 @@
   filter: brightness(1.02);
 }
 
+
 /* === Botones de acción con ícono para todas las páginas === */
 .abmc-actions .abmc-btn-icon {
   background: var(--accent) !important;
@@ -110,6 +111,26 @@
 
 .abmc-actions .abmc-btn-icon:active {
   transform: translateY(1px) scale(0.98);
+}
+
+/* Padding consistente para tablas de ABMC */
+.abmc-table--aligned th,
+.abmc-table--aligned td {
+  text-align: left;
+  padding-left: 18px !important;
+}
+
+.abmc-table--aligned th:last-child,
+.abmc-table--aligned td:last-child {
+  padding-right: 18px !important;
+}
+
+@media (max-width: 480px) {
+  .abmc-table--aligned th,
+  .abmc-table--aligned td {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
 }
 
 /* === Tabla: primera columna alineada === */
@@ -353,6 +374,34 @@ button,
   border-radius: 10px !important;
 }
 
+/* Forzar estilo para el botón Cancelar — mayor especificidad y !important */
+.abmc-btn.btn-cancelar,
+.abmc-btn.btn-cancelar:focus,
+.abmc-btn.btn-cancelar:active {
+  background: #9e9e9e !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #E8EAED;           /* ← TEXTO gris oscuro */
+  box-shadow: none !important; /* si abmc-btn tiene shadow */
+}
+
+/* Hover */
+.abmc-btn.btn-cancelar:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #fff !important;
+}
+
+/* Si tu theme usa variables y sobrescribe con background-image, anulalo */
+.abmc-btn.btn-cancelar {
+  background-image: none !important;
+}
+
+/* Si el botón llega a estar disabled (por ej en forms), asegurate que no esté bloqueado */
+.abmc-btn.btn-cancelar[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
 .input-with-button .abmc-btn {
   width: 44px;
   height: 44px;
@@ -375,4 +424,14 @@ button,
 /* Asegurar que el texto interno también sea negro */
 .geoapify-autocomplete-items .geoapify-autocomplete-item * {
   color: #000 !important;
+}
+
+/* === Botón Cancelar gris, que gane a .abmc-topbar button === */
+.abmc-topbar .abmc-btn.abmc-btn-secondary {
+  background-color: #6c757d !important;   /* gris */
+  color: white !important;
+}
+
+.abmc-topbar .abmc-btn.abmc-btn-secondary:hover {
+  background-color: #9e9e9e !important;   /* gris oscuro */
 }

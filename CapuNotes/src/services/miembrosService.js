@@ -4,10 +4,11 @@ import apiClient from "./apiClient";
 const API_URL = "/miembros";
 
 export const miembrosService = {
-  // === Alias seguro para no romper nada ===
+  // Alias
   getMiembros: async () => {
     return await miembrosService.list();
   },
+
   // ===============================================================
   // Obtener todos los miembros
   // ===============================================================
@@ -20,58 +21,54 @@ export const miembrosService = {
     // 🔸 Normalización: aseguramos estructura uniforme
     return list.map((m) => ({
       id: {
-        tipoDocumento:
-          m.id?.tipoDocumento || m.tipoDocumento || m.tipo || 'DNI',
-        nroDocumento:
-          m.id?.nroDocumento || m.nroDocumento || m.numeroDocumento || null,
+        tipoDocumento: m.id?.tipoDocumento || 'DNI',
+        nroDocumento: m.id?.nroDocumento || null,
       },
       nombre: m.nombre || '',
       apellido: m.apellido || '',
-      correo: m.correo || m.email || '',
-      telefono: m.telefono || m.celular || '',
-      area: m.area?.name || m.area?.nombre || null,
+      correo: m.correo || '',
+      nroTelefono: m.nroTelefono || '',
+      carreraProfesion: m.carreraProfesion || '',
+      lugarOrigen: m.lugarOrigen || '',
+      instrumentoMusical: m.instrumentoMusical || '',
+      area: m.area?.name || null,
       cuerda: {
         id: m.cuerda?.id || null,
-        name: m.cuerda?.name || m.cuerda?.nombre || null,
+        name: m.cuerda?.name || null,
       },
-      activo:
-        m.activo !== undefined
-          ? m.activo
-          : m.estado === 'ACTIVO' || m.estado === true,
+      activo: m.activo ?? false,
     }));
   },
 
   // ===============================================================
-  // Obtener miembro por ID compuesto
+  // Obtener miembro por ID
   // ===============================================================
   getById: async (nroDocumento, tipoDocumento = "DNI") => {
     const m = await apiClient.get(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
 
     return {
       id: {
-        tipoDocumento:
-          m.id?.tipoDocumento || m.tipoDocumento || m.tipo || 'DNI',
-        nroDocumento:
-          m.id?.nroDocumento || m.nroDocumento || m.numeroDocumento || null,
+        tipoDocumento: m.id?.tipoDocumento || 'DNI',
+        nroDocumento: m.id?.nroDocumento || null,
       },
       nombre: m.nombre || '',
       apellido: m.apellido || '',
       correo: m.correo || '',
-      telefono: m.telefono || '',
-      area: m.area?.name || m.area?.nombre || null,
+      nroTelefono: m.nroTelefono || '',
+      carreraProfesion: m.carreraProfesion || '',
+      lugarOrigen: m.lugarOrigen || '',
+      instrumentoMusical: m.instrumentoMusical || '',
+      area: m.area?.nombre || null,
       cuerda: {
         id: m.cuerda?.id || null,
-        name: m.cuerda?.name || m.cuerda?.nombre || null,
+        name: m.cuerda?.nombre || null,
       },
-      activo:
-        m.activo !== undefined
-          ? m.activo
-          : m.estado === 'ACTIVO' || m.estado === true,
+      activo: m.activo ?? false,
     };
   },
 
   // ===============================================================
-  // Crear nuevo miembro
+  // Crear miembro
   // ===============================================================
   create: async (data) => {
     const result = await apiClient.post(API_URL, { body: data });
@@ -80,7 +77,7 @@ export const miembrosService = {
   },
 
   // ===============================================================
-  // Actualizar miembro existente (con cambio de documento)
+  // Actualizar miembro (PUT — si cambia DNI)
   // ===============================================================
   update: async (data) => {
     const result = await apiClient.patch(API_URL, { body: data });
@@ -89,7 +86,7 @@ export const miembrosService = {
   },
 
   // ===============================================================
-  // Dar de baja lógica
+  // Baja lógica
   // ===============================================================
   darDeBaja: async (nroDocumento, tipoDocumento = "DNI") => {
     await apiClient.delete(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
@@ -97,7 +94,7 @@ export const miembrosService = {
   },
 
   // ===============================================================
-  // Reactivar miembro
+  // Reactivar
   // ===============================================================
   reactivar: async (nroDocumento, tipoDocumento = "DNI") => {
     await apiClient.patch(`${API_URL}/${nroDocumento}/${tipoDocumento}/reactivar`);

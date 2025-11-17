@@ -344,3 +344,59 @@ select.abmc-select:focus,
     min-width: 100%;
   }
 }
+
+.form-grid-2cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px; /* espacio entre columnas y filas */
+}
+
+/* En pantallas chicas, vuelve a 1 columna */
+@media (max-width: 780px) {
+  .form-grid-2cols {
+    grid-template-columns: 1fr;
+  }
+}
+.ver-miembro-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+  padding: 0.5rem 0;
+}
+
+.ver-miembro-grid p {
+  margin: 0;
+  font-size: 1rem;
+}
+/* === FIX PARA MODO SOLO LECTURA (disabled) === */
+.abmc-input:disabled,
+.abmc-select:disabled,
+.geoapify-wrapper input:disabled {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-light) !important;   /* <<< ACA ESTÁ EL ARREGLO */
+  border: 1px solid var(--card) !important;
+  opacity: 1 !important;                 /* evita que se vea apagado */
+}
+
+.abmc-input[readonly],
+.abmc-select[readonly] {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-light) !important;
+  border: 1px solid var(--card) !important;
+  opacity: 1 !important;
+}
+
+.aviso-obligatorios.alineado-derecha {
+  text-align: right;        /* A la derecha */
+  margin-top: 8px;          /* Aire debajo de la línea amarilla */
+  margin-bottom: 15px;      /* Aire antes del formulario */
+  padding-right: 4px;       /* Un pequeño margen visual */
+  color: var(--text-light);
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+.required {
+  color: var(--accent) !important;
+  font-weight: bold;
+}
+

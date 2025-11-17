@@ -1,0 +1,302 @@
+/* ============================================================
+   REPERTORIOS - ESTILOS AISLADOS
+   ============================================================ */
+
+/* ------ MODAL GENERAL PARA REPERTORIOS ------ */
+.repertorio-modal {
+  width: 80vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.repertorio-modal-body {
+  flex: 1;
+  padding: 1rem;
+  background: #101335;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* ------ CONTENEDOR PRINCIPAL DUAL PANEL ------ */
+.repertorio-dual-container {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 1100px) {
+  .repertorio-dual-container {
+    flex-direction: column;
+  }
+}
+
+/* ============================================================
+   PANEL IZQUIERDO: CANCIONES DISPONIBLES
+   PANEL DERECHO: REPERTORIO SELECCIONADO
+   ============================================================ */
+
+.canciones-panel,
+.repertorio-panel {
+  border: 1px solid #2c2f53;
+  border-radius: 10px;
+  padding: 1rem;
+  background: #0e1130;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Header de cada panel */
+.repertorio-panel-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin: -1rem -1rem 1rem -1rem;
+  padding: 0.9rem 1rem;
+  background: #090c2a;
+  border-bottom: 1px solid #2c2f53;
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.repertorio-panel-heading {
+  margin-bottom: 0.5rem;
+}
+
+.repertorio-form-title {
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.repertorio-form-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+/* ============================================================
+   BUSCADOR / FILTROS
+   ============================================================ */
+.search-row {
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.search-row .abmc-input,
+.search-row .abmc-select {
+  flex: 1;
+  min-width: 150px;
+}
+
+.search-row .abmc-select {
+  max-width: 220px;
+}
+
+.search-row-full {
+  width: 100%;
+}
+
+.repertorio-search-input {
+  width: 100%;
+}
+
+.repertorio-filters-row {
+  width: 100%;
+  display: flex;
+  gap: 1rem;
+}
+
+.repertorio-filter-select {
+  flex: 1 1 45%;
+}
+
+/* ============================================================
+   TABLA HEADER (Orden - Título - Acciones)
+   ============================================================ */
+
+.repertorio-header.grid,
+.table-header.grid,
+.available-grid {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 0.5rem;
+  font-weight: 600;
+  opacity: 0.9;
+  padding: 0.25rem 0.5rem 0.5rem;
+}
+
+.repertorio-header.grid {
+  grid-template-columns: 56px 1fr auto;
+  padding: 0 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.actions-label {
+  justify-self: end;
+}
+
+/* Botón orden asc/desc */
+.available-sort {
+  background: none;
+  border: none;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.abmc-sort-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-light);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: 0;
+}
+
+.abmc-sort-btn:hover {
+  color: var(--accent);
+}
+
+/* ============================================================
+   LISTAS / SCROLL AREA
+   ============================================================ */
+
+.panel-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.repertorio-list,
+.available-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.droppable-surface {
+  min-height: 56px;
+  padding: 6px;
+}
+
+/* ============================================================
+   ITEMS DRAGGABLES / AVAILABLE + SELECTED
+   ============================================================ */
+
+.draggable-item,
+.available-row {
+  display: grid;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.45rem;
+  border-radius: 8px;
+  background: #1b1f3f;
+  transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+  cursor: grab;
+}
+
+.draggable-item {
+  grid-template-columns: 56px 1fr auto;
+}
+
+.available-row {
+  grid-template-columns: 1fr auto;
+}
+
+.available-row.available-grid {
+  grid-template-columns: 1fr 120px;
+}
+
+/* Estado de arrastre */
+.draggable-item.dragging,
+.available-row.dragging {
+  background: #262b60;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transform: scale(1.01);
+  cursor: grabbing;
+}
+
+/* Números de orden */
+.order {
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Estado vacío */
+.list-empty,
+.repertorio-empty {
+  opacity: 0.8;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+/* ============================================================
+   SUBTÍTULOS Y CHECKBOX EXTRA
+   ============================================================ */
+
+.repertorio-subtitle {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.fav-check {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   FOOTER DEL MODAL (SOLO REPERTORIOS)
+   ============================================================ */
+
+.repertorio-footer {
+  position: sticky;
+  bottom: 0;
+  background: #1b1b3a;
+  padding: 1rem;
+  border-top: 1px solid #333;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  z-index: 3;
+}
+
+/* Botón secundario aislado para repertorios */
+.repertorio-footer .abmc-btn.abmc-btn-secondary {
+  background-color: #9aa0a6 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+/* Corrección de conflictos con .btn global */
+.repertorio-footer .abmc-btn.abmc-btn-secondary.btn,
+.repertorio-footer .abmc-btn.abmc-btn-secondary[class*="btn-"] {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  background-color: #9aa0a6 !important;
+  color: #ffffff !important;
+}

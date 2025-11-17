@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import BackButton from '@/components/common/BackButton.jsx';
 import PopUpEventos from './popUpEventos.jsx';
 import ConfirmDeletePopup from './ConfirmDeletePopUp.jsx';
+import RepertorioPopup from './RepertorioPopup.jsx';
 import '@/styles/eventos.css';
 import Swal from 'sweetalert2';
 import { eventoService } from '@/services/eventoService.js'; // 👈 corregido
@@ -12,6 +13,7 @@ const Eventos = () => {
   const [popupMode, setPopupMode] = useState(null);
   const [selectedEvento, setSelectedEvento] = useState(null);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [showRepertorioPopup, setShowRepertorioPopup] = useState(false);
   const [eventos, setEventos] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -46,8 +48,18 @@ const Eventos = () => {
     setSelectedEvento(evento);
   };
 
+  const handleOpenRepertorioPopup = (evento) => {
+    setSelectedEvento(evento);
+    setShowRepertorioPopup(true);
+  };
+
   const handleClosePopup = () => {
     setPopupMode(null);
+    setSelectedEvento(null);
+  };
+
+  const handleCloseRepertorioPopup = () => {
+    setShowRepertorioPopup(false);
     setSelectedEvento(null);
   };
 
@@ -55,6 +67,14 @@ const Eventos = () => {
   const handleDeleteEvento = (id) => {
     setEventos((prevEventos) =>
       prevEventos.filter((evento) => evento.id !== id)
+    );
+  };
+
+  const handleRepertorioAssigned = (eventoId, cantidadRepertorios) => {
+    setEventos((prev) =>
+      prev.map((ev) =>
+        ev.id === eventoId ? { ...ev, cantidadRepertorios } : ev
+      )
     );
   };
 
@@ -167,6 +187,23 @@ const Eventos = () => {
                   </svg>
                 </button>
                 <button
+                  className={`evento-btn repertorios redondeado ${
+                    (evento.cantidadRepertorios || 0) > 0 ? 'activo' : ''
+                  }`}
+                  onClick={() => handleOpenRepertorioPopup(evento)}
+                  title="Asignar repertorios"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#e3e3e3"
+                  >
+                    <path d="M120-200v-520l280-80 320 80 120-40v520l-320 80-280-80-120 40Zm80-60 200 58v-399l-200-59v400Zm280 58 240-60v-401l-240 60v401Zm-280-458 200 58 240-58-200-58-240 58Zm240 58Zm0 401Zm-80-241Z" />
+                  </svg>
+                </button>
+                <button
                   className="evento-btn eliminar redondeado"
                   onClick={() => {
                     setSelectedEvento(evento);
@@ -222,7 +259,6 @@ const Eventos = () => {
                 const data = await eventoService.listPendientes();
                 setEventos(data);
 
-                // Mostrar confirmación visual al usuario
                 Swal.fire({
                   icon: 'success',
                   title:
@@ -251,6 +287,14 @@ const Eventos = () => {
                 });
               }
             }}
+          />
+        )}
+
+        {showRepertorioPopup && selectedEvento && (
+          <RepertorioPopup
+            evento={selectedEvento}
+            onClose={handleCloseRepertorioPopup}
+            onSaved={handleRepertorioAssigned}
           />
         )}
       </div>

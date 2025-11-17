@@ -8,7 +8,7 @@ import '@/styles/horarios.css';
 // - value: { horaDesde, horaHasta, duracion }
 // - onChange: function(index, newValue)
 // - onRemove: function(index)
-const HorarioInputs = ({ index, value = {}, onChange, onRemove }) => {
+const HorarioInputs = ({ index, value = {}, onChange, onRemove, allowRemove = true }) => {
     
     const handleChange = (field) => (newVal) => {
         if (typeof onChange === 'function') {
@@ -18,6 +18,7 @@ const HorarioInputs = ({ index, value = {}, onChange, onRemove }) => {
 
     const handleRemove = (e) => {
         e.preventDefault();
+        if (!allowRemove) return;
         if (typeof onRemove === 'function') onRemove(index);
     };
 
@@ -27,7 +28,14 @@ const HorarioInputs = ({ index, value = {}, onChange, onRemove }) => {
             <InputHorario name='Hora Hasta' value={value.horaHasta || ''} onChange={handleChange('horaHasta')} />
             <InputDuracionTurno name='Duración del turno' value={value.duracion || ''} onChange={handleChange('duracion')} />
             <div className='container-eliminar-turno'>
-                <button className="abmc-btn btn-secondary" onClick={handleRemove}>Eliminar</button>
+                <button
+                    className="abmc-btn btn-secondary"
+                    onClick={handleRemove}
+                    disabled={!allowRemove}
+                    style={{ visibility: allowRemove ? 'visible' : 'hidden' }}
+                >
+                    Eliminar
+                </button>
             </div>
         </div>
     );

@@ -1,0 +1,85 @@
+/* === FIX GEOAPIFY PARA QUE SE VEA COMO TUS INPUTS === */
+
+/* Contenedor principal del input */
+.geoapify-wrapper .geoapify-autocomplete-input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-light) !important;
+  border: 1px solid var(--card) !important; /* BORDE CELESTE */
+  border-radius: 12px !important;
+  padding: 0.5rem 0.75rem !important;
+  height: 48px !important;
+  font-size: 1rem !important;
+  line-height: 48px !important;
+  width: 100% !important;
+  outline: none !important;
+}
+
+/* FOCO → CELESTE (igual que tus inputs) */
+.geoapify-wrapper .geoapify-autocomplete-input:focus {
+  border-color: var(--card) !important;
+  box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25) !important;
+  outline: none !important;
+}
+
+/* Quitar el foco amarillo global */
+.geoapify-wrapper .geoapify-autocomplete-input:focus-visible {
+  outline: none !important;
+}
+
+/* ===== OVERRIDE DURO (PISA EL CSS INTERNO DE GEOAPIFY) ===== */
+.geoapify-autocomplete-input {
+  border: 1px solid var(--card) !important;  /* CELESTE */
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* === DROPDOWN === */
+.geoapify-autocomplete-items {
+  background: #0f1036 !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--card) !important; /* borde celeste */
+  color: var(--text-light) !important;
+  font-size: 0.95rem !important;
+}
+
+/* Item individual */
+.geoapify-autocomplete-item {
+  background: #0f1036 !important;
+  color: #fff !important; /* letra blanca */
+  padding: 8px 10px !important;
+}
+
+/* Ciudad + provincia/pais */
+.geoapify-autocomplete-item small {
+  color: #dcdcdc !important; /* clarito */
+}
+
+/* Hover del item */
+.geoapify-autocomplete-item:hover {
+  background: #2a285e !important; /* celestito */
+  cursor: pointer;
+}
+
+/* Iconito del edificio */
+.geoapify-autocomplete-item .icon {
+  filter: invert(90%) !important; /* icono blanco */
+}
+
+/* X del input */
+.geoapify-autocomplete-input + div svg {
+  fill: #ccc !important;
+  transition: 0.2s;
+}
+
+.geoapify-autocomplete-input + div svg:hover {
+  fill: var(--accent) !important; /* amarillo */
+}
+/* === FORZAR LETRAS BLANCAS EN TODO EL DROPDOWN (strong, span, etc.) === */
+
+/* texto principal (ciudad) */
+.geoapify-autocomplete-item strong {
+  color: #fff !important;
+  font-weight: 600 !important;
+}
+
+ 

@@ -1,106 +1,127 @@
-import {
-  GeoapifyGeocoderAutocomplete,
-  GeoapifyContext,
-} from '@geoapify/react-geocoder-autocomplete';
-import '@geoapify/geocoder-autocomplete/styles/minimal.css';
-import { useState, useEffect, useRef } from 'react';
-import { Button, Form } from 'react-bootstrap';
-import Swal from 'sweetalert2';
-import { useNavigate, useLocation } from 'react-router-dom';
-import '@/styles/miembros.css';
-import '@/styles/abmc.css';
-import BackButton from '@/components/common/BackButton.jsx';
-import { cuerdasService } from '@/services/cuerdasService.js';
-import { areasService } from '@/services/areasService.js';
-import { miembrosService } from '@/services/miembrosService.js';
-import { InputMask } from '@react-input/mask';
+import { useState, useEffect, useRef } from "react";
+import { Button, Form } from "react-bootstrap";
+import Swal from "sweetalert2";
+import { useNavigate, useLocation } from "react-router-dom";
 
-// ---- VALIDAR FECHA dd/mm/aaaa IGUAL QUE index.jsx ----
+import "@/styles/miembros.css";
+import "@/styles/abmc.css";
+
+import BackButton from "@/components/common/BackButton.jsx";
+import GenericEditPopup from "@/components/abmc/GenericEditPopup";
+
+import { cuerdasService } from "@/services/cuerdasService.js";
+import { areasService } from "@/services/areasService.js";
+import { miembrosService } from "@/services/miembrosService.js";
+import { InputMask } from "@react-input/mask";
+import {formatearFechaDdMmAIso} from "@/components/common/datetime.js";
+/* ====================== Helpers ====================== */
+
+const formatearFechaVisual = (fecha) => {
+  if (!fecha) return "";
+  if (fecha.includes("/")) return fecha;
+  const [yyyy, mm, dd] = fecha.split("-");
+  return `${dd}/${mm}/${yyyy}`;
+};
+
+const normalizarFechaBackend = (fecha) => {
+  if (!fecha || fecha.length !== 10) return null;
+  const [dd, mm, yyyy] = fecha.split('/');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 function validarEdadDDMMAAAA(fecha) {
-  if (!fecha.includes('/')) return false;
-
-  const [dia, mes, anio] = fecha.split('/');
+  if (!fecha.includes("/")) return false;
+  const [dia, mes, anio] = fecha.split("/");
   const nacimiento = new Date(anio, mes - 1, dia);
   const hoy = new Date();
-
   let edad = hoy.getFullYear() - nacimiento.getFullYear();
-
-  const cumpleEsteAño =
-    hoy.getMonth() > nacimiento.getMonth() ||
+  if (
+    hoy.getMonth() < nacimiento.getMonth() ||
     (hoy.getMonth() === nacimiento.getMonth() &&
-      hoy.getDate() >= nacimiento.getDate());
-
-  if (!cumpleEsteAño) edad -= 1;
-
+      hoy.getDate() < nacimiento.getDate())
+  )
+    edad--;
   return edad >= 17;
 }
 
-export default function MiembrosEditar({ title = 'Editar miembro' }) {
+/* ====================== COMPONENTE ====================== */
+
+export default function MiembrosEditar({ title = "Editar miembro" }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const miembroInicial = location.state?.miembro;
 
-  // Guardamos el documento viejo (ID original)
+  const miembroInicial = location.state?.miembro;
+  const soloVer = location.state?.soloVer === true;
+
+  const geoRef = useRef(null);
+
   const docViejo = {
     nro: miembroInicial?.id?.nroDocumento,
-    tipo: miembroInicial?.id?.tipoDocumento
+    tipo: miembroInicial?.id?.tipoDocumento,
   };
 
-  // Estado inicial del formulario
-  const [miembro, setMiembro] = useState(() => ({
-    nombre: miembroInicial?.nombre || '',
-    apellido: miembroInicial?.apellido || '',
-    tipoDocumento:
-      miembroInicial?.id?.tipoDocumento || miembroInicial?.tipoDocumento || '',
-    numeroDocumento:
-      miembroInicial?.id?.nroDocumento || miembroInicial?.numeroDocumento || '',
-    fechaNacimiento: miembroInicial?.fechaNacimiento || '',
-    telefono: miembroInicial?.nroTelefono || miembroInicial?.telefono || '',
-    correo: miembroInicial?.correo || '',
-    carreraProfesion: miembroInicial?.carreraProfesion || '',
-    lugarOrigen: miembroInicial?.lugarOrigen || '',
-    instrumentoMusical: miembroInicial?.instrumentoMusical || '',
-    cuerda: miembroInicial?.cuerda?.id || '',
-    area: miembroInicial?.area?.id || '',
-  }));
+  const [miembro, setMiembro] = useState({
+    nombre: miembroInicial?.nombre || "",
+    apellido: miembroInicial?.apellido || "",
+    tipoDocumento: miembroInicial?.id?.tipoDocumento || "",
+    numeroDocumento: miembroInicial?.id?.nroDocumento || "",
+    fechaNacimiento: formatearFechaDdMmAIso(miembroInicial?.fechaNacimiento),
+    telefono: miembroInicial?.nroTelefono || "",
+    correo: miembroInicial?.correo || "",
+    carreraProfesion: miembroInicial?.carreraProfesion || "",
+    lugarOrigen: miembroInicial?.lugarOrigen || "",
+    instrumentoMusical: miembroInicial?.instrumentoMusical || "",
+    cuerda: miembroInicial?.cuerda?.id || "",
+    area: miembroInicial?.area?.id || "",
+  });
 
   const [errores, setErrores] = useState({});
   const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
   const [areasDisponibles, setAreasDisponibles] = useState([]);
 
-  // Cargar cuerdas y áreas
+  // POPUPS
+  const [showPopupCuerda, setShowPopupCuerda] = useState(false);
+  const [showPopupArea, setShowPopupArea] = useState(false);
+
+  // SCHEMAS
+  const cuerdaSchema = [
+    { key: "name", label: "Nombre", type: "text", required: true },
+  ];
+
+  const areaSchema = [
+    { key: "nombre", label: "Nombre", type: "text", required: true },
+    { key: "descripcion", label: "Descripción", type: "text", required: true },
+  ];
+
+  /* === Cargar datos === */
+  const cargarListas = async () => {
+    try {
+      const [cuerdas, areas] = await Promise.all([
+        cuerdasService.list(),
+        areasService.list(),
+      ]);
+      setCuerdasDisponibles(cuerdas);
+      setAreasDisponibles(areas);
+    } catch (error) {
+      console.error("Error cargando cuerdas o áreas:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [cuerdas, areas] = await Promise.all([
-          cuerdasService.list(),
-          areasService.list(),
-        ]);
-        setCuerdasDisponibles(cuerdas);
-        setAreasDisponibles(areas);
-      } catch (error) {
-        console.error('Error cargando cuerdas o áreas:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al cargar datos',
-          text: 'No se pudieron cargar las cuerdas o áreas.',
-          background: '#11103a',
-          color: '#E8EAED',
-        });
-      }
-    };
-    fetchData();
+    cargarListas();
   }, []);
 
-  // Manejo de cambios
+  /* === Manejo de cambios === */
   const handleChange = (e) => {
+    if (soloVer) return;
     const { name, value } = e.target;
     setMiembro((prev) => ({ ...prev, [name]: value }));
     setErrores((prev) => ({ ...prev, [name]: '' }));
   };
 
-  // Validación
+  /* === Validación === */
   const validarCampos = () => {
+    if (soloVer) return true;
     const requeridos = [
       'nombre',
       'apellido',
@@ -108,32 +129,33 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
       'numeroDocumento',
       'cuerda',
     ];
-    const nuevosErrores = {};
+    const err = {};
     requeridos.forEach((campo) => {
-      if (!miembro[campo] || String(miembro[campo]).trim() === '') {
-        nuevosErrores[campo] = 'Campo obligatorio';
+      if (!miembro[campo]?.toString().trim()) {
+        err[campo] = "Campo obligatorio";
       }
     });
-    setErrores(nuevosErrores);
-    return Object.keys(nuevosErrores).length === 0;
+    setErrores(err);
+    return Object.keys(err).length === 0;
   };
 
-  // Enviar actualización
+  /* === Guardar === */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (soloVer) return;
+
     if (!validarCampos()) {
       Swal.fire({
         icon: 'warning',
         title: 'Campos incompletos',
-        text: 'Por favor completá todos los campos obligatorios marcados en amarillo.',
         background: '#11103a',
         color: '#E8EAED',
-        confirmButtonColor: '#7c83ff',
       });
       return;
     }
 
     try {
+      const fechaBackend = formatearFechaDdMmAIso(miembro.fechaNacimiento);
       const payload = {
         id: {
           nroDocumento: miembro.numeroDocumento,
@@ -141,7 +163,7 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
         },
         nombre: miembro.nombre,
         apellido: miembro.apellido,
-        fechaNacimiento: miembro.fechaNacimiento || null,
+        fechaNacimiento: normalizarFechaBackend(miembro.fechaNacimiento),
         nroTelefono: miembro.telefono || null,
         correo: miembro.correo || null,
         carreraProfesion: miembro.carreraProfesion || null,
@@ -157,273 +179,239 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
       Swal.fire({
         icon: 'success',
         title: 'Cambios guardados',
-        text: `Se actualizaron los datos de ${miembro.nombre}.`,
-        timer: 1600,
-        showConfirmButton: false,
         background: '#11103a',
         color: '#E8EAED',
+        timer: 1500,
+        showConfirmButton: false,
       });
 
-      navigate('/miembros');
+      navigate("/miembros", { state: { recargar: true } });
     } catch (error) {
       console.error('Error actualizando miembro:', error);
       Swal.fire({
         icon: 'error',
-        title: 'Error',
-        text: 'No se pudo actualizar el miembro.',
+        title: 'Error al actualizar',
+        text: 'Revisá los datos.',
         background: '#11103a',
         color: '#E8EAED',
       });
     }
   };
 
+  /* ====================== RENDER ====================== */
+
   return (
     <main className="pantalla-miembros">
       <div className="abmc-card">
+
         <div className="abmc-header">
           <BackButton />
-          <h1 className="abmc-title">{title}</h1>
-          <p className="aviso-obligatorios">
-            Los campos marcados con <span className="required">*</span> son
-            obligatorios.
-          </p>
+          <h1 className="abmc-title">
+            {soloVer ? "Ver miembro" : "Editar miembro"}
+          </h1>
         </div>
 
+        <p className="aviso-obligatorios alineado-derecha">
+          Los campos marcados con <span className="required">*</span> son obligatorios.
+        </p>
+
         <Form onSubmit={handleSubmit} className="abmc-topbar">
-          {/* Nombre y Apellido */}
-          <Form.Group className="form-group-miembro">
-            <label>
-              Nombre <span className="required">*</span>
-            </label>
-            <Form.Control
-              type="text"
-              name="nombre"
-              value={miembro.nombre}
-              onChange={handleChange}
-              className={`abmc-input ${errores.nombre ? 'error' : ''}`}
-            />
-          </Form.Group>
 
-          <Form.Group className="form-group-miembro">
-            <label>
-              Apellido <span className="required">*</span>
-            </label>
-            <Form.Control
-              type="text"
-              name="apellido"
-              value={miembro.apellido}
-              onChange={handleChange}
-              className={`abmc-input ${errores.apellido ? 'error' : ''}`}
-            />
-          </Form.Group>
+          <div className="form-grid-2cols">
 
-          {/* Tipo y número de documento */}
-          <div className="form-row-miembros">
-            <div className="mitad">
-              <label>
-                Tipo de Documento <span className="required">*</span>
-              </label>
+            {/* === CAMPOS === */}
+            <Form.Group className="form-group-miembro">
+              <label>Nombre *</label>
+              <Form.Control
+                type="text"
+                name="nombre"
+                value={miembro.nombre}
+                onChange={handleChange}
+                disabled={soloVer}
+                className={`abmc-input ${errores.nombre ? "error" : ""}`}
+              />
+            </Form.Group>
+
+            <Form.Group className="form-group-miembro">
+              <label>Apellido *</label>
+              <Form.Control
+                type="text"
+                name="apellido"
+                value={miembro.apellido}
+                onChange={handleChange}
+                disabled={soloVer}
+                className={`abmc-input ${errores.apellido ? "error" : ""}`}
+              />
+            </Form.Group>
+
+            <Form.Group className="form-group-miembro">
+              <label>Tipo Documento *</label>
               <Form.Select
                 name="tipoDocumento"
                 value={miembro.tipoDocumento}
                 onChange={handleChange}
-                className={`abmc-select visible-dropdown ${
-                  errores.tipoDocumento ? 'error' : ''
-                }`}
+                disabled={soloVer}
+                className={`abmc-select ${errores.tipoDocumento ? "error" : ""}`}
               >
-                <option value="">Seleccionar tipo</option>
+                <option value="">Seleccionar</option>
                 <option value="DNI">DNI</option>
                 <option value="Pasaporte">Pasaporte</option>
                 <option value="Libreta Cívica">Libreta Cívica</option>
               </Form.Select>
-            </div>
+            </Form.Group>
 
-            <div className="mitad">
-              <label>
-                Número de Documento <span className="required">*</span>
-              </label>
+            <Form.Group className="form-group-miembro">
+              <label>Número Documento *</label>
               <Form.Control
                 type="text"
                 name="numeroDocumento"
                 value={miembro.numeroDocumento}
                 onChange={handleChange}
-                className={`abmc-input ${
-                  errores.numeroDocumento ? 'error' : ''
-                }`}
+                disabled={soloVer}
+                className={`abmc-input ${errores.numeroDocumento ? "error" : ""}`}
               />
-            </div>
-          </div>
+            </Form.Group>
 
-          {/* Fecha nacimiento y lugar origen */}
-          <div className="form-row-miembros">
-            <div className="mitad">
-              <label>Fecha de Nacimiento</label>
+            <Form.Group className="form-group-miembro">
+              <label>Fecha Nacimiento</label>
+              <InputMask
+                mask="DD/DD/DDDD"
+                replacement={{ D: /\d/ }}
+                value={miembro.fechaNacimiento}
+                placeholder="dd/mm/aaaa"
+                onChange={(e) => {
+                  if (soloVer) return;
+                  const fecha = e.target.value;
 
-              <div className="abmc-input-wrapper">
-                <InputMask
-                  mask="DD/DD/DDDD"
-                  replacement={{
-                    D: /\d/,
-                    // cada D solo permite dígitos
-                  }}
-                  value={miembro.fechaNacimiento}
-                  placeholder="dd/mm/aaaa"
-                  className="abmc-input"
-                  onChange={(e) => {
-                    const fecha = e.target.value;
+                  setMiembro((prev) => ({
+                    ...prev,
+                    fechaNacimiento: fecha,
+                  }));
+
+                  if (fecha.length === 10 && !validarEdadDDMMAAAA(fecha)) {
+                    Swal.fire({
+                      icon: 'warning',
+                      title: 'Edad no válida',
+                      text: 'Debe ser mayor de 17',
+                      background: '#11103a',
+                      color: '#E8EAED',
+                    });
 
                     setMiembro((prev) => ({
                       ...prev,
-                      fechaNacimiento: fecha,
+                      fechaNacimiento: "",
                     }));
+                  }
+                }}
+                disabled={soloVer}
+                className="abmc-input"
+              />
+            </Form.Group>
 
-                    // solo validar cuando está completo:
-                    if (fecha.length === 10) {
-                      if (!validarEdadDDMMAAAA(fecha)) {
-                        Swal.fire({
-                          icon: 'warning',
-                          title: 'Edad no válida',
-                          text: 'El miembro debe tener al menos 17 años.',
-                          confirmButtonText: 'Aceptar',
-                          customClass: {
-                            confirmButton: 'abmc-btn btn-primary',
-                          },
-                          buttonsStyling: false,
-                          background: '#11103a',
-                          color: '#E8EAED',
-                        });
+            <Form.Group className="form-group-miembro">
+              <label>Lugar Origen</label>
+              <input
+                type="text"
+                className="abmc-input"
+                value={miembro.lugarOrigen}
+                onChange={(e) =>
+                  setMiembro((prev) => ({
+                    ...prev,
+                    lugarOrigen: e.target.value,
+                  }))
+                }
+                disabled={soloVer}
+              />
+            </Form.Group>
 
-                        setMiembro((prev) => ({
-                          ...prev,
-                          fechaNacimiento: '',
-                        }));
-                      }
-                    }
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="mitad">
-              <label>Lugar de Origen</label>
-              <GeoapifyContext apiKey="27d4d3c8bf5147f3ae4cd2f98a44009a">
-                <GeoapifyGeocoderAutocomplete
-                  placeholder="Ej: Córdoba, Argentina"
-                  value={miembro.lugarOrigen}
-                  type="city"
-                  lang="es"
-                  limit={8}
-                  debounceDelay={200}
-                  onChange={(value) => {
-                    setMiembro((prev) => ({
-                      ...prev,
-                      lugarOrigen: value?.formatted || '',
-                    }));
-                  }}
-                  onSuggestionChange={(value) => {
-                    if (!value) return;
-                    setLugarOrigenInput(value.formatted);
-                  }}
-                  className="abmc-input geoapify-wrapper"
-                />
-              </GeoapifyContext>
-            </div>
-          </div>
-
-          {/* Teléfono y Correo */}
-          <div className="form-row-miembros">
-            <div className="mitad">
+            <Form.Group className="form-group-miembro">
               <label>Teléfono</label>
               <Form.Control
                 type="text"
                 name="telefono"
                 value={miembro.telefono}
                 onChange={handleChange}
+                disabled={soloVer}
                 className="abmc-input"
               />
-            </div>
-            <div className="mitad">
-              <label>Correo</label>
-              <Form.Control
-                type="email"
-                name="correo"
-                value={miembro.correo}
-                onChange={handleChange}
-                className="abmc-input"
-              />
-            </div>
-          </div>
+            </Form.Group>
 
-          {/* Profesión e Instrumento */}
-          <div className="form-row-miembros">
-            <div className="mitad">
+            <Form.Group className="form-group-miembro">
               <label>Carrera / Profesión</label>
               <Form.Control
                 type="text"
                 name="carreraProfesion"
                 value={miembro.carreraProfesion}
                 onChange={handleChange}
+                disabled={soloVer}
                 className="abmc-input"
               />
-            </div>
-            <div className="mitad">
+            </Form.Group>
+
+            <Form.Group className="form-group-miembro">
+              <label>Correo</label>
+              <Form.Control
+                type="email"
+                name="correo"
+                value={miembro.correo}
+                onChange={handleChange}
+                disabled={soloVer}
+                className="abmc-input"
+              />
+            </Form.Group>
+
+            <Form.Group className="form-group-miembro">
               <label>Instrumento Musical</label>
               <Form.Control
                 type="text"
                 name="instrumentoMusical"
                 value={miembro.instrumentoMusical}
                 onChange={handleChange}
+                disabled={soloVer}
                 className="abmc-input"
               />
-            </div>
-          </div>
+            </Form.Group>
 
-          {/* Cuerda y Área */}
-          <div className="form-row-cuerda-area">
-            <div className="mitad">
-              <label>
-                Cuerda <span className="required">*</span>
-              </label>
+            {/* === CUERDA === */}
+            <Form.Group className="form-group-miembro">
+              <label>Cuerda *</label>
               <div className="input-with-button">
-                <select
+                <Form.Select
                   name="cuerda"
                   value={miembro.cuerda}
                   onChange={handleChange}
-                  className={`abmc-select ${errores.cuerda ? 'error' : ''}`}
+                  disabled={soloVer}
+                  className={`abmc-select ${errores.cuerda ? "error" : ""}`}
                 >
                   <option value="">Seleccionar cuerda</option>
                   {cuerdasDisponibles.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.nombre || c.name || c.descripcion || '—'}
+                      {c.name}
                     </option>
                   ))}
-                </select>
-                <Button
-                  variant="warning"
-                  className="abmc-btn"
-                  onClick={() => navigate('/cuerdas')}
-                  type="button"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="#e3e3e3"
-                  >
-                    <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
-                  </svg>
-                </Button>
-              </div>
-            </div>
+                </Form.Select>
 
-            <div className="mitad">
+                {!soloVer && (
+                  <Button
+                    variant="warning"
+                    className="abmc-btn"
+                    onClick={() => setShowPopupCuerda(true)}
+                  >
+                    +
+                  </Button>
+                )}
+              </div>
+            </Form.Group>
+
+            {/* === ÁREA === */}
+            <Form.Group className="form-group-miembro">
               <label>Área</label>
               <div className="input-with-button">
-                <select
+                <Form.Select
                   name="area"
                   value={miembro.area}
                   onChange={handleChange}
+                  disabled={soloVer}
                   className="abmc-select"
                 >
                   <option value="">Seleccionar área</option>
@@ -432,42 +420,166 @@ export default function MiembrosEditar({ title = 'Editar miembro' }) {
                       {a.nombre}
                     </option>
                   ))}
-                </select>
-                <Button
-                  variant="warning"
-                  className="abmc-btn"
-                  onClick={() => navigate('/areas')}
-                  type="button"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="#e3e3e3"
+                </Form.Select>
+
+                {!soloVer && (
+                  <Button
+                    variant="warning"
+                    className="abmc-btn"
+                    onClick={() => setShowPopupArea(true)}
                   >
-                    <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
-                  </svg>
-                </Button>
+                    +
+                  </Button>
+                )}
               </div>
-            </div>
+            </Form.Group>
+
           </div>
 
-          {/* Botones */}
-          <div className="acciones-form-miembro derecha">
-            <button
-              type="button"
-              className="abmc-btn abmc-btn-secondary"
-              onClick={() => navigate('/miembros')}
-            >
-              Cancelar
-            </button>
-            <button type="submit" className="abmc-btn abmc-btn-primary">
-              Guardar cambios
-            </button>
-          </div>
+          {!soloVer && (
+            <div className="acciones-form-miembro derecha">
+              <button
+                type="button"
+                className="abmc-btn abmc-btn-secondary"
+                onClick={() =>
+                  navigate("/miembros", { state: { recargar: true } })
+                }
+              >
+                Cancelar
+              </button>
+
+              <button type="submit" className="abmc-btn abmc-btn-primary">
+                Guardar cambios
+              </button>
+            </div>
+          )}
         </Form>
       </div>
+
+      {/* === POPUP CUERDA === */}
+      {showPopupCuerda && (
+        <GenericEditPopup
+          isOpen={showPopupCuerda}
+          onClose={() => setShowPopupCuerda(false)}
+          entityName="Cuerda"
+          schema={cuerdaSchema}
+          entity={{}}
+          onSave={async (values) => {
+            try {
+              if (!values.name?.trim()) {
+                return Swal.fire({
+                  icon: "warning",
+                  title: "Campo obligatorio",
+                  text: "Debés completar el nombre de la cuerda.",
+                  background: "#11103a",
+                  color: "#E8EAED",
+                });
+              }
+
+              await cuerdasService.create({ name: values.name });
+              await cargarListas();
+
+              Swal.fire({
+                icon: "success",
+                title: "Cuerda creada",
+                timer: 1500,
+                showConfirmButton: false,
+                background: "#11103a",
+                color: "#E8EAED",
+              });
+
+              setShowPopupCuerda(false);
+            } catch (err) {
+              const msg = (err.response?.data || "").toLowerCase();
+              const duplicado =
+                msg.includes("duplicate") ||
+                msg.includes("already exists") ||
+                msg.includes("unique");
+
+              if (duplicado) {
+                return Swal.fire({
+                  icon: "warning",
+                  title: "Ya existe",
+                  text: "Ese nombre de cuerda ya está registrado.",
+                  background: "#11103a",
+                  color: "#E8EAED",
+                });
+              }
+
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "No se pudo crear la cuerda.",
+                background: "#11103a",
+                color: "#E8EAED",
+              });
+            }
+          }}
+        />
+      )}
+
+      {/* === POPUP ÁREA === */}
+      {showPopupArea && (
+        <GenericEditPopup
+          isOpen={showPopupArea}
+          onClose={() => setShowPopupArea(false)}
+          entityName="Área"
+          schema={areaSchema}
+          entity={{}}
+          onSave={async (values) => {
+            try {
+              if (!values.nombre?.trim() || !values.descripcion?.trim()) {
+                return Swal.fire({
+                  icon: "warning",
+                  title: "Campos incompletos",
+                  text: "Debés completar nombre y descripción.",
+                  background: "#11103a",
+                  color: "#E8EAED",
+                });
+              }
+
+              await areasService.create(values);
+              await cargarListas();
+
+              Swal.fire({
+                icon: "success",
+                title: "Área creada",
+                timer: 1500,
+                showConfirmButton: false,
+                background: "#11103a",
+                color: "#E8EAED",
+              });
+
+              setShowPopupArea(false);
+            } catch (err) {
+              const msg = (err.response?.data || "").toLowerCase();
+              const duplicado =
+                msg.includes("duplicate") ||
+                msg.includes("already exists") ||
+                msg.includes("unique");
+
+              if (duplicado) {
+                return Swal.fire({
+                  icon: "warning",
+                  title: "Nombre duplicado",
+                  text: "Ya existe un área con ese nombre.",
+                  background: "#11103a",
+                  color: "#E8EAED",
+                });
+              }
+
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "No se pudo crear el área.",
+                background: "#11103a",
+                color: "#E8EAED",
+              });
+            }
+          }}
+        />
+      )}
+
     </main>
   );
 }

@@ -24,7 +24,6 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
 
   // ✅ NUEVO: Estados para manejar franjas originales
   const [esPublicada, setEsPublicada] = useState(false);
-  const [franjasOriginales, setFranjasOriginales] = useState({}); // { 'YYYY-MM-DD': [franjas] }
 
   const [dias, setDias] = useState([]); // array<Date>
   const [data, setData] = useState({ nombre: '', ubicacion: '', fechaDesde: '', fechaHasta: '', dias: {} });
@@ -52,7 +51,7 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
         }
         
         // ✅ NUEVO: Detectar si está publicada
-        setEsPublicada(a.estado === 'PUBLICADA');
+        setEsPublicada(a.estadoAudicion === 'PUBLICADA');
         
         setNombre(a.nombre || '');
         setDescripcion(a.descripcion || '');
@@ -64,8 +63,6 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
         // Prefill días + franjas a partir de turnos existentes
         const turnos = await TurnoService.listarFranjasHorarias(a.id);
         const byDateKey = {};
-        const originalesTemp = {}; // ✅ NUEVO: Para guardar franjas originales
-        
         console.log('Turnos obtenidos para la audición:', turnos);
 
         for (const t of turnos || []) {
@@ -88,7 +85,8 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
             horaDesde: formatHora(horaInicio), 
             horaHasta: formatHora(horaFin), 
             duracion: String(t.duracionTurno || 0),
-            turnoId: t.id
+            turnoId: t.id,
+            esOriginal: true
           };
           
           if (!byDateKey[keyISO]) {
@@ -99,21 +97,7 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
             };
           }
           byDateKey[keyISO].franjas.push(franja);
-          
-          // ✅ NUEVO: Guardar en franjas originales
-          if (!originalesTemp[keyISO]) {
-            originalesTemp[keyISO] = [];
-          }
-          originalesTemp[keyISO].push({
-            horaDesde: formatHora(horaInicio),
-            horaHasta: formatHora(horaFin),
-            duracion: String(t.duracionTurno || 0)
-          });
         }
-
-        // ✅ NUEVO: Guardar franjas originales
-        setFranjasOriginales(originalesTemp);
-        console.log('📦 Franjas originales guardadas:', originalesTemp);
 
         const uniqueDates = Object.keys(byDateKey).sort();
         const toDates = uniqueDates.map(s => byDateKey[s].date);
@@ -160,22 +144,36 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
     setDiaHasta(`${yy}-${mm}-${dd}`);
   };
 
-  // ✅ CORREGIR: Función auxiliar para convertir DD/MM/YYYY o DD-MM-YYYY a YYYY-MM-DD
-  const convertirFechaAISO = (fechaDDMMYYYY) => {
-    if (!fechaDDMMYYYY || typeof fechaDDMMYYYY !== 'string') return null;
-    
-    // Aceptar tanto "/" como "-" como separadores
-    const separador = fechaDDMMYYYY.includes('/') ? '/' : '-';
-    const partes = fechaDDMMYYYY.split(separador);
-    
-    if (partes.length !== 3) return null;
-    
-    const [dia, mes, anio] = partes;
-    return `${anio}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+  const obtenerFranjasIncompletas = () => {
+    const resultado = [];
+    Object.entries(data?.dias || {}).forEach(([fecha, franjas]) => {
+      (franjas || []).forEach((franja, idx) => {
+        if (!franja) return;
+        if (esPublicada && franja.esOriginal) return;
+        const { horaDesde, horaHasta, duracion } = franja;
+        if (!horaDesde || !horaHasta || !duracion) {
+          resultado.push({ fecha, idx });
+        }
+      });
+    });
+    return resultado;
   };
 
   const handleGuardar = async () => {
     if (!audicion?.id) return;
+
+    const franjasIncompletas = obtenerFranjasIncompletas();
+    if (franjasIncompletas.length > 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Faltan completar horarios',
+        text: 'Completá o eliminá las franjas sin hora desde/hasta o duración antes de guardar.',
+        background: '#11103a',
+        color: '#E8EAED'
+      });
+      return;
+    }
+
     setIsSaving(true);
     try {
       // ✅ Si está en BORRADOR, eliminar todos los turnos primero
@@ -187,54 +185,33 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
       // ✅ Filtrar franjas según el estado
       let diasParaEnviar = {};
       
+      const sanitizarFranja = (franja = {}) => ({
+        horaDesde: franja?.horaDesde || '',
+        horaHasta: franja?.horaHasta || '',
+        duracion: franja?.duracion || ''
+      });
+
       if (esPublicada) {
-        // PUBLICADA: Solo enviar franjas NUEVAS (que no están en originales)
+        // PUBLICADA: Solo enviar franjas NUEVAS (no originales)
         Object.keys(data.dias || {}).forEach(fecha => {
-          const franjasDelDia = data.dias[fecha] || [];
-          const fechaISO = convertirFechaAISO(fecha);
-          const originalesDelDia = franjasOriginales[fechaISO] || [];
-          
-          console.log(`Procesando día ${fecha} (ISO: ${fechaISO})`);
-          console.log('Franjas del día:', franjasDelDia);
-          console.log('Franjas originales:', originalesDelDia);
-          
-          const franjasNuevas = franjasDelDia.filter(franja => {
-            // Verificar si esta franja NO existía originalmente
-            const esOriginal = originalesDelDia.some(orig => 
-              orig.horaDesde === franja.horaDesde && 
-              orig.horaHasta === franja.horaHasta && 
-              orig.duracion === franja.duracion
-            );
-            
-            console.log(`Franja ${franja.horaDesde}-${franja.horaHasta} es original:`, esOriginal);
-            
-            return !esOriginal;
-          });
-          
-          console.log('Franjas nuevas filtradas:', franjasNuevas);
-          
-          // Solo incluir el día si hay franjas nuevas
+          const franjasDelDia = (data.dias[fecha] || []).filter(Boolean);
+          const franjasNuevas = franjasDelDia.filter(franja => !franja?.esOriginal);
+
           if (franjasNuevas.length > 0) {
-            diasParaEnviar[fecha] = franjasNuevas;
+            diasParaEnviar[fecha] = franjasNuevas.map(sanitizarFranja);
           }
         });
       } else {
         // BORRADOR: Enviar todas las franjas (ya eliminamos los turnos arriba)
-        diasParaEnviar = data.dias || {};
+        Object.keys(data.dias || {}).forEach(fecha => {
+          const franjasDelDia = (data.dias[fecha] || []).filter(Boolean);
+          if (franjasDelDia.length > 0) {
+            diasParaEnviar[fecha] = franjasDelDia.map(sanitizarFranja);
+          }
+        });
       }
 
-      // ✅ Validar que haya algo que enviar
-      if (Object.keys(diasParaEnviar).length === 0) {
-        Swal.fire({ 
-          icon: 'info', 
-          title: 'Sin cambios', 
-          text: 'No hay nuevas franjas horarias para agregar',
-          background: '#11103a', 
-          color: '#E8EAED' 
-        });
-        setIsSaving(false);
-        return;
-      }
+      
 
       const payload = {
         nombre,
@@ -243,6 +220,7 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
         fechaDesde: diaDesde ? formatDDMMYYYY(new Date(diaDesde)) : '',
         fechaHasta: diaHasta ? formatDDMMYYYY(new Date(diaHasta)) : '',
         dias: diasParaEnviar,
+        estadoAudicion: audicion.estadoAudicion || '',
       };
 
       console.log('Estado de la audición:', esPublicada ? 'PUBLICADA' : 'BORRADOR');
@@ -292,7 +270,7 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
               marginLeft: 'auto', 
               padding: '4px 12px', 
               borderRadius: '4px', 
-              backgroundColor: esPublicada ? '#28a745' : '#ffc107',
+              backgroundColor: esPublicada ? '#28a745' : '#DE9205',
               color: esPublicada ? 'white' : 'black',
               fontSize: '14px',
               fontWeight: 'bold'
@@ -350,7 +328,6 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
                       setDias={setDias} 
                       data={data} 
                       setData={setData}
-                      franjasOriginales={franjasOriginales}
                       esPublicada={esPublicada}
                     />
                   ))

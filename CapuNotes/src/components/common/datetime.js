@@ -60,3 +60,10 @@ export function getYear(dateStr) {
   const match = String(dateStr || '').match(/\b(20\d{2}|19\d{2})\b/);
   return match ? match[1] : '';
 }
+
+export function formatearFechaDdMmAIso(ddMMyyyy) {
+    if (!ddMMyyyy) return null;
+    const [dia, mes, anio] = ddMMyyyy.split("/");
+    return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+}
+

@@ -31,7 +31,8 @@ const sendToService = async (data) => {
             fechaInicio: convertToISODate(data.fechaDesde),
             fechaFin: convertToISODate(data.fechaHasta),
             tipoEvento: "AUDICION",
-            estado: "BORRADOR"
+            estadoAudicion: data.estadoAudicion || "BORRADOR",
+            estado:"PENDIENTE"
         };
 
         let audicionCreada = await AudicionService.crear(audicion);

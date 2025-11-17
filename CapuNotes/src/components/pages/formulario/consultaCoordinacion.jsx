@@ -205,7 +205,7 @@ export default function FormularioConsultaCoordinacion({ title = 'Consulta de In
                 <button
                   type="button"
                   className='abmc-btn abmc-btn-primary'
-                  disabled={updatingCuerda || !selectedCuerda || selectedCuerda === (candidato?.cuerda ?? '')}
+                 
                   onClick={async () => {
                     if (!inscripcionId) {
                       Swal.fire({ icon: 'warning', title: 'Falta id', text: 'No se encontró id de inscripción.' });
