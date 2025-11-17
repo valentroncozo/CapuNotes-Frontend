@@ -119,8 +119,10 @@ const Eventos = () => {
 
         {/* 🔹 Listado de eventos */}
         <div className="eventos-grid">
-          {filteredEventos.map((evento) => (
-            <article key={evento.id} className="evento-card">
+          {filteredEventos.map((evento) => {
+            const hasRepertorios = (evento.cantidadRepertorios || 0) > 0;
+            return (
+              <article key={evento.id} className="evento-card">
               <p>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -187,18 +189,17 @@ const Eventos = () => {
                   </svg>
                 </button>
                 <button
-                  className={`evento-btn repertorios redondeado ${
-                    (evento.cantidadRepertorios || 0) > 0 ? 'activo' : ''
-                  }`}
+                  className={`evento-btn repertorios redondeado ${hasRepertorios ? 'activo' : ''}`}
                   onClick={() => handleOpenRepertorioPopup(evento)}
                   title="Asignar repertorios"
+                  aria-label="Asignar repertorios"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     height="24px"
                     viewBox="0 -960 960 960"
                     width="24px"
-                    fill="#e3e3e3"
+                    fill="currentColor"
                   >
                     <path d="M120-200v-520l280-80 320 80 120-40v520l-320 80-280-80-120 40Zm80-60 200 58v-399l-200-59v400Zm280 58 240-60v-401l-240 60v401Zm-280-458 200 58 240-58-200-58-240 58Zm240 58Zm0 401Zm-80-241Z" />
                   </svg>
@@ -222,7 +223,8 @@ const Eventos = () => {
                 </button>
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
 
         {/* 🔸 Popup eliminar */}

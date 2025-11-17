@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Modal from '@/components/common/Modal.jsx';
 import '@/styles/globals.css';
 import '@/styles/popup.css';
 import DatePicker from 'react-datepicker';
@@ -9,6 +10,7 @@ const PopUpEventos = ({
   eventoSeleccionado,
   onClose,
   onSave,
+  isOpen = true,
 }) => {
   const isViewMode = modo === 'ver';
   const [selectedDate, setSelectedDate] = useState(
@@ -16,6 +18,7 @@ const PopUpEventos = ({
       ? new Date(eventoSeleccionado.fechaInicio)
       : null
   );
+  const formId = 'evento-modal-form';
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,26 +40,37 @@ const PopUpEventos = ({
     onSave(nuevoEvento);
   };
 
+  const modalTitle =
+    modo === 'crear'
+      ? 'Crear Evento'
+      : modo === 'editar'
+      ? 'Modificar Evento'
+      : 'Visualizar Evento';
+
+  const modalActions = isViewMode ? (
+    <button type="button" className="btn btn-primary" onClick={onClose}>
+      Cerrar
+    </button>
+  ) : (
+    <>
+      <button type="button" className="btn btn-secondary" onClick={onClose}>
+        Cancelar
+      </button>
+      <button type="submit" form={formId} className="btn btn-primary">
+        Aceptar
+      </button>
+    </>
+  );
+
   return (
-    <div
-      className="popup-container"
-      style={{ overflow: 'auto', maxHeight: '95vh' }}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={modalTitle}
+      actions={modalActions}
+      className="evento-abmc-modal"
     >
-      <header className="abmc-header">
-        <div className="abmc-title">
-          <h1>
-            {modo === 'crear'
-              ? 'Crear Evento'
-              : modo === 'editar'
-              ? 'Modificar Evento'
-              : 'Visualizar Evento'}
-          </h1>
-        </div>
-      </header>
-
-      <hr className="divisor-amarillo" />
-
-      <form className="popup-form" onSubmit={handleSubmit}>
+      <form id={formId} className="evento-modal-form" onSubmit={handleSubmit}>
         <div className="popup-grid">
           <div className="field">
             <label>Nombre</label>
@@ -115,19 +129,8 @@ const PopUpEventos = ({
             />
           </div>
         </div>
-
-        <div className="popup-actions">
-          <button type="button" className="btn-primary" onClick={onClose}>
-            Cancelar
-          </button>
-          {!isViewMode && (
-            <button type="submit" className="btn-primary">
-              Aceptar
-            </button>
-          )}
-        </div>
       </form>
-    </div>
+    </Modal>
   );
 };
 
