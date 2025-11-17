@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Modal from '@/components/common/Modal.jsx';
 import '@/styles/globals.css';
 import '@/styles/popup.css';
 import { repertoriosService } from '@/services/repertoriosService.js';
 import { eventoService } from '@/services/eventoService.js';
 import Swal from 'sweetalert2';
 
-const RepertorioPopup = ({ evento, onClose, onSaved }) => {
+const RepertorioPopup = ({ evento, onClose, onSaved, isOpen = true }) => {
   const [loading, setLoading] = useState(true);
   const [available, setAvailable] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -100,75 +101,87 @@ const RepertorioPopup = ({ evento, onClose, onSaved }) => {
     onClose();
   };
 
-  if (loading) {
-    return (
-      <div className="popup-container">
-        <p>Cargando repertorios...</p>
-      </div>
-    );
-  }
+  const modalActions = (
+    <>
+      <button type="button" className="btn btn-secondary" onClick={onClose}>
+        Cancelar
+      </button>
+      <button
+        type="button"
+        className="btn btn-primary"
+        disabled={saving || loading}
+        onClick={handleSave}
+      >
+        {loading ? 'Cargando...' : saving ? 'Guardando...' : 'Guardar cambios'}
+      </button>
+    </>
+  );
 
   return (
-    <div className="popup-container" style={{ maxWidth: 700 }}>
-      <header className="abmc-header">
-        <div className="abmc-title">
-          <h1>Repertorios del evento</h1>
-          <p style={{ fontSize: '0.9rem', marginTop: '4px', color: '#ccc' }}>
-            {evento?.nombre} — {evento?.tipoEvento}
-          </p>
-        </div>
-      </header>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Repertorios del evento"
+      className="evento-repertorio-modal"
+      actions={modalActions}
+    >
+      <div className="evento-repertorio-body">
+        <p className="evento-repertorio-resumen">
+          {evento?.nombre || 'Evento sin nombre'} — {evento?.tipoEvento || 'Sin tipo'}
+        </p>
+        <hr className="divisor-amarillo" />
 
-      <hr className="divisor-amarillo" />
+        {loading ? (
+          <div className="evento-repertorio-loading">
+            <p>Cargando repertorios...</p>
+          </div>
+        ) : (
+          <div className="evento-repertorio-scroll">
+            <section className="repertorios-lista">
+              <h2>Seleccionar repertorios existentes</h2>
+              {sortedAvailable.length === 0 ? (
+                <p>No hay repertorios activos disponibles.</p>
+              ) : (
+                <ul className="lista-simple">
+                  {sortedAvailable.map((rep) => (
+                    <li key={rep.id}>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(rep.id)}
+                          onChange={() => toggleRepertorio(rep.id)}
+                        />
+                        <span>
+                          {rep.nombre}{' '}
+                          <small style={{ color: '#aaa' }}>
+                            {rep.cantidadCanciones || rep.canciones?.length || 0} canciones
+                          </small>
+                        </span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
 
-      <div className="popup-content" style={{ overflowY: 'auto' }}>
-        <section className="repertorios-lista">
-          <h2>Seleccionar repertorios existentes</h2>
-          {sortedAvailable.length === 0 ? (
-            <p>No hay repertorios activos disponibles.</p>
-          ) : (
-            <ul className="lista-simple">
-              {sortedAvailable.map((rep) => (
-                <li key={rep.id}>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(rep.id)}
-                      onChange={() => toggleRepertorio(rep.id)}
-                    />
-                    <span>
-                      {rep.nombre}{' '}
-                      <small style={{ color: '#aaa' }}>
-                        {rep.cantidadCanciones || rep.canciones?.length || 0} canciones
-                      </small>
-                    </span>
-                  </label>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <section className="repertorios-crear">
-          <h2>Crear y asociar nuevo repertorio</h2>
-          <p className="texto-suave">
-            Se abrirá el formulario habitual y, si guardás correctamente, lo asignaremos a este evento.
-          </p>
-          <button type="button" className="btn-secondary" onClick={handleNavigateToCreate}>
-            Crear repertorio
-          </button>
-        </section>
+            <section className="repertorios-crear">
+              <h2>Crear y asociar nuevo repertorio</h2>
+              <p className="texto-suave">
+                Se abrirá el formulario habitual y, si guardás correctamente, lo asignaremos a este
+                evento.
+              </p>
+              <button
+                type="button"
+                className="abmc-btn btn-secondary btn-cuestionario"
+                onClick={handleNavigateToCreate}
+              >
+                Crear repertorio
+              </button>
+            </section>
+          </div>
+        )}
       </div>
-
-      <div className="popup-actions">
-        <button type="button" className="btn-secondary" onClick={onClose}>
-          Cancelar
-        </button>
-        <button type="button" className="btn-primary" disabled={saving} onClick={handleSave}>
-          {saving ? 'Guardando...' : 'Guardar cambios'}
-        </button>
-      </div>
-    </div>
+    </Modal>
   );
 };
 
