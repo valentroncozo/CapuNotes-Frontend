@@ -104,7 +104,7 @@
   z-index: 1; /* Asegura que los iconos permanezcan visibles */
   border-radius: 20px; /* Bordes redondeados */
   padding: 4px 16px;
-  min-width: 32%;
+  min-width: 32% !important;
   max-height: 300px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   text-align: center;

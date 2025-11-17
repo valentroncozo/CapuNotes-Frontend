@@ -20,7 +20,6 @@ function showDuplicateAlert(uniqueBy) {
   });
 }
 
-
 export default function EntityTableABMC({
   title = "Entidad",
   service,
@@ -28,6 +27,7 @@ export default function EntityTableABMC({
   uniqueBy = "nombre",
   entityName = "registro",
   showBackButton = true,
+  forceOpenCreate = false,   // 👈 PROP NUEVA
 }) {
   const [items, setItems] = useState([]);
   const [nuevo, setNuevo] = useState({});
@@ -36,15 +36,30 @@ export default function EntityTableABMC({
   const [editOpen, setEditOpen] = useState(false);
   const [selected, setSelected] = useState(null);
 
+  /* -----------------------------------------
+     🚀 AUTOPEN (crear automático si viene true)
+  ------------------------------------------*/
+  useEffect(() => {
+    if (forceOpenCreate) {
+      setSelected({});
+      setEditOpen(true);
+    }
+  }, [forceOpenCreate]);
+
+
+  /* -----------------------------------------
+     Cargar lista inicial
+  ------------------------------------------*/
   const load = async () => {
     try {
       const data = await service.list();
 
-      // Ordenar alfabéticamente por el campo "nombre"
       const sorted = Array.isArray(data)
         ? [...data].sort((a, b) =>
-          (a.nombre || "").localeCompare(b.nombre || "", "es", { sensitivity: "base" })
-        )
+            (a.nombre || "").localeCompare(b.nombre || "", "es", {
+              sensitivity: "base",
+            })
+          )
         : [];
 
       setItems(sorted);
@@ -62,15 +77,14 @@ export default function EntityTableABMC({
     }
   };
 
+  useEffect(() => {
+    load();
+    // eslint-disable-next-line
+  }, []);
 
-  useEffect(() => { load(); /* eslint-disable-next-line */ }, []);
-
-  const handleChangeNuevo = (e) => {
-    const { name, value } = e.target;
-    setNuevo((prev) => ({ ...prev, [name]: value }));
-    if (nuevoError) setNuevoError("");
-  };
-
+  /* -----------------------------------------
+     Campos obligatorios
+  ------------------------------------------*/
   const missingRequiredLabels = (obj) => {
     const labels = [];
     for (const f of schema) {
@@ -79,43 +93,49 @@ export default function EntityTableABMC({
     return labels;
   };
 
-  const isDuplicate = (obj) => {
-    if (!uniqueBy) return false;
-    const base = String(obj[uniqueBy] ?? "").trim().toLowerCase();
-    if (!base) return false;
-    return items.some((it) => String(it[uniqueBy] ?? "").toLowerCase() === base);
-  };
-
   const showMissingAlert = (labels) => {
     const list = labels.map((l) => `<li>${l}</li>`).join("");
     Swal.fire({
       icon: "warning",
       title: "Campos obligatorios",
       html: `<p>Completá los campos requeridos:</p><ul style="text-align:left;margin:0 auto;max-width:300px">${list}</ul>`,
-      confirmButtonText: "OK",
       background: "#11103a",
       color: "#E8EAED",
       confirmButtonColor: "#7c83ff",
     });
   };
 
+  /* -----------------------------------------
+     Detectar duplicado
+  ------------------------------------------*/
+  const isDuplicate = (obj) => {
+    if (!uniqueBy) return false;
+    const base = String(obj[uniqueBy] ?? "").trim().toLowerCase();
+    if (!base) return false;
+    return items.some(
+      (it) => String(it[uniqueBy] ?? "").trim().toLowerCase() === base
+    );
+  };
+
+  /* -----------------------------------------
+     Guardar nuevo registro
+  ------------------------------------------*/
   const handleAgregar = async (e) => {
     e.preventDefault();
 
-    // Validación de campos obligatorios del schema
     const missing = missingRequiredLabels(nuevo);
     if (missing.length) return showMissingAlert(missing);
 
-    // 🔔 Validar duplicado (ya lo tenés)
-    if (isDuplicate(nuevo)) {
-      showDuplicateAlert(uniqueBy);
-      return;
-    }
+    if (isDuplicate(nuevo)) return showDuplicateAlert(uniqueBy);
 
-    // ⚠️ Validación extra solo para ÁREA (si falta descripción)
     if (entityName.toLowerCase() === "área" && !nuevo.descripcion?.trim()) {
-      // mostrar mensaje inline sobre la barra de creación
-      setNuevoError("Debés ingresar una descripción para el área.");
+      Swal.fire({
+        icon: "warning",
+        title: "Falta completar",
+        text: "Debés ingresar una descripción para el área.",
+        background: "#11103a",
+        color: "#E8EAED",
+      });
       return;
     }
 
@@ -124,32 +144,15 @@ export default function EntityTableABMC({
       await load();
       setNuevo({});
 
-      // ✅ Aviso de éxito — si es 'cuerda' mostramos mensaje detallado con el nombre
-      if (String(entityName).toLowerCase() === "cuerda") {
-        const nombre = created?.name || nuevo?.name || "(sin nombre)";
-        Swal.fire({
-          icon: "success",
-          title: "Creado correctamente",
-          text: `La cuerda "${nombre}" ha sido creada con éxito.`,
-          background: "#11103a",
-          color: "#E8EAED",
-          confirmButtonColor: "#7c83ff",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-      } else {
-        Swal.fire({
-          icon: "success",
-          title: "Creado correctamente",
-          text: `${entityName} se creó con éxito.`,
-          background: "#11103a",
-          color: "#E8EAED",
-          confirmButtonColor: "#7c83ff",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-      }
-      setNuevoError("");
+      Swal.fire({
+        icon: "success",
+        title: "Creado correctamente",
+        text: `${entityName} se creó con éxito.`,
+        background: "#11103a",
+        color: "#E8EAED",
+        timer: 1500,
+        showConfirmButton: false,
+      });
     } catch (err) {
       console.error("❌ Error al crear:", err);
       Swal.fire({
@@ -158,18 +161,19 @@ export default function EntityTableABMC({
         text: err.response?.data || "No se pudo crear el registro.",
         background: "#11103a",
         color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
       });
     }
   };
 
-
+  /* -----------------------------------------
+     Eliminar registro
+  ------------------------------------------*/
   const handleEliminar = async (id, displayName) => {
-    // 🔠 Detectar género de la entidad
-    const femenino = ["cuerda", "área", "audición", "especialidad"]; // podés agregar más si querés
-    const articulo = femenino.includes(entityName.toLowerCase()) ? entityName.charAt(0).toUpperCase() + entityName.slice(1).toLowerCase() : entityName;
+    const femenino = ["cuerda", "área", "audición", "especialidad"];
+    const articulo = femenino.includes(entityName.toLowerCase())
+      ? entityName.charAt(0).toUpperCase() + entityName.slice(1)
+      : entityName;
 
-    // 🔔 Confirmación antes de borrar
     const res = await Swal.fire({
       title: `¿Eliminar ${articulo} ${displayName}?`,
       text: "Esta acción no se puede deshacer.",
@@ -178,8 +182,6 @@ export default function EntityTableABMC({
       confirmButtonColor: "#ffc107",
       cancelButtonColor: "#6c757d",
       confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-      reverseButtons: true, // 👉 mantiene Cancelar a la izquierda
       background: "#11103a",
       color: "#E8EAED",
     });
@@ -189,11 +191,9 @@ export default function EntityTableABMC({
     try {
       await service.remove(id);
       await load();
-
-      // ✅ Aviso de éxito al eliminar
       Swal.fire({
         icon: "success",
-        title: `${articulo} eliminad${femenino.includes(entityName.toLowerCase()) ? "a" : "o"}`,
+        title: `${articulo} eliminado`,
         text: `${articulo} "${displayName}" se eliminó correctamente.`,
         timer: 1500,
         showConfirmButton: false,
@@ -201,129 +201,92 @@ export default function EntityTableABMC({
         color: "#E8EAED",
       });
     } catch (err) {
-      console.error("❌ Error al eliminar:", err);
-
       Swal.fire({
         icon: "error",
         title: `No se puede eliminar ${articulo}`,
-        text: "Tiene elementos asociados o un error impide eliminarlo.",
+        text: "Tiene elementos asociados.",
         background: "#11103a",
         color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
-        reverseButtons: true,
       });
     }
   };
 
+  /* -----------------------------------------
+     Editar (update)
+  ------------------------------------------*/
   const handleEditSave = async (updated) => {
-    // Antes: solo update. Ahora unificamos create/update según exista updated.id
+    const baseValue = updated?.[uniqueBy];
+    if (baseValue) {
+      const base = String(baseValue).trim().toLowerCase();
 
-    // 🔹 Validar duplicado (si aplica)
-    if (uniqueBy && Array.isArray(items)) {
-      const baseValue = updated?.[uniqueBy];
+      const duplicado = items.some(
+        (it) =>
+          String(it?.[uniqueBy] ?? "").trim().toLowerCase() === base &&
+          it.id !== updated.id
+      );
 
-      if (baseValue) {
-        const base = String(baseValue).trim().toLowerCase();
-
-        const duplicado = items.some(
-          (it) =>
-            String(it?.[uniqueBy] ?? "").trim().toLowerCase() === base &&
-            it.id !== updated.id
-        );
-
-        if (duplicado) {
-          showDuplicateAlert(uniqueBy);
-          return;
-        }
-      }
+      if (duplicado) return showDuplicateAlert(uniqueBy);
     }
 
-    // Validación extra para "área": devolver false para indicar bloqueo (el popup mostrará el error inline)
     if (!updated.descripcion && entityName.toLowerCase() === "área") {
-      return false;
+      Swal.fire({
+        icon: "warning",
+        title: "Falta completar",
+        text: "Debés ingresar una descripción para el área.",
+        background: "#11103a",
+        color: "#E8EAED",
+      });
+      return;
     }
 
     try {
       if (updated?.id) {
-        const saved = await service.update(updated);
-        if (String(entityName).toLowerCase() === "cuerda") {
-          const nombre = saved?.name || updated?.name || "(sin nombre)";
-          Swal.fire({
-            icon: "success",
-            title: "Actualizado correctamente",
-            text: `La cuerda "${nombre}" ha sido modificada con éxito.`,
-            background: "#11103a",
-            color: "#E8EAED",
-            confirmButtonColor: "#7c83ff",
-            timer: 1500,
-            showConfirmButton: false,
-          });
-        } else {
-          Swal.fire({
-            icon: "success",
-            title: "Actualizado correctamente",
-            text: `${entityName} se actualizó con éxito.`,
-            background: "#11103a",
-            color: "#E8EAED",
-            confirmButtonColor: "#7c83ff",
-            timer: 1500,
-            showConfirmButton: false,
-          });
-        }
+        await service.update(updated);
+        Swal.fire({
+          icon: "success",
+          title: "Actualizado correctamente",
+          text: `${entityName} se actualizó con éxito.`,
+          background: "#11103a",
+          color: "#E8EAED",
+          timer: 1500,
+          showConfirmButton: false,
+        });
       } else {
-        const created = await service.create(updated);
-        if (String(entityName).toLowerCase() === "cuerda") {
-          const nombre = created?.name || updated?.name || "(sin nombre)";
-          Swal.fire({
-            icon: "success",
-            title: "Creado correctamente",
-            text: `La cuerda "${nombre}" ha sido creada con éxito.`,
-            background: "#11103a",
-            color: "#E8EAED",
-            confirmButtonColor: "#7c83ff",
-            timer: 1500,
-            showConfirmButton: false,
-          });
-        } else {
-          Swal.fire({
-            icon: "success",
-            title: "Creado correctamente",
-            text: `${entityName} se creó con éxito.`,
-            background: "#11103a",
-            color: "#E8EAED",
-            confirmButtonColor: "#7c83ff",
-            timer: 1500,
-            showConfirmButton: false,
-          });
-        }
+        await service.create(updated);
+        Swal.fire({
+          icon: "success",
+          title: "Creado correctamente",
+          text: `${entityName} se creó con éxito.`,
+          background: "#11103a",
+          color: "#E8EAED",
+          timer: 1500,
+          showConfirmButton: false,
+        });
       }
 
       await load();
-      setEditOpen(false);
       setSelected(null);
+      setEditOpen(false);
     } catch (err) {
-      console.error("❌ Error al guardar:", err);
-
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: err.response?.data || "No se pudo guardar el registro.",
+        text: err.response?.data || "No se pudo guardar.",
         background: "#11103a",
         color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
       });
     }
   };
 
-
-  // Campos visibles en la tabla (excluir controles: button, submit, label)
+  /* -----------------------------------------
+     Columnas visibles
+  ------------------------------------------*/
   const visibleFields = schema.filter(
     (f) => !["button", "submit", "label"].includes(f.type)
   );
 
   const columnas = visibleFields.map((f) => f.label);
 
-  // Filtrado y orden alfabético
   const filtrados = items
     .filter((i) => {
       if (!filtro) return true;
@@ -334,13 +297,18 @@ export default function EntityTableABMC({
     })
     .sort((a, b) => {
       const campo = uniqueBy || visibleFields[0]?.key;
-      const textoA = String(a[campo] ?? "").toLowerCase();
-      const textoB = String(b[campo] ?? "").toLowerCase();
-      return textoA.localeCompare(textoB, "es", { sensitivity: "base" });
+      return String(a[campo] ?? "")
+        .toLowerCase()
+        .localeCompare(String(b[campo] ?? "").toLowerCase(), "es", {
+          sensitivity: "base",
+        });
     });
 
   const displayKey = uniqueBy || schema[0]?.key;
 
+  /* -----------------------------------------
+     RENDER
+  ------------------------------------------*/
   return (
     <main className="abmc-page">
       <div className="abmc-card">
@@ -349,8 +317,7 @@ export default function EntityTableABMC({
           <h1 className="abmc-title">{title}</h1>
         </div>
 
-
-
+        {/* TOPBAR */}
         <div className="abmc-topbar" style={{ marginTop: 0 }}>
           {nuevoError && (
             <div style={{ padding: '0 12px', width: '100%' }}>
@@ -371,13 +338,13 @@ export default function EntityTableABMC({
             value={filtro}
             onChange={(e) => setFiltro(e.target.value)}
             className="abmc-input"
-            aria-label="Buscar por nombre"
           />
+
           <button
             type="button"
             className="abmc-btn abmc-btn-primary"
             onClick={() => {
-              setSelected({}); // entidad vacía => modo crear en el popup
+              setSelected({});
               setEditOpen(true);
             }}
           >
@@ -385,6 +352,7 @@ export default function EntityTableABMC({
           </button>
         </div>
 
+        {/* TABLA */}
         <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
             <tr>
@@ -394,6 +362,7 @@ export default function EntityTableABMC({
               <th></th>
             </tr>
           </thead>
+
           <tbody>
             {filtrados.length === 0 && (
               <tr className="abmc-row">
@@ -408,13 +377,13 @@ export default function EntityTableABMC({
                 {visibleFields.map((f) => (
                   <td key={f.key}>{item[f.key] ?? "—"}</td>
                 ))}
+
                 <td>
                   <div className="abmc-actions">
                     <button
                       type="button"
                       className="abmc-btn abmc-btn-icon"
                       title="Editar"
-                      aria-label="Editar"
                       onClick={() => {
                         setSelected(item);
                         setEditOpen(true);
@@ -422,11 +391,11 @@ export default function EntityTableABMC({
                     >
                       <EditIcon />
                     </button>
+
                     <button
                       type="button"
                       className="abmc-btn abmc-btn-icon"
                       title="Eliminar"
-                      aria-label="Eliminar"
                       onClick={() =>
                         handleEliminar(item.id, String(item[displayKey] ?? entityName))
                       }
@@ -441,6 +410,7 @@ export default function EntityTableABMC({
         </table>
       </div>
 
+      {/* POPUP */}
       {editOpen && (
         <GenericEditPopup
           isOpen={editOpen}
@@ -448,10 +418,9 @@ export default function EntityTableABMC({
           entityName={entityName}
           schema={schema}
           entity={selected}
-          onSave={handleEditSave} /* ahora maneja create/update según updated.id */
+          onSave={handleEditSave}
         />
       )}
-
     </main>
   );
 }

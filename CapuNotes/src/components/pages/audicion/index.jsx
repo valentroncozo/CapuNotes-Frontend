@@ -12,6 +12,7 @@ import TurnoService from '@/services/turnoServices.js';
 import AudicionService from '@/services/audicionService.js';
 import preguntasService from '@/services/preguntasService.js';
 import Swal from 'sweetalert2';
+import { es } from 'date-fns/locale';
 
 const Audicion = ({ title = 'Audición' }) => {
   const headers = [
@@ -27,14 +28,14 @@ const Audicion = ({ title = 'Audición' }) => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [filtroDia, setFiltroDia] = useState('');
-  const [esPublicada, setEsPublicada] = useState(false);
+  const [esPublicada, setEsPublicada] = useState('');
   const [formulario, setFormulario] = useState([]);
 
   const load = async () => {
     const audicionActual = await AudicionService.getActual();
     setAudicion(audicionActual);
-    setEsPublicada(audicionActual?.estado === 'PUBLICADA');
-
+    setEsPublicada(audicionActual?.estadoAudicion);
+    console.log('audicionActual', audicionActual);
     if (!audicionActual) {
       setData([]);
       setFilteredData([]);
@@ -262,14 +263,14 @@ const Audicion = ({ title = 'Audición' }) => {
       });
 
       if (res.isConfirmed ) {
-        await AudicionService.actualizarParcial(audicion.id, {estado: 'PUBLICADA'});
+        await AudicionService.actualizarParcial(audicion.id, {estadoAudicion: 'PUBLICADA'});
         Swal.fire({
           title: 'Audición publicada',
           icon: 'success',
           background: '#11103a',
           color: '#E8EAED',
         });
-        setEsPublicada(true);
+        setEsPublicada('PUBLICADA');
       }
     }
 
@@ -286,9 +287,13 @@ const Audicion = ({ title = 'Audición' }) => {
       cancelButtonColor: '#6c757d',
     });
     if (res.isConfirmed) {
-      await AudicionService.actualizarParcial(audicion.id, { estado: 'CERRADA' });
+      await AudicionService.actualizarParcial(audicion.id, { estadoAudicion: 'CERRADA' });
       Swal.fire({ title: 'Audición cerrada', icon: 'success' });
-      setEsPublicada(false);
+      setEsPublicada('CERRADA');
+      setData([]);
+      setFilteredData([]);
+      setFormulario([]);
+      setAudicion(null);
     }
   };
 
@@ -307,13 +312,21 @@ const Audicion = ({ title = 'Audición' }) => {
               style={{
                 padding: '4px 12px',
                 borderRadius: '4px',
-                backgroundColor: esPublicada ? '#28a745' : '#ffc107',
-                color: esPublicada ? 'white' : 'black',
+                backgroundColor: 
+                esPublicada === 'PUBLICADA' ? '#28a745' 
+                : esPublicada === 'CERRADA' ? '#dc3545' 
+                : esPublicada === 'BORRADOR' ? 'var(--accent)' 
+                : 'transparent',
+
+                color: esPublicada === 'PUBLICADA' ? 'var(--text-light)' 
+                : esPublicada === 'CERRADA' ? 'var(--text-dark)' 
+                : esPublicada === 'BORRADOR' ? 'var(--text-dark)' 
+                : 'transparent',
                 fontSize: '14px',
                 fontWeight: 'bold',
               }}
             >
-              Estado: {esPublicada ? 'PUBLICADA' : 'BORRADOR'}
+              Estado: {esPublicada || '-'}
             </span>
           </div>
         )}
@@ -367,7 +380,7 @@ const Audicion = ({ title = 'Audición' }) => {
           </div>
 
           <div className="content-footer">
-            {!esPublicada ? (
+            {esPublicada === 'BORRADOR' ? (
               <button
                 type="button"
                 className="abmc-btn btn-primary btn-dias"
@@ -375,7 +388,7 @@ const Audicion = ({ title = 'Audición' }) => {
               >
                 Publicar Audición
               </button>
-            ) : audicion?.estado === 'PUBLICADA' ? (
+            ) : esPublicada === 'PUBLICADA' ? (
               <button
                 type="button"
                 className="abmc-btn btn-primary btn-dias"

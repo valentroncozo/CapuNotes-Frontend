@@ -28,10 +28,10 @@ export const miembrosService = {
       carreraProfesion: m.carreraProfesion || '',
       lugarOrigen: m.lugarOrigen || '',
       instrumentoMusical: m.instrumentoMusical || '',
-      area: m.area?.nombre || null,
+      area: m.area?.name || null,
       cuerda: {
         id: m.cuerda?.id || null,
-        name: m.cuerda?.nombre || null,
+        name: m.cuerda?.name || null,
       },
       activo: m.activo ?? false,
     }));

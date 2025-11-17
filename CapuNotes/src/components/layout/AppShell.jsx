@@ -40,7 +40,6 @@ function GearIcon(props) {
 
 const MENU_ITEMS = [
   ['/asistencias', 'Asistencias'],
-  ['/canciones', 'Canciones'],
   ['/eventos', 'Eventos'],
   ['/usuarios-roles', 'Usuarios y roles'],
 ];
@@ -50,6 +49,7 @@ export default function AppShell({ onLogout }) {
   const [open, setOpen] = useState(false);
   const [orgOpen, setOrgOpen] = useState(false);
   const [audOpen, setAudOpen] = useState(false);
+  const [songsOpen, setSongsOpen] = useState(false);
   const [gearOpen, setGearOpen] = useState(false);
 
   useEffect(() => {
@@ -138,6 +138,8 @@ export default function AppShell({ onLogout }) {
             setOrgOpen={setOrgOpen}
             audOpen={audOpen}
             setAudOpen={setAudOpen}
+            songsOpen={songsOpen}
+            setSongsOpen={setSongsOpen}
             onNavigate={handleNavigate}
           />
         </div>
@@ -159,7 +161,15 @@ export default function AppShell({ onLogout }) {
   );
 }
 
-function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
+function Menu({
+  orgOpen,
+  setOrgOpen,
+  audOpen,
+  setAudOpen,
+  songsOpen,
+  setSongsOpen,
+  onNavigate,
+}) {
   return (
     <div className="appshell-menu">
       <a
@@ -284,6 +294,64 @@ function Menu({ orgOpen, setOrgOpen, audOpen, setAudOpen, onNavigate }) {
               }}
             >
               Configurar Cuestionario
+            </a>
+          </div>
+        )}
+      </div>
+
+      <div className="appshell-accordion-outer">
+        <button
+          className={`appshell-accordion-trigger ${songsOpen ? "open" : ""}`}
+          onClick={() => setSongsOpen((v) => !v)}
+          aria-expanded={songsOpen}
+        >
+          Canciones
+          <span className="appshell-accordion-caret">
+            {songsOpen ? "▴" : "▾"}
+          </span>
+        </button>
+
+        {songsOpen && (
+          <div className="appshell-accordion-content">
+            <a
+              href="/canciones"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate("/canciones");
+              }}
+            >
+              Cancionero
+            </a>
+            <a
+              href="/repertorios"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate("/repertorios");
+              }}
+            >
+              Repertorios
+            </a>
+            <a
+              href="/tiempos-liturgicos"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate("/tiempos-liturgicos");
+              }}
+            >
+              Tiempos litúrgicos
+            </a>
+            <a
+              href="/categorias-canciones"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate("/categorias-canciones");
+              }}
+            >
+              Categorías
             </a>
           </div>
         )}

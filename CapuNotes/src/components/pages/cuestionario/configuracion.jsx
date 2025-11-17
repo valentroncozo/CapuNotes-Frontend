@@ -66,6 +66,7 @@ export default function CuestionarioConfigPage({
 
   const load = async () => {
     const a = await AudicionService.getActual();
+    console.log("Audición actual:", a);
     setAudicion(a);
     const all = await preguntasService.list();
     // Normalizar estructura mínima para evitar undefined en render
@@ -389,7 +390,7 @@ export default function CuestionarioConfigPage({
   const handleAsignar = async (id) => {
     if (!audicion?.id) return;
 
-    if (String(audicion?.estado) !== 'BORRADOR') {
+    if (String(audicion?.estadoAudicion) !== 'BORRADOR') {
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -407,7 +408,7 @@ export default function CuestionarioConfigPage({
 
   const handleQuitar = async (id) => {
     if (!audicion?.id) return;
-    if (audicion?.estado !== 'BORRADOR') {
+    if (audicion?.estadoAudicion !== 'BORRADOR') {
       Swal.fire({
         icon: 'error',
         title: 'Error',

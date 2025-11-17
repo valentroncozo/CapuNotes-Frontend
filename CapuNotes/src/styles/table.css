@@ -88,3 +88,32 @@
   color: var(--accent);
   text-decoration: none;
 }
+
+.badge {
+  font-family: 'Segoe UI', Roboto, sans-serif !important;
+  font-weight: 400 !important;      /* ← SIN NEGRITA */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  height: 28px !important;          /* alto consistente */
+  line-height: 1 !important;
+  padding: 0 12px !important;
+
+  border-radius: 8px !important;
+}
+
+.badge.bg-success,
+.badge.bg-secondary {
+  font-family: 'Segoe UI', 'Roboto', sans-serif !important;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  padding: 0 12px;
+  line-height: 1;
+  border-radius: 8px;
+}
+
