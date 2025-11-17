@@ -20,7 +20,7 @@
 .pm-titulo {
   margin-top: 10px;
   margin-bottom: 20px;
-  color: ##DE9205;
+  color: #DE9205;
 }
 
 .pm-top {
@@ -154,7 +154,7 @@
 
 .filtro-input:focus {
   outline: none;
-  border-color: ##DE9205;
+  border-color: #DE9205;
 }
 
 /* --- AUTOCOMPLETE --- */

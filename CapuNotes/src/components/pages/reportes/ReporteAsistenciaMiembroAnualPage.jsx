@@ -78,7 +78,7 @@ export default function ReportePorMiembroPage() {
   const faltasTotales =
     (reporte.ausentes ?? 0) + ((reporte.mediasFaltas ?? 0) * 0.5);
 
-  const COLORS = ["#AFD1F0", "##DE9205"];
+  const COLORS = ["#AFD1F0", "#DE9205"];
   const dataTorta = [
     { name: "Presente", value: Number(reporte.porcentajeAsistencia ?? 0) },
     { name: "Ausente", value: Number(reporte.porcentajeAusencia ?? 0) },
@@ -156,7 +156,7 @@ export default function ReportePorMiembroPage() {
             <XAxis dataKey="fecha" />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="continuidad" stroke="##DE9205" strokeWidth={3} dot />
+            <Line type="monotone" dataKey="continuidad" stroke="#DE9205" strokeWidth={3} dot />
           </LineChart>
         </ResponsiveContainer>
       </div>
