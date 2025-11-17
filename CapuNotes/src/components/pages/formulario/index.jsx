@@ -77,6 +77,8 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
         setCuerdas(encuesta.cuerdas || []);
         setTurnos(encuesta.turnos || []);
       } catch (error) {
+        console.log("Error al cargar encues");
+        /*
         console.error('Error cargando encuesta:', error);
         Swal.fire({
           icon: 'error',
@@ -85,6 +87,7 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
           background: '#11103a',
           color: '#E8EAED',
         });
+        */
       } finally {
         setLoading(false);
       }
