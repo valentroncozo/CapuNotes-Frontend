@@ -39,6 +39,7 @@ import TiemposLiturgicos from "@/components/pages/tiempos-liturgicos/index.jsx";
 import Canciones from "@/components/pages/canciones/index.jsx";
 import Repertorios from "@/components/pages/repertorios/index.jsx";
 import RepertorioFormPage from "@/components/pages/repertorios/RepertorioFormPage.jsx";
+import RepertorioLecturaPage from "@/components/pages/repertorios/RepertorioLecturaPage.jsx";
 import FraternidadesPage from "@/components/pages/fraternidades/index.jsx";
 import FraternidadFormPage from "@/components/pages/fraternidades/FraternidadFormPage.jsx";
 
@@ -98,6 +99,7 @@ function AppRoutes() {
         <Route path="repertorios" element={<Repertorios />} />
         <Route path="repertorios/nuevo" element={<RepertorioFormPage mode="create" />} />
         <Route path="repertorios/:id/editar" element={<RepertorioFormPage mode="edit" />} />
+        <Route path="repertorios/lectura" element={<RepertorioLecturaPage />} />
         <Route path="fraternidades" element={<FraternidadesPage />} />
         <Route path="fraternidades/nueva" element={<FraternidadFormPage mode="create" />} />
         <Route path="fraternidades/:id/editar" element={<FraternidadFormPage mode="edit" />} />
