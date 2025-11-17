@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import BackButton from "@/components/common/BackButton";
 import RepertorioEditor from "./RepertorioEditor";
 import { repertoriosService } from "@/services/repertoriosService";
+import { eventoService } from "@/services/eventoService";
 
 import "@/styles/abmc.css";
 
 export default function RepertorioFormPage({ mode = "create" }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams();
   const isEdit = mode === "edit";
 
@@ -80,8 +82,32 @@ export default function RepertorioFormPage({ mode = "create" }) {
           timer: 1500,
           showConfirmButton: false,
         });
+        navigate("/repertorios");
+        return;
+      }
+
+      const creado = await repertoriosService.create(payload);
+      const eventoContext = location.state?.eventoContext;
+
+      if (eventoContext?.eventoId) {
+        const repertorioIds = Array.from(
+          new Set([...(eventoContext.repertorioIds || []), creado.id])
+        );
+        await eventoService.update(eventoContext.eventoId, {
+          tipoEvento: eventoContext.tipoEvento,
+          repertorioIds,
+        });
+        Swal.fire({
+          icon: "success",
+          title: "Repertorio creado y asignado",
+          background: "#11103a",
+          color: "#E8EAED",
+          confirmButtonColor: "#7c83ff",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+        navigate(location.state?.redirectTo || "/eventos");
       } else {
-        await repertoriosService.create(payload);
         Swal.fire({
           icon: "success",
           title: "Repertorio agregado",
@@ -91,8 +117,8 @@ export default function RepertorioFormPage({ mode = "create" }) {
           timer: 1500,
           showConfirmButton: false,
         });
+        navigate("/repertorios");
       }
-      navigate("/repertorios");
     } catch (error) {
       console.error("❌ Error al guardar repertorio:", error);
       Swal.fire({
