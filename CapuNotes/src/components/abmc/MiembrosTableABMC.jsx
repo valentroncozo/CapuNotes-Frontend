@@ -188,6 +188,7 @@ export default function MiembrosTableABMC({
             className="abmc-select"
             value={filtroCuerda}
             onChange={(e) => setFiltroCuerda(e.target.value)}
+            style={{ minWidth: 220 }}
           >
             <option value="">Todas las cuerdas</option>
             {cuerdas.map((c) => (

@@ -212,7 +212,7 @@ const FormularioBasico = () => {
             </div>
 
             <div className="field">
-              <label>Profesión/Carrera</label>
+              <label>Profesión/Carrera*</label>
               <input type="text" name="profesion" required />
             </div>
 
