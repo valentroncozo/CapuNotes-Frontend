@@ -329,7 +329,7 @@ export default function CuestionarioConfigPage({
       showCancelButton: true,
       confirmButtonText: 'Aceptar',
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#ffc107',
+      confirmButtonColor: '#DE9205',
       reverseButtons: true,
       background: '#11103a',
       color: '#E8EAED',
@@ -382,7 +382,7 @@ export default function CuestionarioConfigPage({
         background: '#11103a',
         color: '#E8EAED',
         confirmButtonText: 'Aceptar',
-        confirmButtonColor: '#ffc107',
+        confirmButtonColor: '#DE9205',
       });
     }
   };
@@ -398,7 +398,7 @@ export default function CuestionarioConfigPage({
         background: '#11103a',
         color: '#E8EAED',
         confirmButtonText: 'Aceptar',
-        confirmButtonColor: '#ffc107',
+        confirmButtonColor: '#DE9205',
       });
       return;
     }
@@ -416,7 +416,7 @@ export default function CuestionarioConfigPage({
         background: '#11103a',
         color: '#E8EAED',
         confirmButtonText: 'Aceptar',
-        confirmButtonColor: '#ffc107',
+        confirmButtonColor: '#DE9205',
       });
       return;
     }

@@ -101,7 +101,7 @@ export default function RepertoriosPage() {
       text: "Esta acción solo marca el repertorio como inactivo.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#ffc107",
+      confirmButtonColor: "#DE9205",
       cancelButtonColor: "#6c757d",
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",

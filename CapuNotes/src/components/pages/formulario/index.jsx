@@ -378,7 +378,7 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
     }
   };
 
-  return audicion && audicion.estado !== 'PUBLICADA' ? (
+  return audicion && audicion.estadoAudicion !== 'PUBLICADA' ? (
     <main className="encuesta-container">
       <div
         className="abmc-card"

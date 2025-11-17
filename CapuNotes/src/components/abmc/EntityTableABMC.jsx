@@ -179,7 +179,7 @@ export default function EntityTableABMC({
       text: "Esta acción no se puede deshacer.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#ffc107",
+      confirmButtonColor: "#DE9205",
       cancelButtonColor: "#6c757d",
       confirmButtonText: "Sí, eliminar",
       background: "#11103a",
@@ -323,8 +323,8 @@ export default function EntityTableABMC({
             <div style={{ padding: '0 12px', width: '100%' }}>
               <p style={{
                 background: 'rgba(255,193,7,0.12)',
-                border: '1px solid #ffc107',
-                color: '#ffc107',
+                border: '1px solid #DE9205',
+                color: '#DE9205',
                 padding: '8px 10px',
                 borderRadius: '8px',
                 margin: '0 0 8px 0',

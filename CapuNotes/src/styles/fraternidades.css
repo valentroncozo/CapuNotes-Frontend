@@ -1,0 +1,20 @@
+.fraternidad-editor .fraternidad-member-line {
+  display: flex;
+  flex-direction: column;
+}
+
+.fraternidad-editor .fraternidad-member-subtitle {
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.fraternidad-editor .fraternidad-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.fraternidad-editor .fraternidad-panel-actions .abmc-btn {
+  min-width: max-content;
+}

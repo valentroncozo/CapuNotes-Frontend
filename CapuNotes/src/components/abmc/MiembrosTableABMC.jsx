@@ -101,7 +101,7 @@ export default function MiembrosTableABMC({
         : 'El miembro volverá a estar activo.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#ffc107',
+      confirmButtonColor: '#DE9205',
       cancelButtonColor: '#6c757d',
       confirmButtonText: `Sí, ${accion}`,
       cancelButtonText: 'Cancelar',
@@ -134,7 +134,7 @@ export default function MiembrosTableABMC({
           }.`,
         background: '#11103a',
         color: '#E8EAED',
-        confirmButtonColor: '#ffc107',
+        confirmButtonColor: '#DE9205',
         timer: 1500,
         showConfirmButton: false,
       });

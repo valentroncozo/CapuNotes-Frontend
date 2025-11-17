@@ -182,7 +182,7 @@ const Audicion = ({ title = 'Audición' }) => {
       denyButtonText: 'Administrador',
       background: '#11103a',
       color: '#E8EAED',
-      confirmButtonColor: '#ffc107',
+      confirmButtonColor: '#DE9205',
       denyButtonColor: '#6c757d',
     });
     if (res.isConfirmed) {
@@ -258,7 +258,7 @@ const Audicion = ({ title = 'Audición' }) => {
         cancelButtonText: 'Cancelar',
         background: '#11103a',
         color: '#E8EAED',
-        confirmButtonColor: '#ffc107',
+        confirmButtonColor: '#DE9205',
         cancelButtonColor: '#6c757d',
       });
 

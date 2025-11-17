@@ -63,7 +63,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #ffc107;
+  background-color: #DE9205;
   font-size: 20px;
   border: none;
   border-radius: 50%;
@@ -77,7 +77,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #ffc107;
+  background-color: #DE9205;
   font-size: 20px;
   border: none;
   border-radius: 50%;
@@ -144,7 +144,7 @@
 }
 
 .evento-btn {
-  background-color: #ffc107;
+  background-color: #DE9205;
   border: none;
   border-radius: 5px;
   padding: 5px 10px;
@@ -161,7 +161,7 @@
 }
 
 .evento-btn.repertorios.activo {
-  background-color: #ffc107;
+  background-color: #DE9205;
 }
 
 .evento-btn.repertorios:hover {

@@ -227,6 +227,16 @@ function Menu({
             >
               Miembros
             </a>
+            <a
+              href="/fraternidades"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/fraternidades');
+              }}
+            >
+              Fraternidades
+            </a>
           </div>
         )}
       </div>

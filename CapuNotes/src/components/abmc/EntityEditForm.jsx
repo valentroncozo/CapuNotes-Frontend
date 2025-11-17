@@ -91,7 +91,7 @@ export default function EntityEditForm({ isOpen, onClose, entityName, schema, en
                 className="input"
               />
             )}
-            {errors[f.key] && <small style={{ color: "#ffc107" }}>{errors[f.key]}</small>}
+            {errors[f.key] && <small style={{ color: "#DE9205" }}>{errors[f.key]}</small>}
           </div>
         ))}
       </div>
