@@ -34,7 +34,7 @@ const Audicion = ({ title = 'Audición' }) => {
   const load = async () => {
     const audicionActual = await AudicionService.getActual();
     setAudicion(audicionActual);
-    setEsPublicada(audicionActual?.estado);
+    setEsPublicada(audicionActual?.estadoAudicion);
     console.log('audicionActual', audicionActual);
     if (!audicionActual) {
       setData([]);
@@ -263,7 +263,7 @@ const Audicion = ({ title = 'Audición' }) => {
       });
 
       if (res.isConfirmed ) {
-        await AudicionService.actualizarParcial(audicion.id, {estado: 'PUBLICADA'});
+        await AudicionService.actualizarParcial(audicion.id, {estadoAudicion: 'PUBLICADA'});
         Swal.fire({
           title: 'Audición publicada',
           icon: 'success',
@@ -287,7 +287,7 @@ const Audicion = ({ title = 'Audición' }) => {
       cancelButtonColor: '#6c757d',
     });
     if (res.isConfirmed) {
-      await AudicionService.actualizarParcial(audicion.id, { estado: 'CERRADA' });
+      await AudicionService.actualizarParcial(audicion.id, { estadoAudicion: 'CERRADA' });
       Swal.fire({ title: 'Audición cerrada', icon: 'success' });
       setEsPublicada('CERRADA');
       setData([]);
@@ -315,7 +315,7 @@ const Audicion = ({ title = 'Audición' }) => {
                 backgroundColor: 
                 esPublicada === 'PUBLICADA' ? '#28a745' 
                 : esPublicada === 'CERRADA' ? '#dc3545' 
-                : esPublicada === 'BORRADOR' ? 'var(--text-light)' 
+                : esPublicada === 'BORRADOR' ? 'var(--accent)' 
                 : 'transparent',
 
                 color: esPublicada === 'PUBLICADA' ? 'var(--text-light)' 
@@ -380,7 +380,7 @@ const Audicion = ({ title = 'Audición' }) => {
           </div>
 
           <div className="content-footer">
-            {!esPublicada ? (
+            {esPublicada === 'BORRADOR' ? (
               <button
                 type="button"
                 className="abmc-btn btn-primary btn-dias"
@@ -388,7 +388,7 @@ const Audicion = ({ title = 'Audición' }) => {
               >
                 Publicar Audición
               </button>
-            ) : audicion?.estado === 'PUBLICADA' ? (
+            ) : esPublicada === 'PUBLICADA' ? (
               <button
                 type="button"
                 className="abmc-btn btn-primary btn-dias"

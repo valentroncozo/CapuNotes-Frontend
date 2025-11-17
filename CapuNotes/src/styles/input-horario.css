@@ -1,3 +1,49 @@
+/* Oculta el icono nativo del input date en navegadores WebKit/Chromium */
+input[type="date"].custom-date::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Oculta el icono nativo en Firefox */
+input[type="date"].custom-date::-moz-calendar-picker-indicator {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Contenedor para el input y el icono personalizado */
+.input-date-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* Icono SVG personalizado superpuesto */
+.input-date-wrapper .calendar-custom-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.5rem;
+    height: 1.5rem;
+    pointer-events: none;
+    fill: var(--text-light);
+    z-index: 2;
+}
+
+input[type="date"].custom-date {
+    padding-right: 2.5rem;
+}
+input[type="date"]::-webkit-input-placeholder {
+    color: var(--text-light);
+}
+input[type="date"]::-moz-placeholder {
+    color: var(--text-light);
+}
+input[type="date"]:-ms-input-placeholder {
+    color: var(--text-light);
+}
+input[type="date"]::placeholder {
+    color: var(--text-light);
+}
 .input-horario {
     max-width: 9rem;
     
@@ -23,13 +69,14 @@
 
 .input-with-icon .abmc-input[type="text"] {
     width: 100%;
-    padding-left: 4rem; /* espacio para el icono */
+    padding-left: 3rem; /* espacio para el icono */
     box-sizing: border-box;
 }
 
 .input-with-icon .abmc-input[type="time"] {
+    color: var(--text-light);
     width: 30%;
-    padding-left: 4rem; /* espacio para el icono */
+    padding-left: 3rem; /* espacio para el icono */
     box-sizing: border-box;
 }
 
@@ -37,14 +84,13 @@
 
 /* Chromium / WebKit: ocultar pseudo-elementos posibles */
 .abmc-input[type="time"]::-webkit-calendar-picker-indicator {
-  display: none !important;
-  -webkit-appearance: none !important;
-
+    color: var(--text-light);
+    fill: var(--text-light);
 }
 
 
 .clock-icon {
-    left: .5rem;
+    right: 12px;
     position: absolute;
     pointer-events: none;
     fill: var(--text-light);

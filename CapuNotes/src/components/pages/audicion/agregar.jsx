@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import Swal from "sweetalert2";
 
 import sendToService from './components/utils/sendToServices.js';
+import { es } from 'date-fns/locale';
 
 
 const AudicionAgregar = ({title="Agregar Audición"}) => {
@@ -22,7 +23,7 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
     const [dias, setDias]= useState ([]);
 
     // Estado 'data' con estructura: { ubicacion, fechaDesde, fechaHasta, dias: { "DD/MM/YYYY": [ { horaDesde, horaHasta, duracion } ] } }
-    const [data, setData]= useState ({ nombre: nombre, ubicacion: '', fechaDesde: '', fechaHasta: '', dias: {} });
+    const [data, setData]= useState ({ nombre: nombre, ubicacion: '', fechaDesde: '', fechaHasta: '', dias: {}, estadoAudicion: 'BORRADOR' });
 
     // Mantener data.dias sincronizado con el array `dias` (elimina claves huérfanas)
     useEffect(() => {

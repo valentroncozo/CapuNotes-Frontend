@@ -17,6 +17,7 @@ export default async function saveEdicion(audicionId, data) {
     lugar: data.ubicacion,
     fechaInicio: convertToISODate(data.fechaDesde),
     fechaFin: convertToISODate(data.fechaHasta),
+    estadoAudicion: data.estadoAudicion || '',
   };
   await AudicionService.actualizarParcial(audicionId, patch);
 

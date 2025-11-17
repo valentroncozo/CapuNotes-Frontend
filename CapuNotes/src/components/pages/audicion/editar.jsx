@@ -51,7 +51,7 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
         }
         
         // ✅ NUEVO: Detectar si está publicada
-        setEsPublicada(a.estado === 'PUBLICADA');
+        setEsPublicada(a.estadoAudicion === 'PUBLICADA');
         
         setNombre(a.nombre || '');
         setDescripcion(a.descripcion || '');
@@ -220,6 +220,7 @@ export default function AudicionEditar({ title = 'Modificar Audición' }) {
         fechaDesde: diaDesde ? formatDDMMYYYY(new Date(diaDesde)) : '',
         fechaHasta: diaHasta ? formatDDMMYYYY(new Date(diaHasta)) : '',
         dias: diasParaEnviar,
+        estadoAudicion: audicion.estadoAudicion || '',
       };
 
       console.log('Estado de la audición:', esPublicada ? 'PUBLICADA' : 'BORRADOR');
