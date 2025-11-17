@@ -5,7 +5,8 @@
 .pop-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
   display: grid;
   place-items: center;
   z-index: 1000;
@@ -37,6 +38,10 @@
   font-size: 1.1rem;
   position: relative;
   top: 1px; /* levanta visualmente el texto */
+}
+
+.pop-title h1 {
+  font-size: 1.5rem;
 }
 
 .icon-btn {
@@ -107,12 +112,14 @@
 }
 
 .btn-secondary {
-  background: transparent !important;
-  color: var(--card) !important;
-  border: 2px solid var(--card) !important;
+  background: #9e9e9e !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #e8eaed; /* ← TEXTO gris oscuro */
+  box-shadow: none !important; /* si abmc-btn tiene shadow */
 }
 .btn-secondary:hover {
-  background: rgba(179, 205, 250, 0.1);
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #fff !important;
 }
 
 /* Form grid */
@@ -221,20 +228,23 @@ textarea.input::placeholder {
 
 /* Reducir el espacio entre título y la línea dentro de popups */
 .popup-container .abmc-header {
-  margin-bottom: 6px !important;
+  margin-bottom: 2px !important; /* Reduce el espacio debajo del título */
+}
+
+.popup-container .divisor-amarillo {
+  margin-top: 0 !important; /* Elimina el espacio superior de la línea divisora */
 }
 
 .popup-container .abmc-title h1 {
   margin: 0 !important;
   padding: 0 !important;
   transform: translateY(2px);
+  font-size: 1rem !important; /* Reduce el tamaño del título */
 }
 
-/* Ajustes estéticos opcionales */
-.divisor-amarillo {
-  margin: 0;
-  border: none;
-  border-top: 3px solid var(--accent); /* mantiene la línea amarilla */
+/* Quitar línea del header SOLO en los popups */
+.popup-container .pop-header {
+  border-bottom: none !important;
 }
 
 select[name='tipoEvento'] option {
@@ -257,6 +267,66 @@ select[name='tipoEvento']:focus {
 .pop-body {
   padding: 18px;
   width: 100%;
-  max-height: 65vh;     /* 🔥 límite de altura visible */
-  overflow-y: auto;     /* 🔥 habilita scroll interno */
+  max-height: 65vh; /* 🔥 límite de altura visible */
+  overflow-y: auto; /* 🔥 habilita scroll interno */
+}
+
+/* Estados de solo lectura: sin flecha ni cursor de select */
+.input:disabled,
+textarea.input:disabled {
+  cursor: default;
+  color: rgba(232, 234, 237, 0.85);
+}
+
+select.input:disabled {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none;
+  padding-right: 12px;
+}
+
+/* === FECHA + HORA en la misma fila, con el mismo ancho === */
+.field-inline {
+  display: flex;
+  gap: 16px; /* separación entre ambos */
+  width: 100%;
+}
+
+.field-inline .field {
+  flex: 1; /* 🔥 Ambos tienen el MISMO ancho */
+}
+
+.field-inline .field input,
+.field-inline .field .react-datepicker-wrapper {
+  width: 100%; /* Asegura que ambos inputs se adapten */
+}
+
+.popup-grid {
+  display: grid;
+  width: 100%;
+  gap: 16px;
+}
+
+.field input,
+.field select,
+.field .react-datepicker-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.popup-container hr.divisor-amarillo-eventos {
+  border: none;
+  border-top: 3px solid var(--accent);
+  border-radius: 1px;
+  margin: 0.75rem 0 1.25rem;
+}
+
+/* Forzar que el popup tenga SOLO la línea amarilla del popup */
+.popup-container hr {
+  border: none !important;
+}
+
+.popup-container hr.divisor-amarillo-eventos {
+  border-top: 3px solid var(--accent) !important;
 }

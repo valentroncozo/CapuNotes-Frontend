@@ -11,22 +11,21 @@
 
 .abmc-header {
   display: flex;
-  align-items: flex-start;        /* flecha y texto alineados arriba */
+  align-items: flex-start; /* flecha y texto alineados arriba */
   gap: 16px;
   justify-content: flex-start;
   position: relative;
-  margin-bottom: 32px;            /* más espacio con los filtros */
+  margin-bottom: 32px; /* más espacio con los filtros */
 }
-
 
 /* Línea amarilla institucional */
 .abmc-header::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: -30px;
   left: 0;
   width: 100%;
-  height: .5px;
+  height: 0.5px;
   background-color: var(--accent);
   border-radius: 2px;
 }
@@ -38,7 +37,7 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin-top: 28px;               /* 👈 más aire respecto al header */
+  margin-top: 28px; /* 👈 más aire respecto al header */
   margin-bottom: 1.5rem;
 }
 
@@ -53,6 +52,16 @@
 
 .eventos-search-input::placeholder {
   color: #aaa;
+}
+
+.eventos-search-input:hover {
+  outline: none;
+  border-color: transparent; /* Elimina el borde amarillo */
+}
+
+.eventos-search-input:focus {
+  outline: none;
+  border-color: transparent; /* Elimina el borde amarillo en el estado focus */
 }
 
 .eventos-profile {
@@ -73,6 +82,16 @@
   transition: background-color 0.3s;
 }
 
+.evento-btn.agregar:hover {
+  background-color: var(--accent); /* mantener mismo amarillo */
+  color: #e8eaed; /* icono en blanco */
+  filter: brightness(0.98);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  outline: none !important;
+  border: none !important;
+}
+
 .evento-btn.redondeado {
   display: flex;
   align-items: center;
@@ -87,6 +106,15 @@
   transition: background-color 0.3s;
 }
 
+.evento-btn.redondeado:hover {
+  background-color: var(--accent); /* mantener mismo amarillo */
+  color: #e8eaed; /* icono en blanco */
+  filter: brightness(0.98);
+  transform: translateY(-1px);
+  outline: none !important;
+  border: none !important;
+}
+
 /* ===========================
    GRID DE EVENTOS
 =========================== */
@@ -99,7 +127,7 @@
 }
 
 .evento-card {
-  background-color: #AFD1F0;
+  background-color: #afd1f0;
   position: relative;
   z-index: 1; /* Asegura que los iconos permanezcan visibles */
   border-radius: 20px; /* Bordes redondeados */
@@ -116,8 +144,6 @@
 .evento-card:hover {
   transform: translateY(-3px);
 }
-
-
 
 .evento-card h3,
 .evento-card p {
@@ -139,7 +165,7 @@
 .evento-actions {
   gap: 0.5rem;
   display: flex;
-  justify-content:center;
+  justify-content: center;
   margin-top: 0;
 }
 
@@ -184,6 +210,84 @@
   animation: popupFadeIn 0.25s ease;
 }
 
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.popup-actions .btn-secondary {
+  background-color: #b3b3b3 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 18px;
+  padding: 12px 28px;
+  font-weight: 600;
+}
+
+.popup-actions .btn-secondary:hover {
+  filter: brightness(0.95);
+}
+
+.popup-actions .btn-primary {
+  border-radius: 18px;
+  padding: 12px 28px;
+  font-weight: 600;
+}
+
+.btn-secondary {
+  background-color: #3b3b5c;
+  color: #e3e3e3;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 24px;
+}
+
+.btn-secondary:hover {
+  background-color: #4c4c70;
+}
+
+.lista-simple {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lista-simple li {
+  margin-bottom: 8px;
+}
+
+.lista-simple label {
+  display: flex;
+  gap: 8px;
+  font-size: 0.95rem;
+  align-items: center;
+}
+
+.lista-simple input[type='checkbox'] {
+  accent-color: var(--accent);
+}
+
+.repertorios-crear select {
+  min-height: 120px;
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #fff;
+}
+
+.texto-suave {
+  font-size: 0.85rem;
+  color: #bbb;
+  margin-bottom: 0.75rem;
+}
+
 /* Animación de aparición suave */
 @keyframes popupFadeIn {
   from {
@@ -213,4 +317,30 @@
   .popup-container {
     transform: translate(-50%, -50%) scale(0.85);
   }
+}
+
+/* 🔹 Cuando hay popup → fondo borroso e inactivo */
+.eventos-container.blurred {
+  filter: blur(2px);
+  pointer-events: none; /* No deja tocar nada */
+  transition: filter 0.3s ease;
+  user-select: none;
+}
+
+/* 🔹 Overlay oscuro */
+.overlay-block {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45); /* leve oscuridad */
+  backdrop-filter: blur(3px); /* blur más suave */
+  z-index: 900; /* debajo del popup */
+}
+
+/* Asegúrate de que el popup tenga más z-index */
+.popup-container {
+  position: fixed;
+  z-index: 1000 !important;
 }
