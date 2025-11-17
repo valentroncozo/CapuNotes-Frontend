@@ -3,7 +3,7 @@ import { tiemposLiturgicosService } from "@/services/tiemposLiturgicosService";
 
 const tiempoSchema = [
   { key: "nombre", label: "Nombre", required: true, type: "text" },
-  { key: "descripcion", label: "Descripción", type: "text" },
+  { key: "descripcion", label: "Descripción", required: true, type: "text" },
   { key: "primary", label: "Guardar", type: "submit" },
 ];
 

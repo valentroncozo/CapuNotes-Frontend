@@ -284,6 +284,15 @@
   gap: 1rem;
 }
 
+.evento-modal-error {
+  margin: 0 0.5rem 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(222, 146, 5, 0.12);
+  color: #de9205;
+  font-size: 0.95rem;
+}
+
 .evento-modal-form .field-inline {
   display: grid;
   gap: 1rem;
