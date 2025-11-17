@@ -3,6 +3,7 @@ import apiClient from "./apiClient";
 
 const API_URL = "/fraternidades";
 
+
 const mapMember = (m = {}) => ({
   id: {
     tipoDocumento: m.tipoDocumento || m.id?.tipoDocumento || "DNI",
@@ -24,6 +25,7 @@ const mapDetail = (data = {}) => ({
   miembros: Array.isArray(data.miembros) ? data.miembros.map(mapMember) : [],
 });
 
+
 const serializeMembers = (miembros = []) =>
   miembros
     .map((m) => ({
@@ -43,16 +45,21 @@ export const fraternidadesService = {
     return (data || []).map((f) => ({ id: f.id, nombre: f.name }));
   },
 
+  get: async (id) => {
+    const res = await apiClient.get(`${API_URL}/${id}`);
+    return mapDetail(res); // res ya es el data
+  },
+
   create: async (data) => {
-    const payload = { name: data.nombre };
+    const payload = buildPayload(data);
     const result = await apiClient.post(API_URL, { body: payload });
     return { id: result.id, nombre: result.name };
   },
 
   // Actualizar
-  update: async (data) => {
-    const payload = { name: data.nombre };
-    const result = await apiClient.patch(`${API_URL}/${data.id}`, { body: payload });
+  update: async (id, data) => {
+    const payload = buildPayload(data);
+    const result = await apiClient.put(`${API_URL}/${id}`, { body: payload });
     return { id: result.id, nombre: result.name };
   },
 
@@ -61,13 +68,13 @@ export const fraternidadesService = {
   },
 
   listAvailableMembers: async (filters = {}) => {
-    const res = await axios.get(`${API_URL}/miembros-disponibles`, {
+    const res = await apiClient.get(`${API_URL}/miembros-disponibles`, {
       params: {
         areaId: filters.areaId || undefined,
         cuerdaId: filters.cuerdaId || undefined,
       },
     });
-    return Array.isArray(res.data) ? res.data.map(mapMember) : [];
+    return Array.isArray(res) ? res.map(mapMember) : [];
   },
 };
 

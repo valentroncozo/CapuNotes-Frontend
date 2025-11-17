@@ -34,6 +34,14 @@ import AsistenciaEnsayos from '@/components/pages/asistencias/asistenciaEnsayos.
 import ReporteAsistenciaMiembroAnualPage from "@/components/pages/reportes/ReporteAsistenciaMiembroAnualPage.jsx"; // x view:ReporteAsistencia
 import ReportesPage from "@/components/pages/reportes/ReportesPage.jsx"; // x view:ReportesAsistencia
 
+import FraternidadesPage from "@/components/pages/fraternidades/index.jsx";
+import FraternidadFormPage from "@/components/pages/fraternidades/FraternidadFormPage.jsx";
+
+import CategoriasCanciones from "@/components/pages/categorias-canciones/index.jsx";
+import TiemposLiturgicos from "@/components/pages/tiempos-liturgicos/index.jsx";
+import Canciones from "@/components/pages/canciones/index.jsx";
+import Repertorios from "@/components/pages/repertorios/index.jsx";
+import RepertorioFormPage from "@/components/pages/repertorios/RepertorioFormPage.jsx";
 
 import Error401 from "../components/pages/errors/Error401"; //public
 import Error403 from "../components/pages/errors/Error403"; //public
@@ -64,6 +72,13 @@ const ROUTE_COMPONENTS = {
   AsistenciaEnsayosDetalle,
   ReportesPage,
   ReporteAsistenciaMiembroAnualPage,
+  FraternidadesPage,
+  FraternidadFormPage,
+  CategoriasCanciones,
+  TiemposLiturgicos,
+  Canciones,
+  Repertorios,
+  RepertorioFormPage,
 };
 
 const hasPermission = (permissionList = [], required) => {
@@ -134,7 +149,7 @@ function AppRoutes() {
               path={view.path}
               element={
                 <PermissionGate permission={view.permission}>
-                  <Component />
+                  <Component mode={view.mode} />
                 </PermissionGate>
               }
             />

@@ -9,6 +9,7 @@ export const normalizePermission = (value) =>
 
 export const MENU_SECTIONS = [
     { key: 'extra', label: null, type: 'links' },
+    { key: 'can', label: 'Canciones', type: 'accordion' },
     { key: 'rep', label: 'Repertorio', type: 'accordion' },
     { key: 'aud', label: 'Audiciones', type: 'accordion' },
     { key: 'org', label: 'Organización del Coro', type: 'accordion' },
@@ -17,6 +18,15 @@ export const MENU_SECTIONS = [
 export const PROTECTED_VIEWS = [
   { key: 'asistencias', label: 'Asistencias', path: 'asistencias', permission: 'view:asistencias', section: 'extra', componentKey: 'AsistenciaEnsayos' },
   { key: 'asistencias-detalle', label: 'Detalle de asistencia', path: 'asistencias/ensayos/:idEnsayo', permission: 'view:asistencias', showInMenu: false, section: 'extra', componentKey: 'AsistenciaEnsayosDetalle' },
+  
+  { key: 'canciones', label: 'Canciones', path: 'canciones', permission: 'view:Canciones', section: 'can', componentKey: 'Canciones' },
+  { key: 'repertorios', label: 'Repertorios', path: 'repertorios', permission: 'view:repertorios', section: 'can', componentKey: 'Repertorios' },
+  { key: 'repertorios-agregar', label: 'Repertorios Agregar', path: '"repertorios/nuevo', permission: 'view:repertorios', showInMenu: false, section: 'can', componentKey: 'RepertorioFormPage', mode:"create" },
+  { key: 'repertorios-editar', label: 'Repertorios Editar', path: '"repertorios/:id/editar', permission: 'view:repertorios', showInMenu: false, section: 'can', componentKey: 'RepertorioFormPage', mode:"edit" },
+  { key: 'repertorios-lectura', label: 'Repertorios Leer', path: '"repertorios/lectura', permission: 'view:repertorios', showInMenu: false, section: 'can', componentKey: 'RepertorioFormPage', mode:"edit" },
+  
+  { key: 'categorias-canciones', label: 'Categorías', path: 'categorias-canciones', permission: 'view:CategoriasCanciones', section: 'can', componentKey: 'CategoriasCanciones' },
+  { key: 'tiempos-liturgicos', label: 'Tiempos Litúrgicos', path: 'tiempos-liturgicos', permission: 'view:TiemposLiturgicos', section: 'can', componentKey: 'TiemposLiturgicos' },
   
   { key: 'eventos', label: 'Eventos', path: 'eventos', permission: 'view:eventos', section: 'extra', componentKey: 'Eventos' },
   
@@ -31,6 +41,11 @@ export const PROTECTED_VIEWS = [
   
   { key: 'cuerdas', label: 'Cuerdas', path: 'cuerdas', permission: 'view:cuerdas', section: 'org', componentKey: 'Cuerdas' },
   { key: 'areas', label: 'Áreas', path: 'areas', permission: 'view:areas', section: 'org', componentKey: 'Areas' },
+  
+  { key: 'fraternidades', label: 'Fraternidades', path: 'fraternidades', permission: 'view:Fraternidades', section: 'org', componentKey: 'FraternidadesPage' },
+  { key: 'fraternidades-agregar', label: 'Agregar fraternidad', path: 'fraternidades/nueva', permission: 'view:Fraternidades', showInMenu: false, section: 'org', componentKey: 'FraternidadFormPage', mode:"create" },
+  { key: 'fraternidades-editar', label: 'Editar fraternidad', path: 'fraternidades/:id/editar', permission: 'view:Fraternidades', showInMenu: false, section: 'org', componentKey: 'FraternidadFormPage', mode:"edit" },
+  
   { key: 'miembros', label: 'Miembros', path: 'miembros', permission: 'view:miembros', section: 'org', componentKey: 'Miembros' },
   { key: 'miembros-agregar', label: 'Agregar miembro', path: 'miembros/agregar', permission: 'view:crear:miembros', showInMenu: false, section: 'org', componentKey: 'MiembrosAgregar' },
   { key: 'miembros-editar', label: 'Editar miembro', path: 'miembros/editar', permission: 'view:editar:miembros', showInMenu: false, section: 'org', componentKey: 'MiembrosEditar' },
