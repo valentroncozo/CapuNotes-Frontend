@@ -182,6 +182,7 @@ export default function EntityTableABMC({
       confirmButtonColor: "#DE9205",
       cancelButtonColor: "#6c757d",
       confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
       background: "#11103a",
       color: "#E8EAED",
     });

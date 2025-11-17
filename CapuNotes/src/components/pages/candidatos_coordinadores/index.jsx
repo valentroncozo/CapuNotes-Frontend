@@ -8,6 +8,7 @@ import AudicionService from '@/services/audicionService.js';
 import InscripcionView from '@/components/common/InscripcionView.jsx';
 import TableABMC from '@/components/common/table.jsx';
 import TurnoService from '@/services/turnoServices';
+import Swal from 'sweetalert2';
 import { XCircleFill } from "react-bootstrap-icons";
 import EyeOnIcon from '@/assets/VisibilityOnIcon';
 
@@ -30,24 +31,32 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Admin
       console.warn('No se proporcionó un turno válido para cancelar.');
       return;
     }
-
-    const confirm = window.confirm(`¿Está seguro que desea cancelar el turno de ${d.apellido}, ${d.nombre} a las ${d.hora}?`);
-    if (!confirm) return;
+    const res = await Swal.fire({
+      title: 'Confirmar cancelación',
+      text: `¿Confirma que desea cancelar el turno de ${d.apellido}, ${d.nombre} a las ${d.hora}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Aceptar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#ffc107',
+      background: '#11103a',
+      color: '#E8EAED',
+    });
+    if (!res.isConfirmed) return;
 
     try {
       await TurnoService.actualizarEstado(d.raw.turno.id, 'CANCELADO');
-      alert('Turno cancelado correctamente.');
+      await Swal.fire({ icon: 'success', title: 'Turno cancelado', showConfirmButton: false, timer: 1200, background: '#11103a', color: '#E8EAED' });
       // Refrescar la lista de turnos
       const a = await AudicionService.getActual();
       if (a?.id) {
         const cron = await AudicionService.getCronograma(a.id);
         setCronograma(cron || []);
       }
-
     }
     catch (e) {
       console.error('Error al cancelar el turno:', e);
-      alert('No se pudo cancelar el turno. Por favor, intente nuevamente.');
+      await Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo cancelar el turno. Por favor, intente nuevamente.', background: '#11103a', color: '#E8EAED' });
     }
   };
 
