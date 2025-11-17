@@ -353,6 +353,34 @@ button,
   border-radius: 10px !important;
 }
 
+/* Forzar estilo para el botón Cancelar — mayor especificidad y !important */
+.abmc-btn.btn-cancelar,
+.abmc-btn.btn-cancelar:focus,
+.abmc-btn.btn-cancelar:active {
+  background: #9e9e9e !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #E8EAED;           /* ← TEXTO gris oscuro */
+  box-shadow: none !important; /* si abmc-btn tiene shadow */
+}
+
+/* Hover */
+.abmc-btn.btn-cancelar:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #fff !important;
+}
+
+/* Si tu theme usa variables y sobrescribe con background-image, anulalo */
+.abmc-btn.btn-cancelar {
+  background-image: none !important;
+}
+
+/* Si el botón llega a estar disabled (por ej en forms), asegurate que no esté bloqueado */
+.abmc-btn.btn-cancelar[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
 .input-with-button .abmc-btn {
   width: 44px;
   height: 44px;
@@ -375,4 +403,54 @@ button,
 /* Asegurar que el texto interno también sea negro */
 .geoapify-autocomplete-items .geoapify-autocomplete-item * {
   color: #000 !important;
+}
+
+/* Estilo para botones de acción con fondo transparente */
+button.abmc-btn-quitar,
+.abmc-btn-quitar {
+  background: transparent !important;
+  border: 2px solid #fff !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+button.abmc-btn-quitar:hover,
+.abmc-btn-quitar:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: #fff !important;
+  color: #fff !important;
+}
+
+button.abmc-btn-quitar:active,
+.abmc-btn-quitar:active {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 2px solid #fff !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+button.abmc-btn-secondary,
+.abmc-btn-secondary {
+  background-color: #9e9e9e !important; /* gris */
+  color: #e8eaed !important; /* texto claro */
+  border: none !important;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+button.abmc-btn-secondary:hover,
+.abmc-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: #fff !important;
+  color: #fff !important;
+}
+
+button.abmc-btn-secondary:active,
+.abmc-btn-secondary:active {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 2px solid #fff !important;
+  color: #fff !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease-in-out !important;
 }

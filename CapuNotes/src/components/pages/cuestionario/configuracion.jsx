@@ -53,10 +53,14 @@ export default function CuestionarioConfigPage({
   // nuevo estado agregado para el input de nueva opción en el topbar
   const [nuevaOpcion, setNuevaOpcion] = useState('');
 
+  // errores inline
+  const [topErrorMsg, setTopErrorMsg] = useState('');
+
   // estados para edición en modal
   const [isEditing, setIsEditing] = useState(false);
   const [editing, setEditing] = useState(null);
   const [editOpcionInput, setEditOpcionInput] = useState('');
+  const [modalError, setModalError] = useState('');
 
   const assignedIds = useMemo(() => new Set(asignadas), [asignadas]);
 
@@ -86,6 +90,10 @@ export default function CuestionarioConfigPage({
     load();
   }, []);
 
+  useEffect(() => {
+    setModalError('');
+  }, [editing, isEditing]);
+
   const handleCreate = async () => {
     if (!nuevo.valor.trim()) return;
 
@@ -101,9 +109,18 @@ export default function CuestionarioConfigPage({
     };
 
     if (nuevo.tipo === 'OPCION' || nuevo.tipo === 'MULTIOPCION') {
-      createPayload.opciones = (nuevo.opciones || [])
-        .map((o) => String(o?.valor ?? o))
-        .filter((s) => s !== '');
+      const opts = (nuevo.opciones || []).map((o) => String(o?.valor ?? o));
+      // validations: at least one option, no empty strings
+      if (opts.length === 0) {
+        setTopErrorMsg('Debés agregar al menos una opción.');
+        return;
+      }
+      if (opts.some((s) => !s.trim())) {
+        setTopErrorMsg('Las opciones no pueden estar vacías.');
+        return;
+      }
+
+      createPayload.opciones = opts.filter((s) => s !== '');
     }
 
     // DEBUG: mostrar JSON exacto que se enviará
@@ -133,6 +150,7 @@ export default function CuestionarioConfigPage({
       opciones: [],
     });
     setNuevaOpcion('');
+    setTopErrorMsg('');
   };
 
   const handleUpdate = async (p) => {
@@ -302,9 +320,35 @@ export default function CuestionarioConfigPage({
   };
 
   const handleDelete = async (id) => {
+    // confirmación previa a la eliminación
+    const confirm = await Swal.fire({
+      title: '¿Eliminar pregunta?',
+      text: 'Esta acción eliminará la pregunta permanentemente. ¿Querés continuar?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Aceptar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#ffc107',
+      reverseButtons: true,
+      background: '#11103a',
+      color: '#E8EAED',
+    });
+
+    if (!confirm.isConfirmed) return;
+
     try {
       await callDeleteService(id);
       setPreguntas((prev) => prev.filter((x) => x.id !== id));
+      // feedback breve al usuario
+      Swal.fire({
+        icon: 'success',
+        title: 'Eliminado',
+        text: 'La pregunta se eliminó correctamente.',
+        timer: 1200,
+        showConfirmButton: false,
+        background: '#11103a',
+        color: '#E8EAED',
+      });
     } catch (err) {
       console.error('Error eliminando pregunta:', err);
       if (err?.response) {
@@ -328,6 +372,17 @@ export default function CuestionarioConfigPage({
         );
         return;
       }
+
+      // mostrar error al usuario con botón Aceptar
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err?.response?.data || 'No se pudo eliminar la pregunta.',
+        background: '#11103a',
+        color: '#E8EAED',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#ffc107',
+      });
     }
   };
 
@@ -338,10 +393,11 @@ export default function CuestionarioConfigPage({
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'No se pueden asignar preguntas a una audición que no está en estado Borrador.',
+        text: 'No existe audicion cargada para asignar pregunta.',
         background: '#11103a',
         color: '#E8EAED',
-        confirmButtonColor: '#7c83ff',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#ffc107',
       });
       return;
     }
@@ -358,7 +414,8 @@ export default function CuestionarioConfigPage({
         text: 'No se pueden eliminar preguntas a una audición que no está en estado Borrador.',
         background: '#11103a',
         color: '#E8EAED',
-        confirmButtonColor: '#7c83ff',
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#ffc107',
       });
       return;
     }
@@ -379,7 +436,9 @@ export default function CuestionarioConfigPage({
       opciones: [...(prev.opciones || []), { valor: op }],
     }));
     setNuevaOpcion('');
+    setTopErrorMsg('');
   };
+
 
   return (
     <main className="abmc-page">
@@ -387,7 +446,6 @@ export default function CuestionarioConfigPage({
         <header className="abmc-header">
           <BackButton />
           <h1 className="abmc-title">{title}</h1>
-          <hr className="divisor-amarillo" />
         </header>
 
         <div className="abmc-topbar">
@@ -395,12 +453,18 @@ export default function CuestionarioConfigPage({
             className="abmc-input"
             placeholder="Nueva pregunta"
             value={nuevo.valor}
-            onChange={(e) => setNuevo({ ...nuevo, valor: e.target.value })}
+            onChange={(e) => {
+              setNuevo({ ...nuevo, valor: e.target.value });
+              setTopErrorMsg('');
+            }}
           />
           <select
             className="abmc-select"
             value={nuevo.tipo}
-            onChange={(e) => setNuevo({ ...nuevo, tipo: e.target.value })}
+            onChange={(e) => {
+              setNuevo({ ...nuevo, tipo: e.target.value });
+              setTopErrorMsg('');
+            }}
           >
             {tipos.map((t) => (
               <option key={t.value} value={t.value}>
@@ -437,8 +501,24 @@ export default function CuestionarioConfigPage({
                 type="button"
                 onClick={handleAddOpcion}
               >
-                Agregar opción
+                +
               </button>
+            </div>
+          ) : null}
+          {topErrorMsg ? (
+            <div
+              style={{
+                background: 'rgba(255, 87, 34, 0.15)',
+                border: '1px solid #ff5722',
+                color: '#ff7043',
+                padding: '8px 10px',
+                borderRadius: '8px',
+                marginLeft: 12,
+                marginTop: 8,
+                fontSize: '.9rem',
+              }}
+            >
+              {topErrorMsg}
             </div>
           ) : null}
         </div>
@@ -459,51 +539,21 @@ export default function CuestionarioConfigPage({
                 return (
                   <tr key={p.id ?? `row-${idx}`} className="abmc-row">
                     <td>
-                      <input
-                        className="abmc-input"
-                        value={p.valor || ''}
-                        onChange={(e) =>
-                          setPreguntas((prev) =>
-                            prev.map((x) =>
-                              x.id === p.id
-                                ? { ...x, valor: e.target.value }
-                                : x
-                            )
-                          )
-                        }
-                      />
+                      <div className="abmc-text">{p.valor || ''}</div>
                     </td>
                     <td>
-                      <select
-                        className="abmc-select"
-                        value={p.tipo}
-                        onChange={(e) =>
-                          setPreguntas((prev) =>
-                            prev.map((x) =>
-                              x.id === p.id ? { ...x, tipo: e.target.value } : x
-                            )
-                          )
-                        }
-                      >
-                        {tipos.map((t) => (
-                          <option key={t.value} value={t.value}>
-                            {t.label}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="abmc-text">
+                        {(tipos.find((t) => t.value === p.tipo) || {}).label ||
+                          p.tipo}
+                      </div>
                     </td>
                     <td>
                       {(p.opciones || []).length > 0 ? (
-                        <select className="abmc-select">
-                          {(p.opciones || []).map((o, i) => {
-                            const val = opcionToString(o);
-                            return (
-                              <option key={`${val}-${i}`} value={val}>
-                                {val}
-                              </option>
-                            );
-                          })}
-                        </select>
+                        <div className="abmc-text">
+                          {(p.opciones || []).map((o) => opcionToString(o)).join(
+                            ', '
+                          )}
+                        </div>
                       ) : (
                         <span style={{ color: '#888' }}>—</span>
                       )}
@@ -523,6 +573,7 @@ export default function CuestionarioConfigPage({
                                 : [],
                             });
                             setEditOpcionInput('');
+                            setEditErrorMsg('');
                             setIsEditing(true);
                           }}
                         >
@@ -577,7 +628,7 @@ export default function CuestionarioConfigPage({
             <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
               <input
                 className="abmc-input"
-                style={{ flex: 1 }}
+                style={{ flex: 2, minWidth: 0 }}
                 value={editing.valor || ''}
                 onChange={(e) =>
                   setEditing((prev) => ({ ...prev, valor: e.target.value }))
@@ -585,10 +636,12 @@ export default function CuestionarioConfigPage({
               />
               <select
                 className="abmc-select"
+                style={{ flex: '0 0 160px', width: 160, minWidth: 0 }}
                 value={editing.tipo}
-                onChange={(e) =>
-                  setEditing((prev) => ({ ...prev, tipo: e.target.value }))
-                }
+                onChange={(e) => {
+                  setEditing((prev) => ({ ...prev, tipo: e.target.value }));
+                  setEditErrorMsg('');
+                }}
               >
                 {tipos.map((t) => (
                   <option key={t.value} value={t.value}>
@@ -654,52 +707,94 @@ export default function CuestionarioConfigPage({
                         opciones: [...(prev.opciones || []), { valor: v }],
                       }));
                       setEditOpcionInput('');
+                      setEditErrorMsg('');
                     }}
                   >
-                    Agregar opción
-                  </button>
+                  <span class="material-symbols-outlined">
+                  add
+                  </span>
+                    </button>
                 </div>
               )}
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                gap: 8,
-                justifyContent: 'flex-end',
-                marginTop: 12,
-              }}
-            >
-              <button
-                className="abmc-btn"
-                type="button"
-                onClick={() => {
-                  setIsEditing(false);
-                  setEditing(null);
+            {editErrorMsg ? (
+              <div
+                style={{
+                  background: 'rgba(255, 87, 34, 0.15)',
+                  border: '1px solid #ff5722',
+                  color: '#ff7043',
+                  padding: '8px 10px',
+                  borderRadius: '8px',
+                  marginBottom: 10,
+                  fontSize: '.9rem',
                 }}
               >
-                Cancelar
-              </button>
-              <button
-                className="abmc-btn abmc-btn-primary"
-                type="button"
-                onClick={async () => {
-                  if (!editing.valor || !editing.valor.trim()) return;
-                  try {
-                    await handleUpdate(editing);
+                {editErrorMsg}
+              </div>
+            ) : null}
+
+            <div style={{ display: 'flex', gap: 8, flexDirection: 'column', marginTop: 12 }}>
+              {modalError && (
+                <div style={{ width: '100%', marginBottom: 8 }}>
+                  <p style={{
+                    background: 'rgba(255,87,34,0.12)',
+                    border: '1px solid #ff5722',
+                    color: '#ff7043',
+                    padding: '8px 10px',
+                    borderRadius: '8px',
+                    margin: 0,
+                    fontSize: '0.95rem'
+                  }}>{modalError}</p>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button
+                  className="abmc-btn btn-cancelar"
+                  type="button"
+                  onClick={() => {
                     setIsEditing(false);
                     setEditing(null);
-                  } catch (err) {
-                    console.error('No se pudo guardar la pregunta:', err);
-                    // Mensaje simple al usuario (puedes usar Swal si lo importas)
-                    alert(
-                      'Error al guardar la pregunta. Revisa la consola para más detalles.'
-                    );
-                  }
-                }}
-              >
-                Guardar
-              </button>
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="abmc-btn abmc-btn-primary"
+                  type="button"
+                  onClick={async () => {
+                    if (!editing.valor || !editing.valor.trim()) return;
+
+                    // validación inline para preguntas con opciones
+                    if (editing.tipo === 'OPCION' || editing.tipo === 'MULTIOPCION') {
+                      const lista = Array.isArray(editing.opciones) ? editing.opciones : [];
+                      const vals = lista.map(o => String(o?.valor ?? o).trim()).filter(s => s !== '');
+                      if (vals.length === 0) {
+                        setModalError('Debés agregar al menos una opción.');
+                        return;
+                      }
+                      if (vals.some(v => v.length === 0)) {
+                        setModalError('Las opciones no pueden estar vacías.');
+                        return;
+                      }
+                    }
+
+                    try {
+                      await handleUpdate(editing);
+                      setModalError('');
+                      setIsEditing(false);
+                      setEditing(null);
+                    } catch (err) {
+                      console.error('No se pudo guardar la pregunta:', err);
+                      const msg = err?.response?.data || 'Error al guardar la pregunta. Revisa la consola para más detalles.';
+                      setModalError(msg);
+                    }
+                  }}
+                >
+                  Guardar
+                </button>
+              </div>
             </div>
           </Modal>
         ) : null}

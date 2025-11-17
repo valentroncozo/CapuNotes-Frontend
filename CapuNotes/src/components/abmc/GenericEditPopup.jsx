@@ -13,17 +13,21 @@ export default function GenericEditPopup({
   onSave,
 }) {
   const [form, setForm] = useState({});
+  const [errorMsg, setErrorMsg] = useState("");
 
   // 🔹 Detectar si estamos editando o creando
   const isEditing = Boolean(entity && (entity.id || Object.keys(entity).length > 0));
 
   useEffect(() => {
     setForm(entity || {});
+    setErrorMsg("");
   }, [entity, isOpen]);
 
   const onChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    // limpiar mensaje de error al modificar campos
+    if (errorMsg) setErrorMsg("");
   };
 
   const missingRequiredLabels = () => {
@@ -34,22 +38,44 @@ export default function GenericEditPopup({
     return labels;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // Validación inline: campos obligatorios
     const missing = missingRequiredLabels();
     if (missing.length) {
-      const list = missing.map((l) => `<li>${l}</li>`).join("");
-      Swal.fire({
-        icon: "warning",
-        title: "Campos obligatorios",
-        html: `<p>Completá los campos requeridos:</p><ul style="text-align:left;margin:0 auto;max-width:300px">${list}</ul>`,
-        background: "#11103a",
-        color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
-      });
+      setErrorMsg(`Completá los campos requeridos: ${missing.join(', ')}`);
       return;
     }
-    onSave?.(form);
-    onClose?.();
+
+    // Validación inline específica: nombre de cuerda no puede ser solo números
+    if (String(entityName).toLowerCase() === "cuerda") {
+      const nameVal = String(form.name ?? form.nombre ?? "").trim();
+      if (nameVal && /^\d+$/.test(nameVal)) {
+        setErrorMsg("El nombre de la cuerda no puede estar formado únicamente por números.");
+        return;
+      }
+    }
+
+    // Validación inline específica: si la entidad es 'área' debe tener descripción
+    if (String(entityName).toLowerCase() === "área") {
+      const desc = String(form.descripcion ?? "").trim();
+      if (!desc) {
+        setErrorMsg("Debés ingresar una descripción para el área.");
+        return;
+      }
+    }
+
+    try {
+      console.log('GenericEditPopup: calling onSave with form', form);
+      const res = await onSave?.(form);
+      console.log('GenericEditPopup: onSave returned', res);
+      // Si onSave devuelve explícitamente false, consideramos que hubo un bloqueo/validación
+      // y no cerramos el popup. Cualquier otro valor (incluido undefined) cerrará si no hay error.
+      if (res === false) return;
+      onClose?.();
+    } catch (err) {
+      console.error('Error en onSave:', err);
+      // No cerramos el popup para que el usuario pueda corregir
+    }
   };
 
   return (
@@ -59,15 +85,20 @@ export default function GenericEditPopup({
       title={isEditing ? `Editar ${entityName}` : `Agregar ${entityName}`}
       actions={
         <>
-          <button className="btn btn-secondary" onClick={onClose}>
+          <button type="button" className="btn btn-secondary" onClick={onClose}>
             Cancelar
           </button>
-          <button className="btn btn-primary" onClick={handleSave}>
-            {isEditing ? "Guardar cambios" : "Crear"}
+          <button type="button" className="btn btn-primary" onClick={handleSave}>
+            {isEditing ? "Guardar cambios" : "Agregar"}
           </button>
         </>
       }
     >
+      {errorMsg && (
+        <div style={{ padding: '0 18px', marginBottom: 8 }}>
+          <p style={{ color: '#ffc107', fontSize: '0.95rem', margin: 0 }}>{errorMsg}</p>
+        </div>
+      )}
       <div className="form-grid">
         {schema
           .filter((f) => !["submit", "button", "label"].includes(f.type))
@@ -95,6 +126,18 @@ export default function GenericEditPopup({
                     );
                   })}
                 </select>
+              ) : f.type === "textarea" || f.key === "descripcion" ? (
+                <textarea
+                  id={`field-${f.key}`}
+                  name={f.key}
+                  className="input"
+                  value={form[f.key] || ""}
+                  onChange={onChange}
+                  maxLength={f.max}
+                  placeholder={f.label}
+                  rows={5}
+                  style={{ width: "100%", minHeight: 120, resize: "vertical" }}
+                />
               ) : (
                 <input
                   id={`field-${f.key}`}

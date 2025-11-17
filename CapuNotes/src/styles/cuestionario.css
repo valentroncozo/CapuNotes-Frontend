@@ -4,3 +4,27 @@
 .cuest-list { list-style: none; padding: 0; margin: 0; }
 .cuest-row { display: flex; align-items: center; gap: 12px; margin: 8px 0; }
 .cuest-input { flex: 1; }
+
+/* Ajustes para la barra superior del formulario de preguntas */
+.abmc-page .abmc-topbar {
+	align-items: center;
+}
+.abmc-page .abmc-topbar .abmc-input {
+	/* Hacemos que el input de "Nueva pregunta" ocupe el espacio disponible */
+	flex: 1 1 auto;
+	min-width: 0; /* para que el input pueda encoger en pantallas pequeñas */
+	max-width: none;
+}
+.abmc-page .abmc-topbar .abmc-select {
+	/* Select más compacto para dejar más espacio al input */
+	flex: 0 0 160px;
+	width: 160px;
+}
+
+/* En pantallas pequeñas reducimos el select para mantener responsividad */
+@media (max-width: 480px) {
+	.abmc-page .abmc-topbar .abmc-select {
+		flex: 0 0 120px;
+		width: 120px;
+	}
+}

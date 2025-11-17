@@ -29,7 +29,8 @@
 }
 
 .eventos-scroll {
-  overflow-x: auto;
+  /* Forzamos scroll horizontal siempre visible (opción 4) */
+  overflow-x: scroll;
   display: flex;
   height: auto; /* container height fixed, images keep their sizes */
   flex-direction: row;
@@ -39,7 +40,7 @@
   justify-content: flex-start;
   background: transparent; /* decorative cut handled by CutActivityContainer */
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  scrollbar-width: auto; /* Firefox: mostrar scrollbar */
   align-items: center;
   align-content: center;
   width: 100%;
@@ -55,20 +56,24 @@
     padding-bottom: .25rem;
   }
   .eventos-scroll::-webkit-scrollbar {
-    height: 8px;
+    height: 10px;
   }
+  .eventos-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.06); }
   .eventos-scroll::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,.25);
-    border-radius: var(--radius);
+    background: rgba(0,0,0,0.28);
+    border-radius: 999px;
   }
+  .eventos-scroll::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.4); }
 
-  .evento-card {
-    min-width: 220px;
-  }
+  /* Firefox color */
+  .eventos-scroll { scrollbar-color: rgba(0,0,0,0.28) rgba(0,0,0,0.06); }
+
 }
 
 .evento-card {
   min-width: 220px !important;
+  transition: none !important;
+  box-shadow: none !important;
   background: rgba(255,255,255,.05);
   border: 1px solid rgba(255,255,255,.12);
   border-radius: var(--radius);
@@ -94,12 +99,12 @@
   opacity: .95;
 }
 
-.evento-icon {
-  width: 20px;
-  height: 20px;
-  flex: 0 0 20px;
-  color: var(--card);
+
+.evento-card:hover {
+  transform: none !important;
+  box-shadow: none !important;
 }
+
 
 /* ====== Sección de tareas ====== */
 .tareas-grid {
@@ -114,7 +119,7 @@
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: minmax(220px, 1fr);
-    overflow-x: auto;
+    overflow-x: visible;
     gap: 1rem;
     padding-bottom: .25rem;
   }
@@ -128,6 +133,7 @@
 }
 
 .tarea-card {
+  position: relative;
   background: rgba(255,255,255,.05);
   border: 1px solid rgba(255,255,255,.12);
   border-radius: var(--radius);
@@ -142,7 +148,8 @@
 }
 
 .tarea-card:hover {
-  border: 1px solid var(--text-light);
+  z-index: 10;
+  border: 1px solid var(--accent);
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,.45);
 }
