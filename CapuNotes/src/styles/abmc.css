@@ -426,52 +426,12 @@ button,
   color: #000 !important;
 }
 
-/* Estilo para botones de acción con fondo transparente */
-button.abmc-btn-quitar,
-.abmc-btn-quitar {
-  background: transparent !important;
-  border: 2px solid #fff !important;
-  color: #fff !important;
-  box-shadow: none !important;
-  transition: all 0.2s ease-in-out !important;
+/* === Botón Cancelar gris, que gane a .abmc-topbar button === */
+.abmc-topbar .abmc-btn.abmc-btn-secondary {
+  background-color: #6c757d !important;   /* gris */
+  color: white !important;
 }
 
-button.abmc-btn-quitar:hover,
-.abmc-btn-quitar:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-color: #fff !important;
-  color: #fff !important;
-}
-
-button.abmc-btn-quitar:active,
-.abmc-btn-quitar:active {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: 2px solid #fff !important;
-  color: #fff !important;
-  box-shadow: none !important;
-  transition: all 0.2s ease-in-out !important;
-}
-
-button.abmc-btn-secondary,
-.abmc-btn-secondary {
-  background-color: #9e9e9e !important; /* gris */
-  color: #e8eaed !important; /* texto claro */
-  border: none !important;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-button.abmc-btn-secondary:hover,
-.abmc-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-color: #fff !important;
-  color: #fff !important;
-}
-
-button.abmc-btn-secondary:active,
-.abmc-btn-secondary:active {
-  background: rgba(255, 255, 255, 0.2) !important;
-  border: 2px solid #fff !important;
-  color: #fff !important;
-  box-shadow: none !important;
-  transition: all 0.2s ease-in-out !important;
+.abmc-topbar .abmc-btn.abmc-btn-secondary:hover {
+  background-color: #9e9e9e !important;   /* gris oscuro */
 }

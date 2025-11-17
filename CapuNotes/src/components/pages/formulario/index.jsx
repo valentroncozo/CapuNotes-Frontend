@@ -2,17 +2,17 @@ import { useEffect, useState, useMemo } from 'react';
 import Swal from 'sweetalert2';
 import { InputMask } from '@react-input/mask';
 
-// 2️⃣ Importaciones de componentes internos
+//Importaciones de componentes internos
 import BackButton from '../../common/BackButton.jsx';
 import PreguntaTexto from './preguntas/preguntaTexto.jsx';
 import PreguntaOpcion from './preguntas/preguntaOpcion.jsx';
 import PreguntaMultiOpcion from './preguntas/preguntaMultiOpcion.jsx';
 
-// 3️⃣ Importaciones de servicios / lógica
+//Importaciones de servicios / lógica
 import AudicionService from '@/services/audicionService.js';
 import inscripcionService from '@/services/incripcionService.js';
 
-// 4️⃣ Importaciones de tus estilos personalizados (DEBE IR AL FINAL)
+//Importaciones de tus estilos personalizados 
 import '@/styles/abmc.css';
 import '@/styles/formulario.css';
 import { ca } from 'date-fns/locale';

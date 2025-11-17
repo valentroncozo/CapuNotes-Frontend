@@ -25,14 +25,14 @@ return [
     label: "Cuerda",
     type: "select",
     required: true,
-    options: cuerdas.map(c => c.nombre),
+    options: cuerdas.map(c => c.name),
   },
 
   {
     key: "area",
     label: "Área",
     type: "select",
-    options: areas.map(a => a.nombre),
+    options: areas.map(a => a.name),
   },
 
   { key: "primary", label: "Guardar", type: "button" },
