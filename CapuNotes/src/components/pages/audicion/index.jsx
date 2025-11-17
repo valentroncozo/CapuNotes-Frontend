@@ -35,7 +35,7 @@ const Audicion = ({ title = 'Audición' }) => {
     const audicionActual = await AudicionService.getActual();
     setAudicion(audicionActual);
     setEsPublicada(audicionActual?.estado);
-
+    console.log('audicionActual', audicionActual);
     if (!audicionActual) {
       setData([]);
       setFilteredData([]);

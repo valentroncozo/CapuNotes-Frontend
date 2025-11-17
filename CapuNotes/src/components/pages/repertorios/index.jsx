@@ -306,7 +306,7 @@ export default function RepertoriosPage() {
         </div>
 
         <div className="table-wrapper">
-          <table className="abmc-table abmc-table-rect abmc-table--aligned">
+          <table className="abmc-table abmc-table-rect ">
             <thead className="abmc-thead">
               <tr>
                 <th>

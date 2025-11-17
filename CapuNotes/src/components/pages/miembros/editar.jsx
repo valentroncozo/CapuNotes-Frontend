@@ -13,7 +13,7 @@ import { cuerdasService } from "@/services/cuerdasService.js";
 import { areasService } from "@/services/areasService.js";
 import { miembrosService } from "@/services/miembrosService.js";
 import { InputMask } from "@react-input/mask";
-
+import {formatearFechaDdMmAIso} from "@/components/common/datetime.js";
 /* ====================== Helpers ====================== */
 
 const formatearFechaVisual = (fecha) => {
@@ -65,7 +65,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
     apellido: miembroInicial?.apellido || "",
     tipoDocumento: miembroInicial?.id?.tipoDocumento || "",
     numeroDocumento: miembroInicial?.id?.nroDocumento || "",
-    fechaNacimiento: formatearFechaVisual(miembroInicial?.fechaNacimiento),
+    fechaNacimiento: formatearFechaDdMmAIso(miembroInicial?.fechaNacimiento),
     telefono: miembroInicial?.nroTelefono || "",
     correo: miembroInicial?.correo || "",
     carreraProfesion: miembroInicial?.carreraProfesion || "",
@@ -155,7 +155,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
     }
 
     try {
-      const fechaBackend = convertirDDMMYYYYaMMDDYYYY(miembro.fechaNacimiento);
+      const fechaBackend = formatearFechaDdMmAIso(miembro.fechaNacimiento);
       const payload = {
         id: {
           nroDocumento: miembro.numeroDocumento,

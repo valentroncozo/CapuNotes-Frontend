@@ -12,8 +12,8 @@ import GenericEditPopup from "@/components/abmc/GenericEditPopup";
 import { cuerdasService } from "@/services/cuerdasService.js";
 import { areasService } from "@/services/areasService.js";
 import { miembrosService } from "@/services/miembrosService.js";
-
 import { InputMask } from "@react-input/mask";
+import { formatearFechaDdMmAIso } from "@/components/common/datetime.js";
 
 /* ============================================
    Helpers
@@ -150,7 +150,7 @@ export default function MiembrosAgregar() {
     }
 
     try {
-      const fechaBackend = convertirDDMMYYYYaMMDDYYYY(miembro.fechaNacimiento);
+      const fechaBackend = formatearFechaDdMmAIso(miembro.fechaNacimiento);
       const payload = {
         id: {
           nroDocumento: miembro.numeroDocumento,
