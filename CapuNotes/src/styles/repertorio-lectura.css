@@ -1,0 +1,198 @@
+.lectura-page {
+  min-height: 100vh;
+  background: #040421;
+  color: #f5f6fa;
+  padding: 1.25rem clamp(1rem, 4vw, 2rem);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.lectura-wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.lectura-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.lectura-header h1 {
+  font-size: 1.8rem;
+  margin-bottom: .25rem;
+}
+
+.lectura-indice h2 {
+  font-size: 1.3rem;
+  margin-bottom: .75rem;
+}
+
+.lectura-indice ol {
+  list-style: decimal;
+  list-style-position: outside;
+  padding-left: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  margin: 0;
+}
+
+.lectura-indice ol > li {
+  padding-left: .2rem;
+}
+
+.lectura-indice ol > li::marker {
+  font-weight: 600;
+  color: #ffd54f;
+}
+
+.lectura-indice ul {
+  list-style: none;
+  padding-left: 1.65rem;
+  margin: .25rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+}
+
+.indice-link,
+.indice-link:focus,
+.indice-link:active {
+  display: inline-block;
+  color: #ffd54f;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.35;
+}
+
+.lectura-indice ol > li > .indice-link {
+  margin-left: .35rem;
+}
+
+.indice-link:hover {
+  text-decoration: underline;
+}
+
+.lectura-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: .75rem;
+  margin-top: .5rem;
+}
+
+.lectura-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: .75rem;
+  font-size: .95rem;
+}
+
+.lectura-meta-item span {
+  font-size: .8rem;
+  opacity: .8;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.lectura-repertorio h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.lectura-repertorio,
+.lectura-cancion {
+  scroll-margin-top: 85px;
+}
+
+.lectura-cancion {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lectura-cancion:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.lectura-cancion h3 {
+  margin-bottom: .35rem;
+  font-size: 1.1rem;
+  color: #ffd54f;
+}
+
+.lectura-letra {
+  white-space: pre-wrap;
+  line-height: 1.55;
+  font-size: 1rem;
+  color: #f8f9ff;
+  opacity: .95;
+}
+
+.lectura-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  opacity: .8;
+}
+
+.lectura-actions {
+  display: flex;
+  justify-content: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+
+.lectura-actions button {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: .65rem 1.2rem;
+  border-radius: 999px;
+}
+
+.lectura-error {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 59, 59, 0.08);
+  border: 1px solid rgba(255, 59, 59, 0.25);
+  border-radius: 12px;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  body {
+    background: #040421 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .lectura-card {
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .lectura-letra {
+    font-size: 0.95rem;
+  }
+}
+.lectura-page {
+  scroll-behavior: smooth;
+}
