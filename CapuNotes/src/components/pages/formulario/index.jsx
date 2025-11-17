@@ -555,7 +555,9 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
               </div>
               <div className="mitad">
                 <div className="form-group-miembro">
-                  <label>Carrera/Profesión</label>
+                  <label>Carrera/Profesión <span style={{ color: 'var(--accent)' }}>*</span>
+
+                  </label>
                   <input
                     type="text"
                     className="abmc-input"
