@@ -1,9 +1,19 @@
 /**
  * ================================================================
- * 📋 Schema: Asistencia de Ensayo
+ * Schema: Asistencia de Ensayo (VERSION ACTUALIZADA)
  * ---------------------------------------------------------------
- * Define los campos mostrados en la tabla de asistencia.
- * Coincide con el modelo del backend (Miembro, Cuerda, Estado).
+ * Compatible con el DTO del backend:
+ * {
+ *   id,
+ *   estado,
+ *   fechaRegistro,
+ *   ultimaModificacion,
+ *   nombreMiembro,
+ *   apellidoMiembro,
+ *   cuerdaNombre,
+ *   cuerdaId,
+ *   area
+ * }
  * ================================================================
  */
 
@@ -13,17 +23,14 @@ export const asistenciaSchema = [
     label: "Miembro",
     type: "text",
     getValue: (row) =>
-      row.miembro
-        ? `${row.miembro.nombre} ${row.miembro.apellido}`.trim()
-        : "—",
+      `${row.nombreMiembro ?? ""} ${row.apellidoMiembro ?? ""}`.trim(),
     width: "30%",
   },
   {
     key: "cuerda",
     label: "Cuerda",
     type: "text",
-    getValue: (row) =>
-      row.miembro?.cuerda?.name ? row.miembro.cuerda.name : "—",
+    getValue: (row) => row.cuerdaNombre ?? "—",
     width: "20%",
   },
   {
@@ -46,7 +53,7 @@ export const asistenciaSchema = [
       {
         label: "Guardar",
         variant: "primary",
-        onClick: "handleGuardar", // será manejado desde el componente
+        onClick: "handleGuardar", // manejado desde el componente padre
       },
     ],
     width: "25%",
@@ -54,16 +61,22 @@ export const asistenciaSchema = [
 ];
 
 /**
- * 🔑 Clave única: cada registro se identifica por el ID del miembro.
+ * ================================================================
+ * Clave única por fila
+ * ---------------------------------------------------------------
+ * Antes: miembro.id  (ya NO existe en el DTO modernizado)
+ * Ahora: usamos directamente el id de Asistencia.
+ * Si es null (AUSENTE por defecto), igualmente sirve como key para edición.
+ * ================================================================
  */
-export const asistenciaUniqueBy = "miembro.id";
+export const asistenciaUniqueBy = "id";
 
 /**
- * 🏷️ Nombre de la entidad (para logs o mensajes genéricos)
+ * Nombre de la entidad (logs o helpers)
  */
 export const asistenciaEntityName = "asistencia";
 
 /**
- * 💾 Clave local (para almacenamiento temporal si se usa cache)
+ * Clave de storage local (si se desea guardar modificaciones temporales)
  */
 export const ASISTENCIA_STORAGE_KEY = "capunotes_asistencias";

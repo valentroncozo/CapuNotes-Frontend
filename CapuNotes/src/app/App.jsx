@@ -141,7 +141,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/principal" replace />} />
+        <Route index element={<Navigate to="/landing" replace />} />
         <Route path="principal" element={<Principal username={username} />} />
         {PROTECTED_VIEWS.map((view) => {
           const Component = ROUTE_COMPONENTS[view.componentKey];
