@@ -262,6 +262,7 @@ const Eventos = () => {
               fechaInicio: selectedEvento?.fechaInicio || '',
               hora: selectedEvento?.hora || '',
               lugar: selectedEvento?.lugar || '',
+              estado: selectedEvento?.estado || 'PENDIENTE',
             }}
             onClose={handleClosePopup}
             onSave={async (nuevoEvento) => {

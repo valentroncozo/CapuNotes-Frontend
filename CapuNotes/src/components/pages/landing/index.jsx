@@ -85,7 +85,7 @@ const LandingPage = () => {
             <a href="#Actividades">Actividades</a>
           </li>
           <li>
-            <a href="#Únete">Únete</a>
+            <a href="#Unite">Únite</a>
           </li>
           <li>
             <Link to="/login">Login</Link>
@@ -245,9 +245,9 @@ const LandingPage = () => {
           </ContainerPhoto>
         </div>
         <hr className="dividir" />
-        <section id="Unete" className="section-line">
+        <section id="Unite" className="section-line">
           <h2>
-            <strong>Unete</strong>
+            <strong>Únite a Nosotros</strong>
           </h2>
           <p>
             Nosotros, como ministerio de música, prestamos nuestro servicio en
