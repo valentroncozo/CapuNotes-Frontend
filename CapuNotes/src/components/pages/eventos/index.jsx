@@ -8,6 +8,22 @@ import Swal from 'sweetalert2';
 import { eventoService } from '@/services/eventoService.js'; // 👈 corregido
 import '@/styles/abmc.css';
 
+const parseEventoError = (error) => {
+  if (!error?.response) return null;
+  const status = error.response.status;
+  const raw = String(error.response.data || '').toLowerCase();
+  if (status === 400) {
+    if (raw.includes('fecha')) {
+      return 'La fecha ingresada no es válida.';
+    }
+    if (raw.includes('no debe')) {
+      return 'Completá los campos obligatorios y volvé a intentar.';
+    }
+    return 'Revisá los datos del evento e intentá nuevamente.';
+  }
+  return null;
+};
+
 const Eventos = () => {
   const [popupMode, setPopupMode] = useState(null);
   const [selectedEvento, setSelectedEvento] = useState(null);
@@ -118,8 +134,10 @@ const Eventos = () => {
 
         {/* 🔹 Listado de eventos */}
         <div className="eventos-grid">
-          {filteredEventos.map((evento) => (
-            <article key={evento.id} className="evento-card">
+          {filteredEventos.map((evento) => {
+            const hasRepertorios = (evento.cantidadRepertorios || 0) > 0;
+            return (
+              <article key={evento.id} className="evento-card">
               <p>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -155,7 +173,7 @@ const Eventos = () => {
                 >
                   <path d="M480-80q-75 0-140.5-28.5t-114-77q-48.5-48.5-77-114T120-440q0-75 28.5-140.5t77-114q48.5-48.5 114-77T480-800q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-440q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-80Zm0-360Zm112 168 56-56-128-128v-184h-80v216l152 152ZM224-866l56 56-170 170-56-56 170-170Zm512 0 170 170-56 56-170-170 56-56ZM480-160q117 0 198.5-81.5T760-440q0-117-81.5-198.5T480-720q-117 0-198.5 81.5T200-440q0 117 81.5 198.5T480-160Z" />
                 </svg>
-                {evento.hora?.slice(0, 5)}
+                {evento.hora}
               </p>
               <p>
                 <svg
@@ -186,18 +204,17 @@ const Eventos = () => {
                   </svg>
                 </button>
                 <button
-                  className={`evento-btn repertorios redondeado ${
-                    (evento.cantidadRepertorios || 0) > 0 ? 'activo' : ''
-                  }`}
+                  className={`evento-btn repertorios redondeado ${hasRepertorios ? 'activo' : ''}`}
                   onClick={() => handleOpenRepertorioPopup(evento)}
                   title="Asignar repertorios"
+                  aria-label="Asignar repertorios"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     height="24px"
                     viewBox="0 -960 960 960"
                     width="24px"
-                    fill="#e3e3e3"
+                    fill="currentColor"
                   >
                     <path d="M120-200v-520l280-80 320 80 120-40v520l-320 80-280-80-120 40Zm80-60 200 58v-399l-200-59v400Zm280 58 240-60v-401l-240 60v401Zm-280-458 200 58 240-58-200-58-240 58Zm240 58Zm0 401Zm-80-241Z" />
                   </svg>
@@ -221,7 +238,8 @@ const Eventos = () => {
                 </button>
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
 
         {/* 🔸 Popup eliminar */}
@@ -277,13 +295,18 @@ const Eventos = () => {
                 handleClosePopup();
               } catch (error) {
                 console.error('❌ Error al guardar el evento:', error);
+                const inlineMsg = parseEventoError(error);
+                if (inlineMsg) {
+                  return { errorMessage: inlineMsg };
+                }
                 Swal.fire({
                   icon: 'error',
                   title: 'Error al guardar',
-                  text: 'No se pudo guardar el evento. Revisa los datos.',
+                  text: 'No se pudo guardar el evento. Intenta nuevamente.',
                   background: '#11103a',
                   color: '#E8EAED',
                 });
+                return { errorMessage: 'No pudimos guardar el evento. Intentá nuevamente.' };
               }
             }}
           />
