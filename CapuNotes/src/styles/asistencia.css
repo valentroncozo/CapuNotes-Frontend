@@ -42,3 +42,9 @@
 .attendance-btn.selected.white-text {
   color: white !important; /* Ensure white text overrides other rules */
 }
+
+.btn-disabled {
+  opacity: 0.5 !important;
+  filter: grayscale(50%);
+  cursor: not-allowed !important;
+}

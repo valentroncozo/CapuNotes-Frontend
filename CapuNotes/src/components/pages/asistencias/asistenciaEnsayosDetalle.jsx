@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
 import { asistenciasService } from "@/services/asistenciasService.js";
 import { miembrosService } from "@/services/miembrosService.js";
 import { ensayosService } from "@/services/ensayosService.js";
@@ -37,11 +38,14 @@ export default function AsistenciaEnsayosDetalle() {
   const [cuerdas, setCuerdas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [closing, setClosing] = useState(false);
+
+
   const [filterName, setFilterName] = useState("");
   const [filterCuerda, setFilterCuerda] = useState("todas");
 
   // ============================================================
-  // 🔹 Cargar Ensayo + Miembros (solo activos) + Asistencias + Cuerdas
+  // Cargar datos
   // ============================================================
   useEffect(() => {
     if (!idEnsayo) {
@@ -51,39 +55,33 @@ export default function AsistenciaEnsayosDetalle() {
 
     const fetchData = async () => {
       setLoading(true);
+
       try {
         const ensayoData = await ensayosService.getById(idEnsayo);
         const estadoEnsayo = ensayoData?.estadoAsistencia || "PENDIENTE";
 
         const [miembrosData, asistenciasData, cuerdasData] = await Promise.all([
-          miembrosService
-            .list()
-            .then((list) => list.filter((m) => m.activo === true)) // ⬅ SOLO ACTIVOS
-            .catch(() => []),
-
+          miembrosService.list().catch(() => []),
           asistenciasService.listPorEnsayo(idEnsayo).catch(() => []),
           cuerdasService.list().catch(() => []),
         ]);
 
         setCuerdas(cuerdasData);
 
-        // Crear MAP por nombre-apellido para ubicar asistencia previa
         const asistenciaMap = new Map();
         asistenciasData.forEach((a) => {
-          const clave =
-            `${a.nombreMiembro || ""}-${a.apellidoMiembro || ""}`
-              .trim()
-              .toLowerCase();
-          asistenciaMap.set(clave, a.estado);
+          const nombre = (a.nombreMiembro || "").trim().toLowerCase();
+          const apellido = (a.apellidoMiembro || "").trim().toLowerCase();
+          asistenciaMap.set(`${nombre}-${apellido}`, a.estado);
         });
 
-        // Mapear miembros
         const mappedMembers = miembrosData.map((m, i) => {
           const nombre = (m.nombre || "").trim().toLowerCase();
           const apellido = (m.apellido || "").trim().toLowerCase();
           const clave = `${nombre}-${apellido}`;
 
           const estadoBackend = asistenciaMap.get(clave);
+
           const estado =
             estadoEnsayo === "PENDIENTE"
               ? "AUSENTE"
@@ -96,7 +94,7 @@ export default function AsistenciaEnsayosDetalle() {
           return {
             uid: `${nombre}-${apellido}-${i}`,
             id: m.id,
-            nombre: `${m.nombre} ${m.apellido}`,
+            nombre: `${m.nombre || ""} ${m.apellido || ""}`.trim(),
             cuerdaId: m.cuerda?.id || null,
             cuerdaNombre: m.cuerda?.name || "-",
             asistencia: asistenciaLocal,
@@ -114,6 +112,7 @@ export default function AsistenciaEnsayosDetalle() {
         setMembers(mappedMembers);
       } catch (err) {
         console.error("❌ Error cargando datos:", err);
+        setMembers([]);
       } finally {
         setLoading(false);
       }
@@ -123,14 +122,16 @@ export default function AsistenciaEnsayosDetalle() {
   }, [idEnsayo]);
 
   // ============================================================
-  //  Filtros
+  // Filtros
   // ============================================================
-  const cuerdaOptions = useMemo(() => {
-    return [{ id: "todas", name: "Todas las cuerdas" }, ...cuerdas];
-  }, [cuerdas]);
+  const cuerdaOptions = useMemo(
+    () => [{ id: "todas", name: "Todas las cuerdas" }, ...cuerdas],
+    [cuerdas]
+  );
 
   const filteredMembers = useMemo(() => {
     const name = filterName.trim().toLowerCase();
+
     return members.filter((m) => {
       if (filterCuerda !== "todas" && m.cuerdaId?.toString() !== filterCuerda)
         return false;
@@ -142,7 +143,7 @@ export default function AsistenciaEnsayosDetalle() {
   }, [members, filterName, filterCuerda]);
 
   // ============================================================
-  // Cambiar estado local
+  // Cambiar estado
   // ============================================================
   const handleSetAsistencia = (uid, value) => {
     if (ensayoInfo.estadoAsistencia === "CERRADA") return;
@@ -153,10 +154,11 @@ export default function AsistenciaEnsayosDetalle() {
   };
 
   // ============================================================
-  // Guardar asistencias masivas sin romper nada
+  // Guardar
   // ============================================================
   const handleGuardar = async (cerrar = false) => {
-    setSaving(true);
+    if (cerrar) setClosing(true);
+    else setSaving(true);
 
     try {
       const payload = {
@@ -164,23 +166,24 @@ export default function AsistenciaEnsayosDetalle() {
           estado: ESTADOS_MAP[m.asistencia],
           miembro: {
             id: {
-              tipoDocumento: m.raw?.id?.tipoDocumento,
-              nroDocumento: m.raw?.id?.nroDocumento,
-            },
-          },
-        })),
+              tipoDocumento: m.raw?.id?.tipoDocumento || "DNI",
+              nroDocumento: m.raw?.id?.nroDocumento || m.raw?.nroDocumento,
+            }
+          }
+        }))
       };
 
-      console.log("📤 Payload FINAL:", payload);
-
       await asistenciasService.registrarAsistenciasMasivas(idEnsayo, payload);
-      if (cerrar) await asistenciasService.cerrarAsistencia(idEnsayo);
+
+      if (cerrar) {
+        await asistenciasService.cerrarAsistencia(idEnsayo);
+      }
 
       Swal.fire({
         icon: "success",
         title: cerrar
           ? "Asistencia guardada y cerrada"
-          : "Asistencias guardadas",
+          : "Asistencias guardadas correctamente",
         timer: 1500,
         showConfirmButton: false,
         background: "#11103a",
@@ -188,18 +191,19 @@ export default function AsistenciaEnsayosDetalle() {
       });
 
       setTimeout(() => navigate(-1), 1300);
-    } catch (error) {
-      console.error("❌ ERROR AL GUARDAR:", error);
 
+    } catch (error) {
+      console.error("❌ Error al guardar asistencias:", error);
       Swal.fire({
         icon: "error",
         title: "Error al guardar asistencias",
-        text: "Revisá la consola del backend.",
+        text: "Ocurrió un error al procesar las asistencias.",
         background: "#11103a",
-        color: "#E8EAED",
+        color: "#E8EAED"
       });
     } finally {
       setSaving(false);
+      setClosing(false);
     }
   };
 
@@ -213,14 +217,29 @@ export default function AsistenciaEnsayosDetalle() {
   return (
     <main className="abmc-page">
       <div className="abmc-card">
+        {/* ===== ENCABEZADO ===== */}
         <div className="abmc-header asistencia-header">
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <BackButton />
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <h1 className="abmc-title" style={{ fontSize: "1.9rem" }}>
+              <h1
+                className="abmc-title"
+                style={{
+                  fontSize: "1.9rem",
+                  fontWeight: 700,
+                  marginBottom: "0.3rem",
+                }}
+              >
                 Asistencia {ensayoInfo.nombre}
               </h1>
-              <span style={{ opacity: 0.85 }}>
+
+              <span
+                style={{
+                  fontSize: "1.05rem",
+                  opacity: 0.85,
+                  marginTop: "0.1rem",
+                }}
+              >
                 {ensayoInfo.fecha
                   ? ensayoInfo.fecha.split("-").reverse().join("/")
                   : "-"}
@@ -229,7 +248,16 @@ export default function AsistenciaEnsayosDetalle() {
           </div>
         </div>
 
-        <div className="asistencia-estado" style={{ textAlign: "right" }}>
+        {/* ESTADO */}
+        <div
+          className="asistencia-estado"
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            width: "100%",
+            marginBottom: "1.6rem",
+          }}
+        >
           <span
             className="badge"
             style={{
@@ -237,18 +265,20 @@ export default function AsistenciaEnsayosDetalle() {
                 ensayoInfo.estadoAsistencia === "CERRADA"
                   ? "#FF6B6B"
                   : ensayoInfo.estadoAsistencia === "ABIERTA"
-                  ? "#1FA453"
-                  : "#b6b4b4ff",
-              color: "white",
+                    ? "#1FA453"
+                    : "#b6b4b4ff",
+              color: "var(--text-light)",
               padding: "0.4rem 0.8rem",
               borderRadius: "8px",
+              fontWeight: 600,
+              fontSize: "0.9rem",
             }}
           >
             {ensayoInfo.estadoAsistencia}
           </span>
         </div>
 
-        {/* Filtros */}
+        {/* === FILTROS === */}
         <div className="abmc-topbar">
           <input
             className="abmc-input"
@@ -261,6 +291,7 @@ export default function AsistenciaEnsayosDetalle() {
             className="abmc-select"
             value={filterCuerda}
             onChange={(e) => setFilterCuerda(e.target.value)}
+            style={{ minWidth: "190px" }} // ← evita que se corte
           >
             {cuerdaOptions.map((c) => (
               <option key={c.id} value={c.id.toString()}>
@@ -270,50 +301,45 @@ export default function AsistenciaEnsayosDetalle() {
           </select>
         </div>
 
-        {/* Tabla */}
+        {/* === TABLA === */}
         <table className="abmc-table abmc-table-rect">
-          <thead>
-            <tr>
+          <thead className="abmc-thead">
+            <tr className="abmc-row">
               <th>Miembro</th>
               <th>Cuerda</th>
               <th>Asistencia</th>
             </tr>
           </thead>
+
           <tbody>
             {filteredMembers.map((m) => (
-              <tr key={m.uid}>
+              <tr key={m.uid} className="abmc-row">
                 <td>{m.nombre}</td>
                 <td>{m.cuerdaNombre}</td>
 
                 <td>
                   <div className="attendance-actions">
-                    {/* AUSENTE */}
                     <button
-                      className={`attendance-btn ${
-                        m.asistencia === "no" ? "selected" : ""
-                      }`}
+                      className={`attendance-btn ${m.asistencia === "no" ? "selected" : ""
+                        }`}
                       onClick={() => handleSetAsistencia(m.uid, "no")}
                       disabled={saving || isCerrada}
                     >
                       <CloseIcon fill="var(--text-light)" />
                     </button>
 
-                    {/* MEDIA FALTA */}
                     <button
-                      className={`attendance-btn ${
-                        m.asistencia === "half" ? "selected white-text" : ""
-                      }`}
+                      className={`attendance-btn ${m.asistencia === "half" ? "selected white-text" : ""
+                        }`}
                       onClick={() => handleSetAsistencia(m.uid, "half")}
                       disabled={saving || isCerrada}
                     >
                       ½
                     </button>
 
-                    {/* PRESENTE */}
                     <button
-                      className={`attendance-btn ${
-                        m.asistencia === "yes" ? "selected" : ""
-                      }`}
+                      className={`attendance-btn ${m.asistencia === "yes" ? "selected" : ""
+                        }`}
                       onClick={() => handleSetAsistencia(m.uid, "yes")}
                       disabled={saving || isCerrada}
                     >
@@ -326,30 +352,32 @@ export default function AsistenciaEnsayosDetalle() {
           </tbody>
         </table>
 
-        {/* Botones */}
+        {/* === BOTONES === */}
         <div
           className="pop-footer"
           style={{
-            justifyContent: "space-between",
-            gap: "1rem",
-            marginTop: "1rem",
+            justifyContent: "center",
+            gap: "2rem",
+            marginTop: "2rem",
           }}
         >
           <button
-            className="btn btn-primary"
+            className={`btn btn-primary ${closing ? "btn-disabled" : ""}`}
             onClick={() => handleGuardar(false)}
-            disabled={saving || isCerrada}
+            disabled={saving || closing || isCerrada}
           >
             {saving ? "Guardando..." : "Guardar"}
           </button>
 
+
           <button
-            className="btn btn-danger"
+            className={`btn btn-danger ${saving ? "btn-disabled" : ""}`}
             onClick={() => handleGuardar(true)}
-            disabled={saving || isCerrada}
+            disabled={saving || closing || isCerrada}
           >
-            {saving ? "Cerrando..." : "Guardar y cerrar asistencia"}
+            {closing ? "Cerrando..." : "Guardar y cerrar asistencia"}
           </button>
+
         </div>
       </div>
     </main>
