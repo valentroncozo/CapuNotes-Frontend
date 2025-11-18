@@ -2,6 +2,7 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import '@/styles/offcanvas.css';
+import LogOutIcon from '@/assets/LogOutIcon';
 
 /* Ícono de cierre (X) */
 function CloseIcon(props) {
@@ -39,9 +40,8 @@ function GearIcon(props) {
 }
 
 const MENU_ITEMS = [
-  ['/asistencias', 'Asistencias'],
   ['/eventos', 'Eventos'],
-  ['/usuarios-roles', 'Usuarios y roles'],
+  ['/asistencias', 'Asistencias']
 ];
 
 export default function AppShell({ onLogout }) {
@@ -106,7 +106,7 @@ export default function AppShell({ onLogout }) {
                 setGearOpen((v) => !v);
               }}
             >
-              <GearIcon />
+            <LogOutIcon fill="var(--text-light)"/>
             </button>
 
             {gearOpen && (
@@ -183,63 +183,7 @@ function Menu({
         Inicio
       </a>
 
-      <div className="appshell-accordion-outer">
-        <button
-          className={`appshell-accordion-trigger ${orgOpen ? 'open' : ''}`}
-          onClick={() => setOrgOpen((v) => !v)}
-          aria-expanded={orgOpen}
-        >
-          Organización del Coro
-          <span className="appshell-accordion-caret">
-            {orgOpen ? '▴' : '▾'}
-          </span>
-        </button>
 
-        {orgOpen && (
-          <div className="appshell-accordion-content">
-            <a
-              href="/cuerdas"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/cuerdas');
-              }}
-            >
-              Cuerdas
-            </a>
-            <a
-              href="/areas"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/areas');
-              }}
-            >
-              Áreas
-            </a>
-            <a
-              href="/miembros"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/miembros');
-              }}
-            >
-              Miembros
-            </a>
-            <a
-              href="/fraternidades"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/fraternidades');
-              }}
-            >
-              Fraternidades
-            </a>
-          </div>
-        )}
-      </div>
 
       <div className="appshell-accordion-outer">
         <button
@@ -380,6 +324,63 @@ function Menu({
           {label}
         </a>
       ))}
+            <div className="appshell-accordion-outer">
+        <button
+          className={`appshell-accordion-trigger ${orgOpen ? 'open' : ''}`}
+          onClick={() => setOrgOpen((v) => !v)}
+          aria-expanded={orgOpen}
+        >
+          Organización del Coro
+          <span className="appshell-accordion-caret">
+            {orgOpen ? '▴' : '▾'}
+          </span>
+        </button>
+
+        {orgOpen && (
+          <div className="appshell-accordion-content">
+            <a
+              href="/cuerdas"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/cuerdas');
+              }}
+            >
+              Cuerdas
+            </a>
+            <a
+              href="/areas"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/areas');
+              }}
+            >
+              Áreas
+            </a>
+            <a
+              href="/miembros"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/miembros');
+              }}
+            >
+              Miembros
+            </a>
+            <a
+              href="/fraternidades"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/fraternidades');
+              }}
+            >
+              Fraternidades
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
