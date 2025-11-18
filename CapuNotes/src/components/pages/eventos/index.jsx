@@ -8,22 +8,6 @@ import Swal from 'sweetalert2';
 import { eventoService } from '@/services/eventoService.js'; // 👈 corregido
 import '@/styles/abmc.css';
 
-const parseEventoError = (error) => {
-  if (!error?.response) return null;
-  const status = error.response.status;
-  const raw = String(error.response.data || '').toLowerCase();
-  if (status === 400) {
-    if (raw.includes('fecha')) {
-      return 'La fecha ingresada no es válida.';
-    }
-    if (raw.includes('no debe')) {
-      return 'Completá los campos obligatorios y volvé a intentar.';
-    }
-    return 'Revisá los datos del evento e intentá nuevamente.';
-  }
-  return null;
-};
-
 const Eventos = () => {
   const [popupMode, setPopupMode] = useState(null);
   const [selectedEvento, setSelectedEvento] = useState(null);
@@ -293,18 +277,13 @@ const Eventos = () => {
                 handleClosePopup();
               } catch (error) {
                 console.error('❌ Error al guardar el evento:', error);
-                const inlineMsg = parseEventoError(error);
-                if (inlineMsg) {
-                  return { errorMessage: inlineMsg };
-                }
                 Swal.fire({
                   icon: 'error',
                   title: 'Error al guardar',
-                  text: 'No se pudo guardar el evento. Intenta nuevamente.',
+                  text: 'No se pudo guardar el evento. Revisa los datos.',
                   background: '#11103a',
                   color: '#E8EAED',
                 });
-                return { errorMessage: 'No pudimos guardar el evento. Intentá nuevamente.' };
               }
             }}
           />
