@@ -3,13 +3,12 @@ import BackButton from '../common/BackButton';
 import { Button, Badge } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import { Eye, CheckCircle } from "react-bootstrap-icons";
+import EditIcon from "@/assets/EditIcon";
+import { XCircle } from "react-bootstrap-icons";
 
-import {
-  PencilFill,
-  XCircleFill,
-  CheckCircleFill,
-} from 'react-bootstrap-icons';
 import Swal from 'sweetalert2';
+
 import { miembrosService } from '@/services/miembrosService.js';
 import { cuerdasService } from '@/services/cuerdasService.js';
 import { areasService } from '@/services/areasService.js';
@@ -29,12 +28,10 @@ export default function MiembrosTableABMC({
   const [filtroCuerda, setFiltroCuerda] = useState('');
   const [ordenEstadoAscendente, setOrdenEstadoAscendente] = useState(true);
   const location = useLocation();
-  const [mostrarVer, setMostrarVer] = useState(false);
-  const [miembroSeleccionado, setMiembroSeleccionado] = useState(null);
 
-
-
-  //  Cargar miembros y cuerdas desde el backend
+  // =======================
+  // CARGA + ORDEN PRINCIPAL
+  // =======================
   const load = async () => {
     try {
       const [miembrosData, cuerdasData, areasData] = await Promise.all([
@@ -43,22 +40,18 @@ export default function MiembrosTableABMC({
         areasService.list(),
       ]);
 
-      //verificar porque se ordena por apellido y esta el nombre primero RARI
-      // 🧩 Ordenar primero por activo (true arriba), luego alfabéticamente
+      // ORDEN: activos → apellido → nombre
       const ordenados = [...miembrosData].sort((a, b) => {
-        // Activos primero
-        if (a.activo && !b.activo) return -1;
-        if (!a.activo && b.activo) return 1;
+        if (a.activo !== b.activo) return a.activo ? -1 : 1;
 
-        // Dentro del mismo grupo (ambos activos o ambos inactivos), ordenar por apellido y nombre
-        const apA = a.apellido?.toLowerCase() || '';
-        const apB = b.apellido?.toLowerCase() || '';
-        if (apA !== apB)
-          return apA.localeCompare(apB, 'es', { sensitivity: 'base' });
+        const apA = (a.apellido || '').toLowerCase();
+        const apB = (b.apellido || '').toLowerCase();
+        const cmpAp = apA.localeCompare(apB, 'es', { sensitivity: 'base' });
+        if (cmpAp !== 0) return cmpAp;
 
-        return (a.nombre || '').localeCompare(b.nombre || '', 'es', {
-          sensitivity: 'base',
-        });
+        const nomA = (a.nombre || '').toLowerCase();
+        const nomB = (b.nombre || '').toLowerCase();
+        return nomA.localeCompare(nomB, 'es', { sensitivity: 'base' });
       });
 
       setListaMiembros(ordenados);
@@ -74,13 +67,19 @@ export default function MiembrosTableABMC({
     load();
   }, [location.state?.recargar]);
 
-  // Filtros combinados
+  // ================
+  // FILTRADOS
+  // ================
   const miembrosFiltrados = listaMiembros.filter((m) => {
-    console.log('Filtrando miembro:', m);
+    const texto = filtroTexto.toLowerCase();
+
+    const fullName = `${m.apellido || ''} ${m.nombre || ''}`.toLowerCase();
+
     const matchTexto =
       !filtroTexto ||
-      (m.nombre || '').toLowerCase().includes(filtroTexto.toLowerCase()) ||
-      (m.apellido || '').toLowerCase().includes(filtroTexto.toLowerCase());
+      fullName.includes(texto) ||
+      (m.nombre || '').toLowerCase().includes(texto) ||
+      (m.apellido || '').toLowerCase().includes(texto);
 
     const matchCuerda =
       !filtroCuerda ||
@@ -89,7 +88,9 @@ export default function MiembrosTableABMC({
     return matchTexto && matchCuerda;
   });
 
-  // Cambiar estado (dar de baja / reactivar)
+  // =======================
+  // CAMBIO DE ESTADO
+  // =======================
   const handleCambiarEstado = async (miembro) => {
     const activo = miembro.activo;
     const accion = activo ? 'dar de baja' : 'reactivar';
@@ -130,7 +131,7 @@ export default function MiembrosTableABMC({
       Swal.fire({
         icon: 'success',
         title: activo ? 'Miembro dado de baja' : 'Miembro reactivado',
-        text: `${miembro.nombre} ${miembro.apellido} ahora está ${activo ? 'inactivo' : 'activo'
+        text: `${miembro.apellido}, ${miembro.nombre} ahora está ${activo ? 'inactivo' : 'activo'
           }.`,
         background: '#11103a',
         color: '#E8EAED',
@@ -151,11 +152,13 @@ export default function MiembrosTableABMC({
     }
   };
 
+  // ORDEN POR ESTADO (mantiene tu iconito ▲▼)
   const ordenarPorEstado = () => {
     const ordenados = [...listaMiembros].sort((a, b) => {
       if (a.activo === b.activo) return 0;
       return ordenEstadoAscendente ? (a.activo ? -1 : 1) : a.activo ? 1 : -1;
     });
+
     setListaMiembros(ordenados);
     setOrdenEstadoAscendente(!ordenEstadoAscendente);
   };
@@ -218,7 +221,7 @@ export default function MiembrosTableABMC({
         <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
             <tr className="abmc-row">
-              <th>Nombre y Apellido</th>
+              <th>Apellido, Nombre</th>
               <th>Cuerda</th>
               <th>Área</th>
               <th onClick={ordenarPorEstado} style={{ cursor: 'pointer' }}>
@@ -236,14 +239,13 @@ export default function MiembrosTableABMC({
                   key={`${m.id?.nroDocumento}-${m.id?.tipoDocumento}`}
                   className="abmc-row"
                 >
-                  <td>{`${m.nombre || '-'} ${m.apellido || ''}`}</td>
+                  {/* 👇 Apellido, Nombre */}
+                  <td>{`${m.apellido || ''}, ${m.nombre || ''}`}</td>
+
                   <td>{m.cuerda?.name || '-'}</td>
+
                   <td>
                     {(() => {
-                      // varias formas en que el backend puede devolver el área:
-                      // - objeto: { id, nombre }
-                      // - id numérico
-                      // - nombre como string
                       const a = m.area;
                       if (!a) return '-';
                       if (typeof a === 'string') return a;
@@ -258,98 +260,74 @@ export default function MiembrosTableABMC({
                       return a.nombre || a.name || '-';
                     })()}
                   </td>
+
                   <td>
                     <Badge
-                      bg={m.activo ? "success" : "secondary"}
+                      bg={m.activo ? 'success' : 'secondary'}
                       style={{
-                        fontSize: "1rem",
-                        padding: "3px 12px 5px 12px", // ← 3 arriba, 5 abajo
-                        lineHeight: "1",
-                        borderRadius: "8px",
-                        display: "inline-block",
+                        fontSize: '1rem',
+                        padding: '3px 12px 5px 12px',
+                        lineHeight: '1',
+                        borderRadius: '8px',
+                        display: 'inline-block',
                       }}
                     >
-                      {m.activo ? "Activo" : "Inactivo"}
+                      {m.activo ? 'Activo' : 'Inactivo'}
                     </Badge>
-
                   </td>
 
-
+                  {/* === ACCIONES === */}
                   <td className="abmc-actions">
 
-                    <Button
-                      className="btn-accion"
-                      variant="info"
-                      onClick={() => {
-                        navigate('/miembros/editar', {
-                          state: { miembro: m, soloVer: true }
-                        });
-                      }}
+                    {/* VER */}
+                    <button
+                      type="button"
+                      className="abmc-btn abmc-btn-icon"
                       title="Ver"
+                      onClick={() =>
+                        navigate('/miembros/editar', { state: { miembro: m, soloVer: true } })
+                      }
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        height="24px"
-                        viewBox="0 -960 960 960"
-                        width="24px"
-                        fill="#e3e3e3"
-                      >
-                        <path d="M480-360q63 0 106.5-43.5T630-510q0-63-43.5-106.5T480-660q-63 0-106.5 
-    43.5T330-510q0 63 43.5 106.5T480-360Zm0-80q-29 0-49.5-20.5T410-510q0-29 
-    20.5-49.5T480-580q29 0 49.5 20.5T550-510q0 29-20.5 49.5T480-440Zm0 
-    200q-141 0-259-78T40-510q47-114 165-192t259-78q141 0 259 
-    78t165 192q-47 114-165 192T480-240Z"/>
-                      </svg>
-                    </Button>
+                      <Eye size={18} />
+                    </button>
 
-
-                    <Button
-                      className="btn-accion"
-                      variant="warning"
+                    {/* EDITAR */}
+                    <button
+                      type="button"
+                      className="abmc-btn abmc-btn-icon"
+                      title="Editar"
                       onClick={() =>
                         navigate('/miembros/editar', { state: { miembro: m } })
                       }
-                      title="Editar"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        height="24px"
-                        viewBox="0 -960 960 960"
-                        width="24px"
-                        fill="#e3e3e3"
+                      <EditIcon width={18} height={18} />
+                    </button>
+
+                    {/* DAR DE BAJA / REACTIVAR */}
+                    {m.activo ? (
+                      // DAR DE BAJA → usar una ❌
+                      <button
+                        type="button"
+                        className="abmc-btn abmc-btn-icon"
+                        title="Dar de baja"
+                        onClick={() => handleCambiarEstado(m)}
                       >
-                        <path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z" />
-                      </svg>
-                    </Button>
-                    <Button
-                      className="btn-accion"
-                      variant={m.activo ? 'danger' : 'success'}
-                      onClick={() => handleCambiarEstado(m)}
-                      title={m.activo ? 'Dar de baja' : 'Reactivar'}
-                    >
-                      {m.activo ? (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="24px"
-                          viewBox="0 -960 960 960"
-                          width="24px"
-                          fill="#e3e3e3"
-                        >
-                          <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-                        </svg>
-                      ) : (
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="24px"
-                          viewBox="0 -960 960 960"
-                          width="24px"
-                          fill="#e3e3e3"
-                        >
-                          <path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z" />
-                        </svg>
-                      )}
-                    </Button>
+                        <XCircle size={18} />
+                      </button>
+                    ) : (
+                      // REACTIVAR → usar el check verde
+                      <button
+                        type="button"
+                        className="abmc-btn abmc-btn-icon"
+                        title="Reactivar"
+                        onClick={() => handleCambiarEstado(m)}
+                      >
+                        <CheckCircle size={18} />
+                      </button>
+                    )}
+
                   </td>
+
                 </tr>
               ))
             ) : (
@@ -362,8 +340,6 @@ export default function MiembrosTableABMC({
           </tbody>
         </table>
       </div>
-
-
     </main>
   );
 }

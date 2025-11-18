@@ -1,9 +1,9 @@
 .reportes-tabs {
   display: flex;
   gap: 20px;
-  padding-bottom: 2px;    /* antes 5px */
-  margin-top: 6px;        /* NUEVO: acerca las tabs al título */
-  margin-bottom: 5px;     /* antes 20px */
+  padding-bottom: 0px;    /* antes 5px */
+  margin-top: -10px;        /* NUEVO: acerca las tabs al título */
+  margin-bottom: 0x;     /* antes 20px */
 }
 
 
@@ -19,7 +19,7 @@
 }
 
 .tab:hover {
-  color: white;
+  color: #DE9205;
 }
 
 .tab.activa {

@@ -12,18 +12,18 @@ import ReporteParticipacionPage from "@/components/pages/reportes/ReportePartici
 // import ReportePorCuerda from "@/components/reportes/ReportePorCuerda.jsx";
 
 export default function ReportesPage() {
-    const [tabActiva, setTabActiva] = useState("general");
+    const [tabActiva, setTabActiva] = useState("participacion");
 
     const renderContenido = () => {
         switch (tabActiva) {
-            case "general":
-                return <div>ACA VA EL REPORTE GENERAL</div>; // luego lo reemplazamos
+            //case "general":
+              //  return <div>ACA VA EL REPORTE GENERAL</div>; // luego lo reemplazamos
             case "participacion":
                 return <ReporteParticipacionPage />;
             case "miembro":
                 return <ReportePorMiembro />;
-            case "cuerda":
-                return <div>ACA VA REPORTE POR CUERDA</div>;
+            //case "cuerda":
+              //  return <div>ACA VA REPORTE POR CUERDA</div>;
             default:
                 return null;
         }

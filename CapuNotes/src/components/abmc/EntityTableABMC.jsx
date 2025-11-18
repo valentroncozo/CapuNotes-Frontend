@@ -360,7 +360,7 @@ export default function EntityTableABMC({
               {columnas.map((c) => (
                 <th key={c}>{c}</th>
               ))}
-              <th></th>
+              <th>Acciones</th>
             </tr>
           </thead>
 

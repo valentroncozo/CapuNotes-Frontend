@@ -25,7 +25,15 @@ export default function ReportePorMiembroPage() {
   useEffect(() => {
     const cargar = async () => {
       const res = await miembrosService.getMiembros();
-      setMiembros(res);
+
+      // Ordenar por Apellido + Nombre
+      const ordenados = [...res].sort((a, b) => {
+        const nombreA = `${a.apellido} ${a.nombre}`.toLowerCase();
+        const nombreB = `${b.apellido} ${b.nombre}`.toLowerCase();
+        return nombreA.localeCompare(nombreB);
+      });
+
+      setMiembros(ordenados);
       setMiembroSeleccionado(null); // NO seleccionar el primero
     };
     cargar();
@@ -62,10 +70,6 @@ export default function ReportePorMiembroPage() {
           anio={anio}
           setAnio={setAnio}
         />
-
-        <p style={{ marginTop: "40px", color: "var(--text-light)" }}>
-          Seleccione un miembro para ver su reporte.
-        </p>
       </div>
     );
   }
@@ -215,7 +219,7 @@ function Filtros({
         <span
           className="estado-pill"
           style={{
-            background: miembroSeleccionado.activo ? "#198754" : "#dc3545",
+            background: miembroSeleccionado.activo ? "#198754" : "#b6b4b4ff",
             color: "white",
             padding: "8px 14px",
             borderRadius: "12px",
