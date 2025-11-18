@@ -40,8 +40,8 @@ function GearIcon(props) {
 }
 
 const MENU_ITEMS = [
+  ['/asistencias', 'Asistencias'],
   ['/eventos', 'Eventos'],
-  ['/asistencias', 'Asistencias']
 ];
 
 export default function AppShell({ onLogout }) {
@@ -183,9 +183,78 @@ function Menu({
         Inicio
       </a>
 
+        <a href="/asistencias"    onClick={(e) => {
+            e.preventDefault();
+            onNavigate("/asistencias");
+          }}
+          className="nav-link">Asistencias</a>
 
 
       <div className="appshell-accordion-outer">
+        <button
+          className={`appshell-accordion-trigger ${songsOpen ? "open" : ""}`}
+          onClick={() => setSongsOpen((v) => !v)}
+          aria-expanded={songsOpen}
+        >
+          Canciones
+          <span className="appshell-accordion-caret">
+            {songsOpen ? "▴" : "▾"}
+          </span>
+        </button>
+
+        {songsOpen && (
+          <div className="appshell-accordion-content">
+            <a
+              href="/canciones"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate("/canciones");
+              }}
+            >
+              Cancionero
+            </a>
+            <a
+              href="/repertorios"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate("/repertorios");
+              }}
+            >
+              Repertorios
+            </a>
+            <a
+              href="/tiempos-liturgicos"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate("/tiempos-liturgicos");
+              }}
+            >
+              Tiempos litúrgicos
+            </a>
+            <a
+              href="/categorias-canciones"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate("/categorias-canciones");
+              }}
+            >
+              Categorías
+            </a>
+          </div>
+        )}
+      </div>
+
+        <a href="/eventos"    onClick={(e) => {
+            e.preventDefault();
+            onNavigate("/eventos");
+          }}
+          className="nav-link">Eventos</a>
+
+    <div className="appshell-accordion-outer">
         <button
           className={`appshell-accordion-trigger ${audOpen ? 'open' : ''}`}
           onClick={() => setAudOpen((v) => !v)}
@@ -254,77 +323,6 @@ function Menu({
       </div>
 
       <div className="appshell-accordion-outer">
-        <button
-          className={`appshell-accordion-trigger ${songsOpen ? "open" : ""}`}
-          onClick={() => setSongsOpen((v) => !v)}
-          aria-expanded={songsOpen}
-        >
-          Canciones
-          <span className="appshell-accordion-caret">
-            {songsOpen ? "▴" : "▾"}
-          </span>
-        </button>
-
-        {songsOpen && (
-          <div className="appshell-accordion-content">
-            <a
-              href="/canciones"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate("/canciones");
-              }}
-            >
-              Cancionero
-            </a>
-            <a
-              href="/repertorios"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate("/repertorios");
-              }}
-            >
-              Repertorios
-            </a>
-            <a
-              href="/tiempos-liturgicos"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate("/tiempos-liturgicos");
-              }}
-            >
-              Tiempos litúrgicos
-            </a>
-            <a
-              href="/categorias-canciones"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate("/categorias-canciones");
-              }}
-            >
-              Categorías
-            </a>
-          </div>
-        )}
-      </div>
-
-      {MENU_ITEMS.map(([to, label]) => (
-        <a
-          key={to}
-          href={to}
-          onClick={(e) => {
-            e.preventDefault();
-            onNavigate(to);
-          }}
-          className="nav-link"
-        >
-          {label}
-        </a>
-      ))}
-            <div className="appshell-accordion-outer">
         <button
           className={`appshell-accordion-trigger ${orgOpen ? 'open' : ''}`}
           onClick={() => setOrgOpen((v) => !v)}
