@@ -71,9 +71,14 @@ export default function GenericEditPopup({
       // Si onSave devuelve explícitamente false, consideramos que hubo un bloqueo/validación
       // y no cerramos el popup. Cualquier otro valor (incluido undefined) cerrará si no hay error.
       if (res === false) return;
+      if (res && typeof res === "object" && res.errorMessage) {
+        setErrorMsg(res.errorMessage);
+        return;
+      }
       onClose?.();
     } catch (err) {
       console.error('Error en onSave:', err);
+      setErrorMsg("No pudimos guardar el registro. Intentá nuevamente.");
       // No cerramos el popup para que el usuario pueda corregir
     }
   };

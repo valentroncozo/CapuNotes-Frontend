@@ -21,6 +21,26 @@ function showDuplicateAlert(uniqueBy) {
   });
 }
 
+function extractConstraintMessage(error, schema = []) {
+  const raw = error?.response?.data;
+  if (!raw) return null;
+  const text = String(raw);
+  const lower = text.toLowerCase();
+  if (!lower.includes("constraintviolation") && !lower.includes("no debe")) {
+    return null;
+  }
+  const regex = /propertyPath=([a-zA-Z0-9_]+)/g;
+  const labels = [];
+  let match;
+  while ((match = regex.exec(text))) {
+    const key = match[1];
+    const label = schema.find((f) => f.key === key)?.label || key;
+    if (label && !labels.includes(label)) labels.push(label);
+  }
+  if (!labels.length) return null;
+  return `Completá los campos requeridos: ${labels.join(", ")}`;
+}
+
 export default function EntityABMCSimple({
   title = "Entidad",
   service,
@@ -134,6 +154,10 @@ export default function EntityABMCSimple({
       setSelected(null);
     } catch (err) {
       console.error("❌ Error al guardar:", err);
+      const inlineMsg = extractConstraintMessage(err, schema);
+      if (inlineMsg) {
+        return { errorMessage: inlineMsg };
+      }
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -142,6 +166,7 @@ export default function EntityABMCSimple({
         color: "#E8EAED",
         confirmButtonColor: "#7c83ff",
       });
+      return false;
     }
   };
 
