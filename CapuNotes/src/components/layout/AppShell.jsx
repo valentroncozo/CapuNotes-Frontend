@@ -189,6 +189,12 @@ function Menu({
           }}
           className="nav-link">Asistencias</a>
 
+        <a href="/reportes"    onClick={(e) => {
+            e.preventDefault();
+            onNavigate("/reportes");
+          }}
+          className="nav-link">Reportes</a>
+
 
       <div className="appshell-accordion-outer">
         <button
