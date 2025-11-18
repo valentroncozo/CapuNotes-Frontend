@@ -1,8 +1,8 @@
-import React from "react";
-import Swal from "sweetalert2";
-import "@/styles/globals.css";
-import "@/styles/popup.css";
-import { eventoService } from "@/services/eventoService.js"; // 👈 corregido
+import React from 'react';
+import Swal from 'sweetalert2';
+import '@/styles/globals.css';
+import '@/styles/popup.css';
+import { eventoService } from '@/services/eventoService.js'; // 👈 corregido
 
 const ConfirmDeletePopup = ({ evento, onClose, onDeleted }) => {
   // Al montarse, mostramos SweetAlert en lugar de un popup manual
@@ -12,7 +12,6 @@ const ConfirmDeletePopup = ({ evento, onClose, onDeleted }) => {
     const doConfirm = async () => {
       const res = await Swal.fire({
         title: `¿Cancelar evento "${evento?.nombre || 'sin nombre'}"?`,
-        text: 'Esta acción cancelará el evento y no se puede deshacer.',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#DE9205',
@@ -37,7 +36,9 @@ const ConfirmDeletePopup = ({ evento, onClose, onDeleted }) => {
         await Swal.fire({
           icon: 'success',
           title: 'Evento cancelado',
-          text: `El evento "${evento?.nombre || 'sin nombre'}" fue cancelado correctamente.`,
+          text: `El evento "${
+            evento?.nombre || 'sin nombre'
+          }" fue cancelado correctamente.`,
           timer: 1400,
           showConfirmButton: false,
           background: '#11103a',

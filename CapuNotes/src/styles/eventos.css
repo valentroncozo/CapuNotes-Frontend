@@ -11,22 +11,21 @@
 
 .abmc-header {
   display: flex;
-  align-items: flex-start;        /* flecha y texto alineados arriba */
+  align-items: flex-start; /* flecha y texto alineados arriba */
   gap: 16px;
   justify-content: flex-start;
   position: relative;
-  margin-bottom: 32px;            /* más espacio con los filtros */
+  margin-bottom: 32px; /* más espacio con los filtros */
 }
-
 
 /* Línea amarilla institucional */
 .abmc-header::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: -30px;
   left: 0;
   width: 100%;
-  height: .5px;
+  height: 0.5px;
   background-color: var(--accent);
   border-radius: 2px;
 }
@@ -38,7 +37,7 @@
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin-top: 28px;               /* 👈 más aire respecto al header */
+  margin-top: 28px; /* 👈 más aire respecto al header */
   margin-bottom: 1.5rem;
 }
 
@@ -55,6 +54,16 @@
   color: #aaa;
 }
 
+.eventos-search-input:hover {
+  outline: none;
+  border-color: transparent; /* Elimina el borde amarillo */
+}
+
+.eventos-search-input:focus {
+  outline: none;
+  border-color: transparent; /* Elimina el borde amarillo en el estado focus */
+}
+
 .eventos-profile {
   margin-left: 10px;
 }
@@ -63,7 +72,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #DE9205;
+  background-color: #de9205;
   font-size: 20px;
   border: none;
   border-radius: 50%;
@@ -73,11 +82,21 @@
   transition: background-color 0.3s;
 }
 
+.evento-btn.agregar:hover {
+  background-color: var(--accent); /* mantener mismo amarillo */
+  color: #e8eaed; /* icono en blanco */
+  filter: brightness(0.98);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  outline: none !important;
+  border: none !important;
+}
+
 .evento-btn.redondeado {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #DE9205;
+  background-color: #de9205;
   font-size: 20px;
   border: none;
   border-radius: 50%;
@@ -85,6 +104,15 @@
   height: 40px;
   cursor: pointer;
   transition: background-color 0.3s;
+}
+
+.evento-btn.redondeado:hover {
+  background-color: var(--accent); /* mantener mismo amarillo */
+  color: #e8eaed; /* icono en blanco */
+  filter: brightness(0.98);
+  transform: translateY(-1px);
+  outline: none !important;
+  border: none !important;
 }
 
 /* ===========================
@@ -99,7 +127,7 @@
 }
 
 .evento-card {
-  background-color: #AFD1F0;
+  background-color: #afd1f0;
   position: relative;
   z-index: 1; /* Asegura que los iconos permanezcan visibles */
   border-radius: 20px; /* Bordes redondeados */
@@ -116,8 +144,6 @@
 .evento-card:hover {
   transform: translateY(-3px);
 }
-
-
 
 .evento-card h3,
 .evento-card p {
@@ -139,13 +165,12 @@
 .evento-actions {
   gap: 0.5rem;
   display: flex;
-  justify-content:center;
+  justify-content: center;
   margin-top: 0;
-  flex-wrap: wrap;
 }
 
 .evento-btn {
-  background-color: #DE9205;
+  background-color: #de9205;
   border: none;
   border-radius: 5px;
   padding: 5px 10px;
@@ -158,36 +183,15 @@
 }
 
 .evento-btn.repertorios {
-  background-color: transparent;
-  color: var(--text-light);
-  border: 2px solid var(--text-light);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
-
-.evento-btn.repertorios svg {
-  fill: currentColor;
-}
-
-.evento-btn.repertorios:hover {
-  background-color: var(--accent);
-  border-color: var(--accent);
-  color: var(--text-light);
+  background-color: #2d6cdf;
 }
 
 .evento-btn.repertorios.activo {
-  background-color: #DE9205;
-  border: none;
-  color: #fff;
+  background-color: #de9205;
 }
 
-.evento-btn.repertorios.activo:hover {
-  background-color: #b97405;
+.evento-btn.repertorios:hover {
+  background-color: #5843c4;
 }
 
 /* ===========================
@@ -255,100 +259,6 @@
   background-color: #4c4c70;
 }
 
-.pop-dialog.evento-abmc-modal {
-  width: min(640px, 95vw);
-  height: 80vh;
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.evento-abmc-modal .pop-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.evento-modal-form {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.evento-modal-form .popup-grid {
-  display: grid;
-  gap: 1rem;
-}
-
-.evento-modal-form .field-inline {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-}
-
-.evento-modal-form .react-datepicker-wrapper,
-.evento-modal-form .react-datepicker__input-container {
-  width: 100%;
-}
-
-.evento-modal-form input,
-.evento-modal-form select,
-.evento-modal-form textarea {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.pop-dialog.evento-repertorio-modal {
-  width: min(700px, 95vw);
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.evento-repertorio-modal .pop-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  overflow: hidden;
-}
-
-.evento-repertorio-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  min-height: 0;
-}
-
-.evento-repertorio-resumen {
-  margin: 0;
-  color: #ccc;
-  font-size: 0.95rem;
-}
-
-.evento-repertorio-scroll {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.evento-repertorio-loading {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-  color: #bbb;
-}
-
 .lista-simple {
   list-style: none;
   padding: 0;
@@ -372,7 +282,7 @@
   align-items: center;
 }
 
-.lista-simple input[type="checkbox"] {
+.lista-simple input[type='checkbox'] {
   accent-color: var(--accent);
 }
 
@@ -419,4 +329,30 @@
   .popup-container {
     transform: translate(-50%, -50%) scale(0.85);
   }
+}
+
+/* 🔹 Cuando hay popup → fondo borroso e inactivo */
+.eventos-container.blurred {
+  filter: blur(2px);
+  pointer-events: none; /* No deja tocar nada */
+  transition: filter 0.3s ease;
+  user-select: none;
+}
+
+/* 🔹 Overlay oscuro */
+.overlay-block {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45); /* leve oscuridad */
+  backdrop-filter: blur(3px); /* blur más suave */
+  z-index: 900; /* debajo del popup */
+}
+
+/* Asegúrate de que el popup tenga más z-index */
+.popup-container {
+  position: fixed;
+  z-index: 1000 !important;
 }
