@@ -35,6 +35,26 @@ button, .btn { cursor: pointer; border: none; border-radius: var(--radius); tran
   box-shadow: var(--shadow); 
   }
 
+.btn-cuestionario {
+  background: transparent !important;
+  color: var(--text-light) !important;
+  border: 2px solid var(--text-light) !important;
+  border-radius: 16px !important;
+  padding: 10px 24px !important;
+  font-weight: 700 !important;
+  min-width: 11rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: none !important;
+}
+
+.btn-cuestionario:hover {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: var(--text-light) !important;
+}
 
 /* FORMULARIOS */
 input, select, textarea {

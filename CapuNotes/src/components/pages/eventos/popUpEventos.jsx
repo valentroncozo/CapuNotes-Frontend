@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Modal from '@/components/common/Modal.jsx';
 import '@/styles/globals.css';
 import '@/styles/popup.css';
 import DatePicker from 'react-datepicker';
@@ -9,6 +10,7 @@ const PopUpEventos = ({
   eventoSeleccionado,
   onClose,
   onSave,
+  isOpen = true,
 }) => {
   const isViewMode = modo === 'ver';
   const [selectedDate, setSelectedDate] = useState(
@@ -16,47 +18,105 @@ const PopUpEventos = ({
       ? new Date(eventoSeleccionado.fechaInicio)
       : null
   );
+  const [errorMsg, setErrorMsg] = useState('');
+  const formId = 'evento-modal-form';
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    if (eventoSeleccionado?.fechaInicio) {
+      setSelectedDate(new Date(eventoSeleccionado.fechaInicio));
+    } else {
+      setSelectedDate(null);
+    }
+    setErrorMsg('');
+  }, [eventoSeleccionado, modo, isOpen]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const nuevoEvento = {
-      nombre: formData.get('nombre'),
-      tipoEvento: formData.get('tipoEvento'),
-      fechaInicio: selectedDate ? selectedDate.toISOString().split('T')[0] : '',
-      hora: formData.get('hora'),
-      lugar: formData.get('lugar'),
-    };
+    const nombre = formData.get('nombre')?.trim() || '';
+    const tipoEvento = formData.get('tipoEvento') || '';
+    const horaRaw = formData.get('hora') || '';
+    const lugar = formData.get('lugar')?.trim() || '';
 
-    // Normalizar hora (añadir :00 si falta)
-    if (nuevoEvento.hora?.length === 5) {
-      nuevoEvento.hora += ':00';
+    const missing = [];
+    if (!nombre) missing.push('Nombre');
+    if (!tipoEvento) missing.push('Tipo de evento');
+    if (!selectedDate) missing.push('Fecha');
+    if (!horaRaw) missing.push('Hora');
+    if (!lugar) missing.push('Lugar');
+
+    if (missing.length) {
+      setErrorMsg(`Completá los campos requeridos: ${missing.join(', ')}`);
+      return;
     }
 
-    onSave(nuevoEvento);
+    if (Number.isNaN(selectedDate.getTime())) {
+      setErrorMsg('Seleccioná una fecha válida.');
+      return;
+    }
+
+    let hora = horaRaw;
+    if (hora?.length === 5) {
+      hora += ':00';
+    }
+
+    const nuevoEvento = {
+      nombre,
+      tipoEvento,
+      fechaInicio: selectedDate.toISOString().split('T')[0],
+      hora,
+      lugar,
+    };
+
+    setErrorMsg('');
+    try {
+      const res = await onSave?.(nuevoEvento);
+      if (res && res.errorMessage) {
+        setErrorMsg(res.errorMessage);
+      }
+    } catch (error) {
+      console.error('❌ Error al guardar evento desde popup:', error);
+      setErrorMsg('No pudimos guardar el evento. Intentá nuevamente.');
+    }
   };
 
+  const modalTitle =
+    modo === 'crear'
+      ? 'Crear Evento'
+      : modo === 'editar'
+      ? 'Modificar Evento'
+      : 'Visualizar Evento';
+
+  const modalActions = isViewMode ? (
+    <button type="button" className="btn btn-primary" onClick={onClose}>
+      Cerrar
+    </button>
+  ) : (
+    <>
+      <button type="button" className="btn btn-secondary" onClick={onClose}>
+        Cancelar
+      </button>
+      <button type="submit" form={formId} className="btn btn-primary">
+        Aceptar
+      </button>
+    </>
+  );
+
   return (
-    <div
-      className="popup-container"
-      style={{ overflow: 'auto', maxHeight: '95vh' }}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={modalTitle}
+      actions={modalActions}
+      className="evento-abmc-modal"
     >
-      <header className="abmc-header">
-        <div className="abmc-title">
-          <h1>
-            {modo === 'crear'
-              ? 'Crear Evento'
-              : modo === 'editar'
-              ? 'Modificar Evento'
-              : 'Visualizar Evento'}
-          </h1>
+      {errorMsg && (
+        <div className="evento-modal-error">
+          {errorMsg}
         </div>
-      </header>
-
-      <hr className="divisor-amarillo" />
-
-      <form className="popup-form" onSubmit={handleSubmit}>
+      )}
+      <form id={formId} className="evento-modal-form" onSubmit={handleSubmit}>
         <div className="popup-grid">
           <div className="field">
             <label>Nombre</label>
@@ -115,19 +175,8 @@ const PopUpEventos = ({
             />
           </div>
         </div>
-
-        <div className="popup-actions">
-          <button type="button" className="btn-primary" onClick={onClose}>
-            Cancelar
-          </button>
-          {!isViewMode && (
-            <button type="submit" className="btn-primary">
-              Aceptar
-            </button>
-          )}
-        </div>
       </form>
-    </div>
+    </Modal>
   );
 };
 
