@@ -495,8 +495,8 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
                   </label>
 
                   <InputMask
-                    mask="99/99/9999"
-                    replacement={{ 9: /\d/ }}
+                    mask="DD/DD/DDDD"
+                    replacement={{ D: /\d/ }}
                     value={fechaNacimiento}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -694,14 +694,15 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
                 </div>
               </div>
             </section>
-
-            <button
-              type="button"
-              className="abmc-btn btn-primary"
-              onClick={handleSubmit}
-            >
-              Inscribir
-            </button>
+            <div style={{width: '100%', display: 'flex', justifyContent:'center'}}>
+              <button
+                type="button"
+                className="abmc-btn btn-primary"
+                onClick={handleSubmit}
+              >
+                Inscribir
+              </button>
+            </div>
           </form>
         )}
       </div>
