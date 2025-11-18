@@ -115,8 +115,9 @@ const Eventos = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <div className="eventos-profile">
+            
             <button
-              className="evento-btn agregar"
+              className="abmc-btn abmc-btn-primary"
               onClick={() => handleOpenPopup('crear')}
             >
               <svg

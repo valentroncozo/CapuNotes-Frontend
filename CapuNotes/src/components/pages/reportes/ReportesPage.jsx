@@ -43,12 +43,12 @@ export default function ReportesPage() {
 
                 {/* ===== TABS ===== */}
                 <div className="reportes-tabs">
-                    <button
+                    {/*<button
                         className={tabActiva === "general" ? "tab activa" : "tab"}
                         onClick={() => setTabActiva("general")}
                     >
                         Estadísticas generales
-                    </button>
+                    </button>*/}
 
                      <button
                         className={tabActiva === "participacion" ? "tab activa" : "tab"}
@@ -64,12 +64,12 @@ export default function ReportesPage() {
                         Por miembro
                     </button>
 
-                    <button
+                    {/*<button
                         className={tabActiva === "cuerda" ? "tab activa" : "tab"}
                         onClick={() => setTabActiva("cuerda")}
                     >
                         Por cuerda
-                    </button>
+                    </button>*/}
                 </div>
 
                 {/* ===== CONTENIDO ===== */}

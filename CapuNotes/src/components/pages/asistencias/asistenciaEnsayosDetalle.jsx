@@ -263,7 +263,7 @@ export default function AsistenciaEnsayosDetalle() {
             style={{
               backgroundColor:
                 ensayoInfo.estadoAsistencia === "CERRADA"
-                  ? "#FF6B6B"
+                  ? "#D32F2F"
                   : ensayoInfo.estadoAsistencia === "ABIERTA"
                     ? "#1FA453"
                     : "#b6b4b4ff",

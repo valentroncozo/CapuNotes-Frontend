@@ -1,60 +1,90 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ensayosService } from "@/services/ensayosService.js";
+import { eventoService } from "@/services/eventoService.js";
 import { asistenciasService } from "@/services/asistenciasService.js";
 import BackButton from "@/components/common/BackButton.jsx";
+
 import "@/styles/abmc.css";
 import "@/styles/table.css";
+
 import EyeOnIcon from "@/assets/VisibilityOnIcon";
 import MakerAsistIcon from "@/assets/MakerAsistIcon";
 import OpenAssistIcon from "@/assets/OpenAssistIcon";
 import CloseAssistIcon from "@/assets/CloseAssistIcon";
 
-
 export default function AsistenciaEnsayos() {
   const [rows, setRows] = useState([]);
   const [filters, setFilters] = useState({
     month: "",
-    year: new Date().getFullYear().toString(), // ✅ Año actual por defecto
+    year: new Date().getFullYear().toString(),
     estado: "",
   });
   const [loadingId, setLoadingId] = useState(null);
   const navigate = useNavigate();
 
+  const MESES = [
+    { value: "01", label: "Enero" },
+    { value: "02", label: "Febrero" },
+    { value: "03", label: "Marzo" },
+    { value: "04", label: "Abril" },
+    { value: "05", label: "Mayo" },
+    { value: "06", label: "Junio" },
+    { value: "07", label: "Julio" },
+    { value: "08", label: "Agosto" },
+    { value: "09", label: "Septiembre" },
+    { value: "10", label: "Octubre" },
+    { value: "11", label: "Noviembre" },
+    { value: "12", label: "Diciembre" },
+  ];
+
   // ===============================================================
-  // Cargar lista de ensayos
+  // Cargar ensayos (NO usamos getById para NO pisar estadoAsistencia)
   // ===============================================================
   useEffect(() => {
     const fetchEnsayos = async () => {
       try {
-        const data = await ensayosService.list();
-        const ensayos = (Array.isArray(data) ? data : []).map((e) => {
-          const fechaIso = e.fechaInicio || null;
+        const data = await eventoService.list({ tipo: "ENSAYO" });
+
+        const base = (Array.isArray(data) ? data : []).filter(
+          (e) => e.estado !== "CANCELADO"
+        );
+
+        const mapped = base.map((e) => {
+          const fechaIso = e.fechaInicio;
           let fecha = fechaIso;
           if (fechaIso) {
-            const parts = fechaIso.split("-");
-            if (parts.length === 3) fecha = `${parts[2]}/${parts[1]}/${parts[0]}`;
+            const [y, m, d] = fechaIso.split("-");
+            fecha = `${d}/${m}/${y}`;
           }
+
+          console.log(
+            "🟦 EVENTO LISTADO:",
+            e.id,
+            "→ estadoAsistencia:",
+            e.estadoAsistencia,
+            "→ porcentaje:",
+            e.porcentajeAsistencia
+          );
+
           return {
             id: e.id,
             fecha,
             fechaInicio: fechaIso,
-            nombre: e.nombre || "",
-            descripcion: e.descripcion || "",
+            nombre: e.nombre ?? "",
+            descripcion: e.descripcion ?? "",
+            // TOMAMOS DIRECTO DEL BACK (nuevo DTO)
             estadoAsistencia: e.estadoAsistencia || "PENDIENTE",
             porcentajeAsistencia: e.porcentajeAsistencia ?? 0,
           };
         });
 
-        // Ordenar: próximos primero (por fecha), luego pasados
+        // Ordenar próximos primero
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
 
-        const ordenados = [...ensayos].sort((a, b) => {
-          // 🔧 crear fechas en hora local (sin UTC)
+        const ordenados = [...mapped].sort((a, b) => {
           const [aY, aM, aD] = a.fechaInicio.split("-").map(Number);
           const [bY, bM, bD] = b.fechaInicio.split("-").map(Number);
-
           const fechaA = new Date(aY, aM - 1, aD);
           const fechaB = new Date(bY, bM - 1, bD);
 
@@ -67,26 +97,26 @@ export default function AsistenciaEnsayos() {
           return fechaA - fechaB;
         });
 
-
         setRows(ordenados);
       } catch (error) {
         console.error("❌ Error cargando ensayos:", error);
       }
     };
+
     fetchEnsayos();
   }, []);
 
   // ===============================================================
-  // Filtrar por mes / año / estado
+  // Filtros
   // ===============================================================
   const filtered = useMemo(() => {
     return rows.filter((r) => {
       let coincide = true;
 
-      if (filters.month && r.fechaInicio) {
+      if (filters.month) {
         coincide = coincide && r.fechaInicio.split("-")[1] === filters.month;
       }
-      if (filters.year && r.fechaInicio) {
+      if (filters.year) {
         coincide = coincide && r.fechaInicio.split("-")[0] === filters.year;
       }
       if (filters.estado) {
@@ -97,35 +127,52 @@ export default function AsistenciaEnsayos() {
     });
   }, [rows, filters]);
 
+
   // ===============================================================
-  // Cambiar estado de asistencia (cerrar / reabrir)
+  // Cerrar / Reabrir asistencia (FUNCIONA)
   // ===============================================================
   const toggleAsistencia = async (ensayo) => {
     if (loadingId === ensayo.id) return;
+
     setLoadingId(ensayo.id);
 
     try {
+      let res;
+
       if (ensayo.estadoAsistencia === "ABIERTA") {
-        await asistenciasService.cerrarAsistencia(ensayo.id);
-        setRows((prev) =>
-          prev.map((r) =>
-            r.id === ensayo.id ? { ...r, estadoAsistencia: "CERRADA" } : r
-          )
-        );
+        res = await asistenciasService.cerrarAsistencia(ensayo.id);
       } else {
-        await asistenciasService.reabrirAsistencia(ensayo.id);
-        setRows((prev) =>
-          prev.map((r) =>
-            r.id === ensayo.id ? { ...r, estadoAsistencia: "ABIERTA" } : r
-          )
-        );
+        res = await asistenciasService.reabrirAsistencia(ensayo.id);
       }
+
+      // Actualizamos solo este ensayo
+      setRows((prev) =>
+        prev.map((r) =>
+          r.id === ensayo.id
+            ? {
+              ...r,
+              estadoAsistencia: res.estadoAsistencia,
+              porcentajeAsistencia: res.porcentajeAsistencia,
+            }
+            : r
+        )
+      );
     } catch (err) {
-      console.error("❌ Error al cambiar estado de asistencia:", err?.response || err);
+      console.error("❌ Error cambiando estado:", err);
     } finally {
       setLoadingId(null);
     }
   };
+
+  useEffect(() => {
+    const mesActual = String(new Date().getMonth() + 1).padStart(2, "0");
+
+    setFilters((prev) => ({
+      ...prev,
+      month: mesActual
+    }));
+  }, []);
+
 
   // ===============================================================
   // Render
@@ -135,13 +182,10 @@ export default function AsistenciaEnsayos() {
       <div className="abmc-card">
         <div className="abmc-header">
           <BackButton />
-          <div>
-            <h1 className="abmc-title">Asistencia ensayos</h1>
-            <div></div>
-          </div>
+          <h1 className="abmc-title">Asistencia ensayos</h1>
         </div>
 
-        {/* 🔹 Filtros */}
+        {/* Filtros */}
         <div
           className="filtros"
           style={{
@@ -157,12 +201,13 @@ export default function AsistenciaEnsayos() {
             onChange={(e) => setFilters({ ...filters, month: e.target.value })}
           >
             <option value="">Mes</option>
-            {[...Array(12).keys()].map((m) => (
-              <option key={m + 1} value={String(m + 1).padStart(2, "0")}>
-                {new Date(0, m).toLocaleString("es-AR", { month: "long" })}
+            {MESES.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
               </option>
             ))}
           </select>
+
 
           <select
             className="abmc-input"
@@ -188,7 +233,7 @@ export default function AsistenciaEnsayos() {
           </select>
         </div>
 
-        {/* 🔹 Tabla */}
+        {/* Tabla */}
         <table className="abmc-table abmc-table-rect">
           <thead className="abmc-thead">
             <tr className="abmc-row">
@@ -199,6 +244,7 @@ export default function AsistenciaEnsayos() {
               <th>Acciones</th>
             </tr>
           </thead>
+
           <tbody>
             {filtered.length === 0 ? (
               <tr>
@@ -209,16 +255,17 @@ export default function AsistenciaEnsayos() {
                 <tr key={r.id} className="abmc-row">
                   <td>{r.fecha}</td>
                   <td title={r.descripcion}>{r.nombre}</td>
+
                   <td>
                     <span
                       className="badge"
                       style={{
                         backgroundColor:
                           r.estadoAsistencia === "ABIERTA"
-                            ? "#1FA453" // 💚 Verde intenso
+                            ? "#1FA453"
                             : r.estadoAsistencia === "CERRADA"
-                              ? "#D32F2F" // 🔴 Rojo fuerte
-                              : "#b6b4b4ff", // Gris para pendiente
+                              ? "#D32F2F"
+                              : "#b6b4b4ff",
                         color: "var(--text-light)",
                         padding: "0.4rem 0.6rem",
                         borderRadius: "8px",
@@ -228,17 +275,27 @@ export default function AsistenciaEnsayos() {
                       {r.estadoAsistencia}
                     </span>
                   </td>
+
                   <td>{r.porcentajeAsistencia ?? 0}%</td>
-                  <td className="abmc-actions" style={{justifyContent: 'space-between'}}>
+
+                  <td
+                    className="abmc-actions"
+                    style={{ justifyContent: "center", gap: "10px" }}
+                  >
                     <button
                       className="btn btn-amarillo"
                       onClick={() => navigate(`/asistencias/ensayos/${r.id}`)}
-                      title={r.estadoAsistencia === "CERRADA" ? 'Ver resumen' : 'Tomar asistencia'}
-                    >
-                      {r.estadoAsistencia === "CERRADA"
-                        ? <EyeOnIcon fill='var(--text-light)' />
-                        : <MakerAsistIcon fill='var(--text-light)'/>
+                      title={
+                        r.estadoAsistencia === "CERRADA"
+                          ? "Ver resumen"
+                          : "Tomar asistencia"
                       }
+                    >
+                      {r.estadoAsistencia === "CERRADA" ? (
+                        <EyeOnIcon fill="var(--text-light)" />
+                      ) : (
+                        <MakerAsistIcon fill="var(--text-light)" />
+                      )}
                     </button>
 
                     <button
@@ -246,13 +303,19 @@ export default function AsistenciaEnsayos() {
                       style={{ marginLeft: 8 }}
                       disabled={loadingId === r.id}
                       onClick={() => toggleAsistencia(r)}
-                      title={r.estadoAsistencia === "ABIERTA" ? 'Cerrar asistencia' : 'Reabrir asistencia'}
+                      title={
+                        r.estadoAsistencia === "ABIERTA"
+                          ? "Cerrar asistencia"
+                          : "Reabrir asistencia"
+                      }
                     >
-                      {loadingId === r.id
-                        ? "..."
-                        : r.estadoAsistencia === "ABIERTA"
-                          ? <CloseAssistIcon fill='var(--text-light)' />
-                          : <OpenAssistIcon fill='var(--text-light)' />}
+                      {loadingId === r.id ? (
+                        "..."
+                      ) : r.estadoAsistencia === "ABIERTA" ? (
+                        <CloseAssistIcon fill="var(--text-light)" />
+                      ) : (
+                        <OpenAssistIcon fill="var(--text-light)" />
+                      )}
                     </button>
                   </td>
                 </tr>

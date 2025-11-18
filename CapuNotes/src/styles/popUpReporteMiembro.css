@@ -4,7 +4,9 @@
 
 .pop-dialog.popup-participacion {
   width: min(780px, 96vw);      /* más ancho que el normal */
-  max-height: 92vh;             /* popup más grande */
+  max-height: 92vh; 
+  top: 4rem;
+  position:absolute;            /* popup más grande */
 }
 
 .pop-dialog.popup-participacion .pop-body {
