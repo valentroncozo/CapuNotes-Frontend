@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 
 import BackButton from "@/components/common/BackButton";
 import FraternidadEditor from "./FraternidadEditor";
+import Loader from "@/components/common/Loader";
 import { fraternidadesService } from "@/services/fraternidadesService";
 import { areasService } from "@/services/areasService";
 import { cuerdasService } from "@/services/cuerdasService";
@@ -105,7 +106,17 @@ export default function FraternidadFormPage({ mode = "create" }) {
         </div>
 
         {loading || !initialData ? (
-          <p style={{ padding: "1rem" }}>Cargando datos...</p>
+          <div
+            style={{
+              width: "100%",
+              padding: "4rem 0",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Loader />
+          </div>
         ) : (
           <FraternidadEditor
             mode={isEdit ? "edit" : "create"}

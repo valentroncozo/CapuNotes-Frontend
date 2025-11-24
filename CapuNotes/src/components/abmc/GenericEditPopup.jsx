@@ -15,7 +15,7 @@ export default function GenericEditPopup({
   const [form, setForm] = useState({});
   const [errorMsg, setErrorMsg] = useState("");
 
-  // 🔹 Detectar si estamos editando o creando
+  // Detectar si estamos editando o creando
   const isEditing = Boolean(entity && (entity.id || Object.keys(entity).length > 0));
 
   useEffect(() => {
@@ -51,9 +51,19 @@ export default function GenericEditPopup({
       const nameVal = String(form.name ?? form.nombre ?? "").trim();
       if (nameVal && /^\d+$/.test(nameVal)) {
         setErrorMsg("El nombre de la cuerda no puede estar formado únicamente por números.");
-        return;
+        return false;
       }
     }
+
+   // Validación inline específica: nombre de área no puede ser solo números
+if (String(entityName).toLowerCase() === "área") {
+  const nameVal = String(form.nombre ?? "").trim();
+  if (/^\d+$/.test(nameVal)) {
+    setErrorMsg("El nombre no puede estar formado únicamente por números.");
+    return false; // mantiene el popup abierto
+  }
+}
+
 
     // Validación inline específica: si la entidad es 'área' debe tener descripción
     if (String(entityName).toLowerCase() === "área") {

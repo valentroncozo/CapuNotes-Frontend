@@ -355,3 +355,55 @@ select.input:disabled {
   padding-right: 12px;
 }
 
+/* ======================================================================================
+   ESTILO IDENTICO AL BUSCADOR "Buscar por nombre" PARA LOS INPUTS DEL POPUP
+   ====================================================================================== */
+
+/* Estado normal */
+.pop-body .input,
+.pop-body textarea.input,
+.pop-body select.input {
+  background: rgba(255, 255, 255, 0.05) !important; /* igual que ABMC */
+  border: 1px solid rgba(255, 255, 255, 0.15) !important; /* igual que ABMC */
+  color: var(--text-light) !important;
+  border-radius: 16px !important; /* mismo redondeado del buscador */
+  padding: 10px 14px !important;
+  font-size: 1rem !important;
+  height: 46px !important;
+  outline: none !important;
+  transition: 0.15s ease !important;
+  box-shadow: none !important; /* NO sombra en estado normal */
+}
+
+/* Placeholder */
+.pop-body .input::placeholder,
+.pop-body textarea.input::placeholder {
+  color: rgba(232, 234, 237, 0.6) !important;
+}
+
+/* Estado FOCUS – MISMO QUE EL FILTRO */
+.pop-body .input:focus,
+.pop-body textarea.input:focus,
+.pop-body select.input:focus {
+  border-color: #b3cdfa !important; /* borde celeste */
+  box-shadow: 0 0 0 3px rgba(179, 205, 250, 0.25) !important; /* glow celeste */
+  background: rgba(255, 255, 255, 0.08) !important; /* exacto */
+}
+
+/* Textarea (mantiene estilo uniforme) */
+.pop-body textarea.input {
+  min-height: 120px !important;
+  resize: vertical !important;
+}
+
+/* Campo con error resaltado en amarillo */
+.popup-input-error {
+  border-color: #DE9205 !important;
+  background: rgba(222, 146, 5, 0.1) !important;
+  box-shadow: 0 0 0 3px rgba(222, 146, 5, 0.3) !important;
+  color: var(--text-light) !important;
+}
+
+
+
+

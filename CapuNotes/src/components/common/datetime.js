@@ -62,8 +62,36 @@ export function getYear(dateStr) {
 }
 
 export function formatearFechaDdMmAIso(ddMMyyyy) {
-    if (!ddMMyyyy) return null;
-    const [dia, mes, anio] = ddMMyyyy.split("/");
-    return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
+  if (!ddMMyyyy) return "";
+
+  // Si ya viene en ISO → convertirlo a dd/mm/yyyy primero
+  if (ddMMyyyy.includes("-")) {
+    const [yyyy, mm, dd] = ddMMyyyy.split("-");
+    if (yyyy && mm && dd) {
+      ddMMyyyy = `${dd}/${mm}/${yyyy}`;
+    } else {
+      return "";
+    }
+  }
+
+  // Ahora debería estar en dd/mm/yyyy
+  const partes = ddMMyyyy.split("/");
+  if (partes.length !== 3) return "";
+
+  const [dia, mes, anio] = partes;
+
+  if (!dia || !mes || !anio) return "";
+
+  return `${anio}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
 }
 
+export function isoToDdMmYyyy(iso) {
+  if (!iso) return "";
+
+  // iso = "yyyy-mm-dd"
+  const [yyyy, mm, dd] = iso.split("-");
+
+  if (!yyyy || !mm || !dd) return "";
+
+  return `${dd.padStart(2, "0")}/${mm.padStart(2, "0")}/${yyyy}`;
+}

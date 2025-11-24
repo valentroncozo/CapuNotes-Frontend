@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 import "@/styles/miembros.css";
 import "@/styles/abmc.css";
+import { areaSchema } from "@/schemas/areas";
 
 import BackButton from "@/components/common/BackButton.jsx";
 import GenericEditPopup from "@/components/abmc/GenericEditPopup";
@@ -13,19 +14,16 @@ import { cuerdasService } from "@/services/cuerdasService.js";
 import { areasService } from "@/services/areasService.js";
 import { miembrosService } from "@/services/miembrosService.js";
 import { InputMask } from "@react-input/mask";
-import {formatearFechaDdMmAIso} from "@/components/common/datetime.js";
-/* ====================== Helpers ====================== */
+import { isoToDdMmYyyy } from "@/components/common/datetime.js";
 
-const formatearFechaVisual = (fecha) => {
-  if (!fecha) return "";
-  if (fecha.includes("/")) return fecha;
-  const [yyyy, mm, dd] = fecha.split("-");
-  return `${dd}/${mm}/${yyyy}`;
-};
+/* ================= Helpers ================= */
+
+const soloLetras = (t) =>
+  /^[A-Za-zÁÉÍÓÚáéíóúÜüÑñ\s]*$/.test(t);
 
 const normalizarFechaBackend = (fecha) => {
   if (!fecha || fecha.length !== 10) return null;
-  const [dd, mm, yyyy] = fecha.split('/');
+  const [dd, mm, yyyy] = fecha.split("/");
   return `${yyyy}-${mm}-${dd}`;
 };
 
@@ -34,6 +32,7 @@ function validarEdadDDMMAAAA(fecha) {
   const [dia, mes, anio] = fecha.split("/");
   const nacimiento = new Date(anio, mes - 1, dia);
   const hoy = new Date();
+
   let edad = hoy.getFullYear() - nacimiento.getFullYear();
   if (
     hoy.getMonth() < nacimiento.getMonth() ||
@@ -44,66 +43,67 @@ function validarEdadDDMMAAAA(fecha) {
   return edad >= 17;
 }
 
-/* ====================== COMPONENTE ====================== */
+/* ================= COMPONENTE ================= */
 
-export default function MiembrosEditar({ title = "Editar miembro" }) {
+export default function MiembrosEditar() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  const formRef = useRef(null); // ⬅️ AGREGADO
 
   const miembroInicial = location.state?.miembro;
   const soloVer = location.state?.soloVer === true;
 
-  const geoRef = useRef(null);
-
   const docViejo = {
-    nro: miembroInicial?.id?.nroDocumento,
-    tipo: miembroInicial?.id?.tipoDocumento,
+    nro: miembroInicial?.nroDocumento,
+    tipo: miembroInicial?.tipoDocumento,
   };
 
   const [miembro, setMiembro] = useState({
     nombre: miembroInicial?.nombre || "",
     apellido: miembroInicial?.apellido || "",
-    tipoDocumento: miembroInicial?.id?.tipoDocumento || "",
-    numeroDocumento: miembroInicial?.id?.nroDocumento || "",
-    fechaNacimiento: formatearFechaDdMmAIso(miembroInicial?.fechaNacimiento),
+    tipoDocumento: miembroInicial?.tipoDocumento || "",
+    numeroDocumento: miembroInicial?.nroDocumento || "",
+
+    fechaNacimiento: miembroInicial?.fechaNacimiento
+      ? isoToDdMmYyyy(miembroInicial.fechaNacimiento)
+      : "",
+
     telefono: miembroInicial?.nroTelefono || "",
     correo: miembroInicial?.correo || "",
     carreraProfesion: miembroInicial?.carreraProfesion || "",
     lugarOrigen: miembroInicial?.lugarOrigen || "",
     instrumentoMusical: miembroInicial?.instrumentoMusical || "",
-    cuerda: miembroInicial?.cuerda?.id || "",
-    area: miembroInicial?.area?.id || "",
+
+    cuerda: miembroInicial?.idCuerda || "",
+    area: miembroInicial?.idArea || "",
   });
 
   const [errores, setErrores] = useState({});
   const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
   const [areasDisponibles, setAreasDisponibles] = useState([]);
 
-  // POPUPS
   const [showPopupCuerda, setShowPopupCuerda] = useState(false);
   const [showPopupArea, setShowPopupArea] = useState(false);
 
-  // SCHEMAS
-  const cuerdaSchema = [
-    { key: "name", label: "Nombre", type: "text", required: true },
-  ];
+  /* ==================== CARGAR LISTAS ==================== */
 
-  const areaSchema = [
-    { key: "nombre", label: "Nombre", type: "text", required: true },
-    { key: "descripcion", label: "Descripción", type: "text", required: true },
-  ];
-
-  /* === Cargar datos === */
   const cargarListas = async () => {
     try {
       const [cuerdas, areas] = await Promise.all([
         cuerdasService.list(),
         areasService.list(),
       ]);
-      setCuerdasDisponibles(cuerdas);
-      setAreasDisponibles(areas);
-    } catch (error) {
-      console.error("Error cargando cuerdas o áreas:", error);
+
+      setCuerdasDisponibles(
+        cuerdas.sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
+      );
+
+      setAreasDisponibles(
+        areas.sort((a, b) => a.nombre.localeCompare(b.nombre, "es"))
+      );
+    } catch (err) {
+      console.error("Error cargando listas", err);
     }
   };
 
@@ -111,99 +111,146 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
     cargarListas();
   }, []);
 
-  /* === Manejo de cambios === */
+  /* =================== HANDLE INPUT =================== */
+
   const handleChange = (e) => {
     if (soloVer) return;
+
     const { name, value } = e.target;
-    setMiembro((prev) => ({ ...prev, [name]: value }));
-    setErrores((prev) => ({ ...prev, [name]: '' }));
+
+    const noTrim = ["numeroDocumento", "cuerda", "area"];
+
+    setMiembro((prev) => ({
+      ...prev,
+      [name]: noTrim.includes(name) ? value : value.trim(),
+    }));
+
+    if (!value || value === "") {
+      setErrores((prev) => ({ ...prev, [name]: "Campo obligatorio" }));
+    } else {
+      setErrores((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
-  /* === Validación === */
+  /* =================== VALIDAR =================== */
+
   const validarCampos = () => {
     if (soloVer) return true;
-    const requeridos = [
-      'nombre',
-      'apellido',
-      'tipoDocumento',
-      'numeroDocumento',
-      'cuerda',
-    ];
-    const err = {};
-    requeridos.forEach((campo) => {
-      if (!miembro[campo]?.toString().trim()) {
-        err[campo] = "Campo obligatorio";
+
+    const nuevos = {};
+
+    ["nombre", "apellido", "tipoDocumento", "numeroDocumento", "cuerda"].forEach(
+      (c) => {
+        if (!miembro[c]) nuevos[c] = "Campo obligatorio";
       }
-    });
-    setErrores(err);
-    return Object.keys(err).length === 0;
-  };
+    );
 
-  /* === Guardar === */
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (soloVer) return;
-
-    if (!validarCampos()) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Campos incompletos',
-        background: '#11103a',
-        color: '#E8EAED',
-      });
-      return;
+    if (miembro.fechaNacimiento && miembro.fechaNacimiento.length === 10) {
+      if (!validarEdadDDMMAAAA(miembro.fechaNacimiento)) {
+        nuevos.fechaNacimiento = "Debe tener al menos 17 años.";
+      }
     }
 
-    try {
-      const fechaBackend = formatearFechaDdMmAIso(miembro.fechaNacimiento);
-      const payload = {
-        id: {
-          nroDocumento: miembro.numeroDocumento,
-          tipoDocumento: miembro.tipoDocumento,
-        },
-        nombre: miembro.nombre,
-        apellido: miembro.apellido,
-        fechaNacimiento: normalizarFechaBackend(miembro.fechaNacimiento),
-        nroTelefono: miembro.telefono || null,
-        correo: miembro.correo || null,
-        carreraProfesion: miembro.carreraProfesion || null,
-        lugarOrigen: miembro.lugarOrigen || null,
-        instrumentoMusical: miembro.instrumentoMusical || null,
-        activo: miembroInicial?.activo ?? true,
-        cuerda: { id: parseInt(miembro.cuerda) },
-        area: miembro.area ? { id: parseInt(miembro.area) } : null,
-      };
+    setErrores(nuevos);
 
-      await miembrosService.update(docViejo.nro, docViejo.tipo, payload);
+    if (Object.keys(nuevos).length > 0) {
+      return false;
+    }
 
+    return true;
+  };
+
+  /* =================== SUBMIT =================== */
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validarCampos()) {
+
+      const primerError = formRef.current.querySelector(".error");
+
+      if (primerError) {
+        const contenedor = document.getElementById("root");
+
+        const rect = primerError.getBoundingClientRect();
+        const offset = rect.top + contenedor.scrollTop - window.innerHeight / 3;
+
+        contenedor.scrollTo({
+          top: offset,
+          behavior: "smooth"
+        });
+
+        primerError.focus({ preventScroll: true });
+      }
+
+      // ahora sí mostrar el Swal
       Swal.fire({
-        icon: 'success',
-        title: 'Cambios guardados',
-        background: '#11103a',
-        color: '#E8EAED',
+        icon: "warning",
+        title: "Datos incompletos",
+        text: "Revisá los campos obligatorios.",
+        background: "#11103a",
+        color: "#E8EAED",
         timer: 1500,
         showConfirmButton: false,
       });
 
-      navigate("/miembros", { state: { recargar: true } });
-    } catch (error) {
-      console.error('Error actualizando miembro:', error);
+      return;
+    }
+
+    try {
+      const payload = {
+        tipoDocumento: miembro.tipoDocumento,
+        nroDocumento: miembro.numeroDocumento,
+
+        nombre: miembro.nombre,
+        apellido: miembro.apellido,
+        fechaNacimiento: normalizarFechaBackend(miembro.fechaNacimiento),
+
+        correo: miembro.correo || null,
+        nroTelefono: miembro.telefono || null,
+        carreraProfesion: miembro.carreraProfesion || null,
+        lugarOrigen: miembro.lugarOrigen || null,
+        instrumentoMusical: miembro.instrumentoMusical || null,
+
+        activo: miembroInicial?.activo ?? true,
+
+        idCuerda: miembro.cuerda ? parseInt(miembro.cuerda) : miembroInicial.idCuerda,
+        idArea: miembro.area ? parseInt(miembro.area) : null,
+      };
+
+      await miembrosService.update(
+        docViejo.nro,
+        docViejo.tipo,
+        payload
+      );
+
       Swal.fire({
-        icon: 'error',
-        title: 'Error al actualizar',
-        text: 'Revisá los datos.',
-        background: '#11103a',
-        color: '#E8EAED',
+        icon: "success",
+        title: "Cambios guardados",
+        timer: 1200,
+        showConfirmButton: false,
+        background: "#11103a",
+        color: "#E8EAED",
+      });
+
+      navigate("/miembros", { state: { recargar: true } });
+    } catch (err) {
+      console.error("Error actualizando:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error al actualizar",
+        text: err.response?.data || "Revisá los datos.",
+        background: "#11103a",
+        color: "#E8EAED",
       });
     }
   };
 
-  /* ====================== RENDER ====================== */
+  /* =================== UI =================== */
 
   return (
     <main className="pantalla-miembros">
       <div className="abmc-card">
-
         <div className="abmc-header">
           <BackButton />
           <h1 className="abmc-title">
@@ -211,65 +258,86 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
           </h1>
         </div>
 
-        <p className="aviso-obligatorios alineado-derecha">
-          Los campos marcados con <span className="required">*</span> son obligatorios.
-        </p>
+        {!soloVer && (
+          <p className="aviso-obligatorios alineado-derecha">
+            Los campos marcados con <span className="required">*</span> son obligatorios.
+          </p>
+        )}
 
-        <Form onSubmit={handleSubmit} className="abmc-topbar">
-
+        {/* ⬅️ Formulario con ref */}
+        <Form ref={formRef} onSubmit={handleSubmit} className="abmc-topbar">
           <div className="form-grid-2cols">
+            {/* ---------------- Campos personales ---------------- */}
 
-            {/* === CAMPOS === */}
             <Form.Group className="form-group-miembro">
-              <label>Nombre *</label>
+              <label>
+                Nombre <span className="required">*</span>
+              </label>
               <Form.Control
-                type="text"
                 name="nombre"
                 value={miembro.nombre}
                 onChange={handleChange}
                 disabled={soloVer}
                 className={`abmc-input ${errores.nombre ? "error" : ""}`}
               />
+              {errores.nombre && (
+                <p className="input-hint">{errores.nombre}</p>
+              )}
             </Form.Group>
 
             <Form.Group className="form-group-miembro">
-              <label>Apellido *</label>
+              <label>
+                Apellido <span className="required">*</span>
+              </label>
               <Form.Control
-                type="text"
                 name="apellido"
                 value={miembro.apellido}
                 onChange={handleChange}
                 disabled={soloVer}
                 className={`abmc-input ${errores.apellido ? "error" : ""}`}
               />
+              {errores.apellido && (
+                <p className="input-hint">{errores.apellido}</p>
+              )}
             </Form.Group>
 
             <Form.Group className="form-group-miembro">
-              <label>Tipo Documento *</label>
+              <label>
+                Tipo Documento <span className="required">*</span>
+              </label>
               <Form.Select
                 name="tipoDocumento"
                 value={miembro.tipoDocumento}
                 onChange={handleChange}
                 disabled={soloVer}
-                className={`abmc-select ${errores.tipoDocumento ? "error" : ""}`}
+                className={`abmc-select ${errores.tipoDocumento ? "error" : ""
+                  }`}
               >
                 <option value="">Seleccionar</option>
                 <option value="DNI">DNI</option>
                 <option value="Pasaporte">Pasaporte</option>
                 <option value="Libreta Cívica">Libreta Cívica</option>
               </Form.Select>
+              {errores.tipoDocumento && (
+                <p className="input-hint">{errores.tipoDocumento}</p>
+              )}
             </Form.Group>
 
             <Form.Group className="form-group-miembro">
-              <label>Número Documento *</label>
+              <label>
+                Número Documento <span className="required">*</span>
+              </label>
               <Form.Control
-                type="text"
                 name="numeroDocumento"
                 value={miembro.numeroDocumento}
                 onChange={handleChange}
                 disabled={soloVer}
-                className={`abmc-input ${errores.numeroDocumento ? "error" : ""}`}
+                className={`abmc-input ${errores.numeroDocumento ? "error" : ""
+                  }`}
               />
+              {errores.numeroDocumento && (
+                <p className="input-hint">{errores.numeroDocumento}</p>
+              )}
             </Form.Group>
 
             <Form.Group className="form-group-miembro">
@@ -278,56 +346,39 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                 mask="DD/DD/DDDD"
                 replacement={{ D: /\d/ }}
                 value={miembro.fechaNacimiento}
-                placeholder="dd/mm/aaaa"
-                onChange={(e) => {
-                  if (soloVer) return;
-                  const fecha = e.target.value;
-
-                  setMiembro((prev) => ({
-                    ...prev,
-                    fechaNacimiento: fecha,
-                  }));
-
-                  if (fecha.length === 10 && !validarEdadDDMMAAAA(fecha)) {
-                    Swal.fire({
-                      icon: 'warning',
-                      title: 'Edad no válida',
-                      text: 'Debe ser mayor de 17',
-                      background: '#11103a',
-                      color: '#E8EAED',
-                    });
-
-                    setMiembro((prev) => ({
-                      ...prev,
-                      fechaNacimiento: "",
-                    }));
-                  }
-                }}
+                onChange={(e) =>
+                  setMiembro((p) => ({
+                    ...p,
+                    fechaNacimiento: e.target.value,
+                  }))
+                }
                 disabled={soloVer}
-                className="abmc-input"
+                className={`abmc-input ${errores.fechaNacimiento ? "error" : ""
+                  }`}
               />
+              {errores.fechaNacimiento && (
+                <p className="input-hint">{errores.fechaNacimiento}</p>
+              )}
             </Form.Group>
 
             <Form.Group className="form-group-miembro">
               <label>Lugar Origen</label>
-              <input
-                type="text"
-                className="abmc-input"
+              <Form.Control
+                name="lugarOrigen"
                 value={miembro.lugarOrigen}
-                onChange={(e) =>
-                  setMiembro((prev) => ({
-                    ...prev,
-                    lugarOrigen: e.target.value,
-                  }))
-                }
+                onChange={handleChange}
                 disabled={soloVer}
+                className={`abmc-input ${errores.lugarOrigen ? "error" : ""
+                  }`}
               />
+              {errores.lugarOrigen && (
+                <p className="input-hint">{errores.lugarOrigen}</p>
+              )}
             </Form.Group>
 
             <Form.Group className="form-group-miembro">
               <label>Teléfono</label>
               <Form.Control
-                type="text"
                 name="telefono"
                 value={miembro.telefono}
                 onChange={handleChange}
@@ -339,13 +390,16 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
             <Form.Group className="form-group-miembro">
               <label>Carrera / Profesión</label>
               <Form.Control
-                type="text"
                 name="carreraProfesion"
                 value={miembro.carreraProfesion}
                 onChange={handleChange}
                 disabled={soloVer}
-                className="abmc-input"
+                className={`abmc-input ${errores.carreraProfesion ? "error" : ""
+                  }`}
               />
+              {errores.carreraProfesion && (
+                <p className="input-hint">{errores.carreraProfesion}</p>
+              )}
             </Form.Group>
 
             <Form.Group className="form-group-miembro">
@@ -363,18 +417,24 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
             <Form.Group className="form-group-miembro">
               <label>Instrumento Musical</label>
               <Form.Control
-                type="text"
                 name="instrumentoMusical"
                 value={miembro.instrumentoMusical}
                 onChange={handleChange}
                 disabled={soloVer}
-                className="abmc-input"
+                className={`abmc-input ${errores.instrumentoMusical ? "error" : ""
+                  }`}
               />
+              {errores.instrumentoMusical && (
+                <p className="input-hint">{errores.instrumentoMusical}</p>
+              )}
             </Form.Group>
 
-            {/* === CUERDA === */}
+            {/* ---------------- CUERDA ---------------- */}
+
             <Form.Group className="form-group-miembro">
-              <label>Cuerda *</label>
+              <label>
+                Cuerda <span className="required">*</span>
+              </label>
               <div className="input-with-button">
                 <Form.Select
                   name="cuerda"
@@ -386,7 +446,7 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                   <option value="">Seleccionar cuerda</option>
                   {cuerdasDisponibles.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.name}
+                      {c.nombre}
                     </option>
                   ))}
                 </Form.Select>
@@ -401,9 +461,13 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                   </Button>
                 )}
               </div>
+              {errores.cuerda && (
+                <p className="input-hint">{errores.cuerda}</p>
+              )}
             </Form.Group>
 
-            {/* === ÁREA === */}
+            {/* ---------------- ÁREA ---------------- */}
+
             <Form.Group className="form-group-miembro">
               <label>Área</label>
               <div className="input-with-button">
@@ -433,7 +497,6 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                 )}
               </div>
             </Form.Group>
-
           </div>
 
           {!soloVer && (
@@ -456,28 +519,22 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
         </Form>
       </div>
 
-      {/* === POPUP CUERDA === */}
+      {/* Popup Cuerda */}
       {showPopupCuerda && (
         <GenericEditPopup
           isOpen={showPopupCuerda}
           onClose={() => setShowPopupCuerda(false)}
           entityName="Cuerda"
-          schema={cuerdaSchema}
+          schema={[{ key: "name", label: "Nombre", type: "text", required: true }]}
           entity={{}}
           onSave={async (values) => {
             try {
-              if (!values.name?.trim()) {
-                return Swal.fire({
-                  icon: "warning",
-                  title: "Campo obligatorio",
-                  text: "Debés completar el nombre de la cuerda.",
-                  background: "#11103a",
-                  color: "#E8EAED",
-                });
-              }
+              const nueva = await cuerdasService.create({
+                nombre: values.name,
+              });
 
-              await cuerdasService.create({ name: values.name });
               await cargarListas();
+              setMiembro((prev) => ({ ...prev, cuerda: nueva.id }));
 
               Swal.fire({
                 icon: "success",
@@ -490,19 +547,17 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
 
               setShowPopupCuerda(false);
             } catch (err) {
-              const msg = (err.response?.data || "").toLowerCase();
-              const duplicado =
-                msg.includes("duplicate") ||
-                msg.includes("already exists") ||
-                msg.includes("unique");
+              const msg = String(err.response?.data || "");
 
-              if (duplicado) {
+              if (msg.startsWith("Ya existe una cuerda")) {
                 return Swal.fire({
                   icon: "warning",
-                  title: "Ya existe",
-                  text: "Ese nombre de cuerda ya está registrado.",
+                  title: "Duplicado",
+                  text: "Ya existe una cuerda con ese nombre",
                   background: "#11103a",
                   color: "#E8EAED",
+                  confirmButtonColor: "#DE9205",
+                  confirmButtonText: "Aceptar",
                 });
               }
 
@@ -512,13 +567,15 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                 text: "No se pudo crear la cuerda.",
                 background: "#11103a",
                 color: "#E8EAED",
+                confirmButtonColor: "#DE9205",
+                confirmButtonText: "Aceptar",
               });
             }
           }}
         />
       )}
 
-      {/* === POPUP ÁREA === */}
+      {/* POPUP ÁREA */}
       {showPopupArea && (
         <GenericEditPopup
           isOpen={showPopupArea}
@@ -538,8 +595,10 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                 });
               }
 
-              await areasService.create(values);
+              const nueva = await areasService.create(values);
+
               await cargarListas();
+              setMiembro((prev) => ({ ...prev, area: nueva.id }));
 
               Swal.fire({
                 icon: "success",
@@ -552,19 +611,17 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
 
               setShowPopupArea(false);
             } catch (err) {
-              const msg = (err.response?.data || "").toLowerCase();
-              const duplicado =
-                msg.includes("duplicate") ||
-                msg.includes("already exists") ||
-                msg.includes("unique");
+              const msg = String(err.response?.data || "").trim();
 
-              if (duplicado) {
+              if (msg.startsWith("Ya existe un área")) {
                 return Swal.fire({
                   icon: "warning",
-                  title: "Nombre duplicado",
-                  text: "Ya existe un área con ese nombre.",
+                  title: "Duplicado",
+                  text: msg,
                   background: "#11103a",
                   color: "#E8EAED",
+                  confirmButtonColor: "#DE9205",
+                  confirmButtonText: "Aceptar",
                 });
               }
 
@@ -574,12 +631,14 @@ export default function MiembrosEditar({ title = "Editar miembro" }) {
                 text: "No se pudo crear el área.",
                 background: "#11103a",
                 color: "#E8EAED",
+                confirmButtonColor: "#DE9205",
+                confirmButtonText: "Aceptar",
               });
             }
           }}
         />
       )}
-
     </main>
   );
 }
+

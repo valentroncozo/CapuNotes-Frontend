@@ -106,7 +106,7 @@ export default function AppShell({ onLogout }) {
                 setGearOpen((v) => !v);
               }}
             >
-            <LogOutIcon fill="var(--text-light)"/>
+              <LogOutIcon fill="var(--text-light)" />
             </button>
 
             {gearOpen && (
@@ -183,17 +183,17 @@ function Menu({
         Inicio
       </a>
 
-        <a href="/asistencias"    onClick={(e) => {
-            e.preventDefault();
-            onNavigate("/asistencias");
-          }}
-          className="nav-link">Asistencias</a>
+      <a href="/asistencias" onClick={(e) => {
+        e.preventDefault();
+        onNavigate("/asistencias");
+      }}
+        className="nav-link">Asistencias</a>
 
-        <a href="/reportes"    onClick={(e) => {
-            e.preventDefault();
-            onNavigate("/reportes");
-          }}
-          className="nav-link">Reportes</a>
+      <a href="/reportes" onClick={(e) => {
+        e.preventDefault();
+        onNavigate("/reportes");
+      }}
+        className="nav-link">Reportes</a>
 
 
       <div className="appshell-accordion-outer">
@@ -254,13 +254,13 @@ function Menu({
         )}
       </div>
 
-        <a href="/eventos"    onClick={(e) => {
-            e.preventDefault();
-            onNavigate("/eventos");
-          }}
-          className="nav-link">Eventos</a>
+      <a href="/eventos" onClick={(e) => {
+        e.preventDefault();
+        onNavigate("/eventos");
+      }}
+        className="nav-link">Eventos</a>
 
-    <div className="appshell-accordion-outer">
+      <div className="appshell-accordion-outer">
         <button
           className={`appshell-accordion-trigger ${audOpen ? 'open' : ''}`}
           onClick={() => setAudOpen((v) => !v)}
@@ -343,16 +343,6 @@ function Menu({
         {orgOpen && (
           <div className="appshell-accordion-content">
             <a
-              href="/cuerdas"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/cuerdas');
-              }}
-            >
-              Cuerdas
-            </a>
-            <a
               href="/areas"
               className="nav-link"
               onClick={(e) => {
@@ -361,6 +351,16 @@ function Menu({
               }}
             >
               Áreas
+            </a>
+            <a
+              href="/cuerdas"
+              className="nav-link"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigate('/cuerdas');
+              }}
+            >
+              Cuerdas
             </a>
             <a
               href="/miembros"

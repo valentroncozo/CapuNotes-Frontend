@@ -14,10 +14,12 @@ import { areasService } from "@/services/areasService.js";
 import { miembrosService } from "@/services/miembrosService.js";
 import { InputMask } from "@react-input/mask";
 import { formatearFechaDdMmAIso } from "@/components/common/datetime.js";
+import { useRef } from "react";
 
-/* ============================================
+
+/* ============================
    Helpers
-============================================ */
+============================ */
 
 const normalizarFechaBackend = (fecha) => {
   if (!fecha || fecha.length !== 10) return null;
@@ -35,15 +37,16 @@ function validarEdadDDMMAAAA(fecha) {
     hoy.getMonth() < nacimiento.getMonth() ||
     (hoy.getMonth() === nacimiento.getMonth() &&
       hoy.getDate() < nacimiento.getDate())
-  ) {
+  )
     edad--;
-  }
   return edad >= 17;
 }
 
-/* ============================================
+const soloLetras = (str) => /^[A-Za-zÀ-ÿ\s]+$/.test(str);
+
+/* ============================
    COMPONENTE
-============================================ */
+============================ */
 
 export default function MiembrosAgregar() {
   const navigate = useNavigate();
@@ -68,11 +71,9 @@ export default function MiembrosAgregar() {
   const [cuerdasDisponibles, setCuerdasDisponibles] = useState([]);
   const [areasDisponibles, setAreasDisponibles] = useState([]);
 
-  // POPUPS
   const [showPopupCuerda, setShowPopupCuerda] = useState(false);
   const [showPopupArea, setShowPopupArea] = useState(false);
 
-  /* === SCHEMAS === */
   const cuerdaSchema = [
     { key: "name", label: "Nombre", type: "text", required: true },
   ];
@@ -82,7 +83,10 @@ export default function MiembrosAgregar() {
     { key: "descripcion", label: "Descripción", type: "text", required: true },
   ];
 
-  /* === Cargar cuerdas y áreas === */
+  /* ============================
+     Cargar listas
+  ============================ */
+
   const cargarListas = async () => {
     try {
       const [cuerdas, areas] = await Promise.all([
@@ -90,8 +94,17 @@ export default function MiembrosAgregar() {
         areasService.list(),
       ]);
 
-      setCuerdasDisponibles(cuerdas);
-      setAreasDisponibles(areas);
+      setCuerdasDisponibles(
+        [...cuerdas].sort((a, b) =>
+          a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" })
+        )
+      );
+
+      setAreasDisponibles(
+        [...areas].sort((a, b) =>
+          a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" })
+        )
+      );
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -107,66 +120,126 @@ export default function MiembrosAgregar() {
     cargarListas();
   }, []);
 
-  /* === Manejo de inputs === */
+  /* ============================
+     Manejo de inputs
+  ============================ */
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     setMiembro((prev) => ({ ...prev, [name]: value }));
     setErrores((prev) => ({ ...prev, [name]: "" }));
+
+    if (
+      ["nombre", "apellido", "carreraProfesion", "instrumentoMusical"].includes(
+        name
+      )
+    ) {
+      if (value.trim() !== "" && !soloLetras(value)) {
+        setErrores((prev) => ({
+          ...prev,
+          [name]: "No se admiten caracteres especiales o números.",
+        }));
+      }
+    }
   };
 
-  /* === Validación === */
-  const validarCampos = () => {
-    const requeridos = [
-      "nombre",
-      "apellido",
-      "tipoDocumento",
-      "numeroDocumento",
-      "cuerda",
-    ];
+  /* ============================
+     VALIDACIÓN FINAL
+  ============================ */
 
+  const validarCampos = () => {
     const nuevosErrores = {};
-    requeridos.forEach((c) => {
-      if (!miembro[c]?.toString().trim()) {
-        nuevosErrores[c] = "Campo obligatorio";
+
+    // Obligatorios
+    if (!miembro.nombre.trim()) nuevosErrores.nombre = "El nombre es obligatorio.";
+    if (!miembro.apellido.trim()) nuevosErrores.apellido = "El apellido es obligatorio.";
+    if (!miembro.tipoDocumento) nuevosErrores.tipoDocumento = "Debe seleccionar un tipo.";
+    if (!miembro.numeroDocumento.trim()) nuevosErrores.numeroDocumento = "Debe ingresar un número.";
+    if (!miembro.cuerda) nuevosErrores.cuerda = "Debe seleccionar una cuerda.";
+
+    // Letras válidas
+    ["nombre", "apellido", "carreraProfesion", "instrumentoMusical"].forEach((f) => {
+      if (miembro[f] && !soloLetras(miembro[f])) {
+        nuevosErrores[f] = "Solo se permiten letras.";
       }
     });
 
-    setErrores(nuevosErrores);
-    return Object.keys(nuevosErrores).length === 0;
-  };
+    // Fecha válida
+    if (miembro.fechaNacimiento && miembro.fechaNacimiento.length === 10) {
+      if (!validarEdadDDMMAAAA(miembro.fechaNacimiento)) {
+        nuevosErrores.fechaNacimiento = "Debe tener al menos 17 años.";
+      }
+    }
 
-  /* === Submit === */
+    setErrores(nuevosErrores);
+
+    if (Object.keys(nuevosErrores).length > 0) {
+      return false;
+    }
+
+    return true;
+  };
+  /* ============================
+     SUBMIT
+  ============================ */
+
+  const formRef = useRef(null);
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Ejecutamos validación
     if (!validarCampos()) {
-      return Swal.fire({
+      const primerError = formRef.current.querySelector(".error");
+
+      if (primerError) {
+        // El contenedor real que scrollea es #root (igual que en Editar)
+        const contenedor = document.getElementById("root");
+
+        const rect = primerError.getBoundingClientRect();
+        const offset = rect.top + contenedor.scrollTop - window.innerHeight / 3;
+
+        contenedor.scrollTo({
+          top: offset,
+          behavior: "smooth",
+        });
+
+        primerError.focus({ preventScroll: true });
+      }
+
+      // MOSTRAR el swal DESPUÉS del scroll
+      Swal.fire({
         icon: "warning",
-        title: "Campos incompletos",
-        text: "Completá todos los campos obligatorios.",
+        title: "Datos incompletos",
+        text: "Revisá los campos obligatorios.",
         background: "#11103a",
         color: "#E8EAED",
+        timer: 1500,
+        showConfirmButton: false,
       });
+
+      return;
     }
 
+    // === LÓGICA DE GUARDADO (La tuya, igual que antes) ===
+
     try {
-      const fechaBackend = formatearFechaDdMmAIso(miembro.fechaNacimiento);
       const payload = {
-        id: {
-          nroDocumento: miembro.numeroDocumento,
-          tipoDocumento: miembro.tipoDocumento,
-        },
+        tipoDocumento: miembro.tipoDocumento,
+        nroDocumento: miembro.numeroDocumento,
         nombre: miembro.nombre,
         apellido: miembro.apellido,
         fechaNacimiento: normalizarFechaBackend(miembro.fechaNacimiento),
-        nroTelefono: miembro.telefono || null,
         correo: miembro.correo || null,
+        nroTelefono: miembro.telefono || null,
         carreraProfesion: miembro.carreraProfesion || null,
         lugarOrigen: miembro.lugarOrigen || null,
         instrumentoMusical: miembro.instrumentoMusical || null,
+        idCuerda: parseInt(miembro.cuerda),
+        idArea: miembro.area ? parseInt(miembro.area) : null,
         activo: true,
-        cuerda: { id: parseInt(miembro.cuerda) },
-        area: miembro.area ? { id: parseInt(miembro.area) } : null,
       };
 
       await miembrosService.create(payload);
@@ -174,7 +247,7 @@ export default function MiembrosAgregar() {
       Swal.fire({
         icon: "success",
         title: "Miembro registrado",
-        timer: 1600,
+        timer: 1200,
         showConfirmButton: false,
         background: "#11103a",
         color: "#E8EAED",
@@ -192,9 +265,10 @@ export default function MiembrosAgregar() {
     }
   };
 
-  /* ============================================
+
+  /* ============================
      RENDER
-  ============================================ */
+  ============================ */
 
   return (
     <main className="pantalla-miembros">
@@ -209,7 +283,8 @@ export default function MiembrosAgregar() {
           Los campos marcados con <span className="required">*</span> son obligatorios.
         </p>
 
-        <Form onSubmit={handleSubmit} className="abmc-topbar">
+        <Form ref={formRef} onSubmit={handleSubmit} className="abmc-topbar">
+
           <div className="form-grid-2cols">
 
             {/* === NOMBRE === */}
@@ -221,6 +296,7 @@ export default function MiembrosAgregar() {
                 onChange={handleChange}
                 className={`abmc-input ${errores.nombre ? "error" : ""}`}
               />
+              {errores.nombre && <p className="input-hint">{errores.nombre}</p>}
             </Form.Group>
 
             {/* === APELLIDO === */}
@@ -232,6 +308,7 @@ export default function MiembrosAgregar() {
                 onChange={handleChange}
                 className={`abmc-input ${errores.apellido ? "error" : ""}`}
               />
+              {errores.apellido && <p className="input-hint">{errores.apellido}</p>}
             </Form.Group>
 
             {/* === TIPO DOCUMENTO === */}
@@ -248,9 +325,12 @@ export default function MiembrosAgregar() {
                 <option value="Pasaporte">Pasaporte</option>
                 <option value="Libreta Cívica">Libreta Cívica</option>
               </Form.Select>
+              {errores.tipoDocumento && (
+                <p className="input-hint">{errores.tipoDocumento}</p>
+              )}
             </Form.Group>
 
-            {/* === NÚMERO DOCUMENTO === */}
+            {/* === NUMERO DOCUMENTO === */}
             <Form.Group className="form-group-miembro">
               <label>Número Documento <span className="required">*</span></label>
               <Form.Control
@@ -259,6 +339,9 @@ export default function MiembrosAgregar() {
                 onChange={handleChange}
                 className={`abmc-input ${errores.numeroDocumento ? "error" : ""}`}
               />
+              {errores.numeroDocumento && (
+                <p className="input-hint">{errores.numeroDocumento}</p>
+              )}
             </Form.Group>
 
             {/* === FECHA NAC === */}
@@ -269,22 +352,24 @@ export default function MiembrosAgregar() {
                 replacement={{ D: /\d/ }}
                 value={miembro.fechaNacimiento}
                 placeholder="dd/mm/aaaa"
-                className="abmc-input"
+                className={`abmc-input ${errores.fechaNacimiento ? "error" : ""}`}
                 onChange={(e) => {
                   const fecha = e.target.value;
                   setMiembro((prev) => ({ ...prev, fechaNacimiento: fecha }));
+
                   if (fecha.length === 10 && !validarEdadDDMMAAAA(fecha)) {
-                    Swal.fire({
-                      icon: "warning",
-                      title: "Edad no válida",
-                      text: "Debe tener al menos 17 años",
-                      background: "#11103a",
-                      color: "#E8EAED",
-                    });
-                    setMiembro((prev) => ({ ...prev, fechaNacimiento: "" }));
+                    setErrores((prev) => ({
+                      ...prev,
+                      fechaNacimiento: "Debe tener al menos 17 años.",
+                    }));
+                  } else {
+                    setErrores((prev) => ({ ...prev, fechaNacimiento: "" }));
                   }
                 }}
               />
+              {errores.fechaNacimiento && (
+                <p className="input-hint">{errores.fechaNacimiento}</p>
+              )}
             </Form.Group>
 
             {/* === LUGAR ORIGEN === */}
@@ -294,11 +379,12 @@ export default function MiembrosAgregar() {
                 name="lugarOrigen"
                 value={miembro.lugarOrigen}
                 onChange={handleChange}
-                className="abmc-input"
+                className={`abmc-input ${errores.lugarOrigen ? "error" : ""}`}
               />
+              {errores.lugarOrigen && <p className="input-hint">{errores.lugarOrigen}</p>}
             </Form.Group>
 
-            {/* === TELÉFONO === */}
+            {/* === TELEFONO === */}
             <Form.Group className="form-group-miembro">
               <label>Teléfono</label>
               <Form.Control
@@ -316,8 +402,11 @@ export default function MiembrosAgregar() {
                 name="carreraProfesion"
                 value={miembro.carreraProfesion}
                 onChange={handleChange}
-                className="abmc-input"
+                className={`abmc-input ${errores.carreraProfesion ? "error" : ""}`}
               />
+              {errores.carreraProfesion && (
+                <p className="input-hint">{errores.carreraProfesion}</p>
+              )}
             </Form.Group>
 
             {/* === CORREO === */}
@@ -338,8 +427,11 @@ export default function MiembrosAgregar() {
                 name="instrumentoMusical"
                 value={miembro.instrumentoMusical}
                 onChange={handleChange}
-                className="abmc-input"
+                className={`abmc-input ${errores.instrumentoMusical ? "error" : ""}`}
               />
+              {errores.instrumentoMusical && (
+                <p className="input-hint">{errores.instrumentoMusical}</p>
+              )}
             </Form.Group>
 
             {/* === CUERDA === */}
@@ -355,7 +447,7 @@ export default function MiembrosAgregar() {
                   <option value="">Seleccionar cuerda</option>
                   {cuerdasDisponibles.map((c) => (
                     <option key={c.id} value={c.id}>
-                      {c.name}
+                      {c.nombre}
                     </option>
                   ))}
                 </Form.Select>
@@ -365,17 +457,11 @@ export default function MiembrosAgregar() {
                   className="abmc-btn"
                   onClick={() => setShowPopupCuerda(true)}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="#e3e3e3"
-                  >
-                    <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
-                  </svg>
+                  +
                 </Button>
               </div>
+
+              {errores.cuerda && <p className="input-hint">{errores.cuerda}</p>}
             </Form.Group>
 
             {/* === ÁREA === */}
@@ -401,21 +487,13 @@ export default function MiembrosAgregar() {
                   className="abmc-btn"
                   onClick={() => setShowPopupArea(true)}
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="24px"
-                    viewBox="0 -960 960 960"
-                    width="24px"
-                    fill="#e3e3e3"
-                  >
-                    <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
-                  </svg>
+                  +
                 </Button>
               </div>
             </Form.Group>
+
           </div>
 
-          {/* === ACCIONES === */}
           <div className="acciones-form-miembro derecha">
             <button
               type="button"
@@ -433,34 +511,31 @@ export default function MiembrosAgregar() {
           </div>
         </Form>
       </div>
-
-      {/* 🔶 POPUP CUERDA */}
+      {/* Popup Cuerda */}
       {showPopupCuerda && (
         <GenericEditPopup
           isOpen={showPopupCuerda}
           onClose={() => setShowPopupCuerda(false)}
           entityName="Cuerda"
-          schema={cuerdaSchema}
+          schema={[{ key: "name", label: "Nombre", type: "text", required: true }]}
           entity={{}}
           onSave={async (values) => {
             try {
-              if (!values.name?.trim()) {
-                return Swal.fire({
-                  icon: "warning",
-                  title: "Campo obligatorio",
-                  text: "Debés completar el nombre de la cuerda.",
-                  background: "#11103a",
-                  color: "#E8EAED",
-                });
-              }
+              // Crear cuerda
+              const nueva = await cuerdasService.create({ nombre: values.name });
 
-              await cuerdasService.create({ name: values.name });
+              // Recargar listas
               await cargarListas();
+
+              // Seleccionar automáticamente la nueva cuerda
+              setMiembro((prev) => ({
+                ...prev,
+                cuerda: nueva.id, // <--- ¡ACÁ!
+              }));
 
               Swal.fire({
                 icon: "success",
                 title: "Cuerda creada",
-                text: "La cuerda se creó correctamente.",
                 timer: 1500,
                 showConfirmButton: false,
                 background: "#11103a",
@@ -469,27 +544,18 @@ export default function MiembrosAgregar() {
 
               setShowPopupCuerda(false);
             } catch (err) {
-
-              // === Detectar clave duplicada ===
-              const mensaje = err.response?.data || "";
-
-              const esDuplicado =
-                mensaje.toLowerCase().includes("duplicate") ||
-                mensaje.toLowerCase().includes("already exists") ||
-                mensaje.toLowerCase().includes("unique constraint");
-
-              if (esDuplicado) {
+              const msg = String(err.response?.data || "").trim();
+              if (msg.startsWith("Ya existe una cuerda con ese nombre")) {
                 return Swal.fire({
                   icon: "warning",
-                  title: "Ya existe",
-                  text: "Ese nombre de cuerda ya está registrado.",
+                  title: "Duplicado",
+                  text: "Ya existe una cuerda con ese nombre",
                   background: "#11103a",
                   color: "#E8EAED",
                   confirmButtonColor: "#DE9205",
+                  confirmButtonText: "Aceptar",
                 });
               }
-
-              // === ERROR GENÉRICO ===
               Swal.fire({
                 icon: "error",
                 title: "Error",
@@ -497,14 +563,15 @@ export default function MiembrosAgregar() {
                 background: "#11103a",
                 color: "#E8EAED",
                 confirmButtonColor: "#DE9205",
+                confirmButtonText: "Aceptar",
               });
             }
           }}
-
         />
       )}
 
-      {/* 🔶 POPUP ÁREA */}
+
+      {/* POPUP ÁREA */}
       {showPopupArea && (
         <GenericEditPopup
           isOpen={showPopupArea}
@@ -514,7 +581,7 @@ export default function MiembrosAgregar() {
           entity={{}}
           onSave={async (values) => {
             try {
-              // --- Validación ---
+              // Validación local (igual que antes)
               if (!values.nombre?.trim() || !values.descripcion?.trim()) {
                 return Swal.fire({
                   icon: "warning",
@@ -523,39 +590,46 @@ export default function MiembrosAgregar() {
                   background: "#11103a",
                   color: "#E8EAED",
                   confirmButtonColor: "#DE9205",
+                  confirmButtonText: "Aceptar",
                 });
               }
 
-              // --- Crear ---
-              await areasService.create(values);
+              // Crear el área (el backend devuelve el id)
+              const nueva = await areasService.create(values);
+
+              // Recargar lista de áreas
               await cargarListas();
+
+              // Seleccionar automáticamente el área recién creada
+              setMiembro((prev) => ({
+                ...prev,
+                area: nueva.id,
+              }));
 
               Swal.fire({
                 icon: "success",
                 title: "Área creada",
-                text: "El área se creó correctamente.",
-                background: "#11103a",
-                color: "#E8EAED",
                 timer: 1500,
                 showConfirmButton: false,
+                background: "#11103a",
+                color: "#E8EAED",
               });
 
               setShowPopupArea(false);
             } catch (err) {
-              const msg = (err.response?.data || "").toLowerCase();
-              const duplicado =
-                msg.includes("duplicate") ||
-                msg.includes("already exists") ||
-                msg.includes("unique constraint");
+              const msg = String(err.response?.data || "").trim();
 
-              if (duplicado) {
+              // 🔥 Detectar duplicado EXACTO del backend:
+              // "Ya existe un área con el nombre 'Marketing'"
+              if (msg.startsWith("Ya existe un área con el nombre")) {
                 return Swal.fire({
                   icon: "warning",
-                  title: "Nombre duplicado",
-                  text: "Ya existe un área con ese nombre.",
+                  title: "Duplicado",
+                  text: "Ya existe dicha área",
                   background: "#11103a",
                   color: "#E8EAED",
                   confirmButtonColor: "#DE9205",
+                  confirmButtonText: "Aceptar",
                 });
               }
 
@@ -566,14 +640,17 @@ export default function MiembrosAgregar() {
                 background: "#11103a",
                 color: "#E8EAED",
                 confirmButtonColor: "#DE9205",
+                confirmButtonText: "Aceptar",
               });
             }
           }}
         />
       )}
 
+
     </main>
   );
 }
+
 
 

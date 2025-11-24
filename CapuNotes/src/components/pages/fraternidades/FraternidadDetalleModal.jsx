@@ -10,11 +10,11 @@ export default function FraternidadDetalleModal({ fraternidad, isOpen, onClose }
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Fraternidad: ${fraternidad.nombre}`}
+      title={`${fraternidad.nombre}`}
       className="fraternidad-detalle-modal"
     >
-      <p style={{ marginBottom: "0.75rem" }}>
-        Total de miembros: <strong>{fraternidad.cantidadMiembros || miembros.length}</strong>
+      <p style={{ marginBottom: "0.75rem", textAlign: "right" }}>
+        Cantidad de miembros: <strong>{fraternidad.cantidadMiembros || miembros.length}</strong>
       </p>
 
       {miembros.length === 0 ? (

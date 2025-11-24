@@ -1,0 +1,79 @@
+ {/* POPUP ÁREA */}
+      {showPopupArea && (
+        <GenericEditPopup
+          isOpen={showPopupArea}
+          onClose={() => setShowPopupArea(false)}
+          entityName="Área"
+          schema={areaSchema}
+          entity={{}}
+          onSave={async (values) => {
+            try {
+              // Validación local (igual que antes)
+              if (!values.nombre?.trim() || !values.descripcion?.trim()) {
+                return Swal.fire({
+                  icon: "warning",
+                  title: "Campos incompletos",
+                  text: "Debés completar nombre y descripción.",
+                  background: "#11103a",
+                  color: "#E8EAED",
+                  confirmButtonColor: "#DE9205",
+                  confirmButtonText: "Aceptar",
+                });
+              }
+
+              // Crear el área (el backend devuelve el id)
+              const nueva = await areasService.create({
+                nombre: values.nombre,
+                descripcion: values.descripcion,
+              });
+
+
+              // Recargar lista de áreas
+              await cargarListas();
+
+              // Seleccionar automáticamente el área recién creada
+              setMiembro((prev) => ({
+                ...prev,
+                area: nueva.id,
+              }));
+
+              Swal.fire({
+                icon: "success",
+                title: "Área creada",
+                timer: 1500,
+                showConfirmButton: false,
+                background: "#11103a",
+                color: "#E8EAED",
+              });
+
+              setShowPopupArea(false);
+            } catch (err) {
+              const msg = String(err.response?.data || "").trim();
+
+              // 🔥 Detectar duplicado EXACTO del backend:
+              // "Ya existe un área con el nombre 'Marketing'"
+              if (msg.startsWith("Ya existe un área con el nombre")) {
+                return Swal.fire({
+                  icon: "warning",
+                  title: "Duplicado",
+                  text: "Ya existe dicha área",
+                  background: "#11103a",
+                  color: "#E8EAED",
+                  confirmButtonColor: "#DE9205",
+                  confirmButtonText: "Aceptar",
+                });
+              }
+
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "No se pudo crear el área.",
+                background: "#11103a",
+                color: "#E8EAED",
+                confirmButtonColor: "#DE9205",
+                confirmButtonText: "Aceptar",
+              });
+            }
+          }}
+        />
+      )}

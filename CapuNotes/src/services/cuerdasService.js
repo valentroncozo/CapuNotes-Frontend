@@ -6,23 +6,36 @@ const API_URL = "/api/cuerdas";
 export const cuerdasService = {
   list: async () => {
     const res = await axios.get(API_URL);
-    console.log("📡 Datos recibidos de CUERDAS:", res.data);
-    return res.data;
+    return res.data.map((c) => ({
+      id: c.id,
+      nombre: c.name,
+    }));
   },
 
   getById: async (id) => {
     const res = await axios.get(`${API_URL}/${id}`);
-    return res.data;
+    return {
+      id: res.data.id,
+      nombre: res.data.name,
+    };
   },
 
   create: async (data) => {
-    const res = await axios.post(API_URL, data);
-    return res.data;
+    const payload = { name: data.nombre };
+    const res = await axios.post(API_URL, payload);
+    return {
+      id: res.data.id,
+      nombre: res.data.name,
+    };
   },
 
-  update: async (updated) => {
-    const res = await axios.put(`${API_URL}/${updated.id}`, updated);
-    return res.data;
+  update: async (data) => {
+    const payload = { name: data.nombre };
+    const res = await axios.put(`${API_URL}/${data.id}`, payload);
+    return {
+      id: res.data.id,
+      nombre: res.data.name,
+    };
   },
 
   remove: async (id) => {

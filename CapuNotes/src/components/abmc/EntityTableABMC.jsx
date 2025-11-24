@@ -16,7 +16,8 @@ function showDuplicateAlert(uniqueBy) {
     text: `Ya existe un registro con ese ${uniqueBy}.`,
     background: "#11103a",
     color: "#E8EAED",
-    confirmButtonColor: "#7c83ff",
+    confirmButtonText: "Aceptar",
+    confirmButtonColor: "#DE9205",
   });
 }
 
@@ -27,7 +28,7 @@ export default function EntityTableABMC({
   uniqueBy = "nombre",
   entityName = "registro",
   showBackButton = true,
-  forceOpenCreate = false,   // 👈 PROP NUEVA
+  forceOpenCreate = false,
 }) {
   const [items, setItems] = useState([]);
   const [nuevo, setNuevo] = useState({});
@@ -37,7 +38,7 @@ export default function EntityTableABMC({
   const [selected, setSelected] = useState(null);
 
   /* -----------------------------------------
-     🚀 AUTOPEN (crear automático si viene true)
+     AUTOPEN
   ------------------------------------------*/
   useEffect(() => {
     if (forceOpenCreate) {
@@ -45,7 +46,6 @@ export default function EntityTableABMC({
       setEditOpen(true);
     }
   }, [forceOpenCreate]);
-
 
   /* -----------------------------------------
      Cargar lista inicial
@@ -56,7 +56,7 @@ export default function EntityTableABMC({
 
       const sorted = Array.isArray(data)
         ? [...data].sort((a, b) =>
-            (a.nombre || "").localeCompare(b.nombre || "", "es", {
+            (a[uniqueBy] || "").localeCompare(b[uniqueBy] || "", "es", {
               sensitivity: "base",
             })
           )
@@ -79,7 +79,6 @@ export default function EntityTableABMC({
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line
   }, []);
 
   /* -----------------------------------------
@@ -106,19 +105,26 @@ export default function EntityTableABMC({
   };
 
   /* -----------------------------------------
-     Detectar duplicado
+     Normalizar (para duplicados)
   ------------------------------------------*/
+  const normalize = (str) =>
+    str
+      ?.normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim();
+
   const isDuplicate = (obj) => {
     if (!uniqueBy) return false;
-    const base = String(obj[uniqueBy] ?? "").trim().toLowerCase();
-    if (!base) return false;
-    return items.some(
-      (it) => String(it[uniqueBy] ?? "").trim().toLowerCase() === base
-    );
+
+    const nuevo = normalize(obj[uniqueBy]);
+    if (!nuevo) return false;
+
+    return items.some((it) => normalize(it[uniqueBy]) === nuevo);
   };
 
   /* -----------------------------------------
-     Guardar nuevo registro
+     Guardar nuevo
   ------------------------------------------*/
   const handleAgregar = async (e) => {
     e.preventDefault();
@@ -140,7 +146,7 @@ export default function EntityTableABMC({
     }
 
     try {
-      const created = await service.create(nuevo);
+      await service.create(nuevo);
       await load();
       setNuevo({});
 
@@ -166,7 +172,7 @@ export default function EntityTableABMC({
   };
 
   /* -----------------------------------------
-     Eliminar registro
+     Eliminar
   ------------------------------------------*/
   const handleEliminar = async (id, displayName) => {
     const femenino = ["cuerda", "área", "audición", "especialidad"];
@@ -179,6 +185,7 @@ export default function EntityTableABMC({
       text: "Esta acción no se puede deshacer.",
       icon: "warning",
       showCancelButton: true,
+      reverseButtons: true,
       confirmButtonColor: "#DE9205",
       cancelButtonColor: "#6c757d",
       confirmButtonText: "Sí, eliminar",
@@ -195,7 +202,7 @@ export default function EntityTableABMC({
       Swal.fire({
         icon: "success",
         title: `${articulo} eliminado`,
-        text: `${articulo} "${displayName}" se eliminó correctamente.`,
+        text: ` "${displayName}" se eliminó correctamente.`,
         timer: 1500,
         showConfirmButton: false,
         background: "#11103a",
@@ -213,20 +220,21 @@ export default function EntityTableABMC({
   };
 
   /* -----------------------------------------
-     Editar (update)
+     Guardar edición
   ------------------------------------------*/
   const handleEditSave = async (updated) => {
     const baseValue = updated?.[uniqueBy];
     if (baseValue) {
-      const base = String(baseValue).trim().toLowerCase();
+      const nuevoValor = normalize(updated?.[uniqueBy]);
 
       const duplicado = items.some(
-        (it) =>
-          String(it?.[uniqueBy] ?? "").trim().toLowerCase() === base &&
-          it.id !== updated.id
+        (it) => normalize(it?.[uniqueBy]) === nuevoValor && it.id !== updated.id
       );
 
-      if (duplicado) return showDuplicateAlert(uniqueBy);
+      if (duplicado) {
+        showDuplicateAlert(uniqueBy);
+        return false;
+      }
     }
 
     if (!updated.descripcion && entityName.toLowerCase() === "área") {
@@ -288,24 +296,25 @@ export default function EntityTableABMC({
 
   const columnas = visibleFields.map((f) => f.label);
 
+  /* -----------------------------------------
+     Filtros y orden
+  ------------------------------------------*/
   const filtrados = items
     .filter((i) => {
       if (!filtro) return true;
-      const q = filtro.toLowerCase();
-      return visibleFields.some((f) =>
-        String(i[f.key] ?? "").toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => {
-      const campo = uniqueBy || visibleFields[0]?.key;
-      return String(a[campo] ?? "")
+      return String(i[uniqueBy] ?? "")
         .toLowerCase()
-        .localeCompare(String(b[campo] ?? "").toLowerCase(), "es", {
+        .includes(filtro.toLowerCase());
+    })
+    .sort((a, b) =>
+      String(a[uniqueBy] ?? "")
+        .toLowerCase()
+        .localeCompare(String(b[uniqueBy] ?? "").toLowerCase(), "es", {
           sensitivity: "base",
-        });
-    });
+        })
+    );
 
-  const displayKey = uniqueBy || schema[0]?.key;
+  const displayKey = uniqueBy;
 
   /* -----------------------------------------
      RENDER
@@ -321,16 +330,20 @@ export default function EntityTableABMC({
         {/* TOPBAR */}
         <div className="abmc-topbar" style={{ marginTop: 0 }}>
           {nuevoError && (
-            <div style={{ padding: '0 12px', width: '100%' }}>
-              <p style={{
-                background: 'rgba(255,193,7,0.12)',
-                border: '1px solid #DE9205',
-                color: '#DE9205',
-                padding: '8px 10px',
-                borderRadius: '8px',
-                margin: '0 0 8px 0',
-                fontSize: '0.9rem'
-              }}>{nuevoError}</p>
+            <div style={{ padding: "0 12px", width: "100%" }}>
+              <p
+                style={{
+                  background: "rgba(255,193,7,0.12)",
+                  border: "1px solid #DE9205",
+                  color: "#DE9205",
+                  padding: "8px 10px",
+                  borderRadius: "8px",
+                  margin: "0 0 8px 0",
+                  fontSize: "0.9rem",
+                }}
+              >
+                {nuevoError}
+              </p>
             </div>
           )}
           <input
