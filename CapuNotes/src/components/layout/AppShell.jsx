@@ -2,6 +2,7 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import '@/styles/offcanvas.css';
+import LogOutIcon from '@/assets/LogOutIcon';
 
 /* Ícono de cierre (X) */
 function CloseIcon(props) {
@@ -41,7 +42,6 @@ function GearIcon(props) {
 const MENU_ITEMS = [
   ['/asistencias', 'Asistencias'],
   ['/eventos', 'Eventos'],
-  ['/usuarios-roles', 'Usuarios y roles'],
 ];
 
 export default function AppShell({ onLogout }) {
@@ -106,7 +106,7 @@ export default function AppShell({ onLogout }) {
                 setGearOpen((v) => !v);
               }}
             >
-              <GearIcon />
+              <LogOutIcon fill="var(--text-light)" />
             </button>
 
             {gearOpen && (
@@ -183,63 +183,82 @@ function Menu({
         Inicio
       </a>
 
+      <a href="/asistencias" onClick={(e) => {
+        e.preventDefault();
+        onNavigate("/asistencias");
+      }}
+        className="nav-link">Asistencias</a>
+
+      <a href="/reportes" onClick={(e) => {
+        e.preventDefault();
+        onNavigate("/reportes");
+      }}
+        className="nav-link">Reportes</a>
+
+
       <div className="appshell-accordion-outer">
         <button
-          className={`appshell-accordion-trigger ${orgOpen ? 'open' : ''}`}
-          onClick={() => setOrgOpen((v) => !v)}
-          aria-expanded={orgOpen}
+          className={`appshell-accordion-trigger ${songsOpen ? "open" : ""}`}
+          onClick={() => setSongsOpen((v) => !v)}
+          aria-expanded={songsOpen}
         >
-          Organización del Coro
+          Canciones
           <span className="appshell-accordion-caret">
-            {orgOpen ? '▴' : '▾'}
+            {songsOpen ? "▴" : "▾"}
           </span>
         </button>
 
-        {orgOpen && (
+        {songsOpen && (
           <div className="appshell-accordion-content">
             <a
-              href="/cuerdas"
+              href="/canciones"
               className="nav-link"
               onClick={(e) => {
                 e.preventDefault();
-                onNavigate('/cuerdas');
+                onNavigate("/canciones");
               }}
             >
-              Cuerdas
+              Cancionero
             </a>
             <a
-              href="/areas"
+              href="/repertorios"
               className="nav-link"
               onClick={(e) => {
                 e.preventDefault();
-                onNavigate('/areas');
+                onNavigate("/repertorios");
               }}
             >
-              Áreas
+              Repertorios
             </a>
             <a
-              href="/miembros"
+              href="/tiempos-liturgicos"
               className="nav-link"
               onClick={(e) => {
                 e.preventDefault();
-                onNavigate('/miembros');
+                onNavigate("/tiempos-liturgicos");
               }}
             >
-              Miembros
+              Tiempos litúrgicos
             </a>
             <a
-              href="/fraternidades"
+              href="/categorias-canciones"
               className="nav-link"
               onClick={(e) => {
                 e.preventDefault();
-                onNavigate('/fraternidades');
+                onNavigate("/categorias-canciones");
               }}
             >
-              Fraternidades
+              Categorías
             </a>
           </div>
         )}
       </div>
+
+      <a href="/eventos" onClick={(e) => {
+        e.preventDefault();
+        onNavigate("/eventos");
+      }}
+        className="nav-link">Eventos</a>
 
       <div className="appshell-accordion-outer">
         <button
@@ -311,75 +330,61 @@ function Menu({
 
       <div className="appshell-accordion-outer">
         <button
-          className={`appshell-accordion-trigger ${songsOpen ? "open" : ""}`}
-          onClick={() => setSongsOpen((v) => !v)}
-          aria-expanded={songsOpen}
+          className={`appshell-accordion-trigger ${orgOpen ? 'open' : ''}`}
+          onClick={() => setOrgOpen((v) => !v)}
+          aria-expanded={orgOpen}
         >
-          Canciones
+          Organización del Coro
           <span className="appshell-accordion-caret">
-            {songsOpen ? "▴" : "▾"}
+            {orgOpen ? '▴' : '▾'}
           </span>
         </button>
 
-        {songsOpen && (
+        {orgOpen && (
           <div className="appshell-accordion-content">
             <a
-              href="/canciones"
+              href="/areas"
               className="nav-link"
               onClick={(e) => {
                 e.preventDefault();
-                onNavigate("/canciones");
+                onNavigate('/areas');
               }}
             >
-              Cancionero
+              Áreas
             </a>
             <a
-              href="/repertorios"
+              href="/cuerdas"
               className="nav-link"
               onClick={(e) => {
                 e.preventDefault();
-                onNavigate("/repertorios");
+                onNavigate('/cuerdas');
               }}
             >
-              Repertorios
+              Cuerdas
             </a>
             <a
-              href="/tiempos-liturgicos"
+              href="/miembros"
               className="nav-link"
               onClick={(e) => {
                 e.preventDefault();
-                onNavigate("/tiempos-liturgicos");
+                onNavigate('/miembros');
               }}
             >
-              Tiempos litúrgicos
+              Miembros
             </a>
             <a
-              href="/categorias-canciones"
+              href="/fraternidades"
               className="nav-link"
               onClick={(e) => {
                 e.preventDefault();
-                onNavigate("/categorias-canciones");
+                onNavigate('/fraternidades');
               }}
             >
-              Categorías
+              Fraternidades
             </a>
           </div>
         )}
       </div>
-
-      {MENU_ITEMS.map(([to, label]) => (
-        <a
-          key={to}
-          href={to}
-          onClick={(e) => {
-            e.preventDefault();
-            onNavigate(to);
-          }}
-          className="nav-link"
-        >
-          {label}
-        </a>
-      ))}
     </div>
   );
 }

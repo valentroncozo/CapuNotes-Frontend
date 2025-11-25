@@ -435,3 +435,133 @@ button,
 .abmc-topbar .abmc-btn.abmc-btn-secondary:hover {
   background-color: #9e9e9e !important;   /* gris oscuro */
 }
+.required {
+  color: #DE9205 !important;
+  font-weight: bold;
+}
+.input-hint {
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+/* ===== Scroll interno de los SELECT (dropdown) ===== */
+select {
+    scrollbar-width: thin !important;          /* Firefox */
+    scrollbar-color: rgba(255,255,255,.3) transparent !important;
+}
+
+/* ===== Chrome / Edge / Safari ===== */
+select::-webkit-scrollbar {
+    width: 8px !important;
+}
+
+select::-webkit-scrollbar-thumb {
+    background: #7b7d9e !important;        /* gris */
+    border-radius: 8px !important;
+}
+
+select::-webkit-scrollbar-track {
+    background: #11103a !important;     /* gris oscuro */
+}
+
+.input-hint {
+  display: none !important;
+}
+
+/* ANULAR hover clarito */
+button,
+.abmc-btn,
+.abmc-btn-primary,
+button.swal2-confirm,
+button.swal2-cancel {
+  transition: none !important;
+}
+
+button:hover,
+.abmc-btn:hover,
+.abmc-btn-primary:hover,
+button.swal2-confirm:hover,
+button.swal2-cancel:hover {
+  filter: none !important;
+  background-color: inherit !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+/* AUMENTAR SOLO EL ÍCONO SIN AFECTAR EL BOTÓN */
+button svg,
+button i,
+.abmc-btn svg,
+.abmc-btn i {
+  width: 18px !important;   /* ← ajustá el tamaño acá */
+  height: 22px !important;
+  transform: translateY(1px); /* lo alinea mejor verticalmente */
+}
+/* ========================================================================= */
+/* ===============  SWEETALERT2 — ESTILOS UNIFICADOS  ====================== */
+/* ========================================================================= */
+
+/* =================== 1) INPUT — ESTADO NORMAL ============================ */
+
+.swal2-input.swal2-input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid var(--card) !important;        /* Borde celestito normal */
+  color: var(--text-light) !important;
+  box-shadow: none !important;
+  font-family: 'Manjari', sans-serif !important;
+}
+
+/* =================== 2) INPUT — ESTADO ERROR ============================ */
+
+.swal2-input.swal2-input.swal2-inputerror {
+  border: 1px solid var(--accent) !important;      /* Borde amarillo */
+  box-shadow: 0 0 0 3px rgba(222,146,5,0.25) !important;
+}
+
+/* Evitar borde rojo default del navegador */
+.swal2-input:invalid,
+.swal2-input.swal2-input:focus:invalid {
+  border-color: var(--accent) !important;
+  box-shadow: none !important;
+}
+
+/* ================== SWEETALERT2 INPUT — ESTILO CAPUNOTES ================== */
+
+.swal2-input.swal2-input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-light) !important;
+
+  /* Borde celestito igual al de tu input */
+  border: 2px solid #b3cdfa !important;
+  border-radius: 12px !important;
+
+  /* Tamaño y padding igual al input real */
+  height: 48px !important;
+  padding: 0.5rem 0.75rem !important;
+
+  /* Glow azul igual al foco */
+  box-shadow: 0 0 0 2px rgba(179, 205, 250, 0.25) !important;
+
+  font-family: 'Manjari', sans-serif !important;
+  font-size: 1rem !important;
+}
+
+/* ====== Estado de error — mantiene forma pero cambia a amarillo ====== */
+
+.swal2-input.swal2-input.swal2-inputerror {
+  border: 2px solid var(--accent) !important; /* Amarillo */
+  box-shadow: 0 0 0 3px rgba(222,146,5,0.25) !important;
+}
+.swal2-validation-message {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin-top: 6px !important;
+
+  color: var(--accent) !important;                 /* amarillo institucional */
+  font-family: 'Manjari', sans-serif !important;
+  font-size: 0.9rem !important;
+  text-align: center !important;
+
+  font-weight: 700 !important;                     /* ← NEGRITA */
+}

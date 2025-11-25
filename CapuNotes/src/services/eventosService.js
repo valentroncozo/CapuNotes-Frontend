@@ -1,68 +1,73 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = 'api/eventos';
+const API_URL = "/api/eventos";
 
 export const eventosService = {
-  // 🔹 Listar eventos (con filtros opcionales)
-  async listarEventos(filtros = {}) {
+  // ⭐ Listar eventos con filtros opcionales
+  list: async (filtros = {}) => {
     try {
-      const params = new URLSearchParams(filtros).toString();
-      const res = await axios.get(`${API_URL}${params ? `?${params}` : ''}`);
-      console.log('📅 Eventos obtenidos:', res.data);
+      const res = await axios.get(API_URL, { params: filtros });
       return res.data;
-    } catch (err) {
-      console.error('❌ Error al listar eventos:', err);
-      throw err;
+    } catch (error) {
+      console.error("❌ Error al listar eventos:", error);
+      throw error;
     }
   },
 
-  // 🔹 Obtener un evento por ID
-  async obtenerEventoPorId(id) {
+  // ⭐ Listar solo pendientes
+  listPendientes: async () => {
+    try {
+      const res = await axios.get(`${API_URL}/pendientes`);
+      return res.data;
+    } catch (error) {
+      console.error("❌ Error al listar eventos pendientes:", error);
+      throw error;
+    }
+  },
+
+  // ⭐ Obtener un evento por ID
+  getById: async (id) => {
     try {
       const res = await axios.get(`${API_URL}/${id}`);
-      console.log(`🔍 Evento ${id}:`, res.data);
       return res.data;
-    } catch (err) {
-      console.error(`❌ Error al obtener evento ${id}:`, err);
-      throw err;
+    } catch (error) {
+      console.error(`❌ Error al obtener evento ${id}:`, error);
+      throw error;
     }
   },
 
-  // 🔹 Crear un nuevo evento
-  async crearEvento(data) {
+  // ⭐ Crear evento
+  create: async (data) => {
     try {
       const res = await axios.post(API_URL, data);
-      console.log('🆕 Evento creado:', res.data);
       return res.data;
-    } catch (err) {
-      console.error('❌ Error al crear evento:', err);
-      throw err;
+    } catch (error) {
+      console.error("❌ Error al crear evento:", error);
+      throw error;
     }
   },
 
-  // 🔹 Editar evento existente
-  async editarEvento(id, data) {
+  // ⭐ Editar evento (PATCH como en tu backend)
+  update: async (id, data) => {
     try {
-      const res = await axios.put(`${API_URL}/${id}`, data);
-      console.log(`✏️ Evento ${id} editado:`, res.data);
+      const res = await axios.patch(`${API_URL}/${id}`, data);
       return res.data;
-    } catch (err) {
-      console.error(`❌ Error al editar evento ${id}:`, err);
-      throw err;
+    } catch (error) {
+      console.error(`❌ Error al actualizar evento ${id}:`, error);
+      throw error;
     }
   },
 
-  // 🔹 Eliminar evento
-  async eliminarEvento(id, tipoEvento) {
+  // ⭐ Eliminar evento (requiere tipoEvento)
+  remove: async (id, tipoEvento) => {
     try {
       const res = await axios.delete(`${API_URL}/${id}`, {
         params: { tipoEvento },
       });
-      console.log(`🗑️ Evento ${id} eliminado:`, res.data);
       return res.data;
-    } catch (err) {
-      console.error(`❌ Error al eliminar evento ${id}:`, err);
-      throw err;
+    } catch (error) {
+      console.error(`❌ Error al eliminar evento ${id}:`, error);
+      throw error;
     }
   },
 };

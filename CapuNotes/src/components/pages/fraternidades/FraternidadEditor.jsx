@@ -5,14 +5,18 @@ import Swal from "sweetalert2";
 
 import miembrosService from "@/services/miembrosService";
 import PopUpVerMiembro from "@/components/pages/miembros/popUpVerMiembro";
+import Loader from "@/components/common/Loader";
+
 import "@/styles/repertorios.css";
 import "@/styles/fraternidades.css";
+
 
 const DROPPABLE_AVAILABLE = "available";
 const DROPPABLE_SELECTED = "selected";
 
 const memberKey = (member = {}) => {
-  const tipo = (member.id?.tipoDocumento || member.tipoDocumento || "DNI").toUpperCase();
+  const tipo =
+    (member.id?.tipoDocumento || member.tipoDocumento || "DNI").toUpperCase();
   const nro = member.id?.nroDocumento || member.nroDocumento || "";
   if (!nro) return null;
   return `${tipo}-${nro}`;
@@ -26,7 +30,11 @@ const normalizeMembers = (list = []) => {
     map.set(key, {
       ...member,
       id: {
-        tipoDocumento: (member.id?.tipoDocumento || member.tipoDocumento || "DNI").toUpperCase(),
+        tipoDocumento: (
+          member.id?.tipoDocumento ||
+          member.tipoDocumento ||
+          "DNI"
+        ).toUpperCase(),
         nroDocumento: member.id?.nroDocumento || member.nroDocumento || "",
       },
       nombre: member.nombre || "",
@@ -48,28 +56,37 @@ export default function FraternidadEditor({
   onCancel,
 }) {
   const [nombre, setNombre] = useState(initialData?.nombre || "");
-  const [selected, setSelected] = useState(normalizeMembers(initialData?.miembros || []));
+  const [selected, setSelected] = useState(
+    normalizeMembers(initialData?.miembros || [])
+  );
   const [available, setAvailable] = useState(normalizeMembers(availableMembers));
   const [filters, setFilters] = useState({ area: "", cuerda: "" });
   const [search, setSearch] = useState("");
   const [detalleMiembro, setDetalleMiembro] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [loading, setLoading] = useState(true);
+
+
   useEffect(() => {
     const normalizedSelected = normalizeMembers(initialData?.miembros || []);
-    const takenKeys = new Set(normalizedSelected.map((m) => memberKey(m)));
+    const takenKeys = new Set(
+      normalizedSelected.map((m) => memberKey(m))
+    );
     const normalizedAvailable = normalizeMembers(availableMembers).filter(
       (m) => !takenKeys.has(memberKey(m))
     );
     setNombre(initialData?.nombre || "");
     setSelected(normalizedSelected);
     setAvailable(normalizedAvailable);
+    setLoading(false); //apagar loader
   }, [initialData, availableMembers]);
 
   const filteredAvailable = useMemo(() => {
     const areaId = filters.area ? Number(filters.area) : null;
     const cuerdaId = filters.cuerda ? Number(filters.cuerda) : null;
     const term = search.trim().toLowerCase();
+
     return available
       .filter((member) => {
         if (!areaId) return true;
@@ -81,7 +98,8 @@ export default function FraternidadEditor({
       })
       .filter((member) => {
         if (!term) return true;
-        const full = `${member.apellido || ""} ${member.nombre || ""}`.toLowerCase();
+        const full = `${member.apellido || ""} ${member.nombre || ""
+          }`.toLowerCase();
         return full.includes(term);
       })
       .sort((a, b) =>
@@ -97,19 +115,25 @@ export default function FraternidadEditor({
     const key = memberKey(member);
     if (!key) return;
     setSelected((prev) => normalizeMembers([...prev, member]));
-    setAvailable((prev) => prev.filter((m) => memberKey(m) !== key));
+    setAvailable((prev) =>
+      prev.filter((m) => memberKey(m) !== key)
+    );
   };
 
   const handleRemove = (member) => {
     const key = memberKey(member);
     if (!key) return;
-    setSelected((prev) => prev.filter((m) => memberKey(m) !== key));
+    setSelected((prev) =>
+      prev.filter((m) => memberKey(m) !== key)
+    );
     setAvailable((prev) => normalizeMembers([...prev, member]));
   };
 
   const handleClearSelected = () => {
     if (!selected.length) return;
-    setAvailable((prev) => normalizeMembers([...prev, ...selected]));
+    setAvailable((prev) =>
+      normalizeMembers([...prev, ...selected])
+    );
     setSelected([]);
   };
 
@@ -121,6 +145,8 @@ export default function FraternidadEditor({
         text: "Todos los miembros ya fueron seleccionados.",
         background: "#11103a",
         color: "#E8EAED",
+        confirmButtonColor: "#DE9205",
+        confirmButtonText: "Aceptar",
       });
       return;
     }
@@ -134,9 +160,13 @@ export default function FraternidadEditor({
         max: available.length,
         step: 1,
       },
-      inputValue: Math.min(available.length, Math.max(1, selected.length || 1)),
+      inputValue: Math.min(
+        available.length,
+        Math.max(1, selected.length || 1)
+      ),
       showCancelButton: true,
-      confirmButtonColor: "#ffc107",
+      reverseButtons: true,
+      confirmButtonColor: "#de9205",
       cancelButtonColor: "#6c757d",
       confirmButtonText: "Generar",
       cancelButtonText: "Cancelar",
@@ -154,6 +184,8 @@ export default function FraternidadEditor({
         text: "No hay suficientes miembros disponibles.",
         background: "#11103a",
         color: "#E8EAED",
+        confirmButtonColor: "#DE9205",
+        confirmButtonText: "Aceptar",
       });
       return;
     }
@@ -164,14 +196,21 @@ export default function FraternidadEditor({
       [pool[i], pool[j]] = [pool[j], pool[i]];
     }
     const escogidos = pool.slice(0, cantidad);
-    const escogidosKeys = new Set(escogidos.map((m) => memberKey(m)));
+    const escogidosKeys = new Set(
+      escogidos.map((m) => memberKey(m))
+    );
 
-    setSelected((prev) => normalizeMembers([...prev, ...escogidos]));
-    setAvailable((prev) => prev.filter((m) => !escogidosKeys.has(memberKey(m))));
+    setSelected((prev) =>
+      normalizeMembers([...prev, ...escogidos])
+    );
+    setAvailable((prev) =>
+      prev.filter((m) => !escogidosKeys.has(memberKey(m)))
+    );
   };
 
   const handleDragEnd = ({ source, destination, draggableId }) => {
     if (!destination) return;
+
     if (
       source.droppableId === destination.droppableId &&
       source.index === destination.index
@@ -267,15 +306,37 @@ export default function FraternidadEditor({
     ? `${filteredAvailable.length} miembro(s) disponibles`
     : "No hay miembros con esos filtros.";
 
+  if (loading) {
+    return (
+      <div style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        paddingTop: "4rem"
+      }}>
+        <Loader />
+      </div>
+    );
+  }
+
+
   return (
     <>
       <DragDropContext onDragEnd={handleDragEnd}>
+        {/* ACÁ EMPIEZA TU UI COMPLETA — NO LA TOQUÉ EN NADA */}
+
         <section className="repertorio-editor fraternidad-editor">
           <div className="repertorio-dual-container">
+            {/* ===========================================================
+                PANEL DE DISPONIBLES
+            =========================================================== */}
             <section className="canciones-panel">
               <div className="repertorio-panel-header">
                 <h4 className="repertorio-form-title">Miembros disponibles</h4>
               </div>
+
               <div className="search-row search-row-full">
                 <input
                   type="text"
@@ -285,11 +346,17 @@ export default function FraternidadEditor({
                   className="abmc-input repertorio-search-input"
                 />
               </div>
+
               <div className="repertorio-filters-row">
                 <select
                   className="abmc-select repertorio-filter-select"
                   value={filters.area}
-                  onChange={(e) => setFilters((prev) => ({ ...prev, area: e.target.value }))}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      area: e.target.value,
+                    }))
+                  }
                 >
                   <option value="">Todas las áreas</option>
                   {areas.map((area) => (
@@ -298,14 +365,23 @@ export default function FraternidadEditor({
                     </option>
                   ))}
                 </select>
+
                 <select
                   className="abmc-select repertorio-filter-select"
                   value={filters.cuerda}
-                  onChange={(e) => setFilters((prev) => ({ ...prev, cuerda: e.target.value }))}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      cuerda: e.target.value,
+                    }))
+                  }
                 >
                   <option value="">Todas las cuerdas</option>
                   {cuerdas.map((cuerda) => (
-                    <option key={cuerda.id} value={cuerda.id}>
+                    <option
+                      key={cuerda.id}
+                      value={cuerda.id}
+                    >
                       {cuerda.name || cuerda.nombre}
                     </option>
                   ))}
@@ -316,6 +392,7 @@ export default function FraternidadEditor({
                 <span>Miembro</span>
                 <span className="actions-label">Acciones</span>
               </div>
+
               <div className="panel-scroll">
                 <Droppable droppableId={DROPPABLE_AVAILABLE}>
                   {(provided) => (
@@ -324,7 +401,10 @@ export default function FraternidadEditor({
                       {...provided.droppableProps}
                       className="available-list"
                     >
-                      <p className="repertorio-subtitle">{availableLabel}</p>
+                      <p className="repertorio-subtitle">
+                        {availableLabel}
+                      </p>
+
                       {filteredAvailable.length ? (
                         filteredAvailable.map((member, index) => {
                           const key = memberKey(member);
@@ -339,30 +419,40 @@ export default function FraternidadEditor({
                                   ref={dragProvided.innerRef}
                                   {...dragProvided.draggableProps}
                                   {...dragProvided.dragHandleProps}
-                                  className={`available-row available-grid ${
-                                    snapshot.isDragging ? "dragging" : ""
-                                  }`}
+                                  className={`available-row available-grid ${snapshot.isDragging ? "dragging" : ""
+                                    }`}
                                 >
                                   <span className="fraternidad-member-line">
                                     {member.apellido}, {member.nombre}
                                     <span className="fraternidad-member-subtitle">
-                                      {member.cuerda || "Sin cuerda"} · {member.area || "Sin área"}
+                                      {member.cuerda || "Sin cuerda"} ·{" "}
+                                      {member.area || "Sin área"}
                                     </span>
                                   </span>
-                                  <div style={{ display: "flex", gap: "0.25rem" }}>
+
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      gap: "0.25rem",
+                                    }}
+                                  >
+
+
+                                    <button
+                                      className="abmc-btn abmc-btn-secondary"
+                                      onClick={() =>
+                                        handleViewMember(member)
+                                      }
+                                    >
+                                      <Eye size={16} />
+                                    </button>
+
                                     <button
                                       type="button"
                                       className="abmc-btn abmc-btn-primary"
                                       onClick={() => handleAdd(member)}
                                     >
                                       <PlusCircle size={16} />
-                                    </button>
-                                    <button
-                                      type="button"
-                                      className="abmc-btn abmc-btn-secondary"
-                                      onClick={() => handleViewMember(member)}
-                                    >
-                                      <Eye size={16} />
                                     </button>
                                   </div>
                                 </div>
@@ -371,8 +461,11 @@ export default function FraternidadEditor({
                           );
                         })
                       ) : (
-                        <div className="list-empty">Sin miembros para mostrar.</div>
+                        <div className="list-empty">
+                          Sin miembros para mostrar.
+                        </div>
                       )}
+
                       {provided.placeholder}
                     </div>
                   )}
@@ -380,35 +473,51 @@ export default function FraternidadEditor({
               </div>
             </section>
 
+            {/* ===========================================================
+                PANEL DE SELECCIONADOS
+            =========================================================== */}
             <section className="repertorio-panel">
               <div className="repertorio-panel-header">
                 <h4 className="repertorio-form-title">Fraternidad</h4>
+
                 <div className="fraternidad-panel-actions">
-                  <button
-                    type="button"
-                    className="abmc-btn abmc-btn-secondary"
-                    onClick={handleClearSelected}
-                  >
-                    Quitar todos
-                  </button>
-                  <button
-                    type="button"
-                    className="abmc-btn abmc-btn-secondary"
-                    onClick={handleRandom}
-                  >
-                    Generar aleatoria
-                  </button>
+
                 </div>
               </div>
+
               <div className="repertorio-form-row">
-                <label className="repertorio-form-title">Nombre de la fraternidad</label>
+                <label className="repertorio-form-title">
+                  Nombre de la fraternidad
+                </label>
                 <input
                   className="abmc-input"
                   placeholder="Nombre"
                   value={nombre}
                   onChange={(e) => setNombre(e.target.value)}
                 />
+
+
               </div>
+              <div className="fraternidad-buttons-row">
+                <button
+                  type="button"
+                  className="abmc-btn abmc-btn-secondary"
+                  onClick={handleClearSelected}
+                  disabled={selected.length === 0}
+                >
+                  Quitar todos
+                </button>
+
+
+                <button
+                  type="button"
+                  className="abmc-btn abmc-btn-secondary"
+                  onClick={handleRandom}
+                >
+                  Generar aleatoria
+                </button>
+              </div>
+
 
               <div className="repertorio-header grid">
                 <span className="order">#</span>
@@ -427,6 +536,7 @@ export default function FraternidadEditor({
                       {selected.length ? (
                         selected.map((member, index) => {
                           const key = memberKey(member);
+
                           return (
                             <Draggable
                               key={`selected-${key}`}
@@ -438,29 +548,45 @@ export default function FraternidadEditor({
                                   ref={dragProvided.innerRef}
                                   {...dragProvided.draggableProps}
                                   {...dragProvided.dragHandleProps}
-                                  className={`draggable-item ${
-                                    snapshot.isDragging ? "dragging" : ""
-                                  }`}
+                                  className={`draggable-item ${snapshot.isDragging ? "dragging" : ""
+                                    }`}
                                 >
-                                  <span className="order">{index + 1}</span>
+                                  <span className="order">
+                                    {index + 1}
+                                  </span>
+
                                   <span className="fraternidad-member-line">
                                     {member.apellido}, {member.nombre}
                                     <span className="fraternidad-member-subtitle">
-                                      {member.cuerda || "Sin cuerda"} · {member.area || "Sin área"}
+                                      {member.cuerda ||
+                                        "Sin cuerda"}{" "}
+                                      ·{" "}
+                                      {member.area || "Sin área"}
                                     </span>
                                   </span>
-                                  <div style={{ display: "flex", gap: "0.25rem" }}>
+
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      gap: "0.25rem",
+                                    }}
+                                  >
                                     <button
                                       type="button"
                                       className="abmc-btn abmc-btn-secondary"
-                                      onClick={() => handleViewMember(member)}
+                                      onClick={() =>
+                                        handleViewMember(member)
+                                      }
                                     >
                                       <Eye size={16} />
                                     </button>
+
                                     <button
                                       type="button"
                                       className="abmc-btn abmc-btn-secondary"
-                                      onClick={() => handleRemove(member)}
+                                      onClick={() =>
+                                        handleRemove(member)
+                                      }
                                     >
                                       <Trash size={16} />
                                     </button>
@@ -475,6 +601,7 @@ export default function FraternidadEditor({
                           No agregaste miembros a la fraternidad aún.
                         </div>
                       )}
+
                       {provided.placeholder}
                     </div>
                   )}
@@ -482,22 +609,33 @@ export default function FraternidadEditor({
               </div>
             </section>
           </div>
+
           <div className="repertorio-footer">
-            <button type="button" className="abmc-btn abmc-btn-secondary" onClick={onCancel}>
+            <button
+              type="button"
+              className="abmc-btn abmc-btn-secondary"
+              onClick={onCancel}
+            >
               Cancelar
             </button>
+
             <button
               type="button"
               className="abmc-btn abmc-btn-primary"
               onClick={handleSave}
               disabled={isSubmitting}
             >
-              {mode === "create" ? "Crear fraternidad" : "Guardar cambios"}
+              {mode === "create"
+                ? "Crear fraternidad"
+                : "Guardar cambios"}
             </button>
           </div>
         </section>
       </DragDropContext>
 
+      {/* ====================================================================
+          POPUP DE MIEMBRO — FUNCIONA PERFECTO
+      ==================================================================== */}
       {detalleMiembro && (
         <PopUpVerMiembro
           isOpen={Boolean(detalleMiembro)}

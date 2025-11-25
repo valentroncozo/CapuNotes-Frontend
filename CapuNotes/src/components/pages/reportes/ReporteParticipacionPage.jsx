@@ -84,8 +84,17 @@ export default function ReporteParticipacionPage() {
             return true;
         })
         .sort((a, b) => {
-            if (!orden.campo) return 0;
+            // 1️⃣ Activos primero
+            if (a.activo !== b.activo) {
+                return a.activo ? -1 : 1; // activos arriba
+            }
 
+            // 2️⃣ Si no hay orden seleccionado → ordenar siempre alfabéticamente por nombre
+            if (!orden.campo) {
+                return a.nombre.localeCompare(b.nombre);
+            }
+
+            // 3️⃣ Si hay columna seleccionada → usar ese orden
             const va = a[orden.campo];
             const vb = b[orden.campo];
 
@@ -101,6 +110,7 @@ export default function ReporteParticipacionPage() {
 
             return orden.asc ? va - vb : vb - va;
         });
+
 
     return (
         <div className="reporte-participacion-page">

@@ -1,99 +1,124 @@
-// src/services/miembrosService.js
 import axios from 'axios';
 
 const API_URL = '/api/miembros';
 
 export const miembrosService = {
-  // Alias
-  getMiembros: async () => {
-    return await miembrosService.list();
-  },
 
   // ===============================================================
-  // Obtener todos los miembros
+  // GET TODOS
   // ===============================================================
   list: async () => {
     const res = await axios.get(API_URL);
-    const data = Array.isArray(res.data) ? res.data : [];
 
-    return data.map((m) => ({
-      id: {
-        tipoDocumento: m.id?.tipoDocumento || 'DNI',
-        nroDocumento: m.id?.nroDocumento || null,
-      },
-      nombre: m.nombre || '',
-      apellido: m.apellido || '',
-      correo: m.correo || '',
-      nroTelefono: m.nroTelefono || '',
-      carreraProfesion: m.carreraProfesion || '',
-      lugarOrigen: m.lugarOrigen || '',
-      instrumentoMusical: m.instrumentoMusical || '',
-      area: m.area?.name || null,
-      cuerda: {
-        id: m.cuerda?.id || null,
-        name: m.cuerda?.name || null,
-      },
-      activo: m.activo ?? false,
+    return res.data.map((m) => ({
+      ...m,
+      cuerda: m.idCuerda
+        ? { id: m.idCuerda, nombre: m.nombreCuerda }
+        : null,
+      area: m.idArea
+        ? { id: m.idArea, nombre: m.nombreArea }
+        : null,
     }));
   },
 
+  getMiembros: async () => miembrosService.list(),
+
   // ===============================================================
-  // Obtener miembro por ID
+  // GET POR ID
   // ===============================================================
-  getById: async (nroDocumento, tipoDocumento = 'DNI') => {
+  getById: async (nroDocumento, tipoDocumento = "DNI") => {
     const res = await axios.get(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
-    const m = res.data || {};
+    const m = res.data;
 
     return {
-      id: {
-        tipoDocumento: m.id?.tipoDocumento || 'DNI',
-        nroDocumento: m.id?.nroDocumento || null,
-      },
-      nombre: m.nombre || '',
-      apellido: m.apellido || '',
-      correo: m.correo || '',
-      nroTelefono: m.nroTelefono || '',
-      carreraProfesion: m.carreraProfesion || '',
-      lugarOrigen: m.lugarOrigen || '',
-      instrumentoMusical: m.instrumentoMusical || '',
-      area: m.area?.nombre || null,
-      cuerda: {
-        id: m.cuerda?.id || null,
-        name: m.cuerda?.nombre || null,
-      },
-      activo: m.activo ?? false,
+      tipoDocumento: m.tipoDocumento,
+      nroDocumento: m.nroDocumento,
+      nombre: m.nombre,
+      apellido: m.apellido,
+      correo: m.correo,
+      nroTelefono: m.nroTelefono,
+      carreraProfesion: m.carreraProfesion,
+      lugarOrigen: m.lugarOrigen,
+      instrumentoMusical: m.instrumentoMusical,
+
+      fechaNacimiento: m.fechaNacimiento || null,
+
+      area: m.idArea
+        ? { id: m.idArea, nombre: m.nombreArea }
+        : null,
+
+      cuerda: m.idCuerda
+        ? { id: m.idCuerda, nombre: m.nombreCuerda }
+        : null,
+
+      activo: m.activo,
     };
   },
 
   // ===============================================================
-  // Crear miembro
+  // CREATE
   // ===============================================================
-  create: async (data) => {
-    const res = await axios.post(API_URL, data);
+  create: async (formData) => {
+    const req = {
+      tipoDocumento: formData.tipoDocumento,
+      nroDocumento: formData.nroDocumento,
+      nombre: formData.nombre,
+      apellido: formData.apellido,
+      correo: formData.correo,
+      nroTelefono: formData.nroTelefono,
+      carreraProfesion: formData.carreraProfesion,
+      lugarOrigen: formData.lugarOrigen,
+      instrumentoMusical: formData.instrumentoMusical,
+      fechaNacimiento: formData.fechaNacimiento || null,
+      idArea: formData.idArea ?? null,
+      idCuerda: formData.idCuerda ?? null,
+      activo: formData.activo ?? true,
+    };
+
+    const res = await axios.post(API_URL, req);
     return res.data;
   },
 
   // ===============================================================
-  // Actualizar miembro (PUT — si cambia DNI)
+  // UPDATE
   // ===============================================================
-  update: async (nroViejo, tipoViejo, data) => {
-    const res = await axios.put(`${API_URL}/${nroViejo}/${tipoViejo}`, data);
+  update: async (nroViejo, tipoViejo, formData) => {
+    const req = {
+      tipoDocumento: formData.tipoDocumento,
+      nroDocumento: formData.nroDocumento,
+      nombre: formData.nombre,
+      apellido: formData.apellido,
+      correo: formData.correo,
+      nroTelefono: formData.nroTelefono,
+      carreraProfesion: formData.carreraProfesion,
+      lugarOrigen: formData.lugarOrigen,
+      instrumentoMusical: formData.instrumentoMusical,
+      fechaNacimiento: formData.fechaNacimiento || null,
+
+      // TOMAR LOS CAMPOS DIRECTOS, NO OBJETOS
+      idArea: formData.idArea ?? formData.area ?? null,
+      idCuerda: formData.idCuerda ?? formData.cuerda ?? null,
+
+      activo: formData.activo,
+    };
+
+    const res = await axios.put(`${API_URL}/${nroViejo}/${tipoViejo}`, req);
     return res.data;
   },
 
+
   // ===============================================================
-  // Baja lógica
+  // BAJA LÓGICA
   // ===============================================================
-  darDeBaja: async (nroDocumento, tipoDocumento = 'DNI') => {
+  darDeBaja: async (nroDocumento, tipoDocumento = "DNI") => {
     await axios.delete(`${API_URL}/${nroDocumento}/${tipoDocumento}`);
   },
 
-  // ===============================================================
   // Reactivar
-  // ===============================================================
-  reactivar: async (nroDocumento, tipoDocumento = 'DNI') => {
+  reactivar: async (nroDocumento, tipoDocumento = "DNI") => {
     await axios.patch(`${API_URL}/${nroDocumento}/${tipoDocumento}/reactivar`);
   },
 };
 
 export default miembrosService;
+

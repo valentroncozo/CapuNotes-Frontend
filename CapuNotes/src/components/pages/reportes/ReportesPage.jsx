@@ -12,18 +12,18 @@ import ReporteParticipacionPage from "@/components/pages/reportes/ReportePartici
 // import ReportePorCuerda from "@/components/reportes/ReportePorCuerda.jsx";
 
 export default function ReportesPage() {
-    const [tabActiva, setTabActiva] = useState("general");
+    const [tabActiva, setTabActiva] = useState("participacion");
 
     const renderContenido = () => {
         switch (tabActiva) {
-            case "general":
-                return <div>ACA VA EL REPORTE GENERAL</div>; // luego lo reemplazamos
+            //case "general":
+              //  return <div>ACA VA EL REPORTE GENERAL</div>; // luego lo reemplazamos
             case "participacion":
                 return <ReporteParticipacionPage />;
             case "miembro":
                 return <ReportePorMiembro />;
-            case "cuerda":
-                return <div>ACA VA REPORTE POR CUERDA</div>;
+            //case "cuerda":
+              //  return <div>ACA VA REPORTE POR CUERDA</div>;
             default:
                 return null;
         }
@@ -43,12 +43,12 @@ export default function ReportesPage() {
 
                 {/* ===== TABS ===== */}
                 <div className="reportes-tabs">
-                    <button
+                    {/*<button
                         className={tabActiva === "general" ? "tab activa" : "tab"}
                         onClick={() => setTabActiva("general")}
                     >
                         Estadísticas generales
-                    </button>
+                    </button>*/}
 
                      <button
                         className={tabActiva === "participacion" ? "tab activa" : "tab"}
@@ -64,12 +64,12 @@ export default function ReportesPage() {
                         Por miembro
                     </button>
 
-                    <button
+                    {/*<button
                         className={tabActiva === "cuerda" ? "tab activa" : "tab"}
                         onClick={() => setTabActiva("cuerda")}
                     >
                         Por cuerda
-                    </button>
+                    </button>*/}
                 </div>
 
                 {/* ===== CONTENIDO ===== */}

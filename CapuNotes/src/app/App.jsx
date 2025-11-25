@@ -86,7 +86,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/principal" replace />} />
+        <Route index element={<Navigate to="/landing" replace />} />
         <Route path="principal" element={<Principal username={username} />} />
         <Route path="miembros" element={<Miembros />} />
         <Route path="miembros/agregar" element={<MiembrosAgregar />} />

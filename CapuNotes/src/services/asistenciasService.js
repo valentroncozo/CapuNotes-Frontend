@@ -110,6 +110,16 @@ export const asistenciasService = {
       throw err;
     }
   },
+  getEstado: async (idEnsayo) => {
+    try {
+      const res = await axios.get(`${API_URL}/ensayo/${idEnsayo}/estado`);
+      console.log("📊 Estado de asistencia recibido:", res.data);
+      return res.data;
+    } catch (err) {
+      console.error("❌ Error obteniendo estado de asistencia:", err?.response || err);
+      throw err;
+    }
+  },
 };
 
 export default asistenciasService;

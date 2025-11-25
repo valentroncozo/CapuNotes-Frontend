@@ -8,6 +8,7 @@ import EyeOnIcon from "@/assets/VisibilityOnIcon";
 import EditIcon from "@/assets/EditIcon";
 import TrashIcon from "@/assets/TrashIcon";
 import AddIcon from "@/assets/AddIcon";
+import Loader from "@/components/common/Loader";
 import "@/styles/abmc.css";
 
 import { fraternidadesService } from "@/services/fraternidadesService";
@@ -80,10 +81,11 @@ export default function FraternidadesPage() {
       text: "Los miembros quedarán sin fraternidad asignada.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#ffc107",
+      reverseButtons: true,
+      confirmButtonColor: "#DE9205",
       cancelButtonColor: "#6c757d",
-      confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
+      confirmButtonText: "Sí, eliminar",
       background: "#11103a",
       color: "#E8EAED",
     });
@@ -158,12 +160,24 @@ export default function FraternidadesPage() {
             className="abmc-btn abmc-btn-primary"
             onClick={() => navigate("/fraternidades/nueva")}
           >
-            <AddIcon fill="var(--text-light)" />
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="#e3e3e3">
+              <path d="M440-120v-320H120v-80h320v-320h80v320h320v80H520v320h-80Z" />
+            </svg>
           </button>
         </div>
 
         {loading ? (
-          <p style={{ padding: "1rem" }}>Cargando fraternidades...</p>
+          <div
+            style={{
+              width: "100%",
+              padding: "3rem 0",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Loader />
+          </div>
         ) : (
           <TableABMC
             headers={headers}
@@ -173,6 +187,7 @@ export default function FraternidadesPage() {
             emptyMenssage="No hay fraternidades registradas."
           />
         )}
+
       </div>
 
       {viewing && (

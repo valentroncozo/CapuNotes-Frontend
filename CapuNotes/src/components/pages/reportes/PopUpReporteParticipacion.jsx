@@ -78,14 +78,14 @@ export default function PopUpReporteParticipacion({
                             Proporción de asistencias y faltas durante el año.
                         </p>
 
-                        <ResponsiveContainer width="100%" height={230}>
+                        <ResponsiveContainer padding="10px" width="100%" height={230}>
                             <PieChart>
                                 <Pie
                                     data={dataTorta}
                                     dataKey="value"
                                     cx="50%"
                                     cy="50%"
-                                    outerRadius={90}
+                                    outerRadius={80}
                                     label={({ name, value }) =>
                                         `${name}: ${value != null ? Number(value).toFixed(1) : "0.0"}%`
                                     }

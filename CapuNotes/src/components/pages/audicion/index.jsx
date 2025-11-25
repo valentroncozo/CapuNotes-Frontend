@@ -342,8 +342,8 @@ const Audicion = ({ title = 'Audición' }) => {
 
           <button
             className="abmc-btn btn-primary"
-            disabled={data.length > 0}
-            onClick={() => navigate('audicion/agregar')}
+            
+            onClick={() => navigate('/audicion/agregar')}
           >
             <span
               className="material-symbols-outlined"

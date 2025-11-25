@@ -400,3 +400,10 @@ select.abmc-select:focus,
   font-weight: bold;
 }
 
+.abmc-card {
+  margin-bottom: 200px; /* ajustá lo que necesites */
+}
+.required {
+  color: #DE9205 !important;
+  font-weight: bold;
+}

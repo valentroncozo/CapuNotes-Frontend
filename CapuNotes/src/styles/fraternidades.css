@@ -18,3 +18,69 @@
 .fraternidad-editor .fraternidad-panel-actions .abmc-btn {
   min-width: max-content;
 }
+/* ==== NORMAL ==== */
+button,
+.abmc-btn,
+.abmc-btn-primary,
+button.swal2-confirm,
+button.swal2-cancel {
+  transition: transform 0.15s ease !important;
+}
+
+/* ==== HOVER: solo levantar SIN CAMBIAR COLOR ==== */
+button:hover,
+.abmc-btn:hover,
+.abmc-btn-primary:hover,
+button.swal2-confirm:hover,
+button.swal2-cancel:hover {
+  transform: translateY(-2px) !important;
+  background-color: var(--accent) !important; /* mantiene amarillo */
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+/* Si el cancel es gris, forzamos su color en hover */
+button.swal2-cancel:hover {
+  background-color: #6c757d !important;
+}
+
+.fraternidad-buttons-row {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 18px 0;
+}
+
+/* Deshabilitar completamente el hover/active en botones deshabilitados */
+button.abmc-btn:disabled,
+button.abmc-btn:disabled:hover,
+button.abmc-btn:disabled:active,
+button.abmc-btn:disabled:focus {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  background-color: var(--accent) !important; /* o var(--surface-1) si es secondary */
+  transform: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  pointer-events: none !important;  /* 🔥 ESTO LO MATA DEL TODO */
+}
+/* === SWEETALERT2 VALIDATION MESSAGE — Solo texto amarillo === */
+
+.swal2-validation-message {
+  background: transparent !important;         /* sin fondo */
+  border: none !important;                    /* sin borde */
+  box-shadow: none !important;                /* sin sombras */
+  padding: 0 !important;                      /* sin padding */
+  margin-top: 8px !important;                 /* pequeño espacio */
+  color: var(--accent) !important;            /* amarillo institucional */
+  font-family: 'Manjari', sans-serif !important;
+  font-size: 0.95rem !important;
+  text-align: center !important;              /* centrado */
+}
+
+/* Ocultar iconito gris de Swal */
+.swal2-validation-message::before {
+  display: none !important;
+}
+
+

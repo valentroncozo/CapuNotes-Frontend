@@ -77,6 +77,8 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
         setCuerdas(encuesta.cuerdas || []);
         setTurnos(encuesta.turnos || []);
       } catch (error) {
+        console.log("Error al cargar encues");
+        /*
         console.error('Error cargando encuesta:', error);
         Swal.fire({
           icon: 'error',
@@ -85,6 +87,7 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
           background: '#11103a',
           color: '#E8EAED',
         });
+        */
       } finally {
         setLoading(false);
       }
@@ -492,8 +495,8 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
                   </label>
 
                   <InputMask
-                    mask="99/99/9999"
-                    replacement={{ 9: /\d/ }}
+                    mask="DD/DD/DDDD"
+                    replacement={{ D: /\d/ }}
                     value={fechaNacimiento}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -552,7 +555,9 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
               </div>
               <div className="mitad">
                 <div className="form-group-miembro">
-                  <label>Carrera/Profesión</label>
+                  <label>Carrera/Profesión <span style={{ color: 'var(--accent)' }}>*</span>
+
+                  </label>
                   <input
                     type="text"
                     className="abmc-input"
@@ -689,14 +694,15 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
                 </div>
               </div>
             </section>
-
-            <button
-              type="button"
-              className="abmc-btn btn-primary"
-              onClick={handleSubmit}
-            >
-              Inscribir
-            </button>
+            <div style={{width: '100%', display: 'flex', justifyContent:'center'}}>
+              <button
+                type="button"
+                className="abmc-btn btn-primary"
+                onClick={handleSubmit}
+              >
+                Inscribir
+              </button>
+            </div>
           </form>
         )}
       </div>
