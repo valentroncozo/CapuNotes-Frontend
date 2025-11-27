@@ -49,16 +49,37 @@ export default function CuestionarioPreviewPage({
     });
 
     if (result.isConfirmed) {
-      await preguntasService.quitarDeAudicion(audicion.id, id);
-      await load();
-      Swal.fire({
-        title: 'Pregunta quitada',
-        icon: 'success',
-        timer: 1500,
-        showConfirmButton: false,
-        background: 'var(--bg)', // Fondo del SweetAlert
-        color: 'var(--text-light)', // Color del texto
-      });
+      try {
+
+        await preguntasService.quitarDeAudicion(audicion.id, id);
+        await load();
+        
+        Swal.fire({
+          title: 'Pregunta quitada',
+          icon: 'success',
+          timer: 1500,
+          showConfirmButton: false,
+          background: 'var(--bg)', // Fondo del SweetAlert
+          color: 'var(--text-light)', // Color del texto
+        });
+
+      } catch (error) {
+        
+        console.error('Error quitando pregunta:', error);
+        
+        let texto = audicion.estadoAudicion === "PUBLICADA" ? 
+          "La audición está publicada. No se pueden modificar las preguntas." :
+          "Ha ocurrido un error inesperado. Por favor, intente nuevamente más tarde.";
+
+        Swal.fire({
+          title: 'Error',
+          text: 'No se pudo quitar la pregunta del cuestionario.' + texto,
+          icon: 'error',
+          background: 'var(--bg)',
+          color: 'var(--text-light)',
+        });
+      }
+
     }
   };
 
@@ -100,7 +121,7 @@ export default function CuestionarioPreviewPage({
                   <button
                     className="abmc-btn abmc-btn-quitar"
                     type="button"
-                    onClick={quitar}
+                    onClick={() => quitar(p.id)}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

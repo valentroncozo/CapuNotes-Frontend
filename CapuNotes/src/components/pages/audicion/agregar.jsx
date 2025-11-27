@@ -5,7 +5,7 @@ import BackButton from '../../common/BackButton';
 import TurnoSection from './components/TurnoSection';
 import { useState, useEffect } from 'react';
 import Swal from "sweetalert2";
-
+import  {useNavigate}  from 'react-router-dom';
 import sendToService from './components/utils/sendToServices.js';
 import { es } from 'date-fns/locale';
 
@@ -18,6 +18,8 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
 
     const now = new Date().toISOString().split('T')[0];
     const nombre = `Audiciones ${now}`;
+
+    const navigate = useNavigate();
 
     const [ubicacion,setUbicacion]= useState ('');
     const [dias, setDias]= useState ([]);
@@ -177,6 +179,7 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
        setIsSaving(true);
         try {
             await sendToService(data);
+            navigate('/audicion');
         } catch (error) {
             console.error('Error al guardar:', error);
         } finally {
