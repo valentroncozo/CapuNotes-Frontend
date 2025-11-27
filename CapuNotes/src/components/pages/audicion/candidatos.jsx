@@ -65,7 +65,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Coord
         (cron || []).forEach(item => {
           const f = item?.turno?.fecha;
           if (!f) return;
-          const label = item?.turno?.diaString ? `${item.turno.diaString} — ${formatDate(f)}` : formatDate(f);
+          const label = item?.turno?.diaString ? formatDate(`${item.turno.diaString} — ${f}`) : formatDate(f); 
           if (!mapa.has(f)) mapa.set(f, { value: f, label });
         });
 
