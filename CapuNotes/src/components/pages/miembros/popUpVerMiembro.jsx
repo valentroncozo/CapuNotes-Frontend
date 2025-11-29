@@ -6,7 +6,7 @@ import { Badge } from "react-bootstrap";
 export default function PopUpVerMiembro({ isOpen, onClose, miembro }) {
   if (!miembro) return null;
 
-  // 👇👇 FIX SEGURO – evita el error sin romper nada
+  //FIX SEGURO – evita el error sin romper nada
   const tipoDoc =
     miembro.id?.tipoDocumento ||
     miembro.tipoDocumento ||
@@ -38,7 +38,7 @@ export default function PopUpVerMiembro({ isOpen, onClose, miembro }) {
     >
       <div className="ver-miembro-grid">
 
-        {/* 👇 reemplazo directo, mismo UI */}
+        {/*reemplazo directo, mismo UI */}
         <p><strong>Tipo y Nro de documento:</strong> {tipoDoc} - {nroDoc}</p>
         <p><strong>Cuerda:</strong> {cuerda}</p>
         <p><strong>Área:</strong> {area}</p>
