@@ -5,50 +5,51 @@ const API_URL = "/api/eventos";
 
 export const eventoService = {
   // =======================================================
-  // 🔹 Listar todos los eventos (ensayos + presentaciones)
+  //  Listar todos los eventos (ensayos + presentaciones)
   // =======================================================
   list: async (filtros = {}) => {
     const res = await axios.get(API_URL, { params: filtros });
-    console.log("📡 Eventos recibidos:", res.data);
+    console.log("Eventos recibidos:", res.data);
     return res.data;
   },
 
   // =======================================================
-  // 🔹 Listar solo pendientes
+  // Listar solo pendientes
   // =======================================================
   listPendientes: async (filtros = {}) => {
     const res = await axios.get(`${API_URL}/pendientes`, {
       params: filtros,
     });
-    console.log("📡 Eventos pendientes:", res.data);
+    console.log("Eventos pendientes:", res.data);
     return res.data;
   },
 
   // =======================================================
-  // 🔹 Obtener un evento por ID
+  // Obtener un evento por ID
   // =======================================================
   getById: async (id) => {
     const res = await axios.get(`${API_URL}/${id}`);
     return res.data;
   },
 
+  /*
   // =======================================================
-  // 🔹 Crear nuevo evento
+  // Crear nuevo evento
   // =======================================================
   create: async (data) => {
     const res = await axios.post(API_URL, data);
-    console.log("✅ Evento creado:", res.data);
+    console.log("Evento creado:", res.data);
     return res.data;
   },
 
   // =======================================================
-  // 🔹 Editar evento existente
+  // Editar evento existente
   // =======================================================
   update: async (id, data) => {
     const res = await axios.patch(`${API_URL}/${id}`, data);
-    console.log("🛠️ Evento actualizado:", res.data);
+    console.log("Evento actualizado:", res.data);
     return res.data;
-  },
+  },*/
 
   // =======================================================
   // Eliminar evento
@@ -62,10 +63,30 @@ export const eventoService = {
       options.params = { tipo: tipoEvento };
     }
 
-    console.log("🗑️ Eliminando evento — URL:", url, "params:", options.params);
+    console.log("Eliminando evento — URL:", url, "params:", options.params);
 
     const res = await axios.delete(url, options);
-    console.log("🗑️ Evento eliminado:", res.data);
+    console.log("Evento eliminado:", res.data);
     return res.data;
   },
+
+  assignRepertorios: async (eventoId, tipoEvento, repertorioIds) => {
+    if (!eventoId || !tipoEvento) {
+      throw new Error("Faltan parámetros para asignar repertorios.");
+    }
+
+    // ENSAYO → ensayos
+    // PRESENTACION → presentaciones
+    const base = tipoEvento.toLowerCase() === "ensayo"
+      ? "/api/ensayos"
+      : "/api/presentaciones";
+
+    const url = `${base}/${eventoId}/repertorios`;
+
+    console.log("PATCH asignar repertorios:", url, repertorioIds);
+
+    const res = await axios.patch(url, repertorioIds);
+    return res.data;
+  },
+
 };

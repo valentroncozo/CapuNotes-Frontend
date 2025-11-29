@@ -2,9 +2,9 @@
 import React from "react";
 import "@/styles/loader.css";
 
-export default function Loader() {
+export default function Loader({ className = "" }) {
   return (
-    <div className="logo-loader-container">
+    <div className={`logo-loader-container ${className}`}>
       <img
         src="/logo-coro-sin-fondo.png"
         alt="CapuNotes"

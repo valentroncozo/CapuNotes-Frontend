@@ -6,6 +6,7 @@ import '@/styles/popup.css';
 import { repertoriosService } from '@/services/repertoriosService.js';
 import { eventoService } from '@/services/eventoService.js';
 import Swal from 'sweetalert2';
+import Loader from '@/components/common/Loader.jsx';
 
 const RepertorioPopup = ({ evento, onClose, onSaved, isOpen = true }) => {
   const [loading, setLoading] = useState(true);
@@ -57,11 +58,14 @@ const RepertorioPopup = ({ evento, onClose, onSaved, isOpen = true }) => {
   const handleSave = async () => {
     if (!eventoId) return;
     setSaving(true);
+
     try {
-      await eventoService.update(eventoId, {
-        tipoEvento: evento.tipoEvento,
-        repertorioIds: selectedIds,
-      });
+      await eventoService.assignRepertorios(
+        eventoId,
+        evento.tipoEvento,
+        selectedIds
+      );
+
       Swal.fire({
         icon: 'success',
         title: 'Repertorios actualizados',
@@ -71,21 +75,26 @@ const RepertorioPopup = ({ evento, onClose, onSaved, isOpen = true }) => {
         background: '#11103a',
         color: '#E8EAED',
       });
+
       onSaved?.(eventoId, selectedIds.length);
       onClose();
+
     } catch (error) {
       console.error('❌ Error al asignar repertorios:', error);
       Swal.fire({
         icon: 'error',
         title: 'No pudimos guardar',
-        text: 'Revisá los datos e intentá nuevamente.',
+        text: error?.response?.data?.mensaje || 'Revisá los datos e intentá nuevamente.',
         background: '#11103a',
         color: '#E8EAED',
+        confirmButtonColor: '#DE9205',
+        confirmButtonText: 'Aceptar',
       });
     } finally {
       setSaving(false);
     }
   };
+
 
   const handleNavigateToCreate = () => {
     navigate('/repertorios/nuevo', {
@@ -121,7 +130,7 @@ const RepertorioPopup = ({ evento, onClose, onSaved, isOpen = true }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Repertorios del evento"
+      title="Repertorios"
       className="evento-repertorio-modal"
       actions={modalActions}
     >
@@ -132,13 +141,21 @@ const RepertorioPopup = ({ evento, onClose, onSaved, isOpen = true }) => {
         <hr className="divisor-amarillo" />
 
         {loading ? (
-          <div className="evento-repertorio-loading">
-            <p>Cargando repertorios...</p>
+          <div
+            className="evento-repertorio-loading"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              padding: "1rem 0"
+            }}
+          >
+            <Loader />
           </div>
         ) : (
           <div className="evento-repertorio-scroll">
             <section className="repertorios-lista">
-              <h2>Seleccionar repertorios existentes</h2>
+              <h4>Seleccionar repertorios existentes</h4>
+              
               {sortedAvailable.length === 0 ? (
                 <p>No hay repertorios activos disponibles.</p>
               ) : (
@@ -165,14 +182,14 @@ const RepertorioPopup = ({ evento, onClose, onSaved, isOpen = true }) => {
             </section>
 
             <section className="repertorios-crear">
-              <h2>Crear y asociar nuevo repertorio</h2>
+              <h4>Crear y asociar nuevo repertorio</h4>
               <p className="texto-suave">
                 Se abrirá el formulario habitual y, si guardás correctamente, lo asignaremos a este
                 evento.
               </p>
               <button
                 type="button"
-                className="abmc-btn btn-secondary btn-cuestionario"
+                className="abmc-btn btn-primary"
                 onClick={handleNavigateToCreate}
               >
                 Crear repertorio
