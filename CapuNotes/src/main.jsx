@@ -9,9 +9,12 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 
 // Si ya creaste tokens/globals, activalos. Si no, dejá index.css como estaba.
 import '@/styles/globals.css'
+import { PermisosProvider } from "@/context/PermisosContext.jsx";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <PermisosProvider>
+      <App />
+    </PermisosProvider>
   </React.StrictMode>,
 )

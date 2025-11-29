@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import '@/styles/offcanvas.css';
 import LogOutIcon from '@/assets/LogOutIcon';
+import { usePermisos } from "@/context/PermisosContext.jsx";
 
 /* Ícono de cierre (X) */
 function CloseIcon(props) {
@@ -170,6 +171,7 @@ function Menu({
   setSongsOpen,
   onNavigate,
 }) {
+  const { permisos } = usePermisos();
   return (
     <div className="appshell-menu">
       <a
@@ -182,209 +184,127 @@ function Menu({
       >
         Inicio
       </a>
-
-      <a href="/asistencias" onClick={(e) => {
-        e.preventDefault();
-        onNavigate("/asistencias");
-      }}
-        className="nav-link">Asistencias</a>
-
-      <a href="/reportes" onClick={(e) => {
-        e.preventDefault();
-        onNavigate("/reportes");
-      }}
-        className="nav-link">Reportes</a>
-
-
-      <div className="appshell-accordion-outer">
-        <button
-          className={`appshell-accordion-trigger ${songsOpen ? "open" : ""}`}
-          onClick={() => setSongsOpen((v) => !v)}
-          aria-expanded={songsOpen}
-        >
-          Canciones
-          <span className="appshell-accordion-caret">
-            {songsOpen ? "▴" : "▾"}
-          </span>
-        </button>
-
-        {songsOpen && (
-          <div className="appshell-accordion-content">
-            <a
-              href="/canciones"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate("/canciones");
-              }}
-            >
-              Cancionero
-            </a>
-            <a
-              href="/repertorios"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate("/repertorios");
-              }}
-            >
-              Repertorios
-            </a>
-            <a
-              href="/tiempos-liturgicos"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate("/tiempos-liturgicos");
-              }}
-            >
-              Tiempos litúrgicos
-            </a>
-            <a
-              href="/categorias-canciones"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate("/categorias-canciones");
-              }}
-            >
-              Categorías
-            </a>
-          </div>
-        )}
-      </div>
-
-      <a href="/eventos" onClick={(e) => {
-        e.preventDefault();
-        onNavigate("/eventos");
-      }}
-        className="nav-link">Eventos</a>
-
-      <div className="appshell-accordion-outer">
-        <button
-          className={`appshell-accordion-trigger ${audOpen ? 'open' : ''}`}
-          onClick={() => setAudOpen((v) => !v)}
-          aria-expanded={audOpen}
-        >
-          Audiciones
-          <span className="appshell-accordion-caret">
-            {audOpen ? '▴' : '▾'}
-          </span>
-        </button>
-
-        {audOpen && (
-          <div className="appshell-accordion-content">
-            <a
-              href="/audicion"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/audicion');
-              }}
-            >
-              Audición
-            </a>
-            <a
-              href="/candidatos"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('audicion/candidatos');
-              }}
-            >
-              Candidatos
-            </a>
-            <a
-              href="/candidatos-coordinadores"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/candidatos-administracion');
-              }}
-            >
-              Candidatos (Administración)
-            </a>
-            <a
-              href="/candidatos/historial"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/audicion/historial');
-              }}
-            >
-              Historial Candidatos
-            </a>
-            <a
-              href="/cuestionario/configuracion"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/cuestionario/configuracion');
-              }}
-            >
-              Configurar Cuestionario
-            </a>
-          </div>
-        )}
-      </div>
-
-      <div className="appshell-accordion-outer">
-        <button
-          className={`appshell-accordion-trigger ${orgOpen ? 'open' : ''}`}
-          onClick={() => setOrgOpen((v) => !v)}
-          aria-expanded={orgOpen}
-        >
-          Organización del Coro
-          <span className="appshell-accordion-caret">
-            {orgOpen ? '▴' : '▾'}
-          </span>
-        </button>
-
-        {orgOpen && (
-          <div className="appshell-accordion-content">
-            <a
-              href="/areas"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/areas');
-              }}
-            >
-              Áreas
-            </a>
-            <a
-              href="/cuerdas"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/cuerdas');
-              }}
-            >
-              Cuerdas
-            </a>
-            <a
-              href="/miembros"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/miembros');
-              }}
-            >
-              Miembros
-            </a>
-            <a
-              href="/fraternidades"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/fraternidades');
-              }}
-            >
-              Fraternidades
-            </a>
-          </div>
-        )}
-      </div>
+      {permisos.includes("view:asistencias") && (
+        <a href="/asistencias" onClick={(e) => { e.preventDefault(); onNavigate("/asistencias"); }} className="nav-link">Asistencias</a>
+      )}
+      {permisos.includes("view:reportes") && (
+        <a href="/reportes" onClick={(e) => { e.preventDefault(); onNavigate("/reportes"); }} className="nav-link">Reportes</a>
+      )}
+      {/* Canciones */}
+      {(
+        permisos.includes("view:canciones") ||
+        permisos.includes("view:repertorios") ||
+        permisos.includes("view:tiempos-liturgicos") ||
+        permisos.includes("view:categorias-canciones")
+      ) && (
+        <div className="appshell-accordion-outer">
+          <button
+            className={`appshell-accordion-trigger ${songsOpen ? "open" : ""}`}
+            onClick={() => setSongsOpen((v) => !v)}
+            aria-expanded={songsOpen}
+          >
+            Canciones
+            <span className="appshell-accordion-caret">
+              {songsOpen ? "▴" : "▾"}
+            </span>
+          </button>
+          {songsOpen && (
+            <div className="appshell-accordion-content">
+              {permisos.includes("view:canciones") && (
+                <a href="/canciones" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate("/canciones"); }}>Cancionero</a>
+              )}
+              {permisos.includes("view:repertorios") && (
+                <a href="/repertorios" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate("/repertorios"); }}>Repertorios</a>
+              )}
+              {permisos.includes("view:tiempos-liturgicos") && (
+                <a href="/tiempos-liturgicos" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate("/tiempos-liturgicos"); }}>Tiempos litúrgicos</a>
+              )}
+              {permisos.includes("view:categorias-canciones") && (
+                <a href="/categorias-canciones" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate("/categorias-canciones"); }}>Categorías</a>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+      {permisos.includes("view:eventos") && (
+        <a href="/eventos" onClick={(e) => { e.preventDefault(); onNavigate("/eventos"); }} className="nav-link">Eventos</a>
+      )}
+      {/* Audiciones */}
+      {(
+        permisos.includes("view:audicion") ||
+        permisos.includes("view:candidatos") ||
+        permisos.includes("view:candidatos-administracion") ||
+        permisos.includes("view:historial-candidatos") ||
+        permisos.includes("view:cuestionario-configuracion")
+      ) && (
+        <div className="appshell-accordion-outer">
+          <button
+            className={`appshell-accordion-trigger ${audOpen ? 'open' : ''}`}
+            onClick={() => setAudOpen((v) => !v)}
+            aria-expanded={audOpen}
+          >
+            Audiciones
+            <span className="appshell-accordion-caret">
+              {audOpen ? '▴' : '▾'}
+            </span>
+          </button>
+          {audOpen && (
+            <div className="appshell-accordion-content">
+              {permisos.includes("view:audicion") && (
+                <a href="/audicion" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate('/audicion'); }}>Audición</a>
+              )}
+              {permisos.includes("view:candidatos") && (
+                <a href="/candidatos" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate('audicion/candidatos'); }}>Candidatos</a>
+              )}
+              {permisos.includes("view:candidatos-administracion") && (
+                <a href="/candidatos-coordinadores" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate('/candidatos-administracion'); }}>Candidatos (Administración)</a>
+              )}
+              {permisos.includes("view:historial-candidatos") && (
+                <a href="/candidatos/historial" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate('/audicion/historial'); }}>Historial Candidatos</a>
+              )}
+              {permisos.includes("view:cuestionario-configuracion") && (
+                <a href="/cuestionario/configuracion" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate('/cuestionario/configuracion'); }}>Configurar Cuestionario</a>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+      {/* Organización */}
+      {(
+        permisos.includes("view:areas") ||
+        permisos.includes("view:cuerdas") ||
+        permisos.includes("view:miembros") ||
+        permisos.includes("view:fraternidades")
+      ) && (
+        <div className="appshell-accordion-outer">
+          <button
+            className={`appshell-accordion-trigger ${orgOpen ? 'open' : ''}`}
+            onClick={() => setOrgOpen((v) => !v)}
+            aria-expanded={orgOpen}
+          >
+            Organización del Coro
+            <span className="appshell-accordion-caret">
+              {orgOpen ? '▴' : '▾'}
+            </span>
+          </button>
+          {orgOpen && (
+            <div className="appshell-accordion-content">
+              {permisos.includes("view:areas") && (
+                <a href="/areas" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate('/areas'); }}>Áreas</a>
+              )}
+              {permisos.includes("view:cuerdas") && (
+                <a href="/cuerdas" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate('/cuerdas'); }}>Cuerdas</a>
+              )}
+              {permisos.includes("view:miembros") && (
+                <a href="/miembros" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate('/miembros'); }}>Miembros</a>
+              )}
+              {permisos.includes("view:fraternidades") && (
+                <a href="/fraternidades" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate('/fraternidades'); }}>Fraternidades</a>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
