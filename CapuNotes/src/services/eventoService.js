@@ -51,7 +51,7 @@ export const eventoService = {
   },
 
   // =======================================================
-  // 🔹 Eliminar evento
+  // Eliminar evento
   //      requiere enviar tipoEvento como query param
   // =======================================================
   remove: async (id, tipoEvento) => {
@@ -59,22 +59,13 @@ export const eventoService = {
     const options = {};
 
     if (tipoEvento) {
-      options.params = { tipoEvento };
+      options.params = { tipo: tipoEvento };
     }
 
     console.log("🗑️ Eliminando evento — URL:", url, "params:", options.params);
 
     const res = await axios.delete(url, options);
     console.log("🗑️ Evento eliminado:", res.data);
-    return res.data;
-  },
-
-  // =======================================================
-  // 🔹 Listar pendientes (ensayos + presentaciones)
-  // =======================================================
-  pendientes: async () => {
-    const res = await axios.get(`${API_URL}/pendientes`);
-    console.log("📡 Eventos pendientes recibidos:", res.data);
     return res.data;
   },
 };
