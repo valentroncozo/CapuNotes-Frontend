@@ -75,7 +75,19 @@ export default function AsistenciaEnsayosDetalle() {
           asistenciaMap.set(`${nombre}-${apellido}`, a.estado);
         });
 
-        const mappedMembers = miembrosData.map((m, i) => {
+        const sortedMembers = [...miembrosData].sort((a, b) => {
+          const apA = (a.apellido || "").toLowerCase().trim();
+          const apB = (b.apellido || "").toLowerCase().trim();
+          const cmpAp = apA.localeCompare(apB, "es", { sensitivity: "base" });
+          if (cmpAp !== 0) return cmpAp;
+
+          const nomA = (a.nombre || "").toLowerCase().trim();
+          const nomB = (b.nombre || "").toLowerCase().trim();
+          return nomA.localeCompare(nomB, "es", { sensitivity: "base" });
+        });
+
+
+        const mappedMembers = sortedMembers.map((m, i) => {
           const nombre = (m.nombre || "").trim().toLowerCase();
           const apellido = (m.apellido || "").trim().toLowerCase();
           const clave = `${nombre}-${apellido}`;
@@ -94,9 +106,9 @@ export default function AsistenciaEnsayosDetalle() {
           return {
             uid: `${nombre}-${apellido}-${i}`,
             id: m.id,
-            nombre: `${m.nombre || ""} ${m.apellido || ""}`.trim(),
+            nombre: `${m.apellido || ""}, ${m.nombre || ""}`.trim(),
             cuerdaId: m.cuerda?.id || null,
-            cuerdaNombre: m.cuerda?.name || "-",
+            cuerdaNombre: m.cuerda?.nombre || "-",
             asistencia: asistenciaLocal,
             raw: m,
           };
@@ -125,9 +137,10 @@ export default function AsistenciaEnsayosDetalle() {
   // Filtros
   // ============================================================
   const cuerdaOptions = useMemo(
-    () => [{ id: "todas", name: "Todas las cuerdas" }, ...cuerdas],
+    () => [{ id: "todas", nombre: "Todas las cuerdas" }, ...cuerdas],
     [cuerdas]
   );
+
 
   const filteredMembers = useMemo(() => {
     const name = filterName.trim().toLowerCase();
@@ -199,9 +212,11 @@ export default function AsistenciaEnsayosDetalle() {
         title: "Error al guardar asistencias",
         text: "Ocurrió un error al procesar las asistencias.",
         background: "#11103a",
-        color: "#E8EAED"
-      });
-    } finally {
+        color: "#E8EAED",
+        confirmButtonColor:"#DE9205",
+        confirmButtonText: "Aceptar",
+      })
+    } finally {;
       setSaving(false);
       setClosing(false);
     }
@@ -295,8 +310,9 @@ export default function AsistenciaEnsayosDetalle() {
           >
             {cuerdaOptions.map((c) => (
               <option key={c.id} value={c.id.toString()}>
-                {c.name}
+                {c.nombre}
               </option>
+
             ))}
           </select>
         </div>

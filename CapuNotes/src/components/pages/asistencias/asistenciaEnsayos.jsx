@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { eventoService } from "@/services/eventoService.js";
+import { ensayosService } from "@/services/ensayosService.js";
 import { asistenciasService } from "@/services/asistenciasService.js";
 import BackButton from "@/components/common/BackButton.jsx";
 import Loader from "@/components/common/Loader.jsx";
@@ -48,7 +48,8 @@ export default function AsistenciaEnsayos() {
       try {
         setLoading(true);
 
-        const data = await eventoService.list({ tipo: "ENSAYO" });
+        const data = await ensayosService.listActivos();
+
 
         const base = (Array.isArray(data) ? data : []).filter(
           (e) => e.estado !== "CANCELADO"

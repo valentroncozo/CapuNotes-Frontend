@@ -49,5 +49,15 @@ export const ensayosService = {
     console.log("📡 Ensayo por ID:", res.data);
     return res.data;
   },
+
+  // ============================================================
+  // Listar ensayos activos
+  // ============================================================
+  listActivos: async () => {
+  const res = await axios.get(`${API}/activos`);
+  console.log("📡 Ensayos activos recibidos:", res.data);
+  return res.data;
+},
+
 };
 

@@ -10,8 +10,8 @@ export const ensayoSchema = [
     required: false,
     options: [
       { value: "PENDIENTE", label: "Pendiente" },
-      { value: "COMPLETA", label: "Completa" },
-      { value: "INCOMPLETA", label: "Incompleta" },
+      { value: "ABIERTA", label: "Abierta" },
+      { value: "CERRADA", label: "Cerrada" },
     ],
   },
 ];
