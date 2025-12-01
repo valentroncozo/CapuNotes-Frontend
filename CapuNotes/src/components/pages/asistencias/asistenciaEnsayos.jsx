@@ -43,30 +43,39 @@ export default function AsistenciaEnsayos() {
   // ===============================================================
   // Cargar ensayos
   // ===============================================================
+  const CACHE_KEY = "ensayosActivosCache";
+
+
   useEffect(() => {
     const fetchEnsayos = async () => {
       try {
         setLoading(true);
 
-        const data = await ensayosService.listActivos();
+        // 1 --- Intentamos cargar desde cache
+        const cached = sessionStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const data = JSON.parse(cached);
+          setRows(data);
+          setLoading(false);
+          return; // no llamamos al backend
+        }
 
+        // 2 --- Si no hay cache, llamamos al backend
+        const data = await ensayosService.listActivos();
 
         const base = (Array.isArray(data) ? data : []).filter(
           (e) => e.estado !== "CANCELADO"
         );
 
-        const mapped = base.map((e) => {
+        // Pre-procesado
+        const preprocesados = base.map((e) => {
           const fechaIso = e.fechaInicio;
-          let fecha = fechaIso;
-          if (fechaIso) {
-            const [y, m, d] = fechaIso.split("-");
-            fecha = `${d}/${m}/${y}`;
-          }
+          const [y, m, d] = fechaIso.split("-");
 
           return {
             id: e.id,
-            fecha,
-            fechaInicio: fechaIso,
+            fechaInicio: fechaIso,        // yyyy-mm-dd
+            fecha: `${d}/${m}/${y}`,      // dd/mm/yyyy
             nombre: e.nombre ?? "",
             descripcion: e.descripcion ?? "",
             estadoAsistencia: e.estadoAsistencia || "PENDIENTE",
@@ -74,26 +83,35 @@ export default function AsistenciaEnsayos() {
           };
         });
 
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-
-        const ordenados = [...mapped].sort((a, b) => {
+        // ORDENAMIENTO CORRECTO
+        const ordenados = preprocesados.sort((a, b) => {
           const [aY, aM, aD] = a.fechaInicio.split("-").map(Number);
           const [bY, bM, bD] = b.fechaInicio.split("-").map(Number);
 
           const fechaA = new Date(aY, aM - 1, aD);
           const fechaB = new Date(bY, bM - 1, bD);
 
+          const hoy = new Date();
+          hoy.setHours(0, 0, 0, 0);
+
           const esFuturoA = fechaA >= hoy;
           const esFuturoB = fechaB >= hoy;
 
+          // 1) Primero los futuros
           if (esFuturoA && !esFuturoB) return -1;
           if (!esFuturoA && esFuturoB) return 1;
 
+          // 2) En segundo orden, ordenar por fecha real ascendente
           return fechaA - fechaB;
         });
 
+
+        // 3 --- Guardamos en cache
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify(ordenados));
+
+        // 4 --- Actualizamos estado
         setRows(ordenados);
+
       } catch (error) {
         console.error("❌ Error cargando ensayos:", error);
       } finally {
@@ -103,6 +121,7 @@ export default function AsistenciaEnsayos() {
 
     fetchEnsayos();
   }, []);
+
 
   // ===============================================================
   // Filtros
@@ -142,23 +161,37 @@ export default function AsistenciaEnsayos() {
         res = await asistenciasService.reabrirAsistencia(ensayo.id);
       }
 
-      setRows((prev) =>
-        prev.map((r) =>
+      console.log("Respuesta del backend:", res);
+
+
+      // invalidar cache para que la próxima carga sea fresca
+      sessionStorage.removeItem(CACHE_KEY);
+
+
+      setRows((prev) => {
+        const updated = prev.map((r) =>
           r.id === ensayo.id
             ? {
-                ...r,
-                estadoAsistencia: res.estadoAsistencia,
-                porcentajeAsistencia: res.porcentajeAsistencia,
-              }
+              ...r,
+              estadoAsistencia: res.estadoAsistencia,
+              porcentajeAsistencia: res.porcentajeAsistencia,
+            }
             : r
-        )
-      );
+        );
+
+        // Actualizamos también el cache
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify(updated));
+
+        return updated;
+      });
+
     } catch (err) {
       console.error("❌ Error cambiando estado:", err);
     } finally {
       setLoadingId(null);
     }
   };
+
 
   // Mes actual por defecto
   useEffect(() => {
@@ -272,8 +305,8 @@ export default function AsistenciaEnsayos() {
                           r.estadoAsistencia === "ABIERTA"
                             ? "#1FA453"
                             : r.estadoAsistencia === "CERRADA"
-                            ? "#D32F2F"
-                            : "#b6b4b4ff",
+                              ? "#D32F2F"
+                              : "#b6b4b4ff",
                         color: "var(--text-light)",
                         padding: "0.4rem 0.6rem",
                         borderRadius: "8px",
@@ -292,6 +325,11 @@ export default function AsistenciaEnsayos() {
                   >
                     <button
                       className="btn btn-amarillo"
+                      title={
+                        r.estadoAsistencia === "CERRADA"
+                          ? "Ver asistencia"
+                          : "Registrar asistencia"
+                      }
                       onClick={() => navigate(`/asistencias/ensayos/${r.id}`)}
                     >
                       {r.estadoAsistencia === "CERRADA" ? (
@@ -305,6 +343,15 @@ export default function AsistenciaEnsayos() {
                       className="btn btn-amarillo"
                       style={{ marginLeft: 8 }}
                       disabled={loadingId === r.id}
+                      title={
+                        loadingId === r.id
+                          ? "Procesando..."
+                          : r.estadoAsistencia === "ABIERTA"
+                            ? "Cerrar asistencia"
+                            : r.estadoAsistencia === "CERRADA"
+                              ? "Reabrir asistencia"
+                              : "Abrir asistencia"
+                      }
                       onClick={() => toggleAsistencia(r)}
                     >
                       {loadingId === r.id ? (
@@ -315,6 +362,7 @@ export default function AsistenciaEnsayos() {
                         <OpenAssistIcon fill="var(--text-light)" />
                       )}
                     </button>
+
                   </td>
                 </tr>
               ))

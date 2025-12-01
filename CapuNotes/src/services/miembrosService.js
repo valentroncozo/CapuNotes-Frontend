@@ -118,6 +118,12 @@ export const miembrosService = {
   reactivar: async (nroDocumento, tipoDocumento = "DNI") => {
     await axios.patch(`${API_URL}/${nroDocumento}/${tipoDocumento}/reactivar`);
   },
+
+  //listar activos
+   async listActivos() {
+    const res = await axios.get(`${API_URL}/activos`);
+    return res.data;
+  },
 };
 
 export default miembrosService;

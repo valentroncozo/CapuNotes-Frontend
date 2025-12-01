@@ -61,36 +61,66 @@ export default function AsistenciaEnsayosDetalle() {
         const estadoEnsayo = ensayoData?.estadoAsistencia || "PENDIENTE";
 
         const [miembrosData, asistenciasData, cuerdasData] = await Promise.all([
-          miembrosService.list().catch(() => []),
+          miembrosService.listActivos().catch(() => []),
           asistenciasService.listPorEnsayo(idEnsayo).catch(() => []),
           cuerdasService.list().catch(() => []),
         ]);
+
+        console.log("MiembrosData crudo:", miembrosData.map(m => ({
+          nombre: m.nombre,
+          apellido: m.apellido,
+          activo: m.activo,
+          tipoDoc: m.tipoDocumento,
+          nroDoc: m.nroDocumento
+        })));
+
 
         setCuerdas(cuerdasData);
 
         const asistenciaMap = new Map();
         asistenciasData.forEach((a) => {
-          const nombre = (a.nombreMiembro || "").trim().toLowerCase();
-          const apellido = (a.apellidoMiembro || "").trim().toLowerCase();
-          asistenciaMap.set(`${nombre}-${apellido}`, a.estado);
+          const tipo = (a.tipoDocumento || "").toLowerCase();
+          const numero = (a.nroDocumento || "").toLowerCase();
+          asistenciaMap.set(`${tipo}-${numero}`, a.estado);
         });
 
-        const sortedMembers = [...miembrosData].sort((a, b) => {
-          const apA = (a.apellido || "").toLowerCase().trim();
-          const apB = (b.apellido || "").toLowerCase().trim();
-          const cmpAp = apA.localeCompare(apB, "es", { sensitivity: "base" });
+
+        const activos = miembrosData.filter(m => m.activo);
+
+        // Ordenar alfabéticamente
+        const sortedMembers = [...activos].sort((a, b) => {
+          const apA = (a.apellido || '').toLowerCase();
+          const apB = (b.apellido || '').toLowerCase();
+          const cmpAp = apA.localeCompare(apB, 'es', { sensitivity: 'base' });
           if (cmpAp !== 0) return cmpAp;
 
-          const nomA = (a.nombre || "").toLowerCase().trim();
-          const nomB = (b.nombre || "").toLowerCase().trim();
-          return nomA.localeCompare(nomB, "es", { sensitivity: "base" });
+          const nomA = (a.nombre || '').toLowerCase();
+          const nomB = (b.nombre || '').toLowerCase();
+          return nomA.localeCompare(nomB, 'es', { sensitivity: 'base' });
         });
 
-
+        // Construir lista final
         const mappedMembers = sortedMembers.map((m, i) => {
-          const nombre = (m.nombre || "").trim().toLowerCase();
-          const apellido = (m.apellido || "").trim().toLowerCase();
-          const clave = `${nombre}-${apellido}`;
+
+          console.log("DEBUG M:", m);
+
+          // claves únicas basadas en tipo + documento
+          const tipo = (
+            m.id?.tipoDocumento ||
+            m.tipoDocumento ||
+            m.tipoDoc ||
+            ""
+          ).toLowerCase();
+
+          const numero = (
+            m.id?.nroDocumento ||
+            m.nroDocumento ||
+            m.nroDoc ||
+            ""
+          ).toLowerCase();
+
+
+          const clave = `${tipo}-${numero}`;
 
           const estadoBackend = asistenciaMap.get(clave);
 
@@ -104,11 +134,11 @@ export default function AsistenciaEnsayosDetalle() {
             "no";
 
           return {
-            uid: `${nombre}-${apellido}-${i}`,
+            uid: `${tipo}-${numero}-${i}`,   // <-- corregido, ANTES USABA VARIABLES QUE NO EXISTÍAN
             id: m.id,
             nombre: `${m.apellido || ""}, ${m.nombre || ""}`.trim(),
             cuerdaId: m.cuerda?.id || null,
-            cuerdaNombre: m.cuerda?.nombre || "-",
+            cuerdaNombre: m.cuerda?.name || m.cuerda?.nombre || "-",
             asistencia: asistenciaLocal,
             raw: m,
           };
@@ -179,18 +209,69 @@ export default function AsistenciaEnsayosDetalle() {
           estado: ESTADOS_MAP[m.asistencia],
           miembro: {
             id: {
-              tipoDocumento: m.raw?.id?.tipoDocumento || "DNI",
-              nroDocumento: m.raw?.id?.nroDocumento || m.raw?.nroDocumento,
+              tipoDocumento:
+                m.raw?.id?.tipoDocumento ||
+                m.raw?.tipoDocumento ||
+                m.tipoDocumento,
+
+              nroDocumento:
+                m.raw?.id?.nroDocumento ||
+                m.raw?.nroDocumento ||
+                m.nroDocumento,
             }
           }
         }))
       };
+
+
+      console.log("=== PAYLOAD QUE ESTOY ENVIANDO ===");
+      console.log(JSON.stringify(payload, null, 2));
+
+
+      console.log("PAYLOAD FINAL:", JSON.stringify(payload, null, 2));
+
 
       await asistenciasService.registrarAsistenciasMasivas(idEnsayo, payload);
 
       if (cerrar) {
         await asistenciasService.cerrarAsistencia(idEnsayo);
       }
+
+      // ⭐⭐ CACHE FINO: actualizar solo este ensayo ⭐⭐
+      const CACHE_KEY = "ensayosActivosCache";
+      const cacheRaw = sessionStorage.getItem(CACHE_KEY);
+
+      if (cacheRaw) {
+        try {
+          const cache = JSON.parse(cacheRaw);
+
+          // el backend recalcula porcentaje y estado al cerrar, así que lo pedimos:
+          const ensayoActualizado = await ensayosService.getById(idEnsayo);
+
+          const [y, m, d] = ensayoActualizado.fechaInicio.split("-");
+
+          const objetoFinal = {
+            id: ensayoActualizado.id,
+            fechaInicio: ensayoActualizado.fechaInicio,
+            fecha: `${d}/${m}/${y}`,
+            nombre: ensayoActualizado.nombre ?? "",
+            descripcion: ensayoActualizado.descripcion ?? "",
+            estadoAsistencia: ensayoActualizado.estadoAsistencia,
+            porcentajeAsistencia: ensayoActualizado.porcentajeAsistencia ?? 0,
+          };
+
+          // reemplazar solo ese ensayo dentro del array del cache
+          const actualizado = cache.map(e =>
+            e.id === ensayoActualizado.id ? objetoFinal : e
+          );
+
+          sessionStorage.setItem(CACHE_KEY, JSON.stringify(actualizado));
+
+        } catch (err) {
+          console.warn("No se pudo actualizar cache fino", err);
+        }
+      }
+
 
       Swal.fire({
         icon: "success",
@@ -207,16 +288,18 @@ export default function AsistenciaEnsayosDetalle() {
 
     } catch (error) {
       console.error("❌ Error al guardar asistencias:", error);
+      console.error("BACKEND ERROR:", error.response?.data);
       Swal.fire({
         icon: "error",
         title: "Error al guardar asistencias",
         text: "Ocurrió un error al procesar las asistencias.",
         background: "#11103a",
         color: "#E8EAED",
-        confirmButtonColor:"#DE9205",
+        confirmButtonColor: "#DE9205",
         confirmButtonText: "Aceptar",
       })
-    } finally {;
+    } finally {
+      ;
       setSaving(false);
       setClosing(false);
     }
