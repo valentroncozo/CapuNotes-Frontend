@@ -12,7 +12,7 @@ import CloseIcon from '@/assets/CloseIcon.jsx';
 import EyeOnIcon from '@/assets/VisibilityOnIcon.jsx';
 import { formatDate } from '@/components/common/datetime.js';
 
-export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Coordinador)' }) {
+export default function CandidatosCoordinadoresPage({ title = 'Cronograma de candidatos' }) {
 
   const [dias, setDias] = useState([]); // [{ value, label }]
   const [diaSel, setDiaSel] = useState('-');
