@@ -79,16 +79,16 @@ const LandingPage = () => {
             />
           </li>
           <li>
-            <a href="#quienes-somos">Quienes Somos</a>
+            <a href="#quienes-somos">¿Quiénes Somos?</a>
           </li>
           <li>
             <a href="#Actividades">Actividades</a>
           </li>
           <li>
-            <a href="#Unite">Únite</a>
+            <a href="#Unirme">Inscribirme</a>
           </li>
           <li>
-            <Link to="/login">Login</Link>
+            <Link to="/login">Iniciar Sesión</Link>
           </li>
         </ul>
       </nav>
@@ -157,7 +157,7 @@ const LandingPage = () => {
       <article className="landing-article">
         <section id="quienes-somos" className="section-line">
           <h2>
-            <strong>¿Quienes Somos?</strong>
+            <strong>¿Quiénes Somos?</strong>
           </h2>
           <p>
             Somos el Coro Capuchinos, un grupo de personas que, habiendo tenido
@@ -245,9 +245,9 @@ const LandingPage = () => {
           </ContainerPhoto>
         </div>
         <hr className="dividir" />
-        <section id="Unite" className="section-line">
+        <section id="Unirme" className="section-line">
           <h2>
-            <strong>Únite a Nosotros</strong>
+            <strong>Únete a Nosotros</strong>
           </h2>
           <p>
             Nosotros, como ministerio de música, prestamos nuestro servicio en
