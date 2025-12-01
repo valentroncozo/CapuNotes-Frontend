@@ -171,3 +171,20 @@ input[type="password"]::-webkit-password-toggle-button { display: none !importan
     color: var(--text-light);
   }
 }
+
+/* Sólo para inputs de login/registro */
+.validate-input {
+  border: 1px solid #ccc !important;
+  transition: border-color 0.2s ease;
+}
+
+/* Validez OK → Verde */
+.validate-input.valid {
+  border-color: #28a745 !important;
+}
+
+/* Incorrecto → Rojo */
+.validate-input.invalid {
+  border-color: #dc3545 !important;
+}
+
