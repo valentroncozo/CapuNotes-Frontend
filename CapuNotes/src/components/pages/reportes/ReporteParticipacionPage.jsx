@@ -122,7 +122,7 @@ export default function ReporteParticipacionPage() {
                     placeholder="Buscar miembro..."
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
-                    style={{ width: "260px" }}
+                    //style={{ width: "260px" }}
                 />
 
                 <input
@@ -132,16 +132,17 @@ export default function ReporteParticipacionPage() {
                     min="2010"
                     max={new Date().getFullYear()}
                     onChange={(e) => setAnio(e.target.value)}
-                    style={{ width: "120px" }}
+                    //style={{ width: "120px" }}
                 />
 
                 <select
                     className="abmc-input"
                     value={estadoFiltro}
                     onChange={(e) => setEstadoFiltro(e.target.value)}
-                    style={{ width: "180px" }}
+                    style={{ height: "46px" }}
+                    //style={{ width: "180px" }}
                 >
-                    <option value="todos">Todos</option>
+                    <option value="todos">Todos los estados</option>
                     <option value="activos">Activos</option>
                     <option value="inactivos">Inactivos</option>
                 </select>

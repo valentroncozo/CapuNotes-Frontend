@@ -60,9 +60,9 @@ export default function PopUpReporteParticipacion({
 
     const dataTorta = data
         ? [
-              { name: "Asistencias", value: data.porcentajeAsistencia ?? 0 },
-              { name: "Faltas", value: data.porcentajeAusencia ?? 0 },
-          ]
+            { name: "Asistencias", value: data.porcentajeAsistencia ?? 0 },
+            { name: "Faltas", value: data.porcentajeAusencia ?? 0 },
+        ]
         : [];
 
     return (
@@ -105,13 +105,57 @@ export default function PopUpReporteParticipacion({
                         <p className="grafico-desc">Muestra los ensayos consecutivos asistidos sin faltas.</p>
 
                         <ResponsiveContainer width="100%" height={230}>
-                            <LineChart data={data.continuidad}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                                <XAxis dataKey="fecha" />
-                                <YAxis />
-                                <Tooltip />
-                                <Line type="monotone" dataKey="continuidad" stroke="#DE9205" strokeWidth={3} dot />
-                            </LineChart>
+                            <ResponsiveContainer width="100%" height={230}>
+                                <LineChart
+                                    data={data.continuidad.map((item, idx) => ({
+                                        ...item,
+                                        id: idx, // clave única para evitar fechas duplicadas
+                                    }))}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+
+                                    <XAxis
+                                        dataKey="fecha"
+                                        tickFormatter={(value) => {
+                                            if (!value) return "";
+                                            const [y, m, d] = value.split("-");
+                                            return `${d}-${m}-${y}`;
+                                        }}
+                                    />
+
+                                    <YAxis />
+
+                                    <Tooltip
+                                        labelFormatter={(label) => {
+                                            if (!label) return "";
+
+                                            const [y, m, d] = label.split("-");
+                                            return `Fecha: ${d}-${m}-${y}`;
+                                        }}
+                                        contentStyle={{
+                                            backgroundColor: "rgba(0,0,0,0.75)",
+                                            borderRadius: "6px",
+                                            border: "1px solid #444",
+                                            color: "#fff",
+                                            fontSize: "0.85rem",
+                                        }}
+                                        labelStyle={{
+                                            color: "#e0e0e0",
+                                            fontWeight: "600",
+                                        }}
+                                    />
+
+
+                                    <Line
+                                        type="monotone"
+                                        dataKey="continuidad"
+                                        stroke="#DE9205"
+                                        strokeWidth={3}
+                                        dot
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+
                         </ResponsiveContainer>
                     </div>
                 </>

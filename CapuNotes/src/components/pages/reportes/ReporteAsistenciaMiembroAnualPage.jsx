@@ -22,21 +22,35 @@ export default function ReportePorMiembroPage() {
   const [loading, setLoading] = useState(false);
 
   // ====== CARGAR MIEMBROS ======
+  // ====== CARGAR MIEMBROS ======
   useEffect(() => {
-    const cargar = async () => {
-      const res = await miembrosService.getMiembros();
+    const cargarMiembros = async () => {
+      try {
+        console.log(">>> Cargando miembros...");
 
-      // Ordenar por Apellido + Nombre
-      const ordenados = [...res].sort((a, b) => {
-        const nombreA = `${a.apellido} ${a.nombre}`.toLowerCase();
-        const nombreB = `${b.apellido} ${b.nombre}`.toLowerCase();
-        return nombreA.localeCompare(nombreB);
-      });
+        const res = await miembrosService.list();
 
-      setMiembros(ordenados);
-      setMiembroSeleccionado(null); // NO seleccionar el primero
+        console.log(">>> Miembros recibidos:", res);
+
+        if (!Array.isArray(res)) {
+          console.error("❌ miembrosService.list() NO devolvió un array");
+          return;
+        }
+
+        const ordenados = [...res].sort((a, b) =>
+          `${a.apellido} ${a.nombre}`.toLowerCase()
+            .localeCompare(`${b.apellido} ${b.nombre}`.toLowerCase())
+        );
+
+        setMiembros(ordenados);
+        console.log(">>> Miembros ordenados:", ordenados);
+
+      } catch (error) {
+        console.error("❌ Error cargando miembros:", error);
+      }
     };
-    cargar();
+
+    cargarMiembros();
   }, []);
 
   // ====== CARGAR REPORTE ======
@@ -46,10 +60,20 @@ export default function ReportePorMiembroPage() {
     const cargar = async () => {
       setLoading(true);
 
-      const { tipoDocumento, nroDocumento } = miembroSeleccionado.id;
+      const tipoDocumento = miembroSeleccionado?.tipoDocumento;
+      const nroDocumento = miembroSeleccionado?.nroDocumento;
+
+
+      if (!tipoDocumento || !nroDocumento) {
+        console.warn("Miembro sin documento válido:", miembroSeleccionado);
+        setLoading(false);
+        return;
+      }
 
       const r = await reporteAsistenciaMiembroAnualService.getReporteMiembro(
-        tipoDocumento, nroDocumento, anio
+        tipoDocumento,
+        nroDocumento,
+        anio
       );
 
       setReporte(r);
@@ -58,6 +82,7 @@ export default function ReportePorMiembroPage() {
 
     cargar();
   }, [miembroSeleccionado, anio]);
+
 
   // ========== CASO: NO ELEGIDO TODAVÍA ==========
   if (!miembroSeleccionado) {
@@ -157,9 +182,36 @@ export default function ReportePorMiembroPage() {
         <ResponsiveContainer width="100%" height={260}>
           <LineChart data={reporte.continuidad}>
             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-            <XAxis dataKey="fecha" />
+            <XAxis
+              dataKey="fecha"
+              tickFormatter={(value) => {
+                if (!value) return "";
+                const [y, m, d] = value.split("-");
+                return `${d}-${m}-${y}`;
+              }}
+            />
+
             <YAxis />
-            <Tooltip />
+            <YAxis />
+            <Tooltip
+              labelFormatter={(label) => {
+                if (!label) return "";
+
+                const [y, m, d] = label.split("-");
+                return `Fecha: ${d}-${m}-${y}`;
+              }}
+              contentStyle={{
+                backgroundColor: "rgba(0,0,0,0.75)",
+                borderRadius: "6px",
+                border: "1px solid #444",
+                color: "#fff",
+                fontSize: "0.85rem",
+              }}
+              labelStyle={{
+                color: "#e0e0e0",
+                fontWeight: "600",
+              }}
+            />
             <Line type="monotone" dataKey="continuidad" stroke="#DE9205" strokeWidth={3} dot />
           </LineChart>
         </ResponsiveContainer>
@@ -186,10 +238,15 @@ function Filtros({
       {/* ==== SELECT MIEMBRO ==== */}
       <select
         className="abmc-input"
-        value={miembroSeleccionado?.id?.nroDocumento || ""}
+        value={
+          miembroSeleccionado
+            ? `${miembroSeleccionado.tipoDocumento}-${miembroSeleccionado.nroDocumento}`
+            : ""
+        }
         onChange={(e) => {
+          const clave = e.target.value; // "DNI-32156338"
           const seleccionado = miembros.find(
-            (m) => m.id.nroDocumento === e.target.value
+            (m) => `${m.tipoDocumento}-${m.nroDocumento}` === clave
           );
           setSeleccionado(seleccionado || null);
         }}
@@ -197,12 +254,16 @@ function Filtros({
       >
         <option value="">Seleccionar miembro...</option>
 
-        {miembros.map((m) => (
-          <option key={m.id.nroDocumento} value={m.id.nroDocumento}>
-            {m.apellido}, {m.nombre}
-          </option>
-        ))}
+        {miembros.map((m) => {
+          const clave = `${m.tipoDocumento}-${m.nroDocumento}`;
+          return (
+            <option key={clave} value={clave}>
+              {m.apellido}, {m.nombre}
+            </option>
+          );
+        })}
       </select>
+
 
       {/* ==== AÑO ==== */}
       <input
@@ -215,26 +276,28 @@ function Filtros({
       />
 
       {/* ==== ESTADO DEL MIEMBRO ==== */}
-      {miembroSeleccionado && (
-        <span
-          className="estado-pill"
-          style={{
-            background: miembroSeleccionado.activo ? "#198754" : "#b6b4b4ff",
-            color: "white",
-            padding: "8px 14px",
-            borderRadius: "12px",
-            fontSize: "0.9rem",
-            fontWeight: "600",
-            display: "flex",
-            alignItems: "center",
-            height: "42px"
-          }}
-        >
-          {miembroSeleccionado.activo ? "Activo" : "Inactivo"}
-        </span>
-      )}
+      {
+        miembroSeleccionado && (
+          <span
+            className="estado-pill"
+            style={{
+              background: miembroSeleccionado.activo ? "#198754" : "#b6b4b4ff",
+              color: "white",
+              padding: "8px 14px",
+              borderRadius: "12px",
+              fontSize: "0.9rem",
+              fontWeight: "600",
+              display: "flex",
+              alignItems: "center",
+              height: "42px"
+            }}
+          >
+            {miembroSeleccionado.activo ? "Activo" : "Inactivo"}
+          </span>
+        )
+      }
 
-    </div>
+    </div >
   );
 }
 
