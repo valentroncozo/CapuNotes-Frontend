@@ -4,7 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height: 50vh;
   background-color: var(--bg);
   gap: 1.5rem;
 }
@@ -54,5 +54,21 @@
   to {
     opacity: 1;
   }
+}
+
+/* === MINI LOADER PARA USAR EN LAS CARDS DE EVENTOS === */
+.logo-loader-container.small {
+  transform: scale(0.45);   /* 👈 achicamos todo el loader */
+  transform-origin: center;
+  margin: 0 auto;
+}
+
+.logo-loader-container.small .loader-text {
+  display: none; /* 👈 ocultamos el texto para que no estorbe */
+}
+
+.logo-loader.small .logo-loader {
+  width: 40px !important;
+  height: 40px !important;
 }
 

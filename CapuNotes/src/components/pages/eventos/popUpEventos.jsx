@@ -5,6 +5,24 @@ import '@/styles/popup.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
+// =======================================================
+//   Helpers para manejar fechas sin romper el timezone
+// =======================================================
+function parseIsoDate(isoString) {
+  if (!isoString) return null;
+  const [y, m, d] = isoString.split("-");
+  return new Date(Number(y), Number(m) - 1, Number(d));
+}
+
+function formatDateToIsoLocal(date) {
+  if (!date) return null;
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+
 const PopUpEventos = ({
   modo = 'crear',
   eventoSeleccionado,
@@ -15,21 +33,29 @@ const PopUpEventos = ({
   const isViewMode = modo === 'ver';
   const [selectedDate, setSelectedDate] = useState(
     eventoSeleccionado?.fechaInicio
-      ? new Date(eventoSeleccionado.fechaInicio)
+      ? parseIsoDate(eventoSeleccionado.fechaInicio)
       : null
   );
+
   const [errorMsg, setErrorMsg] = useState('');
   const formId = 'evento-modal-form';
 
+  // =============================
+  //   Sincronizar con edición
+  // =============================
   useEffect(() => {
     if (eventoSeleccionado?.fechaInicio) {
-      setSelectedDate(new Date(eventoSeleccionado.fechaInicio));
-    } else {
+      setSelectedDate(parseIsoDate(eventoSeleccionado.fechaInicio));
+    }
+    else {
       setSelectedDate(null);
     }
     setErrorMsg('');
   }, [eventoSeleccionado, modo, isOpen]);
 
+  // =============================
+  //   Submit del formulario
+  // =============================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -56,15 +82,16 @@ const PopUpEventos = ({
       return;
     }
 
+    // 🔹 Asegurar formato HH:mm
     let hora = horaRaw;
-    if (hora?.length === 5) {
-      hora += ':00';
+    if (hora.length > 5) {
+      hora = hora.slice(0, 5);
     }
 
     const nuevoEvento = {
       nombre,
       tipoEvento,
-      fechaInicio: selectedDate.toISOString().split('T')[0],
+      fechaInicio: formatDateToIsoLocal(selectedDate),
       hora,
       lugar,
     };
@@ -81,13 +108,19 @@ const PopUpEventos = ({
     }
   };
 
+  // =============================
+  //   TÍTULO DEL POPUP
+  // =============================
   const modalTitle =
     modo === 'crear'
       ? 'Crear Evento'
       : modo === 'editar'
-      ? 'Modificar Evento'
-      : 'Visualizar Evento';
+        ? 'Modificar Evento'
+        : 'Visualizar Evento';
 
+  // =============================
+  //   ACCIONES DEL POPUP
+  // =============================
   const modalActions = isViewMode ? (
     <button type="button" className="btn btn-primary" onClick={onClose}>
       Cerrar
@@ -103,6 +136,9 @@ const PopUpEventos = ({
     </>
   );
 
+  // =============================
+  //   RENDER
+  // =============================
   return (
     <Modal
       isOpen={isOpen}
@@ -116,8 +152,10 @@ const PopUpEventos = ({
           {errorMsg}
         </div>
       )}
+
       <form id={formId} className="evento-modal-form" onSubmit={handleSubmit}>
         <div className="popup-grid">
+
           <div className="field">
             <label>Nombre</label>
             <input
@@ -174,6 +212,7 @@ const PopUpEventos = ({
               disabled={isViewMode}
             />
           </div>
+
         </div>
       </form>
     </Modal>

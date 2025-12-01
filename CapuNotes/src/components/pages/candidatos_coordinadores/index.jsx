@@ -11,6 +11,8 @@ import TurnoService from '@/services/turnoServices';
 import Swal from 'sweetalert2';
 import { XCircleFill } from "react-bootstrap-icons";
 import EyeOnIcon from '@/assets/VisibilityOnIcon';
+import { formatDate } from '@/components/common/datetime.js';
+
 
 
 export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Administrador)' }) {
@@ -80,7 +82,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Admin
         (cron || []).forEach(item => {
           const f = item?.turno?.fecha;
           if (!f) return;
-          const label = item?.turno?.diaString ? `${item.turno.diaString} — ${f}` : f;
+          const label = item?.turno?.diaString ? formatDate(`${item.turno.diaString} — ${f}`) : formatDate(f);
           if (!mapa.has(f)) mapa.set(f, { value: f, label });
         });
 

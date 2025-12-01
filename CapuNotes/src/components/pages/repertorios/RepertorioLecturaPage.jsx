@@ -5,6 +5,8 @@ import { eventoService } from "@/services/eventoService";
 import { repertoriosService } from "@/services/repertoriosService";
 import { cancionesService } from "@/services/cancionesService";
 import "@/styles/repertorio-lectura.css";
+import Loader from "@/components/common/Loader.jsx";
+
 
 let html2PdfPromise = null;
 
@@ -183,8 +185,8 @@ export default function RepertorioLecturaPage() {
               const completo = await repertoriosService.get(rep.id);
               const cancionesOrdenadas = Array.isArray(completo.canciones)
                 ? [...completo.canciones].sort(
-                    (a, b) => (a.orden ?? 0) - (b.orden ?? 0)
-                  )
+                  (a, b) => (a.orden ?? 0) - (b.orden ?? 0)
+                )
                 : [];
 
               const cancionesConLetra = await Promise.all(
@@ -286,7 +288,12 @@ export default function RepertorioLecturaPage() {
   return (
     <main className="lectura-page" id="lectura-root">
       <div className="lectura-wrap">
-        {loading && <p>Cargando repertorios...</p>}
+        {loading && (
+          <div className="lectura-loading">
+            <Loader />
+          </div>
+        )}
+
         {!loading && error && <div className="lectura-error">{error}</div>}
         {!loading && !error && evento && (
           <>
@@ -300,10 +307,10 @@ export default function RepertorioLecturaPage() {
                   <strong>
                     {evento.fechaInicio
                       ? new Date(evento.fechaInicio).toLocaleDateString("es-ES", {
-                          weekday: "long",
-                          day: "numeric",
-                          month: "long",
-                        })
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                      })
                       : "-"}
                   </strong>
                 </div>
@@ -336,9 +343,8 @@ export default function RepertorioLecturaPage() {
                         {rep.cancionesDetalle.length > 0 && (
                           <ul>
                             {rep.cancionesDetalle.map((cancion, idx) => {
-                              const songAnchorId = `rep-${rep.id}-song-${
-                                cancion.orden ?? idx + 1
-                              }`;
+                              const songAnchorId = `rep-${rep.id}-song-${cancion.orden ?? idx + 1
+                                }`;
                               return (
                                 <li key={`idx-${rep.id}-${idx}`}>
                                   <a

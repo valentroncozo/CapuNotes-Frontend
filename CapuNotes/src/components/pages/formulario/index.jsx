@@ -25,6 +25,7 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
   const [cuerdas, setCuerdas] = useState([]);
   const [turnos, setTurnos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Estados del formulario
   const [respuestas, setRespuestas] = useState([]);
@@ -77,8 +78,8 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
         setCuerdas(encuesta.cuerdas || []);
         setTurnos(encuesta.turnos || []);
       } catch (error) {
-        console.log("Error al cargar encues");
-        /*
+        console.log("Error al cargar encuesta");
+        
         console.error('Error cargando encuesta:', error);
         Swal.fire({
           icon: 'error',
@@ -87,7 +88,7 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
           background: '#11103a',
           color: '#E8EAED',
         });
-        */
+        
       } finally {
         setLoading(false);
       }
@@ -699,8 +700,9 @@ const Formulario = ({ title = 'Inscripción a Audiciones CoroCapuchinos' }) => {
                 type="button"
                 className="abmc-btn btn-primary"
                 onClick={handleSubmit}
+                disabled={isSaving}
               >
-                Inscribir
+                {isSaving ? 'Enviando...' : 'Inscribir'}
               </button>
             </div>
           </form>

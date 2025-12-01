@@ -1,63 +1,51 @@
-// src/services/ensayosService.js
+// src/services/presentacionesService.js
 import axios from "axios";
 
-const API = "/api/ensayos";
+const API = "/api/presentaciones";
 
-export const ensayosService = {
+export const presentacionesService = {
   // ============================================================
-  // Crear ensayo
+  // Crear presentación
   // ============================================================
   create: async (data) => {
     const res = await axios.post(API, data);
-    console.log("🟢 Ensayo creado:", res.data);
+    console.log("🟢 Presentación creada:", res.data);
     return res.data;
   },
 
   // ============================================================
-  // Editar ensayo existente
+  // Editar presentación
   // ============================================================
   update: async (id, data) => {
     const res = await axios.patch(`${API}/${id}`, data);
-    console.log("🛠️ Ensayo actualizado:", res.data);
+    console.log("🛠️ Presentación actualizada:", res.data);
     return res.data;
   },
 
   // ============================================================
-  // Eliminar ensayo (cambia estado a CANCELADO)
+  // Eliminar presentación (pasa a estado CANCELADO)
   // ============================================================
   remove: async (id) => {
     const res = await axios.delete(`${API}/${id}`);
-    console.log("🗑️ Ensayo cancelado:", res.data);
+    console.log("🗑️ Presentación cancelada:", res.data);
     return res.data;
   },
 
   // ============================================================
-  // Listar todos los ensayos
-  //     Cada ensayo viene con porcentaje, estadoAsistencia, etc.
+  // Listar todas las presentaciones
   // ============================================================
   list: async () => {
     const res = await axios.get(API);
-    console.log("📡 Ensayos recibidos:", res.data);
+    console.log("📡 Presentaciones recibidas:", res.data);
     return res.data;
   },
 
   // ============================================================
-  // Obtener ensayo por ID
+  // Obtener presentación por ID
   // ============================================================
   getById: async (id) => {
     const res = await axios.get(`${API}/${id}`);
-    console.log("📡 Ensayo por ID:", res.data);
+    console.log("📡 Presentación por ID:", res.data);
     return res.data;
   },
-
-  // ============================================================
-  // Listar ensayos activos
-  // ============================================================
-  listActivos: async () => {
-  const res = await axios.get(`${API}/activos`);
-  console.log("📡 Ensayos activos recibidos:", res.data);
-  return res.data;
-},
-
 };
-

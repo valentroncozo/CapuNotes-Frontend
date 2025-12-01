@@ -5,7 +5,7 @@ import BackButton from '../../common/BackButton';
 import TurnoSection from './components/TurnoSection';
 import { useState, useEffect } from 'react';
 import Swal from "sweetalert2";
-
+import  {useNavigate}  from 'react-router-dom';
 import sendToService from './components/utils/sendToServices.js';
 import { es } from 'date-fns/locale';
 
@@ -18,6 +18,8 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
 
     const now = new Date().toISOString().split('T')[0];
     const nombre = `Audiciones ${now}`;
+
+    const navigate = useNavigate();
 
     const [ubicacion,setUbicacion]= useState ('');
     const [dias, setDias]= useState ([]);
@@ -71,8 +73,15 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
     const handleAgregarDia = () => {
         if (!dias || dias.length === 0) {
             if (!diaDesde) {
-                alert('No hay días en la lista. Generá fechas o completá "Fecha Desde" primero.');
-                return;
+            Swal.fire({
+            icon: "error",
+            title: "Error al cargar datos",
+            text:'No hay días en la lista. Generá fechas o completá "Fecha Desde" primero.',
+            background: "#11103a",
+            color: "#E8EAED",
+            });
+            
+            return;
             }
             const [y, m, d] = diaDesde.split('-');
             const first = new Date(Number(y), Number(m) - 1, Number(d));
@@ -121,7 +130,13 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
 
         const existe = dias.some((dt) => dt.getTime() === siguiente.getTime());
         if (existe) {
-            alert('La fecha ya existe en la lista.');
+            Swal.fire({
+                icon: "error",
+                title: "Error al cargar datos",
+                text:'La fecha ya existe en la lista.',
+                background: "#11103a",
+                color: "#E8EAED",
+            });
             return;
         }
 
@@ -159,11 +174,12 @@ const AudicionAgregar = ({title="Agregar Audición"}) => {
         }
 
         console.log('Datos guardados en estado data:', data);
-        alert('Datos guardados en el estado');
+      
 
        setIsSaving(true);
         try {
             await sendToService(data);
+            navigate('/audicion');
         } catch (error) {
             console.error('Error al guardar:', error);
         } finally {

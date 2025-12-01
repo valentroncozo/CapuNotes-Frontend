@@ -5,7 +5,7 @@ const API_URL = "/api/asistencias";
 
 export const asistenciasService = {
   // =======================================================
-  // 🔹 LISTAR ASISTENCIAS POR ENSAYO
+  //LISTAR ASISTENCIAS POR ENSAYO
   // =======================================================
   /**
    * GET /api/asistencias/ensayo/{idEnsayo}?cuerdaId=&nombre=
@@ -15,16 +15,16 @@ export const asistenciasService = {
       const res = await axios.get(`${API_URL}/ensayo/${idEnsayo}`, {
         params: { ...(cuerdaId ? { cuerdaId } : {}), ...(nombre ? { nombre } : {}) },
       });
-      console.log("📡 Asistencias recibidas:", res.data);
+      console.log("Asistencias recibidas:", res.data);
       return Array.isArray(res.data) ? res.data : [];
     } catch (err) {
-      console.error("❌ Error listando asistencias:", err?.response || err);
+      console.error("Error listando asistencias:", err?.response || err);
       throw err;
     }
   },
 
   // =======================================================
-  // 🔹 REGISTRAR / ACTUALIZAR UNA ASISTENCIA INDIVIDUAL
+  // REGISTRAR / ACTUALIZAR UNA ASISTENCIA INDIVIDUAL
   // =======================================================
   /**
    * POST /api/asistencias/ensayo/{idEnsayo}
@@ -48,7 +48,7 @@ export const asistenciasService = {
   },
 
   // =======================================================
-  // 🔹 REGISTRO MASIVO
+  // REGISTRO MASIVO
   // =======================================================
   /**
    * POST /api/asistencias/ensayo/{idEnsayo}/masivo
@@ -73,7 +73,7 @@ export const asistenciasService = {
   },
 
   // =======================================================
-  // 🔹 CERRAR / REABRIR ASISTENCIA
+  // CERRAR / REABRIR ASISTENCIA
   // =======================================================
   cerrarAsistencia: async (idEnsayo) => {
     try {
@@ -89,34 +89,34 @@ export const asistenciasService = {
   reabrirAsistencia: async (idEnsayo) => {
     try {
       const res = await axios.patch(`${API_URL}/ensayo/${idEnsayo}/abrir`);
-      console.log("🔓 Asistencia reabierta:", res.data);
+      console.log("Asistencia reabierta:", res.data);
       return res.data;
     } catch (err) {
-      console.error("❌ Error reabriendo asistencia:", err?.response || err);
+      console.error(" Error reabriendo asistencia:", err?.response || err);
       throw err;
     }
   },
 
   // =======================================================
-  // 🔹 ELIMINAR
+  //  ELIMINAR
   // =======================================================
   eliminarAsistenciasPorEnsayo: async (idEnsayo) => {
     try {
       const res = await axios.delete(`${API_URL}/ensayo/${idEnsayo}`);
-      console.log("🗑️ Asistencias eliminadas del ensayo:", res.data);
+      console.log("Asistencias eliminadas del ensayo:", res.data);
       return res.data;
     } catch (err) {
-      console.error("❌ Error eliminando asistencias:", err?.response || err);
+      console.error(" Error eliminando asistencias:", err?.response || err);
       throw err;
     }
   },
   getEstado: async (idEnsayo) => {
     try {
       const res = await axios.get(`${API_URL}/ensayo/${idEnsayo}/estado`);
-      console.log("📊 Estado de asistencia recibido:", res.data);
+      console.log(" Estado de asistencia recibido:", res.data);
       return res.data;
     } catch (err) {
-      console.error("❌ Error obteniendo estado de asistencia:", err?.response || err);
+      console.error("Error obteniendo estado de asistencia:", err?.response || err);
       throw err;
     }
   },

@@ -93,16 +93,18 @@ export default function RepertorioFormPage({ mode = "create" }) {
         const repertorioIds = Array.from(
           new Set([...(eventoContext.repertorioIds || []), creado.id])
         );
-        await eventoService.update(eventoContext.eventoId, {
-          tipoEvento: eventoContext.tipoEvento,
-          repertorioIds,
-        });
+        await eventoService.assignRepertorios(
+          eventoContext.eventoId,
+          eventoContext.tipoEvento,
+          repertorioIds
+        );
+
         Swal.fire({
           icon: "success",
           title: "Repertorio creado y asignado",
           background: "#11103a",
           color: "#E8EAED",
-          confirmButtonColor: "#7c83ff",
+          confirmButtonColor: "#de9205",
           timer: 1500,
           showConfirmButton: false,
         });
@@ -127,7 +129,8 @@ export default function RepertorioFormPage({ mode = "create" }) {
         text: error?.response?.data || "No se pudo guardar el repertorio.",
         background: "#11103a",
         color: "#E8EAED",
-        confirmButtonColor: "#7c83ff",
+        confirmButtonColor: "#de9205",
+        confirmButtonText: "Aceptar",
       });
     }
   };

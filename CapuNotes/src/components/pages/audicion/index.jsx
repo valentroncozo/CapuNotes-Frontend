@@ -30,6 +30,7 @@ const Audicion = ({ title = 'Audición' }) => {
   const [filtroDia, setFiltroDia] = useState('');
   const [esPublicada, setEsPublicada] = useState('');
   const [formulario, setFormulario] = useState([]);
+  
 
   const load = async () => {
     const audicionActual = await AudicionService.getActual();
