@@ -14,7 +14,18 @@ import {
   hasErrors,
 } from "@/components/common/validators.js";
 
-export default function Login({ onLogin }) {
+import { usuariosService } from "@/services/usuariosService.js";
+
+// ⭐ IMPORTAR CONTEXTO
+import { useUser } from "@/context/UserContext.jsx";
+import { useNavigate } from "react-router-dom";
+
+
+
+export default function Login() {
+  const navigate = useNavigate();
+  const { login } = useUser(); // <- esta es la función válida del contexto
+
   const [isRegisterMode, setIsRegisterMode] = useState(false);
 
   // LOGIN
@@ -31,10 +42,6 @@ export default function Login({ onLogin }) {
   const [regShowPassword, setRegShowPassword] = useState(false);
   const [regShowPassword2, setRegShowPassword2] = useState(false);
 
-  // 🔥 VARIABLE EN DURO PARA SIMULAR RESULTADO DEL REGISTRO
-  // true = éxito | false = error
-  const registroExitoso = true; // CAMBIAR A false PARA PROBAR EL OTRO CASO
-
   const togglePasswordVisibility = () => setShowPassword((v) => !v);
 
   const runValidation = (nextState) => {
@@ -43,13 +50,53 @@ export default function Login({ onLogin }) {
     return !hasErrors(nextErrors);
   };
 
-  const handleSubmit = (e) => {
+  // ============================================================
+  // ⭐ LOGIN REAL
+  // ============================================================
+    const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isRegisterMode) {
-      const isValid = runValidation({ username, password });
-      if (isValid) onLogin(username, password);
+    console.log("🟦 handleSubmit ejecutado");
+    console.log("usuario:", username, "pass:", password);
+
+    if (isRegisterMode) return;
+
+    const isValid = runValidation({ username, password });
+    console.log("validación:", isValid);
+    if (!isValid) return;
+
+    try {
+      console.log("🟩 Enviando request al backend...");
+      const data = await usuariosService.login({ username, password });
+      console.log("🟩 RESPUESTA DEL BACKEND:", data);
+
+      const usuarioNormalizado = {
+        id: data.id,
+        nombre: data.nombre,
+        apellido: data.apellido || "",
+        username: data.username,
+        rol: data.rol,
+      };
+
+      console.log("🟩 Guardando usuario:", usuarioNormalizado);
+
+      login(usuarioNormalizado);
+
+      console.log("🟩 Redirigiendo a /principal...");
+      navigate("/principal");
+    } catch (err) {
+      console.log("🟥 ERROR EN EL LOGIN:", err);
+
+      Swal.fire({
+        icon: "error",
+        title: "Error al iniciar sesión",
+        text: err?.response?.data?.message || "Usuario o contraseña incorrectos.",
+        confirmButtonColor: "#DE9205",
+        background: "#11103a",
+        color: "#E8EAED",
+      });
     }
   };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -62,7 +109,9 @@ export default function Login({ onLogin }) {
     });
   };
 
+  // ============================================================
   // VALIDACIONES REGISTRO
+  // ============================================================
   const regPasswordRules = {
     min: regPassword.length >= 8,
     mayus: /[A-Z]/.test(regPassword),
@@ -80,42 +129,51 @@ export default function Login({ onLogin }) {
     regPasswordValid &&
     regRepeatMatch;
 
-  // 🔥 FUNCIÓN PARA HACER REGISTRO
+  // ============================================================
+  // REGISTRO REAL
+  // ============================================================
   const handleRegister = async () => {
     if (!isRegisterFormValid) return;
 
-    if (registroExitoso) {
-      await Swal.fire({
+    try {
+      const res = await usuariosService.registrar({
+        nombre: regNombre,
+        apellido: regApellido,
+        password: regPassword,
+        confirmacion: regRepeatPassword,
+      });
+
+      Swal.fire({
         icon: "success",
         title: "Usuario registrado correctamente",
-        text: `${regNombre} ${regApellido} fue creado exitosamente.`,
+        text: res,
         confirmButtonColor: "#DE9205",
         background: "#11103a",
         color: "#E8EAED",
       });
 
-      // Después de cerrar el modal → vuelve al login
       setIsRegisterMode(false);
 
-      // Setea "Usuario" con nombre + apellido
-      setUsername(`${regNombre.trim()} ${regApellido.trim()}`);
+      const sugerido = res.replace("Tu usuario será: ", "");
+      setUsername(sugerido);
 
-      // Limpia datos del registro
       setRegNombre("");
       setRegApellido("");
       setRegPassword("");
       setRegRepeatPassword("");
-    } else {
-      await Swal.fire({
+    } catch (err) {
+      Swal.fire({
         icon: "error",
-        title: "Error al registrar el usuario",
-        text: "Ocurrió un error inesperado.",
+        title: "Error al registrar usuario",
+        text: err?.response?.data?.message || "Ocurrió un error inesperado.",
         confirmButtonColor: "#DE9205",
         background: "#11103a",
         color: "#E8EAED",
       });
     }
   };
+
+  const groupStyle = { marginBottom: "1rem" };
 
   return (
     <main className="login-container">
@@ -124,11 +182,10 @@ export default function Login({ onLogin }) {
         <MobileWavyClipPath />
 
         <Form onSubmit={handleSubmit} noValidate className="formulario-login">
-          {/* LOGIN */}
           {!isRegisterMode && (
             <>
               <h1 className="logo-text">
-                Iniciar sesión en su cuenta de <strong>CapuNotes </strong>
+                Iniciar sesión en su cuenta de <strong>CapuNotes</strong>{" "}
                 <img
                   src="/logo-coro-sin-fondo.png"
                   alt="Logo"
@@ -136,8 +193,7 @@ export default function Login({ onLogin }) {
                 />
               </h1>
 
-              {/* USUARIO */}
-              <Form.Group className="custom-input-group">
+              <Form.Group className="custom-input-group" style={groupStyle}>
                 <AccountUser className="account-icon" />
                 <Form.Control
                   type="text"
@@ -148,13 +204,11 @@ export default function Login({ onLogin }) {
                   value={username}
                   onChange={handleInputChange}
                   name="Usuario"
-                  required
                 />
               </Form.Group>
               <p className="menssaje-error-login">{errors.usuario}</p>
 
-              {/* CONTRASEÑA */}
-              <Form.Group className="custom-input-group">
+              <Form.Group className="custom-input-group" style={groupStyle}>
                 <PasswordToggleIcon
                   isVisible={showPassword}
                   onToggle={togglePasswordVisibility}
@@ -168,19 +222,17 @@ export default function Login({ onLogin }) {
                   value={password}
                   onChange={handleInputChange}
                   name="Contraseña"
-                  required
                 />
               </Form.Group>
               <p className="menssaje-error-login">{errors.contraseña}</p>
 
-              {/* BOTONES */}
-              <Form.Group className="custom-input-group">
+              <Form.Group className="custom-input-group" style={groupStyle}>
                 <Button type="submit" className="button-login">
                   Ingresar
                 </Button>
               </Form.Group>
 
-              <Form.Group className="custom-input-group">
+              <Form.Group className="custom-input-group" style={groupStyle}>
                 <Button
                   className="button-login"
                   onClick={() => setIsRegisterMode(true)}
@@ -191,15 +243,13 @@ export default function Login({ onLogin }) {
             </>
           )}
 
-          {/* REGISTRO */}
           {isRegisterMode && (
             <>
               <h1 className="logo-text">
                 Registrar su cuenta de <strong>CapuNotes</strong>
               </h1>
 
-              {/* NOMBRE */}
-              <Form.Group className="custom-input-group">
+              <Form.Group className="custom-input-group" style={groupStyle}>
                 <Form.Control
                   type="text"
                   className={`custom-input validate-input ${
@@ -211,8 +261,7 @@ export default function Login({ onLogin }) {
                 />
               </Form.Group>
 
-              {/* APELLIDO */}
-              <Form.Group className="custom-input-group">
+              <Form.Group className="custom-input-group" style={groupStyle}>
                 <Form.Control
                   type="text"
                   className={`custom-input validate-input ${
@@ -224,8 +273,7 @@ export default function Login({ onLogin }) {
                 />
               </Form.Group>
 
-              {/* CONTRASEÑA */}
-              <Form.Group className="custom-input-group">
+              <Form.Group className="custom-input-group" style={groupStyle}>
                 <PasswordToggleIcon
                   isVisible={regShowPassword}
                   onToggle={() => setRegShowPassword((v) => !v)}
@@ -241,8 +289,7 @@ export default function Login({ onLogin }) {
                 />
               </Form.Group>
 
-              {/* REGLAS */}
-              <ul style={{ fontSize: 12, marginTop: 5, marginBottom: -5 }}>
+              <ul style={{ fontSize: 12, marginTop: 5 }}>
                 <li style={{ color: regPasswordRules.min ? "green" : "gray" }}>
                   Mínimo 8 caracteres
                 </li>
@@ -263,8 +310,7 @@ export default function Login({ onLogin }) {
                 </li>
               </ul>
 
-              {/* REPETIR CONTRASEÑA */}
-              <Form.Group className="custom-input-group">
+              <Form.Group className="custom-input-group" style={groupStyle}>
                 <PasswordToggleIcon
                   isVisible={regShowPassword2}
                   onToggle={() => setRegShowPassword2((v) => !v)}
@@ -280,8 +326,7 @@ export default function Login({ onLogin }) {
                 />
               </Form.Group>
 
-              {/* BOTÓN REGISTRAR */}
-              <Form.Group className="custom-input-group">
+              <Form.Group className="custom-input-group" style={groupStyle}>
                 <Button
                   className="button-login"
                   disabled={!isRegisterFormValid}
@@ -291,8 +336,7 @@ export default function Login({ onLogin }) {
                 </Button>
               </Form.Group>
 
-              {/* VOLVER */}
-              <Form.Group className="custom-input-group">
+              <Form.Group className="custom-input-group" style={groupStyle}>
                 <Button
                   className="button-login"
                   onClick={() => {

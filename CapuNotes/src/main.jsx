@@ -10,8 +10,11 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 // Si ya creaste tokens/globals, activalos. Si no, dejá index.css como estaba.
 import '@/styles/globals.css'
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+import { UserProvider } from "@/context/UserContext.jsx";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <UserProvider>
     <App />
-  </React.StrictMode>,
-)
+  </UserProvider>
+);
+

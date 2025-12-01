@@ -42,14 +42,15 @@ import RepertorioFormPage from "@/components/pages/repertorios/RepertorioFormPag
 import RepertorioLecturaPage from "@/components/pages/repertorios/RepertorioLecturaPage.jsx";
 import FraternidadesPage from "@/components/pages/fraternidades/index.jsx";
 import FraternidadFormPage from "@/components/pages/fraternidades/FraternidadFormPage.jsx";
-
-// Estilos base (usar globals como fuente deFverdad)
 import "@/styles/globals.css";
 import LandingPage from "../components/pages/landing";
+import UsuariosRolesPage from "../components/pages/usuarios-roles/index.jsx";
+
+import { useUser } from "@/context/UserContext.jsx";
 
 function ProtectedRoute({ children }) {
-  const isAuth = localStorage.getItem("capunotes_auth") === "1";
-  return isAuth ? children : <Navigate to="/login" replace />;
+  const { usuario } = useUser();
+  return usuario ? children : <Navigate to="/login" replace />;
 }
 
 function AppRoutes() {
@@ -73,10 +74,8 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route
-        path="/login"
-        element={<Login onLogin={(u) => handleLogin(u)} />}
-      />
+      <Route path="/login" element={<Login />} />
+
 
       <Route
         path="/"
@@ -87,7 +86,7 @@ function AppRoutes() {
         }
       >
         <Route index element={<Navigate to="/landing" replace />} />
-        <Route path="principal" element={<Principal username={username} />} />
+        <Route path="principal" element={<Principal  />} />
         <Route path="miembros" element={<Miembros />} />
         <Route path="miembros/agregar" element={<MiembrosAgregar />} />
         <Route path="miembros/editar" element={<MiembrosEditar />} />
@@ -146,6 +145,7 @@ function AppRoutes() {
       <Route path="/formulario" element={<Formulario />} />
 
       <Route path="landing" element={<LandingPage />} />
+      <Route path="usuarios-roles" element={<UsuariosRolesPage />} />
     </Routes>
   );
 }
