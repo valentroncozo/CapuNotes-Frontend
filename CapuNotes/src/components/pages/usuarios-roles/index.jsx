@@ -9,7 +9,12 @@ import { usuariosService } from "@/services/usuariosService.js";
 
 import Swal from "sweetalert2";
 
+import { Badge } from "react-bootstrap";
+import { CheckCircle, XCircle } from "react-bootstrap-icons";
+import EditIcon from "@/assets/EditIcon";
+
 import "@/styles/abmc.css";
+import '@/styles/miembros.css';
 
 export default function UsuariosRolesPage() {
   const navigate = useNavigate();
@@ -124,56 +129,60 @@ export default function UsuariosRolesPage() {
   // =========================================================
   // EDITAR ROL
   // =========================================================
-  const handleEditarRol = async (usuario) => {
+ const handleEditarRol = async (usuario) => {
     const { value: nuevoRol } = await Swal.fire({
       title: `Editar rol de ${usuario.nombre}`,
       input: "select",
-      inputOptions: ROLES.reduce(
-        (acc, r) => ({ ...acc, [r]: r }),
-        {}
-      ),
+      inputOptions: {
+        SUPERADMIN: "SUPERADMIN",
+        ADMINISTRADOR: "ADMINISTRADOR",
+        COORDINADOR: "COORDINADOR",
+      },
       inputValue: usuario.rol,
-      confirmButtonColor: "#DE9205",
+
+      inputLabel: "Seleccione un rol",
+
       background: "#11103a",
       color: "#E8EAED",
+
       showCancelButton: true,
-      cancelButtonColor: "#6c757d",
-      inputLabel: "Seleccione un rol",
+
+      // 🔥 BOTONES POSICIONADOS CORRECTAMENTE
+      reverseButtons: false, // Cancelar izquierda, Aceptar derecha
+
+      cancelButtonText: "Cancelar",
+      confirmButtonText: "Aceptar",
+
+      // 🔥 COLORES
+      confirmButtonColor: "#DE9205", // naranja CapuNotes
+      cancelButtonColor: "#6c757d",  // gris
+
+      didOpen: () => {
+        const select = Swal.getPopup().querySelector("select");
+        if (select) {
+          select.style.backgroundColor = "#0f0e39";
+          select.style.color = "white";
+          select.style.padding = "10px";
+          select.style.borderRadius = "8px";
+        }
+      },
     });
 
     if (!nuevoRol) return;
 
-    try {
-      await usuariosService.actualizarRol(usuario.id, { rol: nuevoRol });
-      await load();
+    await usuariosService.actualizarRol(usuario.id, { rol: nuevoRol });
+    await load();
 
-      Swal.fire({
-        icon: "success",
-        title: "Rol actualizado",
-        timer: 1500,
-        showConfirmButton: false,
-        background: "#11103a",
-        color: "#E8EAED",
-      });
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Error", "No se pudo actualizar el rol.", "error");
-    }
+    Swal.fire({
+      icon: "success",
+      title: "Rol actualizado",
+      timer: 1500,
+      showConfirmButton: false,
+      background: "#11103a",
+      color: "#E8EAED",
+    });
   };
 
-  // =========================================================
-  // LOADER
-  // =========================================================
-  if (loading) {
-    return (
-      <main
-        className="abmc-page"
-        style={{ display: "flex", justifyContent: "center", height: "70vh" }}
-      >
-        <Loader />
-      </main>
-    );
-  }
 
   // =========================================================
   // UI
@@ -192,13 +201,13 @@ export default function UsuariosRolesPage() {
           <input
             type="text"
             className="abmc-input"
-            placeholder="Buscar por nombre o usuario..."
+            placeholder="Buscar por nombre o usuario"
             value={filtroTexto}
             onChange={(e) => setFiltroTexto(e.target.value)}
           />
 
           <select
-            className="abmc-select"
+            className="abmc-select abmc-select-roles"
             value={filtroEstado}
             onChange={(e) => setFiltroEstado(e.target.value)}
           >
@@ -211,9 +220,9 @@ export default function UsuariosRolesPage() {
 
         {/* TABLA */}
         <table className="abmc-table abmc-table-rect">
-          <thead>
+          <thead className="abmc-thead">
             <tr>
-              <th>Nombre completo</th>
+              <th>Nombre</th>
               <th>Usuario</th>
               <th>Rol</th>
               <th>Estado</th>
@@ -225,43 +234,52 @@ export default function UsuariosRolesPage() {
             {usuariosFiltrados.length > 0 ? (
               usuariosFiltrados.map((u) => (
                 <tr key={u.id}>
-                  <td>{`${u.apellido}, ${u.nombre}`}</td>
+                  <td>{`${u.nombre} ${u.apellido} `}</td>
                   <td>{u.username}</td>
                   <td>{u.rol}</td>
+
+                  {/* Estado: ahora con Badge */}
                   <td>
-                    <span
+                    <Badge
+                      bg={
+                        u.estado === "ACTIVO"
+                          ? "success"
+                          : u.estado === "PENDIENTE"
+                          ? "warning"
+                          : "secondary"
+                      }
                       style={{
+                        fontSize: "1rem",
                         padding: "6px 14px",
                         borderRadius: "10px",
-                        background:
-                          u.estado === "ACTIVO"
-                            ? "green"
-                            : u.estado === "PENDIENTE"
-                            ? "orange"
-                            : "gray",
+                        color: u.estado === "PENDIENTE" ? "#000" : undefined, // warning default texto oscuro
                       }}
                     >
                       {u.estado}
-                    </span>
+                    </Badge>
                   </td>
 
                   <td className="abmc-actions">
-                    {/* EDITAR ROL */}
+                    {/* Editar rol: usar el mismo icono de lápiz */}
                     <button
                       className="abmc-btn abmc-btn-icon"
                       title="Editar rol"
                       onClick={() => handleEditarRol(u)}
                     >
-                      ✏
+                      <EditIcon width={18} height={18} />
                     </button>
 
-                    {/* ACTIVAR / RECHAZAR */}
+                    {/* Activar / Rechazar: usar iconos en lugar de emojis */}
                     <button
                       className="abmc-btn abmc-btn-icon"
                       title={u.estado === "ACTIVO" ? "Rechazar" : "Activar"}
                       onClick={() => handleCambiarEstado(u)}
                     >
-                      {u.estado === "ACTIVO" ? "❌" : "✔"}
+                      {u.estado === "ACTIVO" ? (
+                        <XCircle size={18} />
+                      ) : (
+                        <CheckCircle size={18} />
+                      )}
                     </button>
                   </td>
                 </tr>

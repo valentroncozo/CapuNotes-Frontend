@@ -178,13 +178,43 @@ input[type="password"]::-webkit-password-toggle-button { display: none !importan
   transition: border-color 0.2s ease;
 }
 
-/* Validez OK → Verde */
-.validate-input.valid {
-  border-color: #28a745 !important;
-}
-
 /* Incorrecto → Rojo */
 .validate-input.invalid {
-  border-color: #dc3545 !important;
+  border-color: #DE9205 !important;
+}
+
+/* Botón volver*/
+.custom-input-group .button-return {
+  width: 30%;
+  padding: clamp(0px, .5rem, .5rem);
+  margin: 0; min-width: 120px;
+  border-radius: var(--radius);
+  background: #9e9e9e !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+.custom-input-group .button-return:focus,
+.custom-input-group .button-return:focus-visible,
+.custom-input-group .button-return:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: var(--shadow); border: 1px solid var(--text-light);
+  color: #fff !important;
+}
+
+.modal-ok-btn {
+  background-color: var(--accent) !important;
+  color: var(--text-dark) !important;
+  border: none !important;
+  font-weight: 600;
+  padding: 0.5rem 1.2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.modal-ok-btn:hover,
+.modal-ok-btn:focus {
+  background-color: var(--accent) !important;
+  color: var(--text-dark) !important;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--text-light) !important;
 }
 

@@ -338,7 +338,7 @@ export default function Login() {
 
               <Form.Group className="custom-input-group" style={groupStyle}>
                 <Button
-                  className="button-login"
+                  className="button-return"
                   onClick={() => {
                     setIsRegisterMode(false);
                     setRegNombre("");
