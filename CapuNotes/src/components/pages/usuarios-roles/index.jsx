@@ -129,7 +129,7 @@ export default function UsuariosRolesPage() {
   // =========================================================
   // EDITAR ROL
   // =========================================================
- const handleEditarRol = async (usuario) => {
+  const handleEditarRol = async (usuario) => {
     const { value: nuevoRol } = await Swal.fire({
       title: `Editar Rol`,
       html: `<div class="thead-modal-userrol" ></div>`,
@@ -150,7 +150,7 @@ export default function UsuariosRolesPage() {
 
       // 🔥 BOTONES POSICIONADOS CORRECTAMENTE
       reverseButtons: true, // Cancelar izquierda, Aceptar derecha
-      
+
       confirmButtonText: "Aceptar",
       cancelButtonText: "Cancelar",
 
@@ -197,112 +197,118 @@ export default function UsuariosRolesPage() {
   // UI
   // =========================================================
   return (
-  <>
-    <main className="abmc-page">
-      <div className="abmc-card">
+    <>
+      <main className="abmc-page">
+        <div className="abmc-card">
 
-        {/* HEADER */}
-        <div className="abmc-header">
-          <BackButton />
-          <h1 className="abmc-title">Usuarios y Roles</h1>
-        </div>
+          {/* HEADER */}
+          <div className="abmc-header">
+            <BackButton />
+            <h1 className="abmc-title">Usuarios y Roles</h1>
+          </div>
 
-        {/* FILTROS */}
-        <div className="abmc-topbar">
-          <input
-            type="text"
-            className="abmc-input"
-            placeholder="Buscar por nombre o usuario"
-            value={filtroTexto}
-            onChange={(e) => setFiltroTexto(e.target.value)}
-          />
+          {/* FILTROS */}
+          <div className="abmc-topbar">
+            <input
+              type="text"
+              className="abmc-input"
+              placeholder="Buscar por nombre o usuario"
+              value={filtroTexto}
+              onChange={(e) => setFiltroTexto(e.target.value)}
+            />
 
-          <select
-            className="abmc-select abmc-select-roles"
-            value={filtroEstado}
-            onChange={(e) => setFiltroEstado(e.target.value)}
-          >
-            <option value="">Todos los estados</option>
-            <option value="ACTIVO">Activo</option>
-            <option value="PENDIENTE">Pendiente</option>
-            <option value="RECHAZADO">Inactivo</option>
-          </select>
-        </div>
+            <select
+              className="abmc-select abmc-select-roles"
+              value={filtroEstado}
+              onChange={(e) => setFiltroEstado(e.target.value)}
+            >
+              <option value="">Todos los estados</option>
+              <option value="ACTIVO">Activo</option>
+              <option value="PENDIENTE">Pendiente</option>
+              <option value="RECHAZADO">Inactivo</option>
+            </select>
+          </div>
 
-        {/* TABLA */}
-        <table className="abmc-table abmc-table-rect">
-          <thead className="abmc-thead">
-            <tr>
-              <th>Nombre</th>
-              <th>Usuario</th>
-              <th>Rol</th>
-              <th>Estado</th>
-              <th style={{ textAlign: "center" }}>Acciones</th>
-            </tr>
-          </thead>
+          {/* TABLA */}
+          <table className="abmc-table abmc-table-rect">
+            <thead className="abmc-thead">
+              <tr>
+                <th>Nombre</th>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th style={{ textAlign: "center" }}>Acciones</th>
+              </tr>
+            </thead>
 
-          <tbody>
-            {usuariosFiltrados.length > 0 ? (
-              usuariosFiltrados.map((u) => (
-                <tr key={u.id}>
-                  <td>{`${u.nombre} ${u.apellido}`}</td>
-                  <td>{u.username}</td>
-                  <td>{u.rol}</td>
+            <tbody>
+              {usuariosFiltrados.length > 0 ? (
+                usuariosFiltrados.map((u) => (
+                  <tr key={u.id}>
+                    <td>{`${u.nombre} ${u.apellido}`}</td>
+                    <td>{u.username}</td>
+                    <td>{u.rol}</td>
 
-                  <td>
-                    <Badge
-                      bg={
-                        u.estado === "ACTIVO"
-                          ? "success"
-                          : u.estado === "PENDIENTE"
-                          ? "warning"
-                          : "secondary"
-                      }
-                      style={{
-                        fontSize: "1rem",
-                        padding: "6px 14px",
-                        borderRadius: "10px",
-                        color: u.estado === "PENDIENTE" ? "#000" : undefined,
-                      }}
-                    >
-                      {u.estado === "RECHAZADO" ? "INACTIVO" : u.estado}
-                    </Badge>
-                  </td>
+                    <td>
+                      <Badge
+                        bg={
+                          u.estado === "ACTIVO"
+                            ? "success"
+                            : u.estado === "PENDIENTE"
+                              ? "warning"
+                              : "secondary"
+                        }
+                        style={{
+                          fontSize: "1rem",
+                          padding: "6px 14px",
+                          borderRadius: "10px",
+                          color: u.estado === "PENDIENTE" ? "#000" : undefined,
+                        }}
+                      >
+                        {(() => {
+                          const texto =
+                            u.estado === "RECHAZADO" ? "INACTIVO" : u.estado;
 
-                  <td className="abmc-actions">
-                    <button
-                      className="abmc-btn abmc-btn-icon"
-                      title="Editar rol"
-                      onClick={() => handleEditarRol(u)}
-                    >
-                      <EditIcon width={18} height={18} />
-                    </button>
+                          return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+                        })()}
+                      </Badge>
+                    </td>
 
-                    <button
-                      className="abmc-btn abmc-btn-icon"
-                      title={u.estado === "ACTIVO" ? "Rechazar" : "Activar"}
-                      onClick={() => handleCambiarEstado(u)}
-                    >
-                      {u.estado === "ACTIVO" ? (
-                        <XCircle size={18} />
-                      ) : (
-                        <CheckCircle size={18} />
-                      )}
-                    </button>
+
+                    <td className="abmc-actions">
+                      <button
+                        className="abmc-btn abmc-btn-icon"
+                        title="Editar rol"
+                        onClick={() => handleEditarRol(u)}
+                      >
+                        <EditIcon width={18} height={18} />
+                      </button>
+
+                      <button
+                        className="abmc-btn abmc-btn-icon"
+                        title={u.estado === "ACTIVO" ? "Rechazar" : "Activar"}
+                        onClick={() => handleCambiarEstado(u)}
+                      >
+                        {u.estado === "ACTIVO" ? (
+                          <XCircle size={18} />
+                        ) : (
+                          <CheckCircle size={18} />
+                        )}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="text-center">
+                    No hay usuarios registrados.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="5" className="text-center">
-                  No hay usuarios registrados.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </main>
-  </>
-);
+              )}
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </>
+  );
 }
