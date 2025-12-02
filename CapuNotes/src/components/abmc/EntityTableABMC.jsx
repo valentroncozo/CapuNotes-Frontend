@@ -37,6 +37,10 @@ export default function EntityTableABMC({
   const [editOpen, setEditOpen] = useState(false);
   const [selected, setSelected] = useState(null);
 
+  // Límite de descripción: usar la cadena proporcionada por el usuario como tope
+  // Límite de descripción en caracteres (establecido a 225 según indicación)
+  const MAX_DESCRIPTION_LENGTH = 225;
+
   /* -----------------------------------------
      AUTOPEN
   ------------------------------------------*/
@@ -134,6 +138,16 @@ export default function EntityTableABMC({
 
     if (isDuplicate(nuevo)) return showDuplicateAlert(uniqueBy);
 
+    // Validación de longitud para el campo principal (uniqueBy)
+    const MAX_TITLE_LENGTH = 30;
+    const nuevoValor = String(nuevo[uniqueBy] ?? "").trim();
+    if (nuevoValor.length > MAX_TITLE_LENGTH) {
+      setNuevoError(
+        `El ${schema.find((f) => f.key === uniqueBy)?.label || uniqueBy} no puede superar ${MAX_TITLE_LENGTH} caracteres.`
+      );
+      return;
+    }
+
     if (entityName.toLowerCase() === "área" && !nuevo.descripcion?.trim()) {
       Swal.fire({
         icon: "warning",
@@ -142,6 +156,15 @@ export default function EntityTableABMC({
         background: "#11103a",
         color: "#E8EAED",
       });
+      return;
+    }
+
+    // Validación de longitud para la descripción (si está presente)
+    const descripcionNuevo = String(nuevo.descripcion ?? "").trim();
+    if (descripcionNuevo && descripcionNuevo.length > MAX_DESCRIPTION_LENGTH) {
+      setNuevoError(
+        `La descripción no puede superar ${MAX_DESCRIPTION_LENGTH} caracteres.`
+      );
       return;
     }
 
@@ -235,6 +258,19 @@ export default function EntityTableABMC({
         showDuplicateAlert(uniqueBy);
         return false;
       }
+    }
+
+    // Validación de longitud para edición/creación desde el popup
+    const MAX_TITLE_LENGTH = 30;
+    const updatedValor = String(updated?.[uniqueBy] ?? "").trim();
+    if (updatedValor.length > MAX_TITLE_LENGTH) {
+      return { errorMessage: `El ${schema.find((f) => f.key === uniqueBy)?.label || uniqueBy} no puede superar ${MAX_TITLE_LENGTH} caracteres.` };
+    }
+
+    // Validación de longitud para la descripción en edición/creación desde popup
+    const descripcionUpdated = String(updated?.descripcion ?? "").trim();
+    if (descripcionUpdated && descripcionUpdated.length > MAX_DESCRIPTION_LENGTH) {
+      return { errorMessage: `La descripción no puede superar ${MAX_DESCRIPTION_LENGTH} caracteres.` };
     }
 
     if (!updated.descripcion && entityName.toLowerCase() === "área") {

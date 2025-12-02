@@ -38,7 +38,10 @@ const PopUpEventos = ({
   );
 
   const [errorMsg, setErrorMsg] = useState('');
+  const [errores, setErrores] = useState({});
   const formId = 'evento-modal-form';
+  const MAX_NAME_LENGTH = 25; // Límite de caracteres para el título (nombre) del evento
+  const MAX_PLACE_LENGTH = 40; // Límite de caracteres para el lugar del evento
 
   // =============================
   //   Sincronizar con edición
@@ -77,6 +80,25 @@ const PopUpEventos = ({
       return;
     }
 
+    // Validación de longitud del título
+    if (nombre.length > MAX_NAME_LENGTH) {
+      setErrores({ ...errores, nombre: `El nombre no puede superar ${MAX_NAME_LENGTH} caracteres.` });
+      setErrorMsg('');
+      return;
+    } else {
+      // limpiar error de campo si existía
+      if (errores.nombre) setErrores((prev) => ({ ...prev, nombre: '' }));
+    }
+
+    // Validación de longitud del lugar
+    if (lugar.length > MAX_PLACE_LENGTH) {
+      setErrores((prev) => ({ ...prev, lugar: `El lugar no puede superar ${MAX_PLACE_LENGTH} caracteres.` }));
+      setErrorMsg('');
+      return;
+    } else {
+      if (errores.lugar) setErrores((prev) => ({ ...prev, lugar: '' }));
+    }
+
     if (Number.isNaN(selectedDate.getTime())) {
       setErrorMsg('Seleccioná una fecha válida.');
       return;
@@ -97,6 +119,7 @@ const PopUpEventos = ({
     };
 
     setErrorMsg('');
+    setErrores({});
     try {
       const res = await onSave?.(nuevoEvento);
       if (res && res.errorMessage) {
@@ -162,8 +185,13 @@ const PopUpEventos = ({
               type="text"
               name="nombre"
               defaultValue={eventoSeleccionado?.nombre || ''}
+              maxLength={MAX_NAME_LENGTH}
               disabled={isViewMode}
+              className={`abmc-input ${errores.nombre ? 'error' : ''}`}
             />
+            {errores.nombre && (
+              <p className="input-hint">{errores.nombre}</p>
+            )}
           </div>
 
           <div className="field">
@@ -209,8 +237,13 @@ const PopUpEventos = ({
               type="text"
               name="lugar"
               defaultValue={eventoSeleccionado?.lugar || ''}
+              maxLength={MAX_PLACE_LENGTH}
               disabled={isViewMode}
+              className={`abmc-input ${errores.lugar ? 'error' : ''}`}
             />
+            {errores.lugar && (
+              <p className="input-hint">{errores.lugar}</p>
+            )}
           </div>
 
         </div>
