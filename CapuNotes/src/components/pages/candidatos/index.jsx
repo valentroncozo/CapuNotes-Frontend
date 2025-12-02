@@ -8,7 +8,7 @@ import ResultadosModal from '../audicion/resultados.jsx';
 import candidatosService from '@/services/candidatosService.js';
 import { InfoCircle as InfoIcon } from 'react-bootstrap-icons';
 
-export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Coordinador)' }) {
+export default function CandidatosCoordinadoresPage({ title = 'Cronograma de candidatos' }) {
 
   const [dias, setDias] = useState([]); // [{ value, label }]
   const [diaSel, setDiaSel] = useState('-');

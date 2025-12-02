@@ -21,6 +21,10 @@
 	width: 160px;
 }
 
+.abmc-select-roles{
+	width: 250px !important;;
+}
+
 /* En pantallas pequeñas reducimos el select para mantener responsividad */
 @media (max-width: 480px) {
 	.abmc-page .abmc-topbar .abmc-select {

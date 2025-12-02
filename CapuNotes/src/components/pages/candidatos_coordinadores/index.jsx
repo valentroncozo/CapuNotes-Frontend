@@ -16,7 +16,7 @@ import { isoToDdMmYyyy } from '@/components/common/datetime.js';
 
 
 
-export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Administrador)' }) {
+export default function CandidatosCoordinadoresPage({ title = 'Cronograma de turnos' }) {
 
   const [dias, setDias] = useState([]); // [{ value, label }]
   const [diaSel, setDiaSel] = useState('-');

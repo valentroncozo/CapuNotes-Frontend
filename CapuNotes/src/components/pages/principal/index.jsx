@@ -16,6 +16,8 @@ import PdfBoxIcon from "@/assets/PdfBoxIcon";
 import Modal from "@/components/common/Modal";
 import Swal from "sweetalert2";
 import Loader from "@/components/common/Loader.jsx";
+import { useUser } from "@/context/UserContext";
+  
 
 
 const formatFechaDDMMYYYY = (isoDate) => {
@@ -48,7 +50,7 @@ const parseEventDate = (evento) => {
   return dt;
 };
 
-export default function Principal({ username }) {
+export default function Principal() {
   const navigate = useNavigate();
   // Corrige la fecha para que NO reste un día
   const parseLocalDate = (isoDate) => {
@@ -68,6 +70,8 @@ export default function Principal({ username }) {
   const [eventos, setEventos] = useState([]);
   const [loadingEventos, setLoadingEventos] = useState(true);
   const [qrOpen, setQrOpen] = useState(false);
+
+  const { usuario } = useUser();
 
   useEffect(() => {
     let mounted = true;
@@ -182,7 +186,7 @@ export default function Principal({ username }) {
     <div className="principal-container">
 
       <div className="abmc-card">
-        <WelcomeCard title={`Bienvenido, ${username}!`} />
+        <WelcomeCard title={`¡Bienvenido, ${usuario?.nombre}!`} />
         <hr className="divisor-amarillo" />
 
         {/* Próximos eventos */}
