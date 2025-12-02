@@ -284,7 +284,7 @@ const Eventos = () => {
 
                   <div className="evento-actions">
                     <button
-                      className="evento-btn editar redondeado"
+                      className="evento-btn editar redondeado "
                       onClick={() => handleOpenPopup('editar', evento)}
                     >
                       <svg
@@ -314,7 +314,7 @@ const Eventos = () => {
                       </svg>
                     </button>
                     <button
-                      className="evento-btn eliminar redondeado"
+                      className="evento-btn eliminar redondeado "
                       onClick={() => {
                         setSelectedEvento(evento);
                         setShowDeletePopup(true);

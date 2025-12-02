@@ -565,3 +565,9 @@
   color: #fff;
   border-radius: 50px;
 }
+
+.evento-btn:hover {
+  transform: translateY(-2px);
+  filter: none;
+  opacity: 1;
+}
