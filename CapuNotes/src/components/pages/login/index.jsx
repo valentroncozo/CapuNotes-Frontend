@@ -245,7 +245,7 @@ export default function Login() {
 
           {isRegisterMode && (
             <>
-              <h1 className="logo-text">
+              <h1 className="logo-text margin-bottom-title">
                 Registrar su cuenta de <strong>CapuNotes</strong>
               </h1>
 

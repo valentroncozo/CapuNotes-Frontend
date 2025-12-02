@@ -114,7 +114,7 @@ export default function UsuariosRolesPage() {
       Swal.fire({
         icon: "success",
         title: "Estado actualizado",
-        text: `El usuario ahora está ${accion === "rechazar" ? "RECHAZADO" : "ACTIVO"}.`,
+        text: `El usuario ahora está ${accion === "rechazar" ? "INACTIVO" : "ACTIVO"}.`,
         timer: 1500,
         showConfirmButton: false,
         background: "#11103a",
@@ -131,7 +131,8 @@ export default function UsuariosRolesPage() {
   // =========================================================
  const handleEditarRol = async (usuario) => {
     const { value: nuevoRol } = await Swal.fire({
-      title: `Editar rol de ${usuario.nombre}`,
+      title: `Editar Rol`,
+      html: `<div class="thead-modal-userrol" ></div>`,
       input: "select",
       inputOptions: {
         SUPERADMIN: "SUPERADMIN",
@@ -148,10 +149,10 @@ export default function UsuariosRolesPage() {
       showCancelButton: true,
 
       // 🔥 BOTONES POSICIONADOS CORRECTAMENTE
-      reverseButtons: false, // Cancelar izquierda, Aceptar derecha
-
-      cancelButtonText: "Cancelar",
+      reverseButtons: true, // Cancelar izquierda, Aceptar derecha
+      
       confirmButtonText: "Aceptar",
+      cancelButtonText: "Cancelar",
 
       // 🔥 COLORES
       confirmButtonColor: "#DE9205", // naranja CapuNotes
@@ -164,6 +165,14 @@ export default function UsuariosRolesPage() {
           select.style.color = "white";
           select.style.padding = "10px";
           select.style.borderRadius = "8px";
+        }
+        const title = Swal.getPopup().querySelector(".swal2-title");
+        if (title) {
+          title.classList.add("titulo-modal-userrol");
+        }
+        const label = Swal.getPopup().querySelector(".swal2-input-label");
+        if (label) {
+          label.classList.add("label-modal-userrol");
         }
       },
     });
@@ -214,7 +223,7 @@ export default function UsuariosRolesPage() {
             <option value="">Todos los estados</option>
             <option value="ACTIVO">Activo</option>
             <option value="PENDIENTE">Pendiente</option>
-            <option value="RECHAZADO">Rechazado</option>
+            <option value="RECHAZADO">Inactivo</option>
           </select>
         </div>
 
@@ -252,11 +261,12 @@ export default function UsuariosRolesPage() {
                         fontSize: "1rem",
                         padding: "6px 14px",
                         borderRadius: "10px",
-                        color: u.estado === "PENDIENTE" ? "#000" : undefined, // warning default texto oscuro
+                        color: u.estado === "PENDIENTE" ? "#000" : undefined,
                       }}
                     >
-                      {u.estado}
+                      {u.estado === "RECHAZADO" ? "INACTIVO" : u.estado}
                     </Badge>
+
                   </td>
 
                   <td className="abmc-actions">
