@@ -203,167 +203,82 @@ export default function RepertorioEditor({
       <DragDropContext onDragEnd={handleDragEnd}>
         <section className="repertorio-editor">
           <div className="repertorio-dual-container">
-          <section className="canciones-panel">
-            <div className="repertorio-panel-header">
-              <h4 className="repertorio-form-title">Canciones disponibles</h4>
-              <div className="search-row search-row-full">
-                <input
-                  type="text"
-                  placeholder="Buscar por título"
-                  value={filters.texto}
-                  onChange={(e) =>
-                    setFilters((prev) => ({ ...prev, texto: e.target.value }))
-                  }
-                  className="abmc-input repertorio-search-input"
-                />
-              </div>
-              <div className="repertorio-filters-row">
-                <select
-                  className="abmc-select repertorio-filter-select"
-                  value={filters.categoria}
-                  onChange={(e) =>
-                    setFilters((prev) => ({ ...prev, categoria: e.target.value }))
-                  }
-                >
-                  <option value="">Todas las categorías</option>
-                  {categorias.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.nombre}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  className="abmc-select repertorio-filter-select"
-                  value={filters.tiempo}
-                  onChange={(e) =>
-                    setFilters((prev) => ({ ...prev, tiempo: e.target.value }))
-                  }
-                >
-                  <option value="">Todos los tiempos</option>
-                  {tiempos.map((tiempo) => (
-                    <option key={tiempo.id} value={tiempo.id}>
-                      {tiempo.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="available-grid repertorio-header grid">
-              <span>Título</span>
-              <span className="actions-label">Acciones</span>
-            </div>
-            <div className="panel-scroll">
-              <Droppable droppableId={DROPPABLE_AVAILABLE}>
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className="available-list"
+            <section className="canciones-panel">
+              <div className="repertorio-panel-header">
+                <h4 className="repertorio-form-title">Canciones disponibles</h4>
+                <div className="search-row search-row-full">
+                  <input
+                    type="text"
+                    placeholder="Buscar por título"
+                    value={filters.texto}
+                    onChange={(e) =>
+                      setFilters((prev) => ({ ...prev, texto: e.target.value }))
+                    }
+                    className="abmc-input repertorio-search-input"
+                  />
+                </div>
+                <div className="repertorio-filters-row">
+                  <select
+                    className="abmc-select repertorio-filter-select"
+                    value={filters.categoria}
+                    onChange={(e) =>
+                      setFilters((prev) => ({ ...prev, categoria: e.target.value }))
+                    }
                   >
-                    <p className="repertorio-subtitle">{availableLabel}</p>
-                    {filteredAvailable.length ? (
-                      filteredAvailable.map((song, index) => (
-                        <Draggable
-                          key={`available-${song.id}`}
-                          draggableId={`available-${song.id}`}
-                          index={index}
-                        >
-                          {(dragProvided, snapshot) => (
-                            <div
-                              ref={dragProvided.innerRef}
-                              {...dragProvided.draggableProps}
-                              {...dragProvided.dragHandleProps}
-                              className={`available-row available-grid ${
-                                snapshot.isDragging ? "dragging" : ""
-                              }`}
-                            >
-                              <span>{song.titulo}</span>
-                              <div style={{ display: "flex", gap: "0.25rem" }}>
-                                <button
-                                  type="button"
-                                  className="abmc-btn abmc-btn-primary"
-                                  onClick={() => handleAddSong(song)}
-                                >
-                                  <PlusCircle size={16} />
-                                </button>
-                                <button
-                                  type="button"
-                                  className="abmc-btn abmc-btn-secondary"
-                                  onClick={() => setDetalleCancion(song)}
-                                >
-                                  <Eye size={16} />
-                                </button>
-                              </div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))
-                    ) : (
-                      <div className="list-empty">Sin canciones para mostrar.</div>
-                    )}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </div>
-          </section>
-
-          <section className="repertorio-panel">
-            <div className="repertorio-panel-header">
-              <h4 className="repertorio-form-title">Repertorio seleccionado</h4>
-              <button
-                type="button"
-                className="abmc-btn abmc-btn-secondary"
-                onClick={() => setSelectedSongs([])}
-              >
-                Quitar todas
-              </button>
-            </div>
-            <div className="repertorio-form-row">
-              <label className="repertorio-form-title">Nombre del repertorio</label>
-              <input
-                className="abmc-input"
-                placeholder="Nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-              />
-            </div>
-
-            <div className="repertorio-header grid">
-              <span className="order">Ord.</span>
-              <span>Título</span>
-              <span className="actions-label">Acciones</span>
-            </div>
-
-            <div className="panel-scroll">
-              <Droppable droppableId={DROPPABLE_SELECTED}>
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className="repertorio-list"
+                    <option value="">Todas las categorías</option>
+                    {categorias.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.nombre}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    className="abmc-select repertorio-filter-select"
+                    value={filters.tiempo}
+                    onChange={(e) =>
+                      setFilters((prev) => ({ ...prev, tiempo: e.target.value }))
+                    }
                   >
-                    {selectedSongs.length ? (
-                      selectedSongs.map((song, index) => {
-                        const draggableKey = `sel-${song.id}`;
-                        return (
+                    <option value="">Todos los tiempos</option>
+                    {tiempos.map((tiempo) => (
+                      <option key={tiempo.id} value={tiempo.id}>
+                        {tiempo.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="available-grid repertorio-header grid">
+                <span>Título</span>
+                <span className="actions-label">Acciones</span>
+              </div>
+              <div className="panel-scroll">
+                <Droppable droppableId={DROPPABLE_AVAILABLE}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className="available-list"
+                    >
+                      <p className="repertorio-subtitle">{availableLabel}</p>
+                      {filteredAvailable.length ? (
+                        filteredAvailable.map((song, index) => (
                           <Draggable
-                            key={draggableKey}
-                            draggableId={draggableKey}
+                            key={`available-${song.id}`}
+                            draggableId={`available-${song.id}`}
                             index={index}
                           >
-                            {(draggableProvided, snapshot) => (
+                            {(dragProvided, snapshot) => (
                               <div
-                                ref={draggableProvided.innerRef}
-                                {...draggableProvided.draggableProps}
-                                {...draggableProvided.dragHandleProps}
-                                className={`draggable-item ${
-                                  snapshot.isDragging ? "dragging" : ""
-                                }`}
+                                ref={dragProvided.innerRef}
+                                {...dragProvided.draggableProps}
+                                {...dragProvided.dragHandleProps}
+                                className={`available-row available-grid ${snapshot.isDragging ? "dragging" : ""
+                                  }`}
                               >
-                                <span className="order">{index + 1}</span>
                                 <span>{song.titulo}</span>
                                 <div style={{ display: "flex", gap: "0.25rem" }}>
+                                  
                                   <button
                                     type="button"
                                     className="abmc-btn abmc-btn-secondary"
@@ -371,49 +286,144 @@ export default function RepertorioEditor({
                                   >
                                     <Eye size={16} />
                                   </button>
+
                                   <button
                                     type="button"
-                                    className="abmc-btn abmc-btn-secondary"
-                                    onClick={() => handleRemoveSong(song.id)}
+                                    className="abmc-btn abmc-btn-primary"
+                                    onClick={() => handleAddSong(song)}
                                   >
-                                    <Trash size={16} />
+                                    <PlusCircle size={16} />
                                   </button>
                                 </div>
                               </div>
                             )}
                           </Draggable>
-                        );
-                      })
-                    ) : (
-                      <div className="repertorio-empty">
-                        No agregaste canciones al repertorio aún.
-                      </div>
-                    )}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </div>
-          </section>
-        </div>
-        <div className="repertorio-footer">
-          <button
-            type="button"
-            className="abmc-btn abmc-btn-secondary"
-            onClick={onCancel}
-          >
-            Cancelar
-          </button>
-          <button
-            type="button"
-            className="abmc-btn abmc-btn-primary"
-            onClick={handleSave}
-            disabled={isSubmitting}
-          >
-            {mode === "create" ? "Agregar repertorio" : "Guardar cambios"}
-          </button>
-        </div>
-      </section>
+                        ))
+                      ) : (
+                        <div className="list-empty">Sin canciones para mostrar.</div>
+                      )}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </div>
+            </section>
+
+            <section className="repertorio-panel">
+              <div className="repertorio-panel-header">
+                <h4 className="repertorio-form-title">Repertorio</h4>
+
+                <div className="repertorio-form-row">
+                  <label className="repertorio-form-title">Nombre del repertorio</label>
+                  <input
+                    className="abmc-input"
+                    placeholder="Nombre"
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                  />
+                </div>
+
+                <div className="repertorio-buttons-row">
+                  <button
+                    type="button"
+                    className="abmc-btn abmc-btn-secondary"
+                    onClick={() => setSelectedSongs([])}
+                    disabled={selectedSongs.length === 0} 
+                  >
+                    Quitar todas
+                  </button>
+                </div>
+
+                
+              </div>
+
+              
+
+
+              <div className="repertorio-header grid">
+                <span className="order">Ord.</span>
+                <span>Título</span>
+                <span className="actions-label">Acciones</span>
+              </div>
+
+              <div className="panel-scroll">
+                <Droppable droppableId={DROPPABLE_SELECTED}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      className="repertorio-list"
+                    >
+                      {selectedSongs.length ? (
+                        selectedSongs.map((song, index) => {
+                          const draggableKey = `sel-${song.id}`;
+                          return (
+                            <Draggable
+                              key={draggableKey}
+                              draggableId={draggableKey}
+                              index={index}
+                            >
+                              {(draggableProvided, snapshot) => (
+                                <div
+                                  ref={draggableProvided.innerRef}
+                                  {...draggableProvided.draggableProps}
+                                  {...draggableProvided.dragHandleProps}
+                                  className={`draggable-item ${snapshot.isDragging ? "dragging" : ""
+                                    }`}
+                                >
+                                  <span className="order">{index + 1}</span>
+                                  <span>{song.titulo}</span>
+                                  <div style={{ display: "flex", gap: "0.25rem" }}>
+                                    <button
+                                      type="button"
+                                      className="abmc-btn abmc-btn-secondary"
+                                      onClick={() => setDetalleCancion(song)}
+                                    >
+                                      <Eye size={16} />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="abmc-btn abmc-btn-secondary"
+                                      onClick={() => handleRemoveSong(song.id)}
+                                    >
+                                      <Trash size={16} />
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </Draggable>
+                          );
+                        })
+                      ) : (
+                        <div className="repertorio-empty">
+                          No agregaste canciones al repertorio aún.
+                        </div>
+                      )}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </div>
+            </section>
+          </div>
+          <div className="repertorio-footer">
+            <button
+              type="button"
+              className="abmc-btn abmc-btn-secondary"
+              onClick={onCancel}
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              className="abmc-btn abmc-btn-primary"
+              onClick={handleSave}
+              disabled={isSubmitting}
+            >
+              {mode === "create" ? "Agregar repertorio" : "Guardar cambios"}
+            </button>
+          </div>
+        </section>
       </DragDropContext>
 
       <CancionModal

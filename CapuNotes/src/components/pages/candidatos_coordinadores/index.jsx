@@ -13,6 +13,7 @@ import { XCircleFill } from "react-bootstrap-icons";
 import EyeOnIcon from '@/assets/VisibilityOnIcon';
 import { formatDate } from '@/components/common/datetime.js';
 import { isoToDdMmYyyy } from '@/components/common/datetime.js';
+import Loader from '@/components/common/Loader.jsx';
 
 
 
@@ -24,6 +25,8 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de tur
   const [rows, setRows] = useState([]);
   const [q, setQ] = useState('');
   const [viewRow, setViewRow] = useState(null);
+  const [loading, setLoading] = useState(true);
+
 
   const [sp, setSearchParams] = useSearchParams();
 
@@ -68,11 +71,14 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de tur
   useEffect(() => {
     (async () => {
       try {
+        setLoading(true); // 👈 INICIO
+
         const a = await AudicionService.getActual();
         if (!a?.id) {
           setDias([]);
           setCronograma([]);
           setDiaSel('-');
+          setLoading(false); // 👈 FIN
           return;
         }
 
@@ -84,7 +90,6 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de tur
           const f = item?.turno?.fecha;
           if (!f) return;
           const label = item?.turno?.diaString ? `${item.turno.diaString} — ${isoToDdMmYyyy(f)}` : isoToDdMmYyyy(f);
-          //const label = item?.turno?.diaString ? formatDate(`${item.turno.diaString} — ${f}`) : formatDate(f);
           if (!mapa.has(f)) mapa.set(f, { value: f, label });
         });
 
@@ -98,9 +103,12 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de tur
         setDias([]);
         setCronograma([]);
         setDiaSel('-');
+      } finally {
+        setLoading(false); // 👈 SIEMPRE
       }
     })();
   }, [sp]);
+
 
   // Calcular rows a partir del cronograma y diaSel
   useEffect(() => {
@@ -109,7 +117,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de tur
       const items = (diaSel && diaSel !== '-') ? cronograma.filter(it => it?.turno?.fecha === diaSel) : cronograma;
       const mapped = items.map(item => {
         const horaRaw = item?.turno?.horaInicio || item?.turno?.hora || item?.turno?.fechaHoraInicio || '';
-        const hora = horaRaw ? String(horaRaw).slice(0,5) : '-';
+        const hora = horaRaw ? String(horaRaw).slice(0, 5) : '-';
         return {
           id: item?.id ?? item?.turno?.id,
           hora,
@@ -130,7 +138,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de tur
   const filtered = useMemo(() => {
     if (!q) return rows;
     const t = q.toLowerCase();
-    return rows.filter(r => `${r.apellido || ''}, ${r.nombre || ''}`.toLowerCase().includes(t) || String(r.cancion||'').toLowerCase().includes(t));
+    return rows.filter(r => `${r.apellido || ''}, ${r.nombre || ''}`.toLowerCase().includes(t) || String(r.cancion || '').toLowerCase().includes(t));
   }, [rows, q]);
 
   const headers = ['Hora', 'Apellido', 'Nombre', 'Canción', 'Acciones'];
@@ -142,7 +150,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de tur
       className: 'abmc-btn ',
       onClick: (d) => { navigate(`/inscripcion/${d.id}`); },
       title: 'Ver inscripción',
-      icon: <EyeOnIcon/>,
+      icon: <EyeOnIcon />,
     },
     {
       className: 'abmc-btn btn-primary',
@@ -151,7 +159,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de tur
       icon: <XCircleFill />,
       label: ''
     },
-    
+
   ];
 
   return (
@@ -181,13 +189,20 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de tur
           </select>
         </div>
 
-        <TableABMC
-          headers={headers}
-          data={filtered}
-          columns={columns}
-          actions={actions}
-          emptyMenssage="No hay candidatos"
-        />
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+            <Loader />
+          </div>
+        ) : (
+          <TableABMC
+            headers={headers}
+            data={filtered}
+            columns={columns}
+            actions={actions}
+            emptyMenssage="No hay candidatos"
+          />
+        )}
+
 
       </div>
 

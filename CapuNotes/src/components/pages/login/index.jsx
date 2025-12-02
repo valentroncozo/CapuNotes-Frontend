@@ -53,7 +53,7 @@ export default function Login() {
   // ============================================================
   // ⭐ LOGIN REAL
   // ============================================================
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("🟦 handleSubmit ejecutado");
     console.log("usuario:", username, "pass:", password);
@@ -167,6 +167,7 @@ export default function Login() {
         title: "Error al registrar usuario",
         text: err?.response?.data?.message || "Ocurrió un error inesperado.",
         confirmButtonColor: "#DE9205",
+        confirmButtonText: "Aceptar",
         background: "#11103a",
         color: "#E8EAED",
       });
@@ -197,9 +198,8 @@ export default function Login() {
                 <AccountUser className="account-icon" />
                 <Form.Control
                   type="text"
-                  className={`custom-input ${
-                    username.trim() ? "valid" : "invalid"
-                  }`}
+                  className={`custom-input ${username.trim() ? "valid" : "invalid"
+                    }`}
                   placeholder="Usuario"
                   value={username}
                   onChange={handleInputChange}
@@ -215,9 +215,8 @@ export default function Login() {
                 />
                 <Form.Control
                   type={showPassword ? "text" : "password"}
-                  className={`custom-input ${
-                    password.trim() ? "valid" : "invalid"
-                  }`}
+                  className={`custom-input ${password.trim() ? "valid" : "invalid"
+                    }`}
                   placeholder="Contraseña"
                   value={password}
                   onChange={handleInputChange}
@@ -237,7 +236,7 @@ export default function Login() {
                   className="button-login"
                   onClick={() => setIsRegisterMode(true)}
                 >
-                  Registrar
+                  Crear cuenta
                 </Button>
               </Form.Group>
             </>
@@ -246,15 +245,19 @@ export default function Login() {
           {isRegisterMode && (
             <>
               <h1 className="logo-text margin-bottom-title">
-                Registrar su cuenta de <strong>CapuNotes</strong>
+                Registrar su cuenta de <strong>CapuNotes</strong>{" "}
+                <img
+                  src="/logo-coro-sin-fondo.png"
+                  alt="Logo"
+                  className="logo-coro"
+                />
               </h1>
 
               <Form.Group className="custom-input-group" style={groupStyle}>
                 <Form.Control
                   type="text"
-                  className={`custom-input validate-input ${
-                    regNombre.trim() ? "valid" : "invalid"
-                  }`}
+                  className={`custom-input validate-input ${regNombre.trim() ? "valid" : "invalid"
+                    }`}
                   placeholder="Nombre"
                   value={regNombre}
                   onChange={(e) => setRegNombre(e.target.value)}
@@ -264,9 +267,8 @@ export default function Login() {
               <Form.Group className="custom-input-group" style={groupStyle}>
                 <Form.Control
                   type="text"
-                  className={`custom-input validate-input ${
-                    regApellido.trim() ? "valid" : "invalid"
-                  }`}
+                  className={`custom-input validate-input ${regApellido.trim() ? "valid" : "invalid"
+                    }`}
                   placeholder="Apellido"
                   value={regApellido}
                   onChange={(e) => setRegApellido(e.target.value)}
@@ -280,9 +282,8 @@ export default function Login() {
                 />
                 <Form.Control
                   type={regShowPassword ? "text" : "password"}
-                  className={`custom-input validate-input ${
-                    regPasswordValid ? "valid" : "invalid"
-                  }`}
+                  className={`custom-input validate-input ${regPasswordValid ? "valid" : "invalid"
+                    }`}
                   placeholder="Contraseña"
                   value={regPassword}
                   onChange={(e) => setRegPassword(e.target.value)}
@@ -317,9 +318,8 @@ export default function Login() {
                 />
                 <Form.Control
                   type={regShowPassword2 ? "text" : "password"}
-                  className={`custom-input validate-input ${
-                    regRepeatMatch ? "valid" : "invalid"
-                  }`}
+                  className={`custom-input validate-input ${regRepeatMatch ? "valid" : "invalid"
+                    }`}
                   placeholder="Repetir contraseña"
                   value={regRepeatPassword}
                   onChange={(e) => setRegRepeatPassword(e.target.value)}

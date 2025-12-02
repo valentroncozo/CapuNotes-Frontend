@@ -12,6 +12,8 @@ import EditIcon from "@/assets/EditIcon";
 import TrashIcon from "@/assets/TrashIcon";
 import "@/styles/abmc.css";
 import { normalizeText } from "@/utils/text";
+import Loader from "@/components/common/Loader.jsx";
+
 
 export default function CancionesPage() {
   const [canciones, setCanciones] = useState([]);
@@ -43,7 +45,7 @@ export default function CancionesPage() {
         : mapNamesToIds(cancion.categoriasNombres, categorias);
     const tiemposIds =
       Array.isArray(cancion.tiempoLiturgicoIds) &&
-      cancion.tiempoLiturgicoIds.length
+        cancion.tiempoLiturgicoIds.length
         ? cancion.tiempoLiturgicoIds
         : mapNamesToIds(cancion.tiemposLiturgicosNombres, tiempos);
 
@@ -304,11 +306,12 @@ export default function CancionesPage() {
             <tbody>
               {isLoading && (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: "center" }}>
-                    Cargando canciones...
+                  <td colSpan="5" style={{ textAlign: "center", padding: "2rem" }}>
+                    <Loader />
                   </td>
                 </tr>
               )}
+
               {!isLoading && toastEmpty && (
                 <tr>
                   <td colSpan="5" style={{ textAlign: "center" }}>

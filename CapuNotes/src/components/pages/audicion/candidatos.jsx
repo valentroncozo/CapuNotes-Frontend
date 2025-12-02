@@ -12,6 +12,7 @@ import CloseIcon from '@/assets/CloseIcon.jsx';
 import EyeOnIcon from '@/assets/VisibilityOnIcon.jsx';
 import { formatDate } from '@/components/common/datetime.js';
 import { isoToDdMmYyyy } from '@/components/common/datetime.js';
+import Loader from '@/components/common/Loader.jsx';
 
 export default function CandidatosCoordinadoresPage({ title = 'Cronograma de candidatos' }) {
 
@@ -24,6 +25,8 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de can
   const [sortBy, setSortBy] = useState(null);
   const [sortDir, setSortDir] = useState('asc');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [loading, setLoading] = useState(true);
+
 
   const [sp, setSearchParams] = useSearchParams();
 
@@ -51,11 +54,14 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de can
   useEffect(() => {
     (async () => {
       try {
+        setLoading(true); // 👈 INICIO
+
         const a = await AudicionService.getActual();
         if (!a?.id) {
           setDias([]);
           setCronograma([]);
           setDiaSel('-');
+          setLoading(false); // 👈 FIN
           return;
         }
 
@@ -66,8 +72,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de can
         (cron || []).forEach(item => {
           const f = item?.turno?.fecha;
           if (!f) return;
-           const label = item?.turno?.diaString ? `${item.turno.diaString} — ${isoToDdMmYyyy(f)}` : isoToDdMmYyyy(f); 
-          //const label = item?.turno?.diaString ? formatDate(`${item.turno.diaString} — ${f}`) : formatDate(f); 
+          const label = item?.turno?.diaString ? `${item.turno.diaString} — ${isoToDdMmYyyy(f)}` : isoToDdMmYyyy(f);
           if (!mapa.has(f)) mapa.set(f, { value: f, label });
         });
 
@@ -76,14 +81,18 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de can
 
         const qp = sp.get('dia');
         setDiaSel((qp && ds.find(d => d.value === qp)) ? qp : (ds[0]?.value || '-'));
+
       } catch (e) {
         console.error('Error cargando cronograma/días', e);
         setDias([]);
         setCronograma([]);
         setDiaSel('-');
+      } finally {
+        setLoading(false); // SIEMPRE
       }
     })();
   }, [sp, refreshTrigger]);
+
 
   // Calcular rows a partir del cronograma y diaSel
   useEffect(() => {
@@ -92,10 +101,10 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de can
       const items = (diaSel && diaSel !== '-') ? cronograma.filter(it => it?.turno?.fecha === diaSel) : cronograma;
       const mapped = items.map(item => {
         const horaRaw = item?.turno?.horaInicio || item?.turno?.hora || item?.turno?.fechaHoraInicio || '';
-        const hora = horaRaw ? String(horaRaw).slice(0,5) : '-';
-        
+        const hora = horaRaw ? String(horaRaw).slice(0, 5) : '-';
+
         console.log('📦 Mapeando item del cronograma:', item);
-        
+
         return {
           id: item?.id ?? item?.turno?.id,
           idInscripcion: item?.id,
@@ -119,12 +128,12 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de can
 
   const filtered = useMemo(() => {
     let result = rows;
-    
+
     // Filtro por búsqueda
     if (q) {
       const t = q.toLowerCase();
-      result = result.filter(r => 
-        `${r.apellido || ''}, ${r.nombre || ''}`.toLowerCase().includes(t) || 
+      result = result.filter(r =>
+        `${r.apellido || ''}, ${r.nombre || ''}`.toLowerCase().includes(t) ||
         String(r.cancion || '').toLowerCase().includes(t)
       );
     }
@@ -133,7 +142,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de can
     if (sortBy) {
       result = [...result].sort((a, b) => {
         let valA, valB;
-        
+
         if (sortBy === 'hora') {
           valA = a.hora || '';
           valB = b.hora || '';
@@ -225,67 +234,100 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de can
           </select>
         </div>
 
-        <table className="abmc-table abmc-table-rect">
-          <thead className="abmc-thead">
-            <tr className="abmc-row">
-              <th className={thClass("hora")}>
-                <span className="th-label">Hora</span>
-                <button
-                  type="button"
-                  className="th-caret-btn"
-                  onClick={() => toggleSort("hora")}
-                  aria-label="Ordenar por hora"
-                >
-                  <span className="th-caret" aria-hidden />
-                </button>
-              </th>
+        {loading ? (
+          <div style={{ display: "flex", justifyContent: "center", padding: "2rem" }}>
+            <Loader />
+          </div>
+        ) : (
+          <table className="abmc-table abmc-table-rect">
+            <thead className="abmc-thead">
+              <tr className="abmc-row">
 
-              <th className={thClass("apynom")}>
-                <span className="th-label">Nombre</span>
-                <button
-                  type="button"
-                  className="th-caret-btn"
-                  onClick={() => toggleSort("apynom")}
-                  aria-label="Ordenar por nombre"
-                >
-                  <span className="th-caret" aria-hidden />
-                </button>
-              </th>
+                <th className={thClass("hora")}>
+                  <span className="th-label">Hora</span>
+                  <button
+                    type="button"
+                    className="th-caret-btn"
+                    onClick={() => toggleSort("hora")}
+                    aria-label="Ordenar por hora"
+                  >
+                    <span className="th-caret" aria-hidden />
+                  </button>
+                </th>
 
-              <th><span className="th-label">Canción</span></th>
-              <th><span className="th-label">Resultado</span></th>
-              <th style={{ textAlign: "center" }}><span className="th-label">Acciones</span></th>
-            </tr>
-          </thead>
+                <th className={thClass("apynom")}>
+                  <span className="th-label">Nombre</span>
+                  <button
+                    type="button"
+                    className="th-caret-btn"
+                    onClick={() => toggleSort("apynom")}
+                    aria-label="Ordenar por nombre"
+                  >
+                    <span className="th-caret" aria-hidden />
+                  </button>
+                </th>
 
-          <tbody>
-            {filtered.length === 0 ? (
-              <tr>
-                <td colSpan="5" style={{ textAlign: "center", padding: "2rem" }}>
-                  No hay candidatos en esta audición.
-                </td>
+                <th>
+                  <span className="th-label">Canción</span>
+                </th>
+
+                <th>
+                  <span className="th-label">Resultado</span>
+                </th>
+
+                <th style={{ textAlign: "center" }}>
+                  <span className="th-label">Acciones</span>
+                </th>
+
               </tr>
-            ) : (
-              filtered.map((r) => (
-                <tr key={r.id} className="abmc-row">
-                  <td>{r.hora || "—"}</td>
-                  <td>{`${r.apellido || ''}, ${r.nombre || ''}` || "—"}</td>
-                  <td>{r.cancion || "—"}</td>
-                  <td style={{ textAlign: "center" }}>{getResultadoButton(r)}</td>
-                  <td style={{ textAlign: "center" }}>
-                    <button
-                      className="btn-accion btn-accion--icon"
-                      onClick={() => navigate(`/inscripcion/coordinadores/${r.id}`)}
-                      title="Ver inscripción"
-                    >
-                      <EyeOnIcon width={20} height={20} fill="var(--text-light)" />
-                    </button>
+            </thead>
+
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: "center", padding: "2rem" }}>
+                    No hay candidatos en esta audición.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                filtered.map((r) => (
+                  <tr key={r.id} className="abmc-row">
+
+                    <td>{r.hora || "—"}</td>
+
+                    <td>
+                      {`${r.apellido || ""}, ${r.nombre || ""}` || "—"}
+                    </td>
+
+                    <td>{r.cancion || "—"}</td>
+
+                    <td style={{ textAlign: "center" }}>
+                      {getResultadoButton(r)}
+                    </td>
+
+                    <td style={{ textAlign: "center" }}>
+                      <button
+                        className="btn-accion btn-accion--icon"
+                        onClick={() =>
+                          navigate(`/inscripcion/coordinadores/${r.id}`)
+                        }
+                        title="Ver inscripción"
+                      >
+                        <EyeOnIcon
+                          width={20}
+                          height={20}
+                          fill="var(--text-light)"
+                        />
+                      </button>
+                    </td>
+
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
+
       </div>
       {/* Modal de resultados */}
       {editResultado && (
@@ -314,7 +356,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma de can
             }
           }}
         />
-      )}     
+      )}
     </main>
   );
 }

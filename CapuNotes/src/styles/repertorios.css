@@ -300,3 +300,10 @@
   background-color: #9aa0a6 !important;
   color: #ffffff !important;
 }
+
+.repertorio-buttons-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 0.2rem; /* opcional */
+}

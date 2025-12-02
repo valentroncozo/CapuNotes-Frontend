@@ -11,6 +11,8 @@ import EditIcon from "@/assets/EditIcon";
 import TrashIcon from "@/assets/TrashIcon";
 import { repertoriosService } from "@/services/repertoriosService";
 import { formatDate } from "@/components/common/datetime";
+import Loader from "@/components/common/Loader.jsx";
+
 
 import "@/styles/abmc.css";
 import "@/styles/repertorios.css";
@@ -213,10 +215,13 @@ export default function RepertoriosPage() {
     if (isLoading) {
       return (
         <tr>
-          <td colSpan="6">Cargando repertorios...</td>
+          <td colSpan="6" style={{ textAlign: "center", padding: "2rem" }}>
+            <Loader />
+          </td>
         </tr>
       );
     }
+
     if (!sortedRepertorios.length) {
       return (
         <tr>

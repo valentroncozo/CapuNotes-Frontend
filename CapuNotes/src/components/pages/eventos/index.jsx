@@ -71,8 +71,10 @@ const Eventos = () => {
   const handleOpenPopup = async (mode, evento = null) => {
     if (mode === "editar" && evento) {
       try {
-        const full = await eventoService.getById(evento.id);
-        setSelectedEvento(full);
+        if (mode === "editar" && evento) {
+          setSelectedEvento(evento); // suficiente para el popup
+        }
+
       } catch (err) {
         Swal.fire({
           icon: "error",
@@ -186,7 +188,7 @@ const Eventos = () => {
                 padding: "2rem 0"
               }}
             >
-              <Loader/>   {/* loader  */}
+              <Loader />   {/* loader  */}
             </div>
           ) : filteredEventos.length > 0 ? (
             filteredEventos.map((evento) => {
@@ -393,8 +395,16 @@ const Eventos = () => {
                 // Actualizar lista
                 // ===================================
                 // Recargar la lista real desde el backend (solo pendientes)
-                const refreshed = await eventoService.listPendientes();
-                setEventos(refreshed);
+                setEventos((prev) => {
+                  const exists = prev.some(e => e.id === full.id);
+
+                  if (exists) {
+                    return prev.map(e => e.id === full.id ? full : e);
+                  } else {
+                    return [full, ...prev];
+                  }
+                });
+
 
 
                 // ===================================
