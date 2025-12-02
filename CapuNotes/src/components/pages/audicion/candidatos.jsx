@@ -11,6 +11,7 @@ import BlockIcon from '@/assets/BlockIcon.jsx';
 import CloseIcon from '@/assets/CloseIcon.jsx';
 import EyeOnIcon from '@/assets/VisibilityOnIcon.jsx';
 import { formatDate } from '@/components/common/datetime.js';
+import { isoToDdMmYyyy } from '@/components/common/datetime.js';
 
 export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Coordinador)' }) {
 
@@ -65,7 +66,8 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Coord
         (cron || []).forEach(item => {
           const f = item?.turno?.fecha;
           if (!f) return;
-          const label = item?.turno?.diaString ? formatDate(`${item.turno.diaString} — ${f}`) : formatDate(f); 
+           const label = item?.turno?.diaString ? `${item.turno.diaString} — ${isoToDdMmYyyy(f)}` : isoToDdMmYyyy(f); 
+          //const label = item?.turno?.diaString ? formatDate(`${item.turno.diaString} — ${f}`) : formatDate(f); 
           if (!mapa.has(f)) mapa.set(f, { value: f, label });
         });
 
@@ -252,7 +254,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Coord
 
               <th><span className="th-label">Canción</span></th>
               <th><span className="th-label">Resultado</span></th>
-              <th style={{ textAlign: "center" }}></th>
+              <th style={{ textAlign: "center" }}><span className="th-label">Acciones</span></th>
             </tr>
           </thead>
 

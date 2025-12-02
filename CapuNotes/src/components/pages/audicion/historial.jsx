@@ -183,7 +183,22 @@ export default function HistorialAudicionesPage() {
                 return (
                   <tr key={r.id} className="abmc-row">
                     <td>{nombreCompleto}</td>
-                    <td>{r.nombreAudicion || "—"}</td>
+                    <td>
+                      {(() => {
+                        let nombre = (r.nombreAudicion || "—").replace(/^audiciones\s*/i, "");
+
+                        const match = nombre.match(/(\d{4})-(\d{2})-(\d{2})/);
+                        if (match) {
+                          const [_, y, m, d] = match;
+                          const fechaFormateada = `${d}/${m}/${y}`;
+                          // Reemplazar solo la fecha dentro del texto
+                          nombre = nombre.replace(match[0], fechaFormateada);
+                        }
+
+                        return nombre;
+                      })()}
+                    </td>
+
                     <td>{r.cancion || "—"}</td>
 
                     {/* ✅ Botón "Ver" solo para visualizar resultado */}
@@ -199,14 +214,14 @@ export default function HistorialAudicionesPage() {
                               typeof r.resultado === "object"
                                 ? r.resultado
                                 : {
-                                    estado: r.resultado || "",
-                                    obs: r.observaciones || "",
-                                  },
+                                  estado: r.resultado || "",
+                                  obs: r.observaciones || "",
+                                },
                           })
                         }
                         title="Ver detalles del resultado"
                       >
-                      <EyeOnIcon />
+                        <EyeOnIcon />
                       </button>
                     </td>
 

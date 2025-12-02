@@ -182,24 +182,24 @@ const LandingPage = () => {
             <strong>Actividades</strong>
           </h2>
           <p>
-            El enfoque principal es servir a la comunidad cantando en la Misa de
-            los domingos a las 21hs. El crecimiento y la constancia de nuestra
+            Nuestro enfoque principal es servir a la comunidad cantando en la Misa nocturna de
+            los domingos. El crecimiento y la constancia de nuestra
             actividad se orientan a ser cada vez más un Ministerio de Música ,
             sustentado en el encuentro personal con Jesús.
             <br />
             <br />
-            Se realiza un <strong>retiro anual</strong> para crecer en nuestra
-            fe, madurar espiritualmente y seguir el camino de Dios comprendiendo
-            los valores franciscanos (Información adicional). La preparación
-            espiritual, que acompaña los ensayos, generalmente se orienta a este
-            retiro. Este espacio permite fomentar/generar/contribuir al
+            Realizamos un <strong>retiro anual</strong> para crecer en nuestra
+            fé, madurar espiritualmente y seguir el camino de Dios comprendiendo
+            los valores franciscanos. La preparación espiritual, que acompaña los ensayos, 
+            generalmente se orienta a este
+            retiro. Este espacio permite contribuir al
             encuentro personal de cada miembro con Jesús.
             <br />
             <br />
-            Se realizan <strong>dos convivencias</strong> al año a través del
+            Además realizamos <strong>dos convivencias</strong> al año a través del
             área Alegranos , por medio de encuentros de otra índole. Estas
-            dinámicas permiten fomentar y crecer la fraternidad entre hermanos y
-            fortalecer el encuentro con Jesús.
+            dinámicas fomentan y fortalecen la fraternidad entre hermanos y
+            enriquecen el encuentro con Jesús.
           </p>
         </section>
 

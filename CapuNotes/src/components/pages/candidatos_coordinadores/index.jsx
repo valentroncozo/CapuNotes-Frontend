@@ -12,6 +12,7 @@ import Swal from 'sweetalert2';
 import { XCircleFill } from "react-bootstrap-icons";
 import EyeOnIcon from '@/assets/VisibilityOnIcon';
 import { formatDate } from '@/components/common/datetime.js';
+import { isoToDdMmYyyy } from '@/components/common/datetime.js';
 
 
 
@@ -82,7 +83,8 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Admin
         (cron || []).forEach(item => {
           const f = item?.turno?.fecha;
           if (!f) return;
-          const label = item?.turno?.diaString ? formatDate(`${item.turno.diaString} — ${f}`) : formatDate(f);
+          const label = item?.turno?.diaString ? `${item.turno.diaString} — ${isoToDdMmYyyy(f)}` : isoToDdMmYyyy(f);
+          //const label = item?.turno?.diaString ? formatDate(`${item.turno.diaString} — ${f}`) : formatDate(f);
           if (!mapa.has(f)) mapa.set(f, { value: f, label });
         });
 
@@ -135,6 +137,13 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Admin
   const columns = ['hora', 'apellido', 'nombre', 'cancion'];
 
   const actions = [
+
+    {
+      className: 'abmc-btn ',
+      onClick: (d) => { navigate(`/inscripcion/${d.id}`); },
+      title: 'Ver inscripción',
+      icon: <EyeOnIcon/>,
+    },
     {
       className: 'abmc-btn btn-primary',
       onClick: (d) => { handlerCancelarTurno(d); },
@@ -142,12 +151,7 @@ export default function CandidatosCoordinadoresPage({ title = 'Cronograma (Admin
       icon: <XCircleFill />,
       label: ''
     },
-    {
-      className: 'abmc-btn ',
-      onClick: (d) => { navigate(`/inscripcion/${d.id}`); },
-      title: 'Ver inscripción',
-      icon: <EyeOnIcon/>,
-    }
+    
   ];
 
   return (

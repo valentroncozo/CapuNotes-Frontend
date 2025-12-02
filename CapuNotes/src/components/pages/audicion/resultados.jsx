@@ -21,7 +21,7 @@ const RESULT_OPTS = [
 function previewResultadoIcon(value) {
   const v = String(value || "sin").toLowerCase();
   if (v === "aceptado" || v === "aceptada" || v === "ok")
-    return (
+    /*return (
       <span className="icon-estado icon-estado--ok icon-md" title="Aceptado">
         <AceptadoIcon />
       </span>
@@ -37,7 +37,7 @@ function previewResultadoIcon(value) {
       <span className="icon-estado icon-estado--pend icon-md" title="Ausente">
         <AusenteIcon />
       </span>
-    );
+    );*/
   return (
     <span className="icon-estado icon-estado--sin icon-md" title="Sin resultado">
       <SinResultadoIcon />
