@@ -76,61 +76,68 @@ export default function AppShell({ onLogout }) {
           <div className="appshell-header-controls">
             {/* Logout */}
 
-            <a
-      
-              href="https://drive.google.com/file/d/1dun1QyTQfCehsQTO4F6YMEeAFOBnFl8s/view?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <HelpIcon fill="var(--text-light)" />
-            </a>
-
             <button
               className="appshell-gearbtn"
-              type="button"
-              aria-label="Cerrar sesión"
-              onClick={(e) => {
-                e.stopPropagation();
-                setGearOpen((v) => !v);
-              }}
+              title="Manual de Usuario"
+              onClick={() =>
+                window.open(
+                  "https://drive.google.com/file/d/1dun1QyTQfCehsQTO4F6YMEeAFOBnFl8s/view?usp=sharing",
+                  "_blank",
+                  "noopener,noreferrer"
+                )
+              }
             >
-              <LogOutIcon fill="var(--text-light)" />
+              <HelpIcon fill="var(--text-light)" />
             </button>
 
-            {gearOpen && (
-              <div className="appshell-gear-panel" role="menu">
-                <button className="appshell-gear-item" onClick={handleLogout}>
-                  Cerrar sesión
-                </button>
-              </div>
-            )}
+          
 
-            {/* Close drawer */}
-            <button
-              type="button"
-              className="appshell-closebtn"
-              onClick={() => setOpen(false)}
-            >
-              <CloseIcon />
-            </button>
-          </div>
-        </div>
+          <button
+            className="appshell-gearbtn"
+            type="button"
+            aria-label="Cerrar sesión"
+            onClick={(e) => {
+              e.stopPropagation();
+              setGearOpen((v) => !v);
+            }}
+          >
+            <LogOutIcon fill="var(--text-light)" />
+          </button>
 
-        <div className="drawer-body">
-          <Menu
-            rol={rol}
-            orgOpen={orgOpen}
-            setOrgOpen={setOrgOpen}
-            audOpen={audOpen}
-            setAudOpen={setAudOpen}
-            songsOpen={songsOpen}
-            setSongsOpen={setSongsOpen}
-            onNavigate={handleNavigate}
-          />
+          {gearOpen && (
+            <div className="appshell-gear-panel" role="menu">
+              <button className="appshell-gear-item" onClick={handleLogout}>
+                Cerrar sesión
+              </button>
+            </div>
+          )}
+
+          {/* Close drawer */}
+          <button
+            type="button"
+            className="appshell-closebtn"
+            onClick={() => setOpen(false)}
+          >
+            <CloseIcon />
+          </button>
         </div>
       </div>
 
-      {open && (
+      <div className="drawer-body">
+        <Menu
+          rol={rol}
+          orgOpen={orgOpen}
+          setOrgOpen={setOrgOpen}
+          audOpen={audOpen}
+          setAudOpen={setAudOpen}
+          songsOpen={songsOpen}
+          setSongsOpen={setSongsOpen}
+          onNavigate={handleNavigate}
+        />
+      </div>
+    </div >
+
+      { open && (
         <div
           className="drawer-backdrop"
           role="presentation"
@@ -138,12 +145,13 @@ export default function AppShell({ onLogout }) {
           onClick={() => setOpen(false)}
           style={{ zIndex: 999 }}
         />
-      )}
+      )
+}
 
-      <div style={{ height: "40px" }} />
+<div style={{ height: "40px" }} />
 
-      {/* Outlet donde van las páginas */}
-      <Outlet />
+{/* Outlet donde van las páginas */ }
+<Outlet />
     </>
   );
 }
@@ -395,10 +403,10 @@ function Menu({
 
           {orgOpen && (
             <div className="appshell-accordion-content">
-              <a href="/areas" className="nav-link" onClick={(e) => {e.preventDefault(); onNavigate("/areas");}}>Áreas</a>
-              <a href="/cuerdas" className="nav-link" onClick={(e) => {e.preventDefault(); onNavigate("/cuerdas");}}>Cuerdas</a>
-              <a href="/miembros" className="nav-link" onClick={(e) => {e.preventDefault(); onNavigate("/miembros");}}>Miembros</a>
-              <a href="/fraternidades" className="nav-link" onClick={(e) => {e.preventDefault(); onNavigate("/fraternidades");}}>Fraternidades</a>
+              <a href="/areas" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate("/areas"); }}>Áreas</a>
+              <a href="/cuerdas" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate("/cuerdas"); }}>Cuerdas</a>
+              <a href="/miembros" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate("/miembros"); }}>Miembros</a>
+              <a href="/fraternidades" className="nav-link" onClick={(e) => { e.preventDefault(); onNavigate("/fraternidades"); }}>Fraternidades</a>
             </div>
           )}
         </div>

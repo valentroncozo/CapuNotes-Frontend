@@ -52,7 +52,7 @@ import { useUser } from "@/context/UserContext.jsx";
 
 function ProtectedRoute({ children }) {
   const { usuario } = useUser();
-  return usuario ? children : <Navigate to="/login" replace />;
+  return usuario ? children : <Navigate to="/landing" replace />;
 }
 
 function AppRoutes() {
@@ -74,11 +74,13 @@ function AppRoutes() {
     setUsername("");
   };
 
-  
+
 
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+
+      <Route index element={<Navigate to="/landing" replace />} />
 
       {/* TODAS LAS RUTAS QUE DEBEN TENER NAVBAR VAN AQUÍ */}
       <Route
@@ -89,7 +91,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/landing" replace />} />
+
 
         <Route path="principal" element={<Principal />} />
         <Route path="miembros" element={<Miembros />} />
@@ -164,15 +166,20 @@ function AppRoutes() {
         {/* ⭐ Usuarios y Roles — AHORA CORRECTO DENTRO DEL APPSHELL ⭐ */}
         <Route path="usuarios-roles" element={<UsuariosRolesPage />} />
 
-        {/* Landing */}
-        <Route path="landing" element={<LandingPage />} />
+        
+        {/* Cualquier ruta inválida → principal */}
+        <Route path="*" element={<Navigate to="/principal" replace />} />
       </Route>
+
+      {/* Landing */}
+      <Route path="landing" element={<LandingPage />} />
+
+
 
       {/* Rutas fuera del layout */}
       <Route path="/formulario" element={<Formulario />} />
 
-      {/* Cualquier ruta inválida → principal */}
-      <Route path="*" element={<Navigate to="/principal" replace />} />
+
     </Routes>
   );
 }
