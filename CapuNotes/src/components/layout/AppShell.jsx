@@ -5,6 +5,7 @@ import { useUser } from "@/context/UserContext.jsx";
 
 import "@/styles/offcanvas.css";
 import LogOutIcon from "@/assets/LogOutIcon";
+import HelpIcon from "@/assets/HelpIcon";
 
 // Ícono de cierre
 function CloseIcon(props) {
@@ -74,6 +75,16 @@ export default function AppShell({ onLogout }) {
 
           <div className="appshell-header-controls">
             {/* Logout */}
+
+            <a
+      
+              href="https://drive.google.com/file/d/1dun1QyTQfCehsQTO4F6YMEeAFOBnFl8s/view?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <HelpIcon fill="var(--text-light)" />
+            </a>
+
             <button
               className="appshell-gearbtn"
               type="button"
