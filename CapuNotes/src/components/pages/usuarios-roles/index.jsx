@@ -197,8 +197,10 @@ export default function UsuariosRolesPage() {
   // UI
   // =========================================================
   return (
+  <>
     <main className="abmc-page">
       <div className="abmc-card">
+
         {/* HEADER */}
         <div className="abmc-header">
           <BackButton />
@@ -243,11 +245,10 @@ export default function UsuariosRolesPage() {
             {usuariosFiltrados.length > 0 ? (
               usuariosFiltrados.map((u) => (
                 <tr key={u.id}>
-                  <td>{`${u.nombre} ${u.apellido} `}</td>
+                  <td>{`${u.nombre} ${u.apellido}`}</td>
                   <td>{u.username}</td>
                   <td>{u.rol}</td>
 
-                  {/* Estado: ahora con Badge */}
                   <td>
                     <Badge
                       bg={
@@ -266,11 +267,9 @@ export default function UsuariosRolesPage() {
                     >
                       {u.estado === "RECHAZADO" ? "INACTIVO" : u.estado}
                     </Badge>
-
                   </td>
 
                   <td className="abmc-actions">
-                    {/* Editar rol: usar el mismo icono de lápiz */}
                     <button
                       className="abmc-btn abmc-btn-icon"
                       title="Editar rol"
@@ -279,7 +278,6 @@ export default function UsuariosRolesPage() {
                       <EditIcon width={18} height={18} />
                     </button>
 
-                    {/* Activar / Rechazar: usar iconos en lugar de emojis */}
                     <button
                       className="abmc-btn abmc-btn-icon"
                       title={u.estado === "ACTIVO" ? "Rechazar" : "Activar"}
@@ -305,5 +303,6 @@ export default function UsuariosRolesPage() {
         </table>
       </div>
     </main>
-  );
+  </>
+);
 }

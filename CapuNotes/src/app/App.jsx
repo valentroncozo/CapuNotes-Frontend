@@ -42,9 +42,11 @@ import RepertorioFormPage from "@/components/pages/repertorios/RepertorioFormPag
 import RepertorioLecturaPage from "@/components/pages/repertorios/RepertorioLecturaPage.jsx";
 import FraternidadesPage from "@/components/pages/fraternidades/index.jsx";
 import FraternidadFormPage from "@/components/pages/fraternidades/FraternidadFormPage.jsx";
+
+import LandingPage from "@/components/pages/landing/index.jsx";
+import UsuariosRolesPage from "@/components/pages/usuarios-roles/index.jsx";
+
 import "@/styles/globals.css";
-import LandingPage from "../components/pages/landing";
-import UsuariosRolesPage from "../components/pages/usuarios-roles/index.jsx";
 
 import { useUser } from "@/context/UserContext.jsx";
 
@@ -76,7 +78,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
 
-
+      {/* TODAS LAS RUTAS QUE DEBEN TENER NAVBAR VAN AQUÍ */}
       <Route
         path="/"
         element={
@@ -86,7 +88,8 @@ function AppRoutes() {
         }
       >
         <Route index element={<Navigate to="/landing" replace />} />
-        <Route path="principal" element={<Principal  />} />
+
+        <Route path="principal" element={<Principal />} />
         <Route path="miembros" element={<Miembros />} />
         <Route path="miembros/agregar" element={<MiembrosAgregar />} />
         <Route path="miembros/editar" element={<MiembrosEditar />} />
@@ -96,27 +99,47 @@ function AppRoutes() {
         <Route path="tiempos-liturgicos" element={<TiemposLiturgicos />} />
         <Route path="canciones" element={<Canciones />} />
         <Route path="repertorios" element={<Repertorios />} />
-        <Route path="repertorios/nuevo" element={<RepertorioFormPage mode="create" />} />
-        <Route path="repertorios/:id/editar" element={<RepertorioFormPage mode="edit" />} />
+        <Route
+          path="repertorios/nuevo"
+          element={<RepertorioFormPage mode="create" />}
+        />
+        <Route
+          path="repertorios/:id/editar"
+          element={<RepertorioFormPage mode="edit" />}
+        />
         <Route path="repertorios/lectura" element={<RepertorioLecturaPage />} />
         <Route path="fraternidades" element={<FraternidadesPage />} />
-        <Route path="fraternidades/nueva" element={<FraternidadFormPage mode="create" />} />
-        <Route path="fraternidades/:id/editar" element={<FraternidadFormPage mode="edit" />} />
         <Route
-          path="cuestionario/configuracion"
-          element={<CuestionarioConfig />}
+          path="fraternidades/nueva"
+          element={<FraternidadFormPage mode="create" />}
         />
+        <Route
+          path="fraternidades/:id/editar"
+          element={<FraternidadFormPage mode="edit" />}
+        />
+
+        <Route path="cuestionario/configuracion" element={<CuestionarioConfig />} />
         <Route path="cuestionario/preview" element={<CuestionarioPreview />} />
+
         <Route path="asistencias" element={<AsistenciaEnsayos />} />
         <Route
           path="asistencias/ensayos/:idEnsayo"
           element={<AsistenciaEnsayosDetalle />}
         />
+
         <Route path="eventos" element={<Eventos />} />
+
         <Route path="audicion" element={<Audicion />} />
         <Route path="audicion/agregar" element={<AudicionAgregar />} />
         <Route path="audicion/editar" element={<AudicionEditar />} />
         <Route path="audicion/historial" element={<HistorialAudiciones />} />
+
+        <Route path="audicion/candidatos" element={<Candidatos />} />
+        <Route
+          path="candidatos-administracion"
+          element={<CandidatosCoordinadores />}
+        />
+
         <Route
           path="inscripcion/:id"
           element={<FormularioConsulta />}
@@ -125,11 +148,7 @@ function AppRoutes() {
           path="inscripcion/coordinadores/:id"
           element={<FormularioConsultaCoordinacion />}
         />
-        <Route path="audicion/candidatos" element={<Candidatos />} />
-        <Route
-          path="candidatos-administracion"
-          element={<CandidatosCoordinadores />}
-        />
+
         <Route path="reportes" element={<ReportesPage />} />
         <Route
           path="reportes/miembro/:tipoDocumento/:nroDocumento"
@@ -139,13 +158,19 @@ function AppRoutes() {
           path="reportes/asistencias/miembro"
           element={<ReporteAsistenciaMiembroAnualPage />}
         />
+
+        {/* ⭐ Usuarios y Roles — AHORA CORRECTO DENTRO DEL APPSHELL ⭐ */}
+        <Route path="usuarios-roles" element={<UsuariosRolesPage />} />
+
+        {/* Landing */}
+        <Route path="landing" element={<LandingPage />} />
       </Route>
 
-      <Route path="*" element={<Navigate to="/principal" replace />} />
+      {/* Rutas fuera del layout */}
       <Route path="/formulario" element={<Formulario />} />
 
-      <Route path="landing" element={<LandingPage />} />
-      <Route path="usuarios-roles" element={<UsuariosRolesPage />} />
+      {/* Cualquier ruta inválida → principal */}
+      <Route path="*" element={<Navigate to="/principal" replace />} />
     </Routes>
   );
 }

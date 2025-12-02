@@ -8,6 +8,7 @@
   color: var(--text-light);
   padding: 24px;
   font-family: var(--font-sans);
+  /*padding-top: 70px !important;*/
 }
 
 .abmc-card {

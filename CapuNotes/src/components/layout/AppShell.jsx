@@ -1,12 +1,12 @@
 // src/components/layout/AppShell.jsx
 import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useUser } from "@/context/UserContext.jsx"; // ⭐ TRAEMOS EL USUARIO
+import { useUser } from "@/context/UserContext.jsx";
 
 import "@/styles/offcanvas.css";
 import LogOutIcon from "@/assets/LogOutIcon";
 
-/* Ícono cierre */
+// Ícono de cierre
 function CloseIcon(props) {
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" {...props}>
@@ -20,10 +20,9 @@ function CloseIcon(props) {
 
 export default function AppShell({ onLogout }) {
   const navigate = useNavigate();
-  const { usuario } = useUser(); // ⭐ obtenemos usuario y rol
+  const { usuario } = useUser();
   const rol = usuario?.rol;
 
-  // Helpers de permisos
   const esFull = rol === "SUPERADMIN" || rol === "COORDINADOR";
   const esAdmin = rol === "ADMINISTRADOR";
 
@@ -33,17 +32,12 @@ export default function AppShell({ onLogout }) {
   const [songsOpen, setSongsOpen] = useState(false);
   const [gearOpen, setGearOpen] = useState(false);
 
+  // Cerrar drawer con ESC
   useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "Escape") setOpen(false);
-    };
+    const onKey = (e) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-
-  useEffect(() => {
-    if (!open) setGearOpen(false);
-  }, [open]);
 
   const handleNavigate = (to) => {
     setOpen(false);
@@ -58,7 +52,11 @@ export default function AppShell({ onLogout }) {
 
   return (
     <>
-      <nav className="navbar fixed-top navbar-dark appshell-navbar">
+      {/* NAV SUPERIOR — agregado z-index alto */}
+      <nav
+        className="navbar fixed-top navbar-dark appshell-navbar"
+        style={{ zIndex: 1050 }}
+      >
         <button
           className="navbar-toggler appshell-toggle"
           type="button"
@@ -69,7 +67,7 @@ export default function AppShell({ onLogout }) {
         </button>
       </nav>
 
-      {/* CONTENEDOR DRAWER */}
+      {/* DRAWER */}
       <div className={`drawer ${open ? "open" : ""}`} role="dialog" aria-modal="true">
         <div className="drawer-header">
           <h5 className="offcanvas-title">Menú</h5>
@@ -96,12 +94,11 @@ export default function AppShell({ onLogout }) {
               </div>
             )}
 
+            {/* Close drawer */}
             <button
               type="button"
               className="appshell-closebtn"
               onClick={() => setOpen(false)}
-              aria-label="Cerrar menú"
-              title="Cerrar"
             >
               <CloseIcon />
             </button>
@@ -110,6 +107,7 @@ export default function AppShell({ onLogout }) {
 
         <div className="drawer-body">
           <Menu
+            rol={rol}
             orgOpen={orgOpen}
             setOrgOpen={setOrgOpen}
             audOpen={audOpen}
@@ -117,7 +115,6 @@ export default function AppShell({ onLogout }) {
             songsOpen={songsOpen}
             setSongsOpen={setSongsOpen}
             onNavigate={handleNavigate}
-            rol={rol}
           />
         </div>
       </div>
@@ -128,19 +125,24 @@ export default function AppShell({ onLogout }) {
           role="presentation"
           aria-hidden="true"
           onClick={() => setOpen(false)}
+          style={{ zIndex: 999 }}
         />
       )}
 
       <div style={{ height: "40px" }} />
+
+      {/* Outlet donde van las páginas */}
       <Outlet />
     </>
   );
 }
 
-/* ============================
-      MENU COMPLETO
-=============================== */
+/* ===========================
+    MENÚ PRINCIPAL COMPLETO
+=========================== */
+
 function Menu({
+  rol,
   orgOpen,
   setOrgOpen,
   audOpen,
@@ -148,7 +150,6 @@ function Menu({
   songsOpen,
   setSongsOpen,
   onNavigate,
-  rol,
 }) {
   const esFull = rol === "SUPERADMIN" || rol === "COORDINADOR";
   const esAdmin = rol === "ADMINISTRADOR";
@@ -158,47 +159,49 @@ function Menu({
       {/* Inicio */}
       <a
         href="/principal"
+        className="nav-link"
         onClick={(e) => {
           e.preventDefault();
           onNavigate("/principal");
         }}
-        className="nav-link"
       >
         Inicio
       </a>
 
-      {/* Asistencias → todos */}
+      {/* Asistencias */}
       <a
         href="/asistencias"
+        className="nav-link"
         onClick={(e) => {
           e.preventDefault();
           onNavigate("/asistencias");
         }}
-        className="nav-link"
       >
         Asistencias
       </a>
 
-      {/* Reportes → todos */}
+      {/* Reportes */}
       <a
         href="/reportes"
+        className="nav-link"
         onClick={(e) => {
           e.preventDefault();
           onNavigate("/reportes");
         }}
-        className="nav-link"
       >
         Reportes
       </a>
 
-      {/* Canciones → todos */}
+      {/* Canciones */}
       <div className="appshell-accordion-outer">
         <button
           className={`appshell-accordion-trigger ${songsOpen ? "open" : ""}`}
           onClick={() => setSongsOpen((v) => !v)}
         >
           Canciones
-          <span className="appshell-accordion-caret">{songsOpen ? "▴" : "▾"}</span>
+          <span className="appshell-accordion-caret">
+            {songsOpen ? "▴" : "▾"}
+          </span>
         </button>
 
         {songsOpen && (
@@ -213,6 +216,7 @@ function Menu({
             >
               Cancionero
             </a>
+
             <a
               href="/repertorios"
               className="nav-link"
@@ -223,6 +227,7 @@ function Menu({
             >
               Repertorios
             </a>
+
             <a
               href="/tiempos-liturgicos"
               className="nav-link"
@@ -233,6 +238,7 @@ function Menu({
             >
               Tiempos litúrgicos
             </a>
+
             <a
               href="/categorias-canciones"
               className="nav-link"
@@ -247,30 +253,24 @@ function Menu({
         )}
       </div>
 
-      {/* Eventos → todos */}
+      {/* Eventos */}
       <a
         href="/eventos"
+        className="nav-link"
         onClick={(e) => {
           e.preventDefault();
           onNavigate("/eventos");
         }}
-        className="nav-link"
       >
         Eventos
       </a>
 
-      {/* AUDICIONES — solo FULL */}
-      {/* ============================================================
-     AUDICIONES – PERMISOS SEGÚN ROL
-   ============================================================ */}
-
-      {/* ⭐ FULL ACCESS (SUPERADMIN / COORDINADOR) */}
+      {/* AUDICIONES (full access) */}
       {esFull && (
         <div className="appshell-accordion-outer">
           <button
             className={`appshell-accordion-trigger ${audOpen ? "open" : ""}`}
             onClick={() => setAudOpen((v) => !v)}
-            aria-expanded={audOpen}
           >
             Audiciones
             <span className="appshell-accordion-caret">
@@ -302,7 +302,6 @@ function Menu({
                 Cronograma de candidatos
               </a>
 
-              {/* ⭐ SE AGREGA ESTA OPCIÓN QUE FALTABA */}
               <a
                 href="/candidatos-administracion"
                 className="nav-link"
@@ -340,14 +339,12 @@ function Menu({
         </div>
       )}
 
-
-      {/* ⭐ ADMINISTRADOR — VE SOLO CANDIDATOS ADMIN */}
+      {/* AUDICIONES SOLO CORDINADOR ADMIN */}
       {esAdmin && (
         <div className="appshell-accordion-outer">
           <button
             className={`appshell-accordion-trigger ${audOpen ? "open" : ""}`}
             onClick={() => setAudOpen((v) => !v)}
-            aria-expanded={audOpen}
           >
             Audiciones
             <span className="appshell-accordion-caret">
@@ -372,8 +369,7 @@ function Menu({
         </div>
       )}
 
-
-      {/* ORGANIZACIÓN DEL CORO — solo SUPERADMIN / COORDINADOR */}
+      {/* Organización del coro */}
       {esFull && (
         <div className="appshell-accordion-outer">
           <button
@@ -381,60 +377,23 @@ function Menu({
             onClick={() => setOrgOpen((v) => !v)}
           >
             Organización del Coro
-            <span className="appshell-accordion-caret">{orgOpen ? "▴" : "▾"}</span>
+            <span className="appshell-accordion-caret">
+              {orgOpen ? "▴" : "▾"}
+            </span>
           </button>
 
           {orgOpen && (
             <div className="appshell-accordion-content">
-              <a
-                href="/areas"
-                className="nav-link"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onNavigate("/areas");
-                }}
-              >
-                Áreas
-              </a>
-
-              <a
-                href="/cuerdas"
-                className="nav-link"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onNavigate("/cuerdas");
-                }}
-              >
-                Cuerdas
-              </a>
-
-              <a
-                href="/miembros"
-                className="nav-link"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onNavigate("/miembros");
-                }}
-              >
-                Miembros
-              </a>
-
-              <a
-                href="/fraternidades"
-                className="nav-link"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onNavigate("/fraternidades");
-                }}
-              >
-                Fraternidades
-              </a>
+              <a href="/areas" className="nav-link" onClick={(e) => {e.preventDefault(); onNavigate("/areas");}}>Áreas</a>
+              <a href="/cuerdas" className="nav-link" onClick={(e) => {e.preventDefault(); onNavigate("/cuerdas");}}>Cuerdas</a>
+              <a href="/miembros" className="nav-link" onClick={(e) => {e.preventDefault(); onNavigate("/miembros");}}>Miembros</a>
+              <a href="/fraternidades" className="nav-link" onClick={(e) => {e.preventDefault(); onNavigate("/fraternidades");}}>Fraternidades</a>
             </div>
           )}
         </div>
       )}
 
-      {/* USUARIOS Y ROLES → solo SUPERADMIN / COORDINADOR */}
+      {/* Usuarios y Roles */}
       {esFull && (
         <a
           href="/usuarios-roles"
