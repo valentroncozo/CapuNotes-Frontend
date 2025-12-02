@@ -285,26 +285,6 @@ function Menu({
               Audición
             </a>
             <a
-              href="/candidatos"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('audicion/candidatos');
-              }}
-            >
-              Candidatos
-            </a>
-            <a
-              href="/candidatos-coordinadores"
-              className="nav-link"
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigate('/candidatos-administracion');
-              }}
-            >
-              Candidatos (Administración)
-            </a>
-            <a
               href="/candidatos/historial"
               className="nav-link"
               onClick={(e) => {
