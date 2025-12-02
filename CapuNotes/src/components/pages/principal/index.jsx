@@ -70,19 +70,20 @@ export default function Principal({ username }) {
   const [qrOpen, setQrOpen] = useState(false);
 
   useEffect(() => {
-    const fetchEventos = async () => {
-      try {
-        setLoadingEventos(true);
-        const data = await eventoService.listPendientes();
-        setEventos(data || []);
-      } catch (error) {
-        console.error('Error cargando eventos en principal:', error);
-      } finally {
-        setLoadingEventos(false);
-      }
-    };
+    let mounted = true;
 
-    fetchEventos();
+    (async () => {
+      try {
+        const data = await eventoService.listPendientes();
+        if (mounted) setEventos(data || []);
+      } catch (err) {
+        console.error("Error cargando eventos en principal:", err);
+      } finally {
+        if (mounted) setLoadingEventos(false);
+      }
+    })();
+
+    return () => (mounted = false);
   }, []);
 
 
@@ -103,25 +104,25 @@ export default function Principal({ username }) {
 
 
   // Ordenar eventos por fecha de inicio (asc) y preparar listado de próximos
-  const upcomingEventos = (eventos || [])
-    .filter((e) => e)
-    .slice()
-    .sort((a, b) => {
-      const da = a?.fechaInicio ? parseLocalDate(a.fechaInicio) : new Date(0);
-      const db = b?.fechaInicio ? parseLocalDate(b.fechaInicio) : new Date(0);
+  // ⬇ MEMO – evita recalcular en cada render
+  const upcomingEventos = useMemo(() => {
+    return (eventos || [])
+      .filter(Boolean)
+      .sort((a, b) => {
+        const da = new Date(a.fechaInicio);
+        const db = new Date(b.fechaInicio);
+        return da - db;
+      });
+  }, [eventos]);
 
-      return da - db;
-    });
 
+  // ⬇ MEMO – calcular solo cuando cambian los eventos
   const nextEvento = useMemo(() => {
-    const now = new Date();
-    return (
-      upcomingEventos.find((evento) => {
-        const dt = parseEventDate(evento);
-        return dt && dt.getTime() > now.getTime();
-      }) || null
-    );
+    const ahora = new Date();
+    return upcomingEventos.find(ev => new Date(ev.fechaInicio) > ahora) || null;
   }, [upcomingEventos]);
+
+
 
   const lecturaUrl = nextEvento
     ? `${window.location.origin}/repertorios/lectura?eventoId=${nextEvento.id}`
